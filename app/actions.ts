@@ -90,28 +90,33 @@ export async function addProduct(formData: FormData) {
   const imagesToProcess = isPro ? rawImages : rawImages.slice(0, 3)
   const uploadedUrls: string[] = []
 
-  // BUCLE DE SUBIDA
-  for (const imageFile of imagesToProcess) {
-    // Verificamos que sea un archivo real
-    if (!imageFile || typeof imageFile.size === 'undefined') continue
-    
-    if (!imageFile.type.startsWith('image/')) continue 
-    if (imageFile.size > 4 * 1024 * 1024) return { error: 'Una de las imágenes pesa más de 4MB' }
+  // SUBIDA EN PARALELO
+  const uploadPromises = imagesToProcess
+    .filter(imageFile => imageFile && typeof imageFile.size !== 'undefined' && imageFile.type.startsWith('image/'))
+    .map(async (imageFile, index) => {
+      if (imageFile.size > 4 * 1024 * 1024) {
+        throw new Error('Una de las imágenes pesa más de 4MB');
+      }
 
-    const fileExt = imageFile.name.split('.').pop()
-    const fileName = `${user.id}/${Date.now()}-${Math.random().toString(36).substring(7)}.${fileExt}`
-    
-    const { error: uploadError } = await supabase.storage
-      .from('products')
-      .upload(fileName, imageFile, { cacheControl: '3600', upsert: false })
+      const fileExt = imageFile.name.split('.').pop();
+      const fileName = `${user.id}/${Date.now()}-${index}-${Math.random().toString(36).substring(7)}.${fileExt}`;
 
-    if (uploadError) return { error: 'Error al subir una de las imágenes' }
+      const { error } = await supabase.storage
+        .from('products')
+        .upload(fileName, imageFile, { cacheControl: '3600', upsert: false });
 
-    const { data: { publicUrl } } = supabase.storage
-      .from('products')
-      .getPublicUrl(fileName)
-    
-    uploadedUrls.push(publicUrl)
+      if (error) {
+        throw new Error('Error al subir una de las imágenes: ' + error.message);
+      }
+
+      return supabase.storage.from('products').getPublicUrl(fileName).data.publicUrl;
+    });
+
+  try {
+    const resolvedUrls = await Promise.all(uploadPromises);
+    uploadedUrls.push(...resolvedUrls);
+  } catch (error: any) {
+    return { error: error.message };
   }
 
   // INSERTAR EN BASE DE DATOS
