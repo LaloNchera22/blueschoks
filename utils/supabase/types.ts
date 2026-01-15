@@ -19,6 +19,7 @@ export interface Database {
           is_pro: boolean | null
           slug: string | null
           email: string | null
+          avatar_url: string | null
           design_bg_color: string | null
           design_title_text: string | null
           design_subtitle_text: string | null
@@ -35,6 +36,7 @@ export interface Database {
           is_pro?: boolean | null
           slug?: string | null
           email?: string | null
+          avatar_url?: string | null
           design_bg_color?: string | null
           design_title_text?: string | null
           design_subtitle_text?: string | null
@@ -51,6 +53,7 @@ export interface Database {
           is_pro?: boolean | null
           slug?: string | null
           email?: string | null
+          avatar_url?: string | null
           design_bg_color?: string | null
           design_title_text?: string | null
           design_subtitle_text?: string | null
