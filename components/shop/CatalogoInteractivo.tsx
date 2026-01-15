@@ -223,7 +223,7 @@ function TarjetaPersonalizable({ product, design, isEditor = false, index = 0 }:
         icon: <Check className="text-green-500" size={16} />
     })
 
-    for(let i=0; i<quantity; i++) addToCart(product)
+    addToCart(product, quantity)
     setIsAdded(true)
     setTimeout(() => setIsAdded(false), 1500)
     setQuantity(1)

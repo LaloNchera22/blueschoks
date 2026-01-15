@@ -4,7 +4,7 @@ import React, { createContext, useContext, useState, useEffect } from "react"
 
 type CartContextType = {
   items: any[]
-  addToCart: (product: any) => void
+  addToCart: (product: any, quantity?: number) => void
   removeItem: (productId: any) => void
   updateQuantity: (productId: any, quantity: number) => void
   removeFromCart: (productId: any) => void
@@ -40,16 +40,16 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
   const cartTotal = items.reduce((acc, item) => acc + (item.price * item.quantity), 0)
   const cartCount = items.reduce((acc, item) => acc + item.quantity, 0)
 
-  const addToCart = (product: any) => {
+  const addToCart = (product: any, quantity: number = 1) => {
     setIsCartOpen(true) // TRUCO: Al agregar, abrimos el carrito automáticamente (opcional)
     setItems((prev) => {
       const existing = prev.find((i) => i.id === product.id)
       if (existing) {
         return prev.map((i) =>
-          i.id === product.id ? { ...i, quantity: (i.quantity || 1) + 1 } : i
+          i.id === product.id ? { ...i, quantity: (i.quantity || 1) + quantity } : i
         )
       }
-      return [...prev, { ...product, quantity: 1 }]
+      return [...prev, { ...product, quantity: quantity }]
     })
   }
 
