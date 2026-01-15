@@ -35,13 +35,11 @@ export async function toggleStock(productId: string) {
   const supabase = await createClient()
 
   // 1. Verificar autenticación
-  const { data: { user }, error } = await supabase.auth.getUser()
-  if (!user || error) {
-    console.error("Auth error in toggleStock:", error)
-    throw new Error("No autorizado: Sesión inválida")
-  }
+  const { data: { user } } = await supabase.auth.getUser()
 
-  console.log(`toggleStock: Processing for productId: ${productId} | User: ${user.id}`)
+  if (!user) {
+    throw new Error("Unauthorized")
+  }
 
   // 2. Obtener producto (Validando propiedad con user_id)
   const { data: product, error: fetchError } = await supabase
@@ -52,15 +50,13 @@ export async function toggleStock(productId: string) {
     .single()
 
   if (fetchError || !product) {
-      // Log detallado del error de Supabase para debugging
       console.error('toggleStock Error (Fetch):', fetchError)
-      // Lanzamos error con detalle (opcionalmente podrías ocultarlo en prod, pero útil ahora)
       throw new Error(`No se pudo obtener el producto: ${fetchError?.message || 'Producto no encontrado'}`)
   }
 
   // 3. Lógica de Toggle:
-  // - Si tiene stock (>0) -> Se apaga (0) = Oculto
-  // - Si no tiene stock (0) -> Se enciende (1) = Visible
+  // - Si el stock actual es 0: Actualízalo a 1 (Activar/Disponible).
+  // - Si el stock actual es > 0: Actualízalo a 0 (Desactivar/Agotado).
   const newStock = product.stock > 0 ? 0 : 1
 
   const { error: updateError } = await supabase
@@ -74,6 +70,7 @@ export async function toggleStock(productId: string) {
       throw new Error("No se pudo actualizar el estado del producto")
   }
 
-  // 4. Revalidar dashboard para feedback inmediato
+  // 4. Revalidar dashboard y shop
   revalidatePath('/dashboard')
+  revalidatePath('/shop')
 }
