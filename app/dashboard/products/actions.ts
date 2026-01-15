@@ -69,11 +69,11 @@ export async function createProduct(formData: FormData) {
   // 7. Guardar en Base de Datos (UPDATE o INSERT)
   const payload = {
     user_id: user.id,
-    name: name,
+    name: name as string,
     price: price,
-    description: description,
+    description: description as string | null,
     image_url: finalMediaArray[0] || null, // Portada actualizada
-    media: finalMediaArray
+    images: finalMediaArray
   }
 
   let error;

@@ -125,7 +125,6 @@ export async function addProduct(formData: FormData) {
   }
 
   // INSERTAR EN BASE DE DATOS
-  // Usamos 'as any' en el insert para que no reclame por la columna 'images'
   const { error: dbError } = await supabase
     .from('products')
     .insert({
@@ -135,7 +134,7 @@ export async function addProduct(formData: FormData) {
       description,
       image_url: uploadedUrls[0], // Foto principal
       images: uploadedUrls        // Array de fotos
-    } as any)
+    })
 
   if (dbError) {
     console.error(dbError)

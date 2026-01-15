@@ -80,7 +80,7 @@ export default async function ShopPage({ params }: { params: { slug: string } })
         </footer>
 
         {/* CARRITO FLOTANTE */}
-        <ShoppingCart shopPhone={shop.whatsapp} shopName={shop.shop_name} />
+        <ShoppingCart shopPhone={shop.whatsapp || ''} shopName={shop.shop_name || 'Tienda'} />
 
       </div>
     </CartProvider>
