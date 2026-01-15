@@ -53,6 +53,7 @@ export default async function ShopPage({ params }: { params: Promise<{ slug: str
     .from("products")
     .select("*")
     .eq("user_id", shop.id)
+    .gt("stock", 0) // Filtramos productos sin stock (ocultos)
     .order("created_at", { ascending: false })
 
   // 3. FILTRAR DUPLICADOS PARA EVITAR ERRORES DE KEY

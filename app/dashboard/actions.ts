@@ -27,17 +27,23 @@ export async function deleteProduct(productId: string) {
 }
 
 export async function toggleStock(productId: string) {
+  // Validación básica del input
+  if (!productId) {
+    throw new Error("Product ID is required")
+  }
+
   const supabase = await createClient()
 
+  // 1. Verificar autenticación
   const { data: { user }, error } = await supabase.auth.getUser()
   if (!user || error) {
     console.error("Auth error in toggleStock:", error)
-    return { error: "No autorizado" }
+    throw new Error("No autorizado: Sesión inválida")
   }
 
-  console.log(`toggleStock called for productId: ${productId} by user: ${user.id}`)
+  console.log(`toggleStock: Processing for productId: ${productId} | User: ${user.id}`)
 
-  // Obtenemos el producto actual para ver su stock
+  // 2. Obtener producto (Validando propiedad con user_id)
   const { data: product, error: fetchError } = await supabase
     .from('products')
     .select('stock')
@@ -46,11 +52,15 @@ export async function toggleStock(productId: string) {
     .single()
 
   if (fetchError || !product) {
-      console.error('Error fetching product in toggleStock:', fetchError)
-      throw new Error("No se pudo obtener el producto")
+      // Log detallado del error de Supabase para debugging
+      console.error('toggleStock Error (Fetch):', fetchError)
+      // Lanzamos error con detalle (opcionalmente podrías ocultarlo en prod, pero útil ahora)
+      throw new Error(`No se pudo obtener el producto: ${fetchError?.message || 'Producto no encontrado'}`)
   }
 
-  // Si stock > 0, lo ponemos en 0. Si es 0, lo ponemos en 1.
+  // 3. Lógica de Toggle:
+  // - Si tiene stock (>0) -> Se apaga (0) = Oculto
+  // - Si no tiene stock (0) -> Se enciende (1) = Visible
   const newStock = product.stock > 0 ? 0 : 1
 
   const { error: updateError } = await supabase
@@ -60,8 +70,10 @@ export async function toggleStock(productId: string) {
     .eq('user_id', user.id)
 
   if (updateError) {
-      throw new Error("No se pudo actualizar el stock")
+      console.error('toggleStock Error (Update):', updateError)
+      throw new Error("No se pudo actualizar el estado del producto")
   }
 
+  // 4. Revalidar dashboard para feedback inmediato
   revalidatePath('/dashboard')
 }
