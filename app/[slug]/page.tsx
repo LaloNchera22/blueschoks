@@ -62,7 +62,7 @@ export default async function ShopPage({ params }: { params: Promise<{ slug: str
 
   return (
     <CartProvider>
-      {/* 4. PASAMOS DATOS LIMPIOS AL COMPONENTE VISUAL */}
+      {/* 4. PASAMOS DATOS LIMPIOS AL COMPONENTE VISUAL (DISEÑO LINKTREE) */}
       <CatalogoInteractivo products={uniqueProducts} shop={shop} />
     </CartProvider>
   )
