@@ -30,7 +30,12 @@ export async function toggleStock(productId: string) {
   const supabase = await createClient()
 
   const { data: { user }, error } = await supabase.auth.getUser()
-  if (!user || error) return { error: "No autorizado" }
+  if (!user || error) {
+    console.error("Auth error in toggleStock:", error)
+    return { error: "No autorizado" }
+  }
+
+  console.log(`toggleStock called for productId: ${productId} by user: ${user.id}`)
 
   // Obtenemos el producto actual para ver su stock
   const { data: product, error: fetchError } = await supabase
@@ -41,6 +46,7 @@ export async function toggleStock(productId: string) {
     .single()
 
   if (fetchError || !product) {
+      console.error('Error fetching product in toggleStock:', fetchError)
       throw new Error("No se pudo obtener el producto")
   }
 
