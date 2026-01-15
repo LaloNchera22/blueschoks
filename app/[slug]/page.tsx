@@ -48,10 +48,13 @@ export default async function ShopPage({ params }: { params: Promise<{ slug: str
     .eq("user_id", shop.id)
     .order("created_at", { ascending: false })
 
+  // 3. FILTRAR DUPLICADOS PARA EVITAR ERRORES DE KEY
+  const uniqueProducts = products ? Array.from(new Map(products.map(p => [p.id, p])).values()) : []
+
   return (
     <CartProvider>
-      {/* 3. PASAMOS TODOS LOS DATOS (SHOP) AL COMPONENTE VISUAL */}
-      <CatalogoInteractivo products={products || []} shop={shop} />
+      {/* 4. PASAMOS DATOS LIMPIOS AL COMPONENTE VISUAL */}
+      <CatalogoInteractivo products={uniqueProducts} shop={shop} />
     </CartProvider>
   )
 }
