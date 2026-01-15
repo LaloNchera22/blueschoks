@@ -17,6 +17,7 @@ const getShop = cache(async (slug: string) => {
       shop_name, 
       whatsapp, 
       email,
+      avatar_url,
       design_bg_color,
       design_title_text,
       design_subtitle_text,
