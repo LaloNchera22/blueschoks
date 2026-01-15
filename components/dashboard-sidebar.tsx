@@ -7,12 +7,16 @@ import { Package, Settings, Palette, Home, Copy, ExternalLink, Globe, LogOut, Ch
 import { Button } from "@/components/ui/button"
 
 // Agregamos la prop 'userEmail' para mostrarlo abajo
-export default function AppSidebar({ shopUrl = "lidiso", userEmail = "usuario@email.com" }: { shopUrl?: string, userEmail?: string }) {
+export default function AppSidebar({ shopUrl = "", userEmail = "usuario@email.com" }: { shopUrl?: string, userEmail?: string }) {
   const pathname = usePathname()
   const [copied, setCopied] = useState(false)
   const isDesigner = pathname === "/dashboard/design"
 
+  const hasShopUrl = shopUrl && shopUrl.length > 0;
+  const storeLink = hasShopUrl ? `/${shopUrl}` : '/dashboard/settings';
+
   const copyLink = () => {
+    if (!hasShopUrl) return;
     navigator.clipboard.writeText(`${window.location.origin}/${shopUrl}`)
     setCopied(true)
     // Después de 2 segundos, vuelve al estado normal
@@ -82,8 +86,8 @@ export default function AppSidebar({ shopUrl = "lidiso", userEmail = "usuario@em
                <div className="bg-blue-50 text-blue-600 p-1.5 rounded-md">
                  <Home size={14} />
                </div>
-               <span className="font-bold text-xs text-slate-700 truncate flex-1">{shopUrl}</span>
-               <a href={`/${shopUrl}`} target="_blank" className="text-slate-400 hover:text-blue-600 transition-colors">
+               <span className="font-bold text-xs text-slate-700 truncate flex-1">{hasShopUrl ? shopUrl : "Sin Tienda"}</span>
+               <a href={storeLink} target={hasShopUrl ? "_blank" : "_self"} className="text-slate-400 hover:text-blue-600 transition-colors">
                   <ExternalLink size={14} />
                </a>
             </div>
@@ -91,7 +95,8 @@ export default function AppSidebar({ shopUrl = "lidiso", userEmail = "usuario@em
             {/* BOTÓN COPIAR DINÁMICO */}
             <Button 
                 onClick={copyLink} 
-                variant="outline" 
+                variant="outline"
+                disabled={!hasShopUrl}
                 className={`w-full h-8 text-[10px] font-bold uppercase tracking-wide transition-all duration-300 ${
                     copied 
                     ? "bg-green-500 text-white border-green-500 hover:bg-green-600 hover:text-white" 
@@ -101,7 +106,7 @@ export default function AppSidebar({ shopUrl = "lidiso", userEmail = "usuario@em
                {copied ? (
                    <div className="flex items-center"><Check size={12} className="mr-2"/> Link Copiado</div>
                ) : (
-                   <div className="flex items-center"><Copy size={12} className="mr-2"/> Copiar Link</div>
+                   <div className="flex items-center"><Copy size={12} className="mr-2"/> {hasShopUrl ? "Copiar Link" : "Configurar Link"}</div>
                )}
             </Button>
             
