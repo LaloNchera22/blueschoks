@@ -5,6 +5,11 @@ import { createClient } from '@/utils/supabase/server'
 import { revalidatePath } from 'next/cache'
 import { redirect } from 'next/navigation'
 
+interface ProfileQueryData {
+  is_pro: boolean
+  username: string | null
+}
+
 // --- ACTUALIZACIÓN DE PERFIL ---
 export async function updateProfile(formData: FormData) {
   const supabase = await createClient()
@@ -65,12 +70,13 @@ export async function addProduct(formData: FormData) {
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) return { error: 'No autorizado' }
 
-  // CONSULTA SEGURA: Usamos 'maybeSingle' y 'any' para evitar quejas de tipos
+  // CONSULTA SEGURA: Tipado manual para evitar 'any'
   const { data: profile } = await supabase
     .from('profiles')
     .select('is_pro, username')
     .eq('id', user.id)
-    .maybeSingle() as any
+    .returns<ProfileQueryData[]>()
+    .maybeSingle()
   
   // Si no encuentra el perfil o la columna, asumimos que no es PRO
   const isPro = profile?.is_pro || false
