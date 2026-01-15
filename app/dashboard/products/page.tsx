@@ -3,12 +3,13 @@ import { redirect } from "next/navigation"
 import { Plus, PackageSearch } from "lucide-react"
 import Link from "next/link"
 import ProductCardClient from "../product-card"
+import { getUser } from "@/utils/user-data"
 
 export default async function ProductsPage() {
-  const supabase = await createClient()
+  const user = await getUser()
+  if (!user) redirect("/login")
 
-  const { data: { user }, error } = await supabase.auth.getUser()
-  if (error || !user) redirect("/login")
+  const supabase = await createClient()
 
   const { data: products } = await supabase
     .from("products")
