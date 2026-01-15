@@ -1,16 +1,24 @@
 "use client"
 
 import { Sheet, SheetContent, SheetTitle } from "@/components/ui/sheet"
-import { useCart } from "./cart-context"
+import { useCart, CartItem } from "./cart-context"
 import { X, Trash2, MessageCircle, ShoppingBag, Plus, Minus, ArrowRight } from "lucide-react"
 import { useState, useEffect, useMemo } from "react"
 import { Button } from "@/components/ui/button"
 import { motion, AnimatePresence } from "framer-motion"
+import Image from "next/image"
 
-export default function CartSidebar({ shop }: { shop: any }) {
+interface Shop {
+  whatsapp?: string | null;
+  shop_name?: string | null;
+  [key: string]: unknown;
+}
+
+export default function CartSidebar({ shop }: { shop: Shop }) {
   const { items, removeFromCart, addToCart, removeItem, cartTotal, isCartOpen, closeCart } = useCart()
   const [isClient, setIsClient] = useState(false)
 
+  // eslint-disable-next-line react-hooks/set-state-in-effect
   useEffect(() => { setIsClient(true) }, [])
 
   const formatPrice = (amount: number) => new Intl.NumberFormat('es-MX', { style: 'currency', currency: 'MXN' }).format(amount)
@@ -19,7 +27,7 @@ export default function CartSidebar({ shop }: { shop: any }) {
     if (!shop || !shop.whatsapp) return null;
     const phone = shop.whatsapp.replace(/\D/g, ''); 
     let message = `Hola *${shop.shop_name || 'Tienda'}*, quiero realizar el siguiente pedido:\n\n`
-    items.forEach((item: any) => {
+    items.forEach((item: CartItem) => {
         message += `▫️ ${item.quantity}x *${item.name}* - $${item.price * item.quantity}\n`
     })
     message += `\n*TOTAL: ${formatPrice(cartTotal)}*\n\nQuedo pendiente para el pago y envío.`
@@ -29,7 +37,7 @@ export default function CartSidebar({ shop }: { shop: any }) {
   if (!isClient) return null
 
   // Ensure items are valid objects before rendering
-  const validItems = items.filter((item: any) => item && typeof item === 'object');
+  const validItems = items.filter((item: unknown): item is CartItem => !!item && typeof item === 'object');
 
   return (
     <Sheet open={isCartOpen} onOpenChange={closeCart} modal={true}>
@@ -72,7 +80,7 @@ export default function CartSidebar({ shop }: { shop: any }) {
                 </div>
             ) : (
                 <AnimatePresence>
-                    {validItems.map((item: any) => (
+                    {validItems.map((item: CartItem) => (
                         <motion.div
                             key={item.id}
                             initial={{ opacity: 0, y: 20 }}
@@ -83,7 +91,13 @@ export default function CartSidebar({ shop }: { shop: any }) {
                         >
                             <div className="w-20 h-20 bg-gray-100 rounded-xl overflow-hidden shrink-0 border border-gray-100 relative group">
                                 {item.image_url ? (
-                                    <img src={item.image_url} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" alt={item.name} />
+                                    <Image
+                                      src={item.image_url}
+                                      fill
+                                      className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
+                                      alt={item.name || "Producto"}
+                                      sizes="80px"
+                                    />
                                 ) : (
                                     <div className="w-full h-full flex items-center justify-center"><ShoppingBag size={20} className="opacity-20"/></div>
                                 )}

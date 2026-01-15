@@ -3,8 +3,19 @@
 import { useState, useMemo } from "react"
 import { useCart } from "./cart-context"
 import { Plus, Minus, ShoppingBag, ChevronLeft, ChevronRight } from "lucide-react"
+import Image from "next/image"
 
-export default function TarjetaFinal({ product }: { product: any }) {
+interface Product {
+  id: string;
+  name: string;
+  price: number;
+  media?: string[];
+  image_url?: string;
+  imageUrl?: string;
+  [key: string]: unknown;
+}
+
+export default function TarjetaFinal({ product }: { product: Product }) {
   const { addToCart } = useCart()
   const [currentIndex, setCurrentIndex] = useState(0)
   const [quantity, setQuantity] = useState(1)
@@ -13,7 +24,7 @@ export default function TarjetaFinal({ product }: { product: any }) {
   const mediaList = useMemo(() => {
     let list: string[] = []
     if (product.media && Array.isArray(product.media) && product.media.length > 0) {
-      const validUrls = product.media.filter((url: any) => typeof url === 'string' && url.length > 5)
+      const validUrls = product.media.filter((url: unknown): url is string => typeof url === 'string' && url.length > 5)
       list = Array.from(new Set(validUrls))
     } else if (product.image_url && typeof product.image_url === 'string') {
       list = [product.image_url]
@@ -77,10 +88,12 @@ export default function TarjetaFinal({ product }: { product: any }) {
 
         {/* Foto */}
         {currentImage ? (
-          <img 
+          <Image
             src={currentImage} 
             alt={product.name}
+            fill
             className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
+            sizes="(max-width: 768px) 50vw, 33vw"
           />
         ) : (
           <div className="w-full h-full flex flex-col items-center justify-center text-gray-300">

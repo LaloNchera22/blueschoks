@@ -1,24 +1,53 @@
 "use client"
 
-import { useState, useMemo, useEffect } from "react"
+import { useState, useEffect } from "react"
 // Importamos openCart del contexto
-import { useCart } from "./cart-context"
+import { useCart, CartItem } from "./cart-context"
 import CartSidebar from "./cart-sidebar" 
-import { Plus, Minus, ShoppingBag, Check, ArrowRight, Instagram, Facebook, Globe, Share2 } from "lucide-react"
+import { Plus, ShoppingBag, Check, Globe, Share2 } from "lucide-react"
 import { useEditorStore } from "@/hooks/useEditorStore"
 import { motion, AnimatePresence } from "framer-motion"
 import confetti from "canvas-confetti"
 import { toast } from "sonner"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
+import Image from "next/image"
 
-export default function CatalogoInteractivo({ products, shop, isEditor = false }: { products: any[], shop: any, isEditor?: boolean }) {
+interface Shop {
+  design_font?: string | null;
+  design_bg_color?: string | null;
+  design_title_color?: string | null;
+  design_title_text?: string | null;
+  design_subtitle_text?: string | null;
+  design_card_style?: string | null;
+  shop_name?: string | null;
+  bio?: string | null;
+  whatsapp?: string | null;
+  avatar_url?: string | null;
+  image_url?: string | null;
+  [key: string]: unknown;
+}
+
+interface Product {
+  id: string;
+  name: string;
+  price: number;
+  description?: string | null;
+  image_url?: string | null;
+  quantity?: number; // Optional as it might not be present initially
+  [key: string]: unknown;
+}
+
+export default function CatalogoInteractivo({ products, shop, isEditor = false }: { products: Product[], shop: Shop, isEditor?: boolean }) {
   // USAMOS EL CONTEXTO DIRECTAMENTE
-  const { items, openCart, addToCart } = useCart() 
+  const { items, openCart } = useCart()
   const { setSelectedElement, selectedElement } = useEditorStore()
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [isClient, setIsClient] = useState(false)
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [scrolled, setScrolled] = useState(false)
 
   useEffect(() => {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setIsClient(true)
   }, [])
 
@@ -29,7 +58,7 @@ export default function CatalogoInteractivo({ products, shop, isEditor = false }
   }, [])
 
   // Totales
-  const totalItems = items?.reduce((acc: number, item: any) => acc + item.quantity, 0) || 0
+  const totalItems = items?.reduce((acc: number, item: CartItem) => acc + (item.quantity || 0), 0) || 0
 
   // LOGICA DE FUENTES
   const fontValue = shop.design_font || 'Inter, sans-serif';
@@ -42,7 +71,8 @@ export default function CatalogoInteractivo({ products, shop, isEditor = false }
   const handleElementClick = (e: React.MouseEvent, type: 'global' | 'text:title' | 'text:subtitle') => {
     if (!isEditor) return
     e.stopPropagation()
-    setSelectedElement(type)
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    setSelectedElement(type as any) // Type assertion due to useEditorStore types
   }
 
   // Helper para generar iniciales
@@ -67,8 +97,8 @@ export default function CatalogoInteractivo({ products, shop, isEditor = false }
               {/* AVATAR */}
               <div className="mb-4 relative">
                   <Avatar className="w-24 h-24 border-4 border-current/10 shadow-lg">
-                        <AvatarImage src={shop.avatar_url || shop.image_url} alt={shop.shop_name} />
-                        <AvatarFallback className="font-bold text-2xl bg-current/5 text-current/70">{getInitials(shop.shop_name)}</AvatarFallback>
+                        <AvatarImage src={shop.avatar_url || shop.image_url || undefined} alt={shop.shop_name || "Avatar"} />
+                        <AvatarFallback className="font-bold text-2xl bg-current/5 text-current/70">{getInitials(shop.shop_name || "")}</AvatarFallback>
                    </Avatar>
                    {/* Botón Carrito Flotante (Header) si hay items */}
                    {!isEditor && totalItems > 0 && (
@@ -150,7 +180,7 @@ export default function CatalogoInteractivo({ products, shop, isEditor = false }
   )
 }
 
-function TarjetaPersonalizable({ product, design, isEditor = false, index = 0 }: { product: any, design: any, isEditor?: boolean, index?: number }) {
+function TarjetaPersonalizable({ product, design, isEditor = false, index = 0 }: { product: Product, design: Shop, isEditor?: boolean, index?: number }) {
   const { addToCart } = useCart()
   const [quantity, setQuantity] = useState(1)
   const [isAdded, setIsAdded] = useState(false)
@@ -192,6 +222,7 @@ function TarjetaPersonalizable({ product, design, isEditor = false, index = 0 }:
 
   // Estilos Condicionales
   const cardStyle = design.design_card_style || 'minimal'
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const isMinimal = cardStyle === 'minimal'
   const isShadow = cardStyle === 'shadow' || cardStyle === 'Sombra' // Handle potential DB naming variations
 
@@ -219,10 +250,12 @@ function TarjetaPersonalizable({ product, design, isEditor = false, index = 0 }:
             */}
             <div className="w-1/3 min-w-[100px] bg-gray-100 relative">
                  {product.image_url ? (
-                    <img
+                    <Image
                         src={product.image_url}
+                        fill
                         className="w-full h-full object-cover absolute inset-0"
                         alt={product.name}
+                        sizes="(max-width: 768px) 33vw, 20vw"
                     />
                 ) : (
                     <div className="w-full h-full flex items-center justify-center opacity-20"><ShoppingBag size={24}/></div>

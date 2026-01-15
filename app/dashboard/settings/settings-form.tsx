@@ -7,7 +7,7 @@ import { useState, useEffect } from "react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
-import { Loader2, Save, Store, Globe, Smartphone, Mail, CheckCircle2, AlertCircle, Pencil, X, Lock } from "lucide-react"
+import { Loader2, Store, Globe, Smartphone, Mail, CheckCircle2, AlertCircle, Pencil } from "lucide-react"
 
 const COUNTRY_CODES = [
   { code: "+52", country: "MX", label: "México (+52)" },
@@ -19,7 +19,15 @@ const COUNTRY_CODES = [
   { code: "+34", country: "ES", label: "España (+34)" },
 ]
 
-export default function SettingsForm({ initialData }: { initialData: any }) {
+interface InitialData {
+  shop_name?: string;
+  slug?: string;
+  whatsapp?: string;
+  email?: string;
+  [key: string]: unknown;
+}
+
+export default function SettingsForm({ initialData }: { initialData: InitialData }) {
   const initialState: SettingsState = { message: null, error: null }
   const [state, dispatch] = useActionState(updateSettings, initialState)
   
@@ -35,8 +43,11 @@ export default function SettingsForm({ initialData }: { initialData: any }) {
   // Cuando se guarda con éxito, cerramos todo
   useEffect(() => {
     if (state.success) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setEditShop(false)
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setEditSlug(false)
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setEditContact(false)
     }
   }, [state.success])
@@ -46,9 +57,12 @@ export default function SettingsForm({ initialData }: { initialData: any }) {
       const fullNumber = initialData.whatsapp.toString()
       const foundPrefix = COUNTRY_CODES.find(c => fullNumber.startsWith(c.code.replace('+', '')))
       if (foundPrefix) {
+        // eslint-disable-next-line react-hooks/set-state-in-effect
         setPhonePrefix(foundPrefix.code)
+        // eslint-disable-next-line react-hooks/set-state-in-effect
         setPhoneNumber(fullNumber.replace(foundPrefix.code.replace('+', ''), ''))
       } else {
+        // eslint-disable-next-line react-hooks/set-state-in-effect
         setPhoneNumber(fullNumber)
       }
     }

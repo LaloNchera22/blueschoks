@@ -1,4 +1,4 @@
-import { createAdminClient, createClient } from "@/utils/supabase/server"
+import { createAdminClient } from "@/utils/supabase/server"
 import { notFound } from "next/navigation"
 import { CartProvider } from "@/components/shop/cart-context"
 // IMPORTAMOS EL COMPONENTE VISUAL

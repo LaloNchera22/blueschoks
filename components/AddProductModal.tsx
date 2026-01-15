@@ -3,6 +3,7 @@
 import { useState, useRef } from 'react'
 import { addProduct } from '@/app/actions' 
 import { useRouter } from 'next/navigation'
+import Image from 'next/image'
 
 interface Props {
   isPro?: boolean
@@ -134,12 +135,18 @@ export default function AddProductModal({ isPro = false }: Props) {
                   <div className="grid grid-cols-3 gap-2 mb-2">
                     {previews.map((src, idx) => (
                       <div key={idx} className="aspect-square relative rounded-lg overflow-hidden border border-gray-200 group">
-                        <img src={src} alt="Preview" className="object-cover w-full h-full" />
+                        <Image
+                            src={src}
+                            alt="Preview"
+                            fill
+                            className="object-cover w-full h-full"
+                            sizes="(max-width: 768px) 33vw, 20vw"
+                        />
                         {/* Botón X para borrar foto individual */}
                         <button
                           type="button"
                           onClick={() => removeImage(idx)}
-                          className="absolute top-1 right-1 bg-red-500 text-white rounded-full w-5 h-5 flex items-center justify-center text-xs font-bold opacity-0 group-hover:opacity-100 transition shadow-md"
+                          className="absolute top-1 right-1 bg-red-500 text-white rounded-full w-5 h-5 flex items-center justify-center text-xs font-bold opacity-0 group-hover:opacity-100 transition shadow-md z-10"
                         >
                           ✕
                         </button>

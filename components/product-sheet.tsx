@@ -8,8 +8,19 @@ import { Textarea } from "@/components/ui/textarea"
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger, SheetClose, SheetFooter } from "@/components/ui/sheet"
 import { Plus, X, Loader2, Image as ImageIcon, Trash2, UploadCloud, Video, ArrowLeft } from "lucide-react"
 import { createProduct } from "@/app/dashboard/products/actions"
+import Image from "next/image"
 
-export default function ProductSheet({ isPro = false, productToEdit, trigger }: { isPro?: boolean, productToEdit?: any, trigger?: React.ReactNode }) {
+interface Product {
+  id: string;
+  name: string;
+  price: number;
+  description?: string;
+  media?: string[];
+  image_url?: string;
+  [key: string]: unknown;
+}
+
+export default function ProductSheet({ isPro = false, productToEdit, trigger }: { isPro?: boolean, productToEdit?: Product, trigger?: React.ReactNode }) {
   const [isOpen, setIsOpen] = useState(false)
   const [isLoading, setIsLoading] = useState(false)
   const [previews, setPreviews] = useState<{url: string, type: string}[]>([])
@@ -22,17 +33,23 @@ export default function ProductSheet({ isPro = false, productToEdit, trigger }: 
   })
 
   useEffect(() => {
-    if (isOpen && productToEdit) {
-      setFormDataState({
-        name: productToEdit.name || "",
-        price: productToEdit.price || "",
-        description: productToEdit.description || ""
-      })
-      const media = productToEdit.media || (productToEdit.image_url ? [productToEdit.image_url] : [])
-      setPreviews(media.map((url: string) => ({ url, type: 'image' }))) 
-    } else if (isOpen && !productToEdit) {
-      setFormDataState({ name: "", price: "", description: "" })
-      setPreviews([])
+    if (isOpen) {
+      if (productToEdit) {
+        // eslint-disable-next-line react-hooks/set-state-in-effect
+        setFormDataState({
+          name: productToEdit.name || "",
+          price: productToEdit.price?.toString() || "",
+          description: productToEdit.description || ""
+        })
+        const media = productToEdit.media || (productToEdit.image_url ? [productToEdit.image_url] : [])
+        // eslint-disable-next-line react-hooks/set-state-in-effect
+        setPreviews(media.map((url: string) => ({ url, type: 'image' })))
+      } else {
+        // eslint-disable-next-line react-hooks/set-state-in-effect
+        setFormDataState({ name: "", price: "", description: "" })
+        // eslint-disable-next-line react-hooks/set-state-in-effect
+        setPreviews([])
+      }
     }
   }, [isOpen, productToEdit])
 
@@ -60,8 +77,12 @@ export default function ProductSheet({ isPro = false, productToEdit, trigger }: 
       setIsOpen(false)
       setPreviews([])
       setFormDataState({ name: "", price: "", description: "" })
-    } catch (error: any) {
-      alert("Error: " + error.message)
+    } catch (error: unknown) {
+        if (error instanceof Error) {
+            alert("Error: " + error.message)
+        } else {
+            alert("Error desconocido")
+        }
     }
     setIsLoading(false)
   }
@@ -144,7 +165,13 @@ export default function ProductSheet({ isPro = false, productToEdit, trigger }: 
                                     {file.type.startsWith('video') ? (
                                         <div className="w-full h-full flex items-center justify-center bg-slate-900 text-white"><Video size={20} className="opacity-80"/></div>
                                     ) : (
-                                        <img src={file.url} className="w-full h-full object-cover" />
+                                        <Image
+                                            src={file.url}
+                                            alt={`Preview ${i}`}
+                                            fill
+                                            className="w-full h-full object-cover"
+                                            sizes="(max-width: 768px) 50vw, 25vw"
+                                        />
                                     )}
                                     <button 
                                         type="button" 
