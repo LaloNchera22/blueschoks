@@ -18,6 +18,10 @@ function RegisterForm() {
   const [slug, setSlug] = useState("")
   const [isSlugEdited, setIsSlugEdited] = useState(false)
 
+  const generateSlug = (text: string) => {
+    return text.toLowerCase().replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, '')
+  }
+
   useEffect(() => {
     const shopFromUrl = searchParams.get("shop")
     if (shopFromUrl) {
@@ -26,11 +30,8 @@ function RegisterForm() {
          setSlug(generateSlug(shopFromUrl))
       }
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [searchParams])
-
-  const generateSlug = (text: string) => {
-    return text.toLowerCase().replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, '')
-  }
 
   const handleShopNameChange = (val: string) => {
     setShopName(val)

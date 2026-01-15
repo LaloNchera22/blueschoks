@@ -10,6 +10,7 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { ArrowLeft, Loader2, PackagePlus, AlertCircle, Image as ImageIcon, X, Video, Crown, UploadCloud } from "lucide-react"
+import Image from "next/image"
 
 const initialState: State = { status: null, message: null }
 
@@ -104,7 +105,13 @@ export default function NewProductPage() {
                                 {media.type === 'video' ? (
                                     <video src={media.url} className="w-full h-full object-cover" controls={false} muted />
                                 ) : (
-                                    <img src={media.url} alt="Preview" className="w-full h-full object-cover" />
+                                    <Image
+                                        src={media.url}
+                                        alt="Preview"
+                                        fill
+                                        className="w-full h-full object-cover"
+                                        sizes="(max-width: 768px) 33vw, 25vw"
+                                    />
                                 )}
                                 <div className="absolute top-2 left-2 bg-black/50 text-white p-1 rounded-md backdrop-blur-sm">
                                     {media.type === 'video' ? <Video size={12} /> : <ImageIcon size={12} />}

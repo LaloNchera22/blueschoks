@@ -1,12 +1,22 @@
 'use client'
 
-import { Edit, Trash2, ExternalLink } from "lucide-react"
+import { Edit, Trash2 } from "lucide-react"
 import { Card, CardContent, CardFooter } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { deleteProduct } from "@/app/actions" 
 import { useState } from "react"
+import Image from "next/image"
 
-export default function ProductCard({ product }: { product: any }) {
+interface Product {
+  id: string;
+  name: string;
+  description?: string;
+  price: number;
+  image_url?: string;
+  [key: string]: unknown;
+}
+
+export default function ProductCard({ product }: { product: Product }) {
   const [isDeleting, setIsDeleting] = useState(false)
 
   const handleDelete = async () => {
@@ -22,10 +32,12 @@ export default function ProductCard({ product }: { product: any }) {
       {/* IMAGEN PRINCIPAL */}
       <div className="aspect-square relative bg-muted/20 overflow-hidden">
         {product.image_url ? (
-          <img 
+          <Image
             src={product.image_url} 
             alt={product.name}
+            fill
             className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
+            sizes="(max-width: 768px) 50vw, 33vw"
           />
         ) : (
           <div className="w-full h-full flex items-center justify-center text-muted-foreground">

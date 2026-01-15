@@ -24,6 +24,7 @@ export async function POST() {
   }
 
   // 2. Buscamos su email (o username)
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const { data: profile } = await supabase
     .from('profiles')
     .select('username') 
@@ -54,8 +55,9 @@ export async function POST() {
 
     return NextResponse.json({ url: session.url })
 
-  } catch (error: any) {
-    console.error('Error Stripe:', error)
-    return NextResponse.json({ error: error.message }, { status: 500 })
+  } catch (error: unknown) {
+    const message = error instanceof Error ? error.message : "Unknown error"
+    console.error('Error Stripe:', message)
+    return NextResponse.json({ error: message }, { status: 500 })
   }
 }

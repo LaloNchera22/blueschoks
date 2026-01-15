@@ -6,8 +6,9 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
-import { Loader2, Image as ImageIcon, Trash2, UploadCloud, Video, ChevronLeft, ArrowLeft } from "lucide-react"
+import { Loader2, Image as ImageIcon, Trash2, UploadCloud, Video, ArrowLeft } from "lucide-react"
 import { createProduct } from "@/app/dashboard/products/actions"
+import Image from "next/image"
 
 export default function CreateProductForm({ isPro = false }: { isPro?: boolean }) {
   const router = useRouter()
@@ -42,8 +43,12 @@ export default function CreateProductForm({ isPro = false }: { isPro?: boolean }
       // Redirigir al dashboard al terminar
       router.push("/dashboard/products")
       router.refresh()
-    } catch (error: any) {
-      alert("Error: " + error.message)
+    } catch (error: unknown) {
+        if (error instanceof Error) {
+            alert("Error: " + error.message)
+        } else {
+            alert("Error desconocido")
+        }
     }
     setIsLoading(false)
   }
@@ -130,7 +135,13 @@ export default function CreateProductForm({ isPro = false }: { isPro?: boolean }
                                     {file.type.startsWith('video') ? (
                                         <div className="w-full h-full flex items-center justify-center bg-slate-900 text-white"><Video size={32} className="opacity-80"/></div>
                                     ) : (
-                                        <img src={file.url} className="w-full h-full object-cover" />
+                                        <Image
+                                            src={file.url}
+                                            alt={`Preview ${i}`}
+                                            fill
+                                            className="w-full h-full object-cover"
+                                            sizes="(max-width: 768px) 50vw, 25vw"
+                                        />
                                     )}
                                     {/* Botón Borrar siempre visible y elegante */}
                                     <button 

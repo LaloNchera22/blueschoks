@@ -2,8 +2,10 @@
 
 import { useState } from 'react'
 import { useCart } from '@/context/CartContext'
+import Image from 'next/image'
 
 export default function CartDrawer({ whatsappNumber, shopName }: { whatsappNumber: string, shopName: string }) {
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const { items, total, count, addToCart, decreaseQuantity, removeFromCart } = useCart()
   const [isOpen, setIsOpen] = useState(false)
 
@@ -63,8 +65,14 @@ export default function CartDrawer({ whatsappNumber, shopName }: { whatsappNumbe
             <div className="flex-1 overflow-y-auto p-5 space-y-4">
               {items.map(item => (
                 <div key={item.id} className="flex gap-4 items-center border-b pb-4">
-                  <div className="w-16 h-16 bg-gray-100 rounded-lg overflow-hidden shrink-0">
-                    <img src={item.image_url} alt={item.name} className="w-full h-full object-cover" />
+                  <div className="w-16 h-16 bg-gray-100 rounded-lg overflow-hidden shrink-0 relative">
+                    <Image
+                        src={item.image_url}
+                        alt={item.name}
+                        fill
+                        className="w-full h-full object-cover"
+                        sizes="64px"
+                    />
                   </div>
                   <div className="flex-1">
                     <h3 className="font-bold text-gray-800">{item.name}</h3>

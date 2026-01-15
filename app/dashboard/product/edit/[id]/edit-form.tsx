@@ -1,6 +1,6 @@
 'use client'
 
-import { updateProduct, State } from "./actions"
+import { updateProduct } from "./actions"
 import { useActionState } from "react"
 import { useFormStatus } from "react-dom"
 import Link from "next/link"
@@ -10,8 +10,19 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { ArrowLeft, Loader2, PackagePlus, AlertCircle, Image as ImageIcon, X, Video, Crown, UploadCloud } from "lucide-react"
+import Image from "next/image"
 
-export default function EditProductForm({ product }: { product: any }) {
+interface Product {
+  id: string;
+  name: string;
+  price: number;
+  description?: string | null;
+  media?: string[] | null;
+  image_url?: string | null;
+  [key: string]: unknown;
+}
+
+export default function EditProductForm({ product }: { product: Product }) {
   const updateProductWithId = updateProduct.bind(null, product.id)
   const [state, dispatch] = useActionState(updateProductWithId, { status: null, message: null })
 
@@ -36,14 +47,15 @@ export default function EditProductForm({ product }: { product: any }) {
     ? product.media
     : (product.image_url ? [product.image_url] : [])
 
-    const mediaList: string[] = rawMedia.filter((url: any) => typeof url === 'string' && url.length > 5)
+    const mediaList: string[] = rawMedia.filter((url: unknown) => typeof url === 'string' && url.length > 5)
 
     const existingPreviews = mediaList.map((url) => ({
         url,
         type: url.includes('.mp4') || url.includes('.webm') ? 'video' : 'image', // check simple
         isExisting: true
     }))
-    // @ts-ignore
+    // @ts-expect-error Types mismatch in preview state initialization
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setPreviews(existingPreviews)
   }, [product])
 
@@ -131,7 +143,13 @@ export default function EditProductForm({ product }: { product: any }) {
                                 {media.type === 'video' ? (
                                     <video src={media.url} className="w-full h-full object-cover" controls={false} muted />
                                 ) : (
-                                    <img src={media.url} alt="Preview" className="w-full h-full object-cover" />
+                                    <Image
+                                        src={media.url}
+                                        alt="Preview"
+                                        fill
+                                        className="w-full h-full object-cover"
+                                        sizes="(max-width: 768px) 33vw, 25vw"
+                                    />
                                 )}
                                 <div className="absolute top-2 left-2 bg-black/50 text-white p-1 rounded-md backdrop-blur-sm">
                                     {media.type === 'video' ? <Video size={12} /> : <ImageIcon size={12} />}
@@ -199,7 +217,7 @@ export default function EditProductForm({ product }: { product: any }) {
 
                 <div className="space-y-3">
                     <Label htmlFor="description" className="text-base font-bold text-slate-900">Descripción</Label>
-                    <textarea id="description" name="description" defaultValue={product.description} rows={4} className="flex w-full rounded-xl border border-slate-200 bg-white px-4 py-3 text-base outline-none focus:ring-2 focus:ring-slate-900" placeholder="Detalles..." />
+                    <textarea id="description" name="description" defaultValue={product.description || ""} rows={4} className="flex w-full rounded-xl border border-slate-200 bg-white px-4 py-3 text-base outline-none focus:ring-2 focus:ring-slate-900" placeholder="Detalles..." />
                 </div>
 
                 {state.status === 'error' && (

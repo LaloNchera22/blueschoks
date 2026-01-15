@@ -58,8 +58,14 @@ export default function ShoppingCart({ shopPhone, shopName }: { shopPhone: strin
                     items.map(item => (
                         <div key={item.id} className="flex gap-4">
                             <div className="w-20 h-20 bg-slate-100 rounded-lg relative overflow-hidden flex-shrink-0 border border-slate-200">
-                                {item.image ? (
-                                    <Image src={item.image} alt={item.name} fill className="object-cover" />
+                                {item.image_url ? (
+                                    <Image
+                                      src={item.image_url}
+                                      alt={item.name || "Producto"}
+                                      fill
+                                      className="object-cover"
+                                      sizes="80px"
+                                    />
                                 ) : (
                                     <div className="w-full h-full flex items-center justify-center text-slate-300"><ShoppingBag size={16}/></div>
                                 )}

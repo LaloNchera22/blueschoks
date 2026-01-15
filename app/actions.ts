@@ -16,7 +16,7 @@ export async function updateProfile(formData: FormData) {
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) redirect('/login')
 
-  const updates: any = {
+  const updates: Record<string, string> = {
     updated_at: new Date().toISOString(),
   }
 
@@ -120,8 +120,11 @@ export async function addProduct(formData: FormData) {
   try {
     const resolvedUrls = await Promise.all(uploadPromises);
     uploadedUrls.push(...resolvedUrls);
-  } catch (error: any) {
-    return { error: error.message };
+  } catch (error: unknown) {
+    if (error instanceof Error) {
+        return { error: error.message };
+    }
+    return { error: 'Unknown error occurred' };
   }
 
   // INSERTAR EN BASE DE DATOS
@@ -166,7 +169,7 @@ export async function deleteProduct(productId: string) {
 }
 
 // --- ACTUALIZAR CAMPO INDIVIDUAL ---
-export async function updateField(prevState: any, formData: FormData) {
+export async function updateField(prevState: unknown, formData: FormData) {
   const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) return { error: 'No autorizado' }

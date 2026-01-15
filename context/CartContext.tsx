@@ -12,7 +12,7 @@ export type CartItem = {
 
 type CartContextType = {
   items: CartItem[]
-  addToCart: (product: any) => void
+  addToCart: (product: CartItem) => void
   removeFromCart: (id: string) => void
   decreaseQuantity: (id: string) => void
   total: number
@@ -23,19 +23,24 @@ const CartContext = createContext<CartContextType | undefined>(undefined)
 
 export function CartProvider({ children }: { children: ReactNode }) {
   const [items, setItems] = useState<CartItem[]>([])
+  const [isInitialized, setIsInitialized] = useState(false)
 
   // Cargar carrito del localStorage al iniciar
   useEffect(() => {
     const saved = localStorage.getItem('blueshock-cart')
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     if (saved) setItems(JSON.parse(saved))
+    setIsInitialized(true)
   }, [])
 
   // Guardar en localStorage cada vez que cambie
   useEffect(() => {
-    localStorage.setItem('blueshock-cart', JSON.stringify(items))
-  }, [items])
+    if (isInitialized) {
+      localStorage.setItem('blueshock-cart', JSON.stringify(items))
+    }
+  }, [items, isInitialized])
 
-  const addToCart = (product: any) => {
+  const addToCart = (product: CartItem) => {
     setItems(prev => {
       const existing = prev.find(item => item.id === product.id)
       if (existing) {

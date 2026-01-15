@@ -1,6 +1,6 @@
 "use client"
 
-import { Home, Package, Settings, Share2, Store } from "lucide-react"
+import { Home, Package, Settings } from "lucide-react"
 import {
   Sidebar,
   SidebarContent,
@@ -24,7 +24,14 @@ const items = [
   { title: "Configuración", url: "/dashboard/settings", icon: Settings },
 ]
 
-export function AppSidebar({ user }: { user: any }) {
+interface User {
+  username?: string;
+  shop_name?: string;
+  email?: string;
+  [key: string]: unknown;
+}
+
+export function AppSidebar({ user }: { user: User }) {
   return (
     <Sidebar collapsible="icon">
       {/* CABECERA */}

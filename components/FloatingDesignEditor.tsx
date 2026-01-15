@@ -1,10 +1,9 @@
 "use client"
 
 import { useState, useEffect, useRef } from "react"
-import { Palette, X, Check, Loader2, Bold, Italic, Underline, AlignLeft, AlignCenter, AlignRight, Type, Move } from "lucide-react"
+import { X, Check, Loader2, AlignLeft, AlignCenter, AlignRight, Type, Move } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { useEditorStore } from "@/hooks/useEditorStore"
-import { createClient } from "@/utils/supabase/client"
 
 // LISTA AMPLIADA ESTILO CANVA (20+ Fuentes Populares)
 const canvaFonts = [
@@ -40,8 +39,8 @@ const canvaFonts = [
 
 interface EditorProps {
   // Las props antiguas se mantienen por compatibilidad, pero usaremos el store principalmente
-  design?: any
-  setDesign?: (design: any) => void
+  design?: Record<string, unknown>
+  setDesign?: (design: Record<string, unknown>) => void
   onSave?: () => void
   saving?: boolean
   isPro?: boolean
@@ -91,6 +90,7 @@ export default function FloatingDesignEditor({
 
   useEffect(() => {
     if (prevSavingRef.current === true && isSaving === false) {
+        // eslint-disable-next-line react-hooks/set-state-in-effect
         setShowSuccess(true)
         const timer = setTimeout(() => setShowSuccess(false), 3000)
         return () => clearTimeout(timer)
