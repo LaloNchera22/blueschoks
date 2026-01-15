@@ -2,7 +2,7 @@ import { createClient } from "@/utils/supabase/server"
 import { redirect } from "next/navigation"
 import { Plus, PackageSearch } from "lucide-react"
 import Link from "next/link"
-import ProductCard from "./product-card"
+import ProductCardClient from "./product-card"
 
 export default async function DashboardPage() {
   const supabase = await createClient()
@@ -46,7 +46,7 @@ export default async function DashboardPage() {
           // --- AQUÍ ESTÁ EL TRUCO: 'items-start' PARA QUE NO SE ESTIREN ---
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 items-start">
               {products.map((product) => (
-                  <ProductCard key={product.id} product={product} />
+                  <ProductCardClient key={product.id} product={product} />
               ))}
           </div>
       ) : (
