@@ -235,10 +235,10 @@ export default function ProductCardClient({ product }: ProductCardProps) {
                       checked={product.stock > 0}
                       onCheckedChange={handleToggleStock}
                       disabled={isTogglingStock || isPending}
-                      className="scale-90 data-[state=checked]:bg-green-600"
+                      className="scale-90 data-[state=checked]:bg-green-600 data-[state=unchecked]:bg-slate-200"
                   />
-                  <span className={`text-xs font-medium ${product.stock > 0 ? 'text-green-600' : 'text-muted-foreground'}`}>
-                      {product.stock > 0 ? 'Activo' : 'Inactivo'}
+                  <span className={`text-xs font-bold uppercase tracking-wider ${product.stock > 0 ? 'text-green-600' : 'text-slate-400'}`}>
+                      {product.stock > 0 ? 'Disponible' : 'Agotado'}
                   </span>
               </div>
 

@@ -1,109 +1,71 @@
 import { createClient } from "@/utils/supabase/server"
-import ProductSheet from "@/components/product-sheet" // Importamos el Sheet de nuevo
-import { ShoppingBag, Search } from "lucide-react"
+import { redirect } from "next/navigation"
+import { Plus, PackageSearch } from "lucide-react"
+import Link from "next/link"
+import ProductCardClient from "../product-card"
 
 export default async function ProductsPage() {
   const supabase = await createClient()
-  const { data: { user } } = await supabase.auth.getUser()
 
-  // 1. OBTENER PERFIL PARA SABER SI ES PRO
-  const { data: profile } = await supabase
-    .from('profiles')
-    .select('is_pro')
-    .eq('id', user?.id)
-    .single()
+  const { data: { user }, error } = await supabase.auth.getUser()
+  if (error || !user) redirect("/login")
 
-  // 2. OBTENER PRODUCTOS
   const { data: products } = await supabase
     .from("products")
     .select("*")
-    .eq("user_id", user?.id)
+    .eq("user_id", user.id)
     .order("created_at", { ascending: false })
 
   return (
-    <div className="p-8 max-w-[1400px] mx-auto min-h-screen">
+    <div className="p-8 md:p-12 w-full max-w-7xl mx-auto space-y-10">
       
       {/* HEADER */}
-      <div className="flex flex-col md:flex-row justify-between items-end md:items-center gap-4 mb-10">
-        <div>
-          <h1 className="text-3xl font-black text-slate-900 tracking-tight mb-1">Mis Productos</h1>
-          <p className="text-slate-500 font-medium text-sm">Gestiona y actualiza tu inventario.</p>
-        </div>
-        
-        {/* USAMOS EL COMPONENTE SHEET AQUÍ */}
-        <ProductSheet isPro={profile?.is_pro || false} />
+      <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 border-b border-slate-200/60 pb-6">
+          <div>
+              <h1 className="text-3xl md:text-4xl font-black text-slate-900 tracking-tight mb-2">
+                  Mis Productos
+              </h1>
+              <p className="text-slate-500 font-medium">
+                  Administra el inventario de tu tienda.
+              </p>
+          </div>
+
+          <Link
+              href="/dashboard/new"
+              className="bg-slate-900 text-white px-6 py-3 rounded-xl font-bold flex items-center gap-2 hover:bg-slate-800 transition-all shadow-lg shadow-slate-200 hover:scale-[1.02] active:scale-[0.98]"
+          >
+              <Plus size={20} />
+              Nuevo Producto
+          </Link>
       </div>
 
-      {/* GRILLA DE PRODUCTOS */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-        {products && products.length > 0 ? (
-            products.map((product) => (
-                <div key={product.id} className="group bg-white rounded-2xl border border-slate-200 overflow-hidden hover:shadow-lg hover:border-slate-300 transition-all duration-300 flex flex-col">
-                   
-                   {/* Imagen */}
-                   <div className="aspect-[4/3] bg-slate-50 relative overflow-hidden">
-                      {product.media && product.media.length > 0 ? (
-                          <img 
-                            src={product.media[0]} 
-                            className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" 
-                            alt={product.name}
-                          />
-                      ) : product.image_url ? (
-                          <img 
-                            src={product.image_url} 
-                            className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" 
-                            alt={product.name}
-                          />
-                      ) : (
-                          <div className="w-full h-full flex flex-col items-center justify-center text-slate-300">
-                              <ShoppingBag size={32} />
-                          </div>
-                      )}
-                      
-                      {/* Badge si tiene más fotos */}
-                      {product.media && product.media.length > 1 && (
-                          <div className="absolute bottom-2 right-2 bg-black/60 backdrop-blur-sm text-white text-[10px] font-bold px-2 py-0.5 rounded-full">
-                              +{product.media.length - 1}
-                          </div>
-                      )}
-                   </div>
-
-                   {/* Info */}
-                   <div className="p-4 flex flex-col gap-1 flex-1">
-                      <h3 className="font-bold text-slate-900 text-sm truncate">{product.name}</h3>
-                      <p className="text-xs text-slate-500 line-clamp-2">{product.description || "Sin descripción"}</p>
-                      
-                      <div className="mt-auto pt-3 border-t border-slate-50 flex justify-between items-center">
-                          <span className="font-black text-slate-900 text-lg">${product.price}</span>
-                          
-                          {/* BOTÓN EDITAR: Reutilizamos el Sheet pasándole el producto */}
-                          <ProductSheet 
-                            isPro={profile?.is_pro || false}
-                            productToEdit={product}
-                            trigger={
-                              <button className="text-xs font-bold text-blue-600 hover:text-blue-800 hover:bg-blue-50 px-3 py-1.5 rounded-md transition-colors uppercase tracking-wide">
-                                Editar
-                              </button>
-                            }
-                          />
-                      </div>
-                   </div>
-                </div>
-            ))
-        ) : (
-            /* ESTADO VACÍO */
-            <div className="col-span-full py-20 flex flex-col items-center justify-center text-center bg-slate-50/50 rounded-3xl border border-dashed border-slate-200">
-                <div className="w-16 h-16 bg-white rounded-full flex items-center justify-center shadow-sm mb-4">
-                    <Search className="text-slate-300" size={24} />
-                </div>
-                <h3 className="text-slate-900 font-bold text-lg">No hay productos</h3>
-                <p className="text-slate-500 text-sm mb-6 max-w-xs mx-auto">Tu inventario está vacío.</p>
-                
-                {/* Botón Crear en estado vacío */}
-                <ProductSheet isPro={profile?.is_pro || false} />
-            </div>
-        )}
-      </div>
+      {/* GRID DE PRODUCTOS */}
+      {products && products.length > 0 ? (
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 items-start">
+              {products.map((product) => (
+                  <ProductCardClient key={product.id} product={product} />
+              ))}
+          </div>
+      ) : (
+          <div className="flex flex-col items-center justify-center py-20 px-4 text-center bg-white border border-dashed border-slate-300 rounded-3xl animate-in fade-in zoom-in-95 duration-500 max-w-2xl mx-auto mt-10">
+              <div className="w-24 h-24 bg-slate-50 text-slate-300 rounded-full flex items-center justify-center mb-6 shadow-inner">
+                  <PackageSearch size={40} />
+              </div>
+              <h3 className="text-2xl font-black text-slate-900 mb-3 tracking-tight">
+                  Tu catálogo está vacío
+              </h3>
+              <p className="text-slate-500 max-w-md mb-10 text-lg leading-relaxed">
+                  Agrega tu primer producto para comenzar a recibir pedidos.
+              </p>
+              <Link
+                  href="/dashboard/new"
+                  className="inline-flex items-center gap-2 bg-slate-900 text-white px-8 py-4 rounded-full font-bold text-lg hover:bg-slate-800 transition-all shadow-xl shadow-slate-200 hover:scale-105 active:scale-95"
+              >
+                  <Plus size={24} />
+                  Crear mi primer producto
+              </Link>
+          </div>
+      )}
     </div>
   )
 }
