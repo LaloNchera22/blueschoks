@@ -1,13 +1,14 @@
 import { createClient } from "@/utils/supabase/server"
 import { notFound, redirect } from "next/navigation"
 import EditProductForm from "./edit-form"
+import { getUser } from "@/utils/user-data"
 
 export default async function EditProductPage({ params }: { params: Promise<{ id: string }> }) {
-  const supabase = await createClient()
   const { id } = await params
+  const user = await getUser()
+  if (!user) redirect("/login")
 
-  const { data: { user }, error } = await supabase.auth.getUser()
-  if (error || !user) redirect("/login")
+  const supabase = await createClient()
 
   const { data: product } = await supabase
     .from("products")

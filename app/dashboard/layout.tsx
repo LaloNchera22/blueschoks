@@ -1,26 +1,20 @@
-import { createClient } from "@/utils/supabase/server"
 import { redirect } from "next/navigation"
 import AppSidebar from "@/components/dashboard-sidebar" 
+import { getProfile, getUser } from "@/utils/user-data"
 
 export default async function DashboardLayout({
   children,
 }: {
   children: React.ReactNode
 }) {
-  const supabase = await createClient()
-
   // 1. Verificar Sesión
-  const { data: { user }, error } = await supabase.auth.getUser()
-  if (error || !user) {
+  const user = await getUser()
+  if (!user) {
     redirect("/login")
   }
 
   // 2. Obtener datos
-  const { data: profile } = await supabase
-    .from("profiles")
-    .select("slug")
-    .eq("id", user.id)
-    .single()
+  const profile = await getProfile()
 
   return (
     <div className="flex h-screen w-full bg-slate-50 overflow-hidden">

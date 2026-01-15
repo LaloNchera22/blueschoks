@@ -1,22 +1,16 @@
-import { createClient } from "@/utils/supabase/server"
 import { redirect } from "next/navigation"
 import SettingsForm from "./settings-form" // Importamos el formulario nuevo
+import { getProfile, getUser } from "@/utils/user-data"
 
 export default async function SettingsPage() {
-  const supabase = await createClient()
-
   // 1. Verificar Usuario
-  const { data: { user }, error } = await supabase.auth.getUser()
-  if (error || !user) {
+  const user = await getUser()
+  if (!user) {
     redirect("/login")
   }
 
   // 2. Obtener Datos del Perfil
-  const { data: profile } = await supabase
-    .from("profiles")
-    .select("*")
-    .eq("id", user.id)
-    .single()
+  const profile = await getProfile()
 
   // 3. Empaquetar datos para el formulario
   const initialData = {
