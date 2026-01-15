@@ -49,18 +49,19 @@ export async function createProduct(formData: FormData) {
   }
 
   // 5. Subir Archivos NUEVOS a Supabase Storage
-  const newMediaUrls: string[] = []
+  const uploadPromises = validNewFiles.map(async (file, index) => {
+    const fileExt = file.name.split('.').pop()
+    const fileName = `${user.id}/${Date.now()}-${index}-${Math.random().toString(36).substring(7)}.${fileExt}`
 
-  for (const file of validNewFiles) {
-      const fileExt = file.name.split('.').pop()
-      const fileName = `${user.id}/${Date.now()}-${Math.random().toString(36).substring(7)}.${fileExt}`
-      
-      const { error } = await supabase.storage.from('products').upload(fileName, file)
-      if (error) continue 
+    const { error } = await supabase.storage.from('products').upload(fileName, file)
+    if (error) return null
 
-      const { data } = supabase.storage.from('products').getPublicUrl(fileName)
-      newMediaUrls.push(data.publicUrl)
-  }
+    const { data } = supabase.storage.from('products').getPublicUrl(fileName)
+    return data.publicUrl
+  })
+
+  const results = await Promise.all(uploadPromises)
+  const newMediaUrls = results.filter((url): url is string => url !== null)
 
   // 6. Combinar URLs (Las viejas que conservamos + las nuevas subidas)
   const finalMediaArray = [...existingMedia, ...newMediaUrls]

@@ -131,6 +131,7 @@ export default function CatalogoInteractivo({ products, shop, isEditor = false }
              <AnimatePresence>
                  {/* MOBILE STICKY BAR */}
                  <motion.div
+                    key="mobile-bar"
                     initial={{ y: 100 }}
                     animate={{ y: 0 }}
                     exit={{ y: 100 }}
@@ -154,6 +155,7 @@ export default function CatalogoInteractivo({ products, shop, isEditor = false }
 
                  {/* DESKTOP FLOATING PILL */}
                  <motion.div
+                    key="desktop-pill"
                     initial={{ y: 50, opacity: 0 }}
                     animate={{ y: 0, opacity: 1 }}
                     exit={{ y: 50, opacity: 0 }}
@@ -223,7 +225,7 @@ function TarjetaPersonalizable({ product, design, isEditor = false, index = 0 }:
         icon: <Check className="text-green-500" size={16} />
     })
 
-    for(let i=0; i<quantity; i++) addToCart(product)
+    addToCart(product, quantity)
     setIsAdded(true)
     setTimeout(() => setIsAdded(false), 1500)
     setQuantity(1)

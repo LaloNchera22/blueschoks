@@ -1,9 +1,13 @@
 'use server'
 
-// Intenta importar con @. Si esto marca rojo, cámbialo por: ../utils/supabase/server
-import { createClient } from '@/utils/supabase/server'
+import { createClient } from '../utils/supabase/server'
 import { revalidatePath } from 'next/cache'
 import { redirect } from 'next/navigation'
+
+interface ProfileQueryData {
+  is_pro: boolean
+  username: string | null
+}
 
 // --- ACTUALIZACIÓN DE PERFIL ---
 export async function updateProfile(formData: FormData) {
@@ -65,12 +69,13 @@ export async function addProduct(formData: FormData) {
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) return { error: 'No autorizado' }
 
-  // CONSULTA SEGURA: Usamos 'maybeSingle' y 'any' para evitar quejas de tipos
+  // CONSULTA SEGURA: Tipado manual para evitar 'any'
   const { data: profile } = await supabase
     .from('profiles')
     .select('is_pro, username')
     .eq('id', user.id)
-    .maybeSingle() as any
+    .returns<ProfileQueryData[]>()
+    .maybeSingle()
   
   // Si no encuentra el perfil o la columna, asumimos que no es PRO
   const isPro = profile?.is_pro || false
@@ -79,8 +84,8 @@ export async function addProduct(formData: FormData) {
   const price = formData.get('price') as string
   const description = formData.get('description') as string
   
-  // OBTENER IMÁGENES: Usamos 'getAll' y forzamos el tipo
-  const rawImages = formData.getAll('image') as any[]
+  // OBTENER IMÁGENES: Filtramos para asegurar que sean archivos
+  const rawImages = formData.getAll('image').filter((item): item is File => item instanceof File)
 
   if (!name || !price || rawImages.length === 0) {
     return { error: 'Faltan datos obligatorios (mínimo 1 imagen)' }
@@ -92,7 +97,7 @@ export async function addProduct(formData: FormData) {
 
   // SUBIDA EN PARALELO
   const uploadPromises = imagesToProcess
-    .filter(imageFile => imageFile && typeof imageFile.size !== 'undefined' && imageFile.type.startsWith('image/'))
+    .filter(imageFile => imageFile.size > 0 && imageFile.type.startsWith('image/'))
     .map(async (imageFile, index) => {
       if (imageFile.size > 4 * 1024 * 1024) {
         throw new Error('Una de las imágenes pesa más de 4MB');
