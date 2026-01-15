@@ -131,6 +131,7 @@ export default function CatalogoInteractivo({ products, shop, isEditor = false }
              <AnimatePresence>
                  {/* MOBILE STICKY BAR */}
                  <motion.div
+                    key="mobile-bar"
                     initial={{ y: 100 }}
                     animate={{ y: 0 }}
                     exit={{ y: 100 }}
@@ -154,6 +155,7 @@ export default function CatalogoInteractivo({ products, shop, isEditor = false }
 
                  {/* DESKTOP FLOATING PILL */}
                  <motion.div
+                    key="desktop-pill"
                     initial={{ y: 50, opacity: 0 }}
                     animate={{ y: 0, opacity: 1 }}
                     exit={{ y: 50, opacity: 0 }}
