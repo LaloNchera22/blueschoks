@@ -10,12 +10,14 @@ export default function CatalogoInteractivo({
     products,
     shop,
     onSelectElement,
-    selectedElement
+    selectedElement,
+    isEditorMode = false
 }: {
     products: any[],
     shop: any,
     onSelectElement?: (id: string | null) => void,
-    selectedElement?: string | null
+    selectedElement?: string | null,
+    isEditorMode?: boolean
 }) {
   // USAMOS EL CONTEXTO DIRECTAMENTE
   const { items, openCart, addToCart } = useCart() 
@@ -37,11 +39,11 @@ export default function CatalogoInteractivo({
     <>
       <style jsx global>{`@import url('${googleFontUrl}');`}</style>
 
-      {/* RENDERIZAMOS EL SIDEBAR */}
-      <CartSidebar shop={shop} />
+      {/* RENDERIZAMOS EL SIDEBAR (Solo si no estamos editando) */}
+      {!isEditorMode && <CartSidebar shop={shop} />}
 
       <div 
-          className="min-h-screen pb-32 relative transition-all duration-500"
+          className={`min-h-screen ${isEditorMode ? 'pb-40' : 'pb-32'} relative transition-all duration-500`}
           style={{ backgroundColor: bgColor, color: textColor, fontFamily: fontValue }}
       >
           {/* HEADER */}
@@ -49,11 +51,13 @@ export default function CatalogoInteractivo({
               <div className="max-w-6xl mx-auto w-full px-4 flex justify-between items-center">
                   <h1 className="font-bold uppercase tracking-widest text-sm truncate">{shop.shop_name}</h1>
                   
-                  {/* BOTÓN HEADER - AHORA USA openCart() */}
-                  <button onClick={openCart} className="relative p-2 hover:opacity-70 transition-opacity">
-                      <ShoppingBag size={20} />
-                      {totalItems > 0 && <span className="absolute top-0 right-0 w-2.5 h-2.5 bg-red-500 rounded-full border-2 border-white"></span>}
-                  </button>
+                  {/* BOTÓN HEADER - Solo si NO es editor */}
+                  {!isEditorMode && (
+                      <button onClick={openCart} className="relative p-2 hover:opacity-70 transition-opacity">
+                          <ShoppingBag size={20} />
+                          {totalItems > 0 && <span className="absolute top-0 right-0 w-2.5 h-2.5 bg-red-500 rounded-full border-2 border-white"></span>}
+                      </button>
+                  )}
               </div>
           </header>
 
@@ -102,8 +106,8 @@ export default function CatalogoInteractivo({
               </div>
           </main>
 
-          {/* --- BOTÓN FLOTANTE FINAL (SIN TRUCOS) --- */}
-          {totalItems > 0 && (
+          {/* --- BOTÓN FLOTANTE FINAL (SIN TRUCOS) - Solo si NO es editor --- */}
+          {totalItems > 0 && !isEditorMode && (
              <div className="fixed bottom-8 left-0 right-0 z-40 flex justify-center px-4 animate-in slide-in-from-bottom-4 fade-in duration-500">
                 <button
                     onClick={openCart} // <--- CLIC DIRECTO AL CONTEXTO

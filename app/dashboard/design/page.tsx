@@ -138,6 +138,7 @@ export default function DesignPage() {
                             shop={previewShopData}
                             onSelectElement={setSelectedElement}
                             selectedElement={selectedElement}
+                            isEditorMode={true}
                         />
                     </CartProvider>
                 </div>
