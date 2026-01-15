@@ -3,26 +3,14 @@ import { notFound } from "next/navigation"
 import { CartProvider } from "@/components/shop/cart-context"
 // IMPORTAMOS EL COMPONENTE VISUAL
 import CatalogoInteractivo from "@/components/shop/CatalogoInteractivo"
+import { cache } from "react"
 
 // Esto asegura que la tienda siempre muestre los cambios frescos, no caché vieja.
 export const revalidate = 0;
 
-export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }) {
-  const { slug } = await params
+const getShop = cache(async (slug: string) => {
   const supabase = await createClient()
-  const { data } = await supabase.from("profiles").select("shop_name, design_title_text").eq("slug", slug).single()
-  return { 
-    title: data?.design_title_text || data?.shop_name || "Catálogo",
-  }
-}
-
-export default async function ShopPage({ params }: { params: Promise<{ slug: string }> }) {
-  const { slug } = await params
-  const supabase = await createClient()
-
-  // 1. OBTENER TIENDA + DISEÑO PERSONALIZADO
-  // Aquí agregamos todas las columnas nuevas que creamos en la base de datos
-  const { data: shop } = await supabase
+  const { data } = await supabase
     .from("profiles")
     .select(`
       id, 
@@ -39,7 +27,26 @@ export default async function ShopPage({ params }: { params: Promise<{ slug: str
     .eq("slug", slug)
     .single()
 
+  return data
+})
+
+export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }) {
+  const { slug } = await params
+  const data = await getShop(slug)
+  return {
+    title: data?.design_title_text || data?.shop_name || "Catálogo",
+  }
+}
+
+export default async function ShopPage({ params }: { params: Promise<{ slug: string }> }) {
+  const { slug } = await params
+
+  // 1. OBTENER TIENDA + DISEÑO PERSONALIZADO
+  const shop = await getShop(slug)
+
   if (!shop) return notFound()
+
+  const supabase = await createClient()
 
   // 2. OBTENER PRODUCTOS
   const { data: products } = await supabase
