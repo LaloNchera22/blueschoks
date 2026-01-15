@@ -2,6 +2,15 @@
 
 import { createClient } from "@/utils/supabase/server"
 import { revalidatePath } from "next/cache"
+import { z } from "zod"
+
+const settingsSchema = z.object({
+  shopName: z.string().optional(),
+  slug: z.string().optional(),
+  countryCode: z.string().optional(),
+  localPhone: z.string().optional(),
+  email: z.string().email().optional().or(z.literal('')),
+})
 
 export type SettingsState = {
   message?: string | null
@@ -15,54 +24,70 @@ export async function updateSettings(prevState: SettingsState, formData: FormDat
   const { data: { user }, error: authError } = await supabase.auth.getUser()
   if (authError || !user) return { error: "No autorizado" }
 
-  const shopName = formData.get("shopName") as string
-  const rawSlug = formData.get("slug") as string
-  
-  // LOGICA NUEVA PARA WHATSAPP
-  const countryCode = formData.get("countryCode") as string
-  const localPhone = formData.get("localPhone") as string
-  
-  // Unimos el código (+52) con el número (123...) para guardar algo como "52123..."
-  // Quitamos el símbolo "+" para que quede limpio en la base de datos
-  const whatsapp = (countryCode.replace('+', '') + localPhone).trim()
+  const rawData = {
+    shopName: formData.get("shopName") as string,
+    slug: formData.get("slug") as string,
+    countryCode: formData.get("countryCode") as string,
+    localPhone: formData.get("localPhone") as string,
+    email: formData.get("email") as string,
+  }
 
-  const slug = rawSlug?.toLowerCase().trim().replace(/\s+/g, '-').replace(/[^\w-]/g, '')
+  const validated = settingsSchema.safeParse(rawData)
 
-  const email = formData.get("email") as string
+  if (!validated.success) {
+    return { error: "Datos inválidos. Revisa el formato." }
+  }
 
-  if (!shopName || !slug) {
-    return { error: "Nombre y Link son obligatorios." }
+  const { shopName, slug: rawSlug, countryCode, localPhone, email } = validated.data
+
+  const updates: any = {
+    updated_at: new Date().toISOString(),
+  }
+
+  // Solo actualizamos si el valor no está vacío.
+  // Esto permite actualizaciones parciales:
+  // Si el usuario edita solo el nombre, el slug puede venir vacío (si no se ha configurado antes)
+  // y lo ignoramos en lugar de intentar guardar "".
+
+  if (shopName && shopName.trim() !== "") {
+    updates.shop_name = shopName.trim()
+  }
+
+  if (rawSlug && rawSlug.trim() !== "") {
+    updates.slug = rawSlug.toLowerCase().trim().replace(/\s+/g, '-').replace(/[^\w-]/g, '')
+  }
+
+  if (countryCode && localPhone && localPhone.trim() !== "") {
+    updates.whatsapp = (countryCode.replace('+', '') + localPhone).trim()
   }
 
   try {
-    const { error: updateError } = await supabase
-      .from("profiles")
-      .update({
-        shop_name: shopName,
-        whatsapp: whatsapp,
-        slug: slug,
-        updated_at: new Date().toISOString(),
-      })
-      .eq("id", user.id)
+    // Solo hacemos update si hay algo más que updated_at
+    if (Object.keys(updates).length > 1) {
+      const { error: updateError } = await supabase
+        .from("profiles")
+        .update(updates)
+        .eq("id", user.id)
 
-    if (updateError) {
-      if (updateError.code === '23505') return { error: "Este Link ya está ocupado. Elige otro." }
-      throw updateError
+      if (updateError) {
+        if (updateError.code === '23505') return { error: "Este Link ya está ocupado. Elige otro." }
+        throw updateError
+      }
     }
 
     // UPDATE EMAIL
-    if (email && email !== user.email) {
+    if (email && email.trim() !== "" && email !== user.email) {
         const { error: emailError } = await supabase.auth.updateUser({ email: email })
         if (emailError) {
              return { error: "Error al actualizar correo: " + emailError.message }
         }
-        // Nota: Si el correo requiere confirmación, Supabase enviará un correo a la nueva dirección.
-        // El cambio no se refleja hasta confirmar.
     }
 
     revalidatePath("/dashboard")
     revalidatePath("/dashboard/settings")
-    revalidatePath(`/shop/${slug}`)
+    if (updates.slug) {
+        revalidatePath(`/shop/${updates.slug}`)
+    }
 
     return { success: true, message: "Cambios guardados correctamente." }
 
