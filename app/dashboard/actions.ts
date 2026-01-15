@@ -25,3 +25,37 @@ export async function deleteProduct(productId: string) {
   // 3. Actualizar la pantalla
   revalidatePath('/dashboard')
 }
+
+export async function toggleStock(productId: string) {
+  const supabase = await createClient()
+
+  const { data: { user }, error } = await supabase.auth.getUser()
+  if (!user || error) return { error: "No autorizado" }
+
+  // Obtenemos el producto actual para ver su stock
+  const { data: product, error: fetchError } = await supabase
+    .from('products')
+    .select('stock')
+    .eq('id', productId)
+    .eq('user_id', user.id)
+    .single()
+
+  if (fetchError || !product) {
+      throw new Error("No se pudo obtener el producto")
+  }
+
+  // Si stock > 0, lo ponemos en 0. Si es 0, lo ponemos en 1.
+  const newStock = product.stock > 0 ? 0 : 1
+
+  const { error: updateError } = await supabase
+    .from('products')
+    .update({ stock: newStock })
+    .eq('id', productId)
+    .eq('user_id', user.id)
+
+  if (updateError) {
+      throw new Error("No se pudo actualizar el stock")
+  }
+
+  revalidatePath('/dashboard')
+}

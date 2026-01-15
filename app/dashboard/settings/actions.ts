@@ -28,6 +28,8 @@ export async function updateSettings(prevState: SettingsState, formData: FormDat
 
   const slug = rawSlug?.toLowerCase().trim().replace(/\s+/g, '-').replace(/[^\w-]/g, '')
 
+  const email = formData.get("email") as string
+
   if (!shopName || !slug) {
     return { error: "Nombre y Link son obligatorios." }
   }
@@ -48,6 +50,16 @@ export async function updateSettings(prevState: SettingsState, formData: FormDat
       throw updateError
     }
 
+    // UPDATE EMAIL
+    if (email && email !== user.email) {
+        const { error: emailError } = await supabase.auth.updateUser({ email: email })
+        if (emailError) {
+             return { error: "Error al actualizar correo: " + emailError.message }
+        }
+        // Nota: Si el correo requiere confirmación, Supabase enviará un correo a la nueva dirección.
+        // El cambio no se refleja hasta confirmar.
+    }
+
     revalidatePath("/dashboard")
     revalidatePath("/dashboard/settings")
     revalidatePath(`/shop/${slug}`)
@@ -55,6 +67,7 @@ export async function updateSettings(prevState: SettingsState, formData: FormDat
     return { success: true, message: "Cambios guardados correctamente." }
 
   } catch (err) {
+    console.error(err)
     return { error: "Error al guardar cambios." }
   }
 }

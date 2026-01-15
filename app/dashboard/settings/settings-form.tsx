@@ -196,14 +196,15 @@ export default function SettingsForm({ initialData }: { initialData: any }) {
               {/* Input Oculto para que el CountryCode se envíe aunque el select esté disabled */}
               {!editContact && <input type="hidden" name="countryCode" value={phonePrefix} />}
 
-              <div className="opacity-60">
+              <div className="">
                   <Label className="font-bold text-slate-700 flex items-center gap-2 mb-2">
                       <Mail size={14} /> Correo de Cuenta
                   </Label>
                   <Input 
+                      name="email"
                       defaultValue={initialData.email} 
-                      disabled
-                      className="h-11 bg-slate-100 border-slate-200 text-slate-500 cursor-not-allowed"
+                      readOnly={!editContact}
+                      className={`h-11 transition-all font-medium ${!editContact ? "bg-slate-100 text-slate-500 border-slate-200 cursor-not-allowed" : "bg-white text-slate-900 border-slate-300 focus:ring-2 focus:ring-slate-900"}`}
                   />
               </div>
           </div>

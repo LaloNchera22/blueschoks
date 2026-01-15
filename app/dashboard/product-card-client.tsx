@@ -3,8 +3,8 @@
 import { useState, useEffect, useTransition } from "react"
 import Image from "next/image"
 import Link from "next/link"
-import { Trash2, Edit, Play, Grid, Square, AlertCircle, Video, ChevronLeft, ChevronRight } from "lucide-react"
-import { deleteProduct } from "./actions"
+import { Trash2, Edit, Play, Grid, Square, AlertCircle, Video, ChevronLeft, ChevronRight, RefreshCw } from "lucide-react"
+import { deleteProduct, toggleStock } from "./actions"
 import { formatCurrency } from "@/lib/utils"
 
 interface ProductCardProps {
@@ -20,6 +20,7 @@ export default function ProductCardClient({ product }: ProductCardProps) {
 
   const [isPending, startTransition] = useTransition()
   const [isDeleting, setIsDeleting] = useState(false)
+  const [isTogglingStock, setIsTogglingStock] = useState(false)
 
   const rawMedia = Array.isArray(product.media) && product.media.length > 0
     ? product.media
@@ -58,6 +59,19 @@ export default function ProductCardClient({ product }: ProductCardProps) {
     }
   }
 
+  const handleToggleStock = async () => {
+      setIsTogglingStock(true)
+      startTransition(async () => {
+          try {
+             await toggleStock(product.id)
+          } catch (error) {
+             console.error("Error toggling stock", error)
+          } finally {
+             setIsTogglingStock(false)
+          }
+      })
+  }
+
   const isVideo = (url: string) => url?.includes('.mp4') || url?.includes('.webm') || url?.includes('.mov');
 
   const nextSlide = (e: React.MouseEvent) => {
@@ -73,10 +87,16 @@ export default function ProductCardClient({ product }: ProductCardProps) {
   }
 
   const StockIndicator = ({ stock }: { stock: number }) => (
-    <div className={`flex items-center gap-2 ${stock > 0 ? 'text-green-600' : 'text-red-500'}`}>
+    <button
+        onClick={handleToggleStock}
+        disabled={isTogglingStock || isPending}
+        className={`flex items-center gap-2 py-1 px-2 rounded-full transition-all hover:bg-slate-50 ${stock > 0 ? 'text-green-600' : 'text-red-500'} ${isTogglingStock ? 'opacity-50' : ''}`}
+        title="Clic para cambiar estado"
+    >
       <span className={`h-2 w-2 rounded-full ${stock > 0 ? 'bg-green-500' : 'bg-red-500'}`}></span>
       <span className="text-xs font-semibold">{stock > 0 ? `${stock} en stock` : 'Agotado'}</span>
-    </div>
+      {isTogglingStock && <RefreshCw size={10} className="animate-spin ml-1" />}
+    </button>
   );
 
   return (

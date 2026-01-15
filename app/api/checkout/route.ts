@@ -7,7 +7,8 @@ import Stripe from 'stripe'
 // CORRECCIÓN AQUÍ:
 // Si te marca error de versión, simplemente quita la línea de apiVersion 
 // o pon la fecha exacta que te sugiere el error (ej: '2024-12-18.acacia')
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
+const stripeSecretKey = process.env.STRIPE_SECRET_KEY || 'sk_test_dummy_key_for_build';
+const stripe = new Stripe(stripeSecretKey, {
   typescript: true, // Esto ayuda a que no se queje tanto
   // apiVersion: '2024-12-18.acacia', <--- PUEDES COMENTAR ESTO SI MOLESTA
 })
@@ -30,18 +31,21 @@ export async function POST() {
     .single()
 
   try {
+    const priceId = process.env.STRIPE_PRICE_ID || 'price_dummy_for_build';
+    const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000';
+
     // 3. Creamos la sesión de pago
     const session = await stripe.checkout.sessions.create({
       payment_method_types: ['card'],
       line_items: [
         {
-          price: process.env.STRIPE_PRICE_ID, // Asegúrate de tener esto en tu .env.local
+          price: priceId, // Asegúrate de tener esto en tu .env.local
           quantity: 1,
         },
       ],
       mode: 'subscription', 
-      success_url: `${process.env.NEXT_PUBLIC_BASE_URL}/dashboard?payment=success`,
-      cancel_url: `${process.env.NEXT_PUBLIC_BASE_URL}/dashboard?payment=cancelled`,
+      success_url: `${baseUrl}/dashboard?payment=success`,
+      cancel_url: `${baseUrl}/dashboard?payment=cancelled`,
       customer_email: user.email, 
       metadata: {
         userId: user.id, 
