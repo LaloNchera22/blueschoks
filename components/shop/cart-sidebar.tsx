@@ -1,11 +1,11 @@
 "use client"
 
-// 1. AGREGAMOS 'SheetTitle' A LOS IMPORTS
 import { Sheet, SheetContent, SheetTitle } from "@/components/ui/sheet"
 import { useCart } from "./cart-context"
-import { X, Trash2, MessageCircle, ShoppingBag, Plus, Minus } from "lucide-react"
+import { X, Trash2, MessageCircle, ShoppingBag, Plus, Minus, ArrowRight } from "lucide-react"
 import { useState, useEffect, useMemo } from "react"
 import { Button } from "@/components/ui/button"
+import { motion, AnimatePresence } from "framer-motion"
 
 export default function CartSidebar({ shop }: { shop: any }) {
   const { items, removeFromCart, addToCart, removeItem, cartTotal, isCartOpen, closeCart } = useCart()
@@ -28,77 +28,102 @@ export default function CartSidebar({ shop }: { shop: any }) {
 
   if (!isClient) return null
 
+  // Ensure items are valid objects before rendering
+  const validItems = items.filter((item: any) => item && typeof item === 'object');
+
   return (
-    <Sheet open={isCartOpen} onOpenChange={closeCart} modal={false}>
-      
+    <Sheet open={isCartOpen} onOpenChange={closeCart} modal={true}>
       <SheetContent 
         side="right" 
-        className="w-full sm:w-[400px] bg-white p-0 flex flex-col z-[100] h-full shadow-2xl border-l border-gray-100"
+        className="w-full sm:w-[400px] bg-white p-0 flex flex-col z-[100] h-full shadow-2xl border-l border-gray-100/50"
       >
-        {/* --- CORRECCIÓN DEL ERROR --- */}
-        {/* Agregamos el Título oculto para accesibilidad */}
         <SheetTitle className="hidden">Carrito de Compras</SheetTitle>
         
-        {/* HEADER VISUAL */}
-        <div className="p-5 border-b border-gray-100 bg-white flex justify-between items-center shadow-sm z-10 shrink-0">
+        {/* HEADER */}
+        <div className="p-5 border-b border-gray-100 bg-white/80 backdrop-blur-md flex justify-between items-center shadow-sm z-10 shrink-0 sticky top-0">
             <div className="flex items-center gap-3">
-                <div className="bg-black text-white p-2 rounded-lg shadow-md">
-                    <ShoppingBag size={18} />
+                <div className="bg-slate-900 text-white p-2.5 rounded-xl shadow-lg shadow-slate-900/20">
+                    <ShoppingBag size={18} strokeWidth={2.5} />
                 </div>
-                <span className="font-bold text-lg text-slate-900">Tu Pedido <span className="text-gray-400 text-sm ml-1">({items.length})</span></span>
+                <div className="flex flex-col">
+                    <span className="font-bold text-lg text-slate-900 leading-none">Tu Pedido</span>
+                    <span className="text-slate-400 text-xs font-medium mt-1">{validItems.length} productos</span>
+                </div>
             </div>
-            <Button variant="ghost" size="icon" onClick={closeCart} className="rounded-full hover:bg-gray-100 text-slate-500">
-                <X size={20} />
+            <Button variant="ghost" size="icon" onClick={closeCart} className="rounded-full hover:bg-slate-100 text-slate-500 transition-all hover:rotate-90">
+                <X size={22} strokeWidth={2.5} />
             </Button>
         </div>
 
         {/* LISTA DE PRODUCTOS */}
         <div className="flex-1 overflow-y-auto p-5 space-y-4 bg-gray-50/50 custom-scrollbar">
-            {items.length === 0 ? (
-                <div className="h-full flex flex-col items-center justify-center text-gray-400 space-y-4">
-                    <ShoppingBag size={64} className="opacity-10" />
-                    <p className="text-sm font-medium opacity-60">Tu carrito está vacío</p>
-                    <Button variant="outline" onClick={closeCart}>Seguir comprando</Button>
+            {validItems.length === 0 ? (
+                <div className="h-full flex flex-col items-center justify-center text-gray-400 space-y-6">
+                    <div className="w-24 h-24 bg-gray-100 rounded-full flex items-center justify-center mb-2 animate-pulse">
+                         <ShoppingBag size={48} className="opacity-20" />
+                    </div>
+                    <div className="text-center">
+                        <p className="text-lg font-bold text-slate-700 mb-1">Tu carrito está vacío</p>
+                        <p className="text-sm font-medium opacity-60">¡Agrega algunos productos para empezar!</p>
+                    </div>
+                    <Button variant="outline" onClick={closeCart} className="rounded-full px-8 border-slate-200 text-slate-700 hover:bg-slate-50 font-bold">
+                        Explorar Tienda
+                    </Button>
                 </div>
             ) : (
-                items.map((item: any) => (
-                    <div key={item.id} className="flex gap-4 bg-white p-3 rounded-2xl border border-gray-100 shadow-sm animate-in fade-in slide-in-from-bottom-2">
-                        <div className="w-20 h-20 bg-gray-100 rounded-xl overflow-hidden shrink-0 border border-gray-100 relative">
-                            {item.image_url ? (
-                                <img src={item.image_url} className="w-full h-full object-cover" alt={item.name} />
-                            ) : (
-                                <div className="w-full h-full flex items-center justify-center"><ShoppingBag size={20} className="opacity-20"/></div>
-                            )}
-                        </div>
-                        
-                        <div className="flex-1 flex flex-col justify-between py-1">
-                            <div className="flex justify-between items-start">
-                                <h4 className="font-bold text-sm line-clamp-2 leading-tight text-slate-800">{item.name}</h4>
-                                <button onClick={() => removeFromCart(item.id)} className="text-gray-300 hover:text-red-500 transition-colors p-1 -mt-1 -mr-1">
-                                    <Trash2 size={14} />
-                                </button>
+                <AnimatePresence>
+                    {validItems.map((item: any) => (
+                        <motion.div
+                            key={item.id}
+                            initial={{ opacity: 0, y: 20 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            exit={{ opacity: 0, x: -50 }}
+                            layout
+                            className="flex gap-4 bg-white p-3 rounded-2xl border border-gray-100 shadow-[0_2px_8px_rgba(0,0,0,0.04)] hover:shadow-md transition-shadow"
+                        >
+                            <div className="w-20 h-20 bg-gray-100 rounded-xl overflow-hidden shrink-0 border border-gray-100 relative group">
+                                {item.image_url ? (
+                                    <img src={item.image_url} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" alt={item.name} />
+                                ) : (
+                                    <div className="w-full h-full flex items-center justify-center"><ShoppingBag size={20} className="opacity-20"/></div>
+                                )}
                             </div>
                             
-                            <div className="flex items-end justify-between mt-2">
-                                <div className="flex items-center gap-3 bg-gray-50 rounded-lg px-2 py-1 border border-gray-200">
-                                    <button onClick={() => removeItem(item.id)} className="w-6 h-6 flex items-center justify-center hover:bg-white rounded-md transition-colors"><Minus size={12} className="text-slate-600"/></button>
-                                    <span className="text-xs font-black w-4 text-center tabular-nums text-slate-900">{item.quantity}</span>
-                                    <button onClick={() => addToCart(item)} className="w-6 h-6 flex items-center justify-center hover:bg-white rounded-md transition-colors"><Plus size={12} className="text-slate-600"/></button>
+                            <div className="flex-1 flex flex-col justify-between py-0.5">
+                                <div className="flex justify-between items-start gap-2">
+                                    <h4 className="font-bold text-sm line-clamp-2 leading-tight text-slate-800">{item.name}</h4>
+                                    <button onClick={() => removeFromCart(item.id)} className="text-gray-300 hover:text-red-500 transition-colors p-1.5 -mr-2 -mt-2 rounded-full hover:bg-red-50">
+                                        <Trash2 size={16} />
+                                    </button>
                                 </div>
-                                <span className="font-black text-sm text-slate-900">{formatPrice(item.price * item.quantity)}</span>
+
+                                <div className="flex items-end justify-between mt-2">
+                                    <div className="flex items-center gap-1 bg-gray-50 rounded-lg p-1 border border-gray-200/50 shadow-sm">
+                                        <button onClick={() => removeItem(item.id)} className="w-6 h-6 flex items-center justify-center bg-white rounded-md shadow-sm border border-gray-100 text-slate-600 hover:scale-105 active:scale-95 transition-all"><Minus size={12} strokeWidth={3}/></button>
+                                        <span className="text-xs font-bold w-6 text-center tabular-nums text-slate-900">{item.quantity}</span>
+                                        <button onClick={() => addToCart(item)} className="w-6 h-6 flex items-center justify-center bg-white rounded-md shadow-sm border border-gray-100 text-slate-600 hover:scale-105 active:scale-95 transition-all"><Plus size={12} strokeWidth={3}/></button>
+                                    </div>
+                                    <span className="font-black text-sm text-slate-900">{formatPrice(item.price * item.quantity)}</span>
+                                </div>
                             </div>
-                        </div>
-                    </div>
-                ))
+                        </motion.div>
+                    ))}
+                </AnimatePresence>
             )}
         </div>
 
         {/* FOOTER */}
-        {items.length > 0 && (
+        {validItems.length > 0 && (
             <div className="p-6 border-t border-gray-100 bg-white shadow-[0_-10px_40px_rgba(0,0,0,0.05)] z-10 shrink-0">
-                <div className="flex justify-between items-center mb-6">
-                    <span className="text-sm text-gray-500 font-medium">Total estimado</span>
-                    <span className="text-2xl font-black text-slate-900">{formatPrice(cartTotal)}</span>
+                <div className="space-y-3 mb-6">
+                     <div className="flex justify-between items-center text-slate-500 text-sm">
+                        <span>Subtotal</span>
+                        <span>{formatPrice(cartTotal)}</span>
+                    </div>
+                    <div className="flex justify-between items-center">
+                        <span className="text-base font-bold text-slate-900">Total a Pagar</span>
+                        <span className="text-2xl font-black text-slate-900">{formatPrice(cartTotal)}</span>
+                    </div>
                 </div>
                 
                 {whatsappLink ? (
@@ -106,20 +131,23 @@ export default function CartSidebar({ shop }: { shop: any }) {
                         href={whatsappLink}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="w-full bg-[#25D366] hover:bg-[#1da851] text-white py-4 rounded-xl font-bold flex items-center justify-center gap-3 transition-all shadow-lg hover:shadow-xl active:scale-95 group text-center no-underline"
+                        className="w-full bg-gradient-to-r from-[#25D366] to-[#128C7E] hover:from-[#20bd5a] hover:to-[#0e6f64] text-white py-4 rounded-2xl font-bold flex items-center justify-center gap-3 transition-all shadow-lg hover:shadow-xl hover:-translate-y-1 active:scale-95 group text-center no-underline relative overflow-hidden"
                     >
-                        <MessageCircle size={22} className="group-hover:scale-110 transition-transform" />
-                        <span>Pedir por WhatsApp</span>
+                        <div className="absolute inset-0 bg-white/20 translate-y-full group-hover:translate-y-0 transition-transform duration-300 rounded-2xl"></div>
+                        <MessageCircle size={24} className="group-hover:rotate-12 transition-transform" />
+                        <span className="relative z-10">Completar Pedido por WhatsApp</span>
+                        <ArrowRight size={18} className="opacity-60 group-hover:translate-x-1 transition-transform relative z-10"/>
                     </a>
                 ) : (
                     <button 
                         onClick={() => alert("⚠️ Error: El dueño de la tienda no ha configurado su número de WhatsApp en el Panel de Control.")}
-                        className="w-full bg-gray-300 text-gray-500 py-4 rounded-xl font-bold flex items-center justify-center gap-3 cursor-not-allowed"
+                        className="w-full bg-gray-200 text-gray-500 py-4 rounded-xl font-bold flex items-center justify-center gap-3 cursor-not-allowed opacity-70"
                     >
                         <MessageCircle size={22} />
                         <span>WhatsApp no configurado</span>
                     </button>
                 )}
+                <p className="text-center text-[10px] text-gray-400 mt-4 font-medium uppercase tracking-wider">Pago seguro y envío coordinado</p>
             </div>
         )}
       </SheetContent>
