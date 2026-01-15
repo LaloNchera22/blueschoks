@@ -1,0 +1,57 @@
+// app/api/checkout/route.ts
+
+import { NextResponse } from 'next/server'
+import { createClient } from '@/utils/supabase/server'
+import Stripe from 'stripe'
+
+// CORRECCIÓN AQUÍ:
+// Si te marca error de versión, simplemente quita la línea de apiVersion 
+// o pon la fecha exacta que te sugiere el error (ej: '2024-12-18.acacia')
+const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
+  typescript: true, // Esto ayuda a que no se queje tanto
+  // apiVersion: '2024-12-18.acacia', <--- PUEDES COMENTAR ESTO SI MOLESTA
+})
+
+export async function POST() {
+  const supabase = await createClient()
+
+  // 1. Verificamos quién es el usuario
+  const { data: { user } } = await supabase.auth.getUser()
+
+  if (!user) {
+    return NextResponse.json({ error: 'No autorizado' }, { status: 401 })
+  }
+
+  // 2. Buscamos su email (o username)
+  const { data: profile } = await supabase
+    .from('profiles')
+    .select('username') 
+    .eq('id', user.id)
+    .single()
+
+  try {
+    // 3. Creamos la sesión de pago
+    const session = await stripe.checkout.sessions.create({
+      payment_method_types: ['card'],
+      line_items: [
+        {
+          price: process.env.STRIPE_PRICE_ID, // Asegúrate de tener esto en tu .env.local
+          quantity: 1,
+        },
+      ],
+      mode: 'subscription', 
+      success_url: `${process.env.NEXT_PUBLIC_BASE_URL}/dashboard?payment=success`,
+      cancel_url: `${process.env.NEXT_PUBLIC_BASE_URL}/dashboard?payment=cancelled`,
+      customer_email: user.email, 
+      metadata: {
+        userId: user.id, 
+      },
+    })
+
+    return NextResponse.json({ url: session.url })
+
+  } catch (error: any) {
+    console.error('Error Stripe:', error)
+    return NextResponse.json({ error: error.message }, { status: 500 })
+  }
+}
