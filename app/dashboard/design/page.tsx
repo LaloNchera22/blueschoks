@@ -3,8 +3,10 @@
 import { useState, useEffect } from "react"
 import { createClient } from "@/utils/supabase/client"
 import CatalogoInteractivo from "@/components/shop/CatalogoInteractivo"
-import FloatingDesignEditor from "@/components/FloatingDesignEditor"
+import ContextualToolbar from "@/components/editor/ContextualToolbar"
 import { CartProvider } from "@/components/shop/cart-context"
+// import { useMediaQuery } from "@/hooks/use-media-query" // Removed assumed hook
+import { Loader2, Check, Save } from "lucide-react"
 
 export default function DesignPage() {
   const supabase = createClient()
@@ -14,6 +16,9 @@ export default function DesignPage() {
   const [shopData, setShopData] = useState<any>(null)
   const [products, setProducts] = useState<any[]>([])
 
+  // Selection State
+  const [selectedElement, setSelectedElement] = useState<string | null>(null)
+
   const [design, setDesign] = useState({
     bg_color: "#ffffff",
     title_text: "Colección",
@@ -22,6 +27,15 @@ export default function DesignPage() {
     font: "sans-serif", 
     card_style: "minimal"
   })
+
+  // Mock media query if hook doesn't exist, we'll check validity later or implement simple check
+  const [isMobile, setIsMobile] = useState(false)
+  useEffect(() => {
+    const checkMobile = () => setIsMobile(window.innerWidth < 768)
+    checkMobile()
+    window.addEventListener('resize', checkMobile)
+    return () => window.removeEventListener('resize', checkMobile)
+  }, [])
 
   useEffect(() => {
     const loadData = async () => {
@@ -81,26 +95,62 @@ export default function DesignPage() {
   }
 
   return (
-    // CONTENEDOR PRINCIPAL: Ocupa el 100% y oculta desbordes
-    <div className="relative w-full h-full bg-slate-100 overflow-hidden">
+    // INFINITE CANVAS (100% Viewport)
+    <div className="relative w-full h-[calc(100vh-64px)] md:h-screen bg-slate-100 overflow-hidden flex flex-col">
         
-        {/* VISTA PREVIA: Centrada y contenida */}
-        <div className="absolute inset-0 z-0 overflow-y-auto custom-scrollbar">
-             {/* Escalar contenido si es necesario para que se vea "fit" */}
-             <div className="min-h-full">
-                <CartProvider>
-                    <CatalogoInteractivo products={products} shop={previewShopData} />
-                </CartProvider>
+        {/* SAVE BUTTON (Sticky Top Right) */}
+        <div className="absolute top-4 right-4 z-50">
+            <button
+                onClick={handleSave}
+                disabled={saving || !isPro}
+                className={`
+                    flex items-center gap-2 px-4 py-2 rounded-full font-bold text-xs uppercase tracking-widest shadow-lg transition-all
+                    ${saving ? 'bg-white text-slate-900' : 'bg-slate-900 text-white hover:bg-black hover:scale-105'}
+                `}
+            >
+                {saving ? <Loader2 size={14} className="animate-spin" /> : <Save size={14} />}
+                <span>{saving ? 'Guardando...' : 'Guardar'}</span>
+            </button>
+        </div>
+
+        {/* CLICK OUTSIDE TO DESELECT */}
+        <div
+            className="flex-1 w-full relative overflow-y-auto custom-scrollbar"
+            onClick={(e) => {
+                // Si el clic fue directo en el fondo (no en un elemento interactivo), deseleccionar
+                if (e.target === e.currentTarget) setSelectedElement(null)
+            }}
+        >
+             <div className="min-h-full py-8 px-4 flex justify-center">
+                <div
+                    className="w-full max-w-[1400px] shadow-2xl rounded-xl overflow-hidden ring-1 ring-slate-900/5 transition-all duration-500 bg-white"
+                    onClick={(e) => {
+                         // Stop propagation if clicking on the frame but not an element
+                         // actually we want clicking the frame background to act as deselect or "general select"
+                         // We'll let `CatalogoInteractivo` handle specific clicks via the callback
+                         // setSelectedElement(null) // Reset first, then child click overrides
+                         // e.stopPropagation()
+                    }}
+                >
+                    <CartProvider>
+                        <CatalogoInteractivo
+                            products={products}
+                            shop={previewShopData}
+                            onSelectElement={setSelectedElement}
+                            selectedElement={selectedElement}
+                        />
+                    </CartProvider>
+                </div>
              </div>
         </div>
 
-        {/* EDITOR: Flotante encima de todo */}
-        <FloatingDesignEditor 
-            design={design} 
-            setDesign={setDesign} 
-            onSave={handleSave} 
-            saving={saving}
-            isPro={isPro}
+        {/* CONTEXTUAL TOOLBAR (The Canva Bar) */}
+        <ContextualToolbar
+            selectedElement={selectedElement}
+            design={design}
+            setDesign={setDesign}
+            onClose={() => setSelectedElement(null)}
+            isMobile={isMobile}
         />
     </div>
   )

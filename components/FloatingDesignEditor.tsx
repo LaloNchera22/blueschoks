@@ -5,7 +5,7 @@ import { Palette, X, Type, LayoutTemplate, Lock, Save, Check, Loader2, ChevronDo
 import { Button } from "@/components/ui/button"
 
 // LISTA AMPLIADA ESTILO CANVA (20+ Fuentes Populares)
-const canvaFonts = [
+export const canvaFonts = [
   // SANS SERIF (Modernas)
   { name: 'Inter', value: 'Inter, sans-serif', category: 'Moderna' },
   { name: 'Montserrat', value: 'Montserrat, sans-serif', category: 'Geométrica' },

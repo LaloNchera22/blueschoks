@@ -6,7 +6,17 @@ import { useCart } from "./cart-context"
 import CartSidebar from "./cart-sidebar" 
 import { Plus, Minus, ShoppingBag, Check, ArrowRight } from "lucide-react"
 
-export default function CatalogoInteractivo({ products, shop }: { products: any[], shop: any }) {
+export default function CatalogoInteractivo({
+    products,
+    shop,
+    onSelectElement,
+    selectedElement
+}: {
+    products: any[],
+    shop: any,
+    onSelectElement?: (id: string | null) => void,
+    selectedElement?: string | null
+}) {
   // USAMOS EL CONTEXTO DIRECTAMENTE
   const { items, openCart, addToCart } = useCart() 
   const [isClient, setIsClient] = useState(false)
@@ -48,10 +58,41 @@ export default function CatalogoInteractivo({ products, shop }: { products: any[
           </header>
 
           {/* CATALOGO */}
-          <main className="max-w-6xl mx-auto px-4 py-8">
-              <div className="text-center mb-12">
-                  <h2 className="text-4xl md:text-5xl font-black mb-2 leading-tight">{shop.design_title_text || "Colección"}</h2>
-                  <p className="opacity-75 text-sm md:text-base">{shop.design_subtitle_text}</p>
+          <main className="max-w-6xl mx-auto px-4 py-8" onClick={(e) => {
+               // Si se hace clic en el fondo blanco del main, deseleccionar
+               if (e.target === e.currentTarget) onSelectElement?.(null)
+          }}>
+              <div className="text-center mb-12 flex flex-col items-center gap-2">
+                  <h2
+                    className={`
+                        text-4xl md:text-5xl font-black leading-tight cursor-pointer transition-all duration-200 border-2 rounded-lg p-2
+                        ${selectedElement === 'title'
+                            ? 'border-blue-500 bg-blue-50/10 ring-4 ring-blue-500/20'
+                            : 'border-transparent hover:border-dashed hover:border-slate-300'
+                        }
+                    `}
+                    onClick={(e) => {
+                        e.stopPropagation()
+                        onSelectElement?.('title')
+                    }}
+                  >
+                      {shop.design_title_text || "Colección"}
+                  </h2>
+                  <p
+                    className={`
+                        opacity-75 text-sm md:text-base cursor-pointer transition-all duration-200 border-2 rounded-lg p-2
+                        ${selectedElement === 'subtitle'
+                            ? 'border-blue-500 bg-blue-50/10 ring-4 ring-blue-500/20'
+                            : 'border-transparent hover:border-dashed hover:border-slate-300'
+                        }
+                    `}
+                    onClick={(e) => {
+                        e.stopPropagation()
+                        onSelectElement?.('subtitle')
+                    }}
+                  >
+                      {shop.design_subtitle_text}
+                  </p>
               </div>
 
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
