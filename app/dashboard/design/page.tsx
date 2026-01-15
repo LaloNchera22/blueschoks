@@ -5,23 +5,17 @@ import { createClient } from "@/utils/supabase/client"
 import CatalogoInteractivo from "@/components/shop/CatalogoInteractivo"
 import FloatingDesignEditor from "@/components/FloatingDesignEditor"
 import { CartProvider } from "@/components/shop/cart-context"
+import { useEditorStore } from "@/hooks/useEditorStore"
 
 export default function DesignPage() {
   const supabase = createClient()
   const [loading, setLoading] = useState(true)
-  const [saving, setSaving] = useState(false)
   const [isPro, setIsPro] = useState(false)
   const [shopData, setShopData] = useState<any>(null)
   const [products, setProducts] = useState<any[]>([])
 
-  const [design, setDesign] = useState({
-    bg_color: "#ffffff",
-    title_text: "Colección",
-    subtitle_text: "Nuevos lanzamientos disponibles",
-    title_color: "#000000",
-    font: "sans-serif", 
-    card_style: "minimal"
-  })
+  // Store global del editor
+  const { design, setDesign, isSaving, setIsSaving } = useEditorStore()
 
   useEffect(() => {
     const loadData = async () => {
@@ -33,26 +27,26 @@ export default function DesignPage() {
         if(profile) {
             setIsPro(profile.is_pro || false)
             setShopData(profile)
-            setDesign(prev => ({
-                ...prev,
-                bg_color: profile.design_bg_color || prev.bg_color,
-                title_text: profile.design_title_text || prev.title_text,
-                subtitle_text: profile.design_subtitle_text || prev.subtitle_text,
-                title_color: profile.design_title_color || prev.title_color,
-                font: profile.design_font || prev.font,
-                card_style: profile.design_card_style || prev.card_style
-            }))
+            // Sincronizar store con DB
+            setDesign({
+                bg_color: profile.design_bg_color,
+                title_text: profile.design_title_text,
+                subtitle_text: profile.design_subtitle_text,
+                title_color: profile.design_title_color,
+                font: profile.design_font,
+                card_style: profile.design_card_style
+            })
             const { data: prod } = await supabase.from('products').select('*').eq('user_id', profile.id).limit(6)
             setProducts(prod || [])
         }
         setLoading(false)
     }
     loadData()
-  }, [])
+  }, [setDesign])
 
   const handleSave = async () => {
     if (!isPro) return
-    setSaving(true)
+    setIsSaving(true)
     const { data: { user } } = await supabase.auth.getUser()
     
     if (user) {
@@ -65,11 +59,12 @@ export default function DesignPage() {
             design_card_style: design.card_style
         }).eq('id', user.id)
     }
-    setTimeout(() => setSaving(false), 1000)
+    setTimeout(() => setIsSaving(false), 1000)
   }
 
   if (loading) return <div className="h-full flex items-center justify-center text-xs font-bold uppercase tracking-widest">Cargando...</div>
 
+  // Combinamos los datos del perfil con el diseño actual del store para la preview
   const previewShopData = {
       ...shopData,
       design_bg_color: design.bg_color,
@@ -85,21 +80,22 @@ export default function DesignPage() {
     <div className="relative w-full h-full bg-slate-100 overflow-hidden">
         
         {/* VISTA PREVIA: Centrada y contenida */}
-        <div className="absolute inset-0 z-0 overflow-y-auto custom-scrollbar">
+        <div className="absolute inset-0 z-0 overflow-y-auto custom-scrollbar pb-32">
              {/* Escalar contenido si es necesario para que se vea "fit" */}
              <div className="min-h-full">
                 <CartProvider>
-                    <CatalogoInteractivo products={products} shop={previewShopData} />
+                    <CatalogoInteractivo
+                        products={products}
+                        shop={previewShopData}
+                        isEditor={true}
+                    />
                 </CartProvider>
              </div>
         </div>
 
         {/* EDITOR: Flotante encima de todo */}
         <FloatingDesignEditor 
-            design={design} 
-            setDesign={setDesign} 
             onSave={handleSave} 
-            saving={saving}
             isPro={isPro}
         />
     </div>

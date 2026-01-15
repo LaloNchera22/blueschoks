@@ -5,10 +5,12 @@ import { useState, useMemo, useEffect } from "react"
 import { useCart } from "./cart-context"
 import CartSidebar from "./cart-sidebar" 
 import { Plus, Minus, ShoppingBag, Check, ArrowRight } from "lucide-react"
+import { useEditorStore } from "@/hooks/useEditorStore"
 
-export default function CatalogoInteractivo({ products, shop }: { products: any[], shop: any }) {
+export default function CatalogoInteractivo({ products, shop, isEditor = false }: { products: any[], shop: any, isEditor?: boolean }) {
   // USAMOS EL CONTEXTO DIRECTAMENTE
   const { items, openCart, addToCart } = useCart() 
+  const { setSelectedElement, selectedElement } = useEditorStore()
   const [isClient, setIsClient] = useState(false)
 
   useEffect(() => { setIsClient(true) }, [])
@@ -23,46 +25,67 @@ export default function CatalogoInteractivo({ products, shop }: { products: any[
   const bgColor = shop.design_bg_color || "#ffffff"
   const textColor = shop.design_title_color || "#000000"
 
+  // Handler para clicks en el editor
+  const handleElementClick = (e: React.MouseEvent, type: 'global' | 'text:title' | 'text:subtitle') => {
+    if (!isEditor) return
+    e.stopPropagation() // Detener propagación para que no seleccione 'global' inmediatamente si hay un wrapper
+    setSelectedElement(type)
+  }
+
   return (
     <>
       <style jsx global>{`@import url('${googleFontUrl}');`}</style>
 
-      {/* RENDERIZAMOS EL SIDEBAR */}
-      <CartSidebar shop={shop} />
+      {/* RENDERIZAMOS EL SIDEBAR SOLO SI NO ES EDITOR */}
+      {!isEditor && <CartSidebar shop={shop} />}
 
       <div 
           className="min-h-screen pb-32 relative transition-all duration-500"
           style={{ backgroundColor: bgColor, color: textColor, fontFamily: fontValue }}
+          onClick={() => isEditor && setSelectedElement('global')}
       >
           {/* HEADER */}
           <header className="sticky top-0 z-30 backdrop-blur-md h-16 flex items-center border-b border-black/5" style={{ backgroundColor: `${bgColor}cc` }}>
               <div className="max-w-6xl mx-auto w-full px-4 flex justify-between items-center">
                   <h1 className="font-bold uppercase tracking-widest text-sm truncate">{shop.shop_name}</h1>
                   
-                  {/* BOTÓN HEADER - AHORA USA openCart() */}
+                  {/* BOTÓN HEADER - Oculto en Editor */}
+                  {!isEditor && (
                   <button onClick={openCart} className="relative p-2 hover:opacity-70 transition-opacity">
                       <ShoppingBag size={20} />
                       {totalItems > 0 && <span className="absolute top-0 right-0 w-2.5 h-2.5 bg-red-500 rounded-full border-2 border-white"></span>}
                   </button>
+                  )}
               </div>
           </header>
 
           {/* CATALOGO */}
           <main className="max-w-6xl mx-auto px-4 py-8">
-              <div className="text-center mb-12">
-                  <h2 className="text-4xl md:text-5xl font-black mb-2 leading-tight">{shop.design_title_text || "Colección"}</h2>
-                  <p className="opacity-75 text-sm md:text-base">{shop.design_subtitle_text}</p>
+              <div className="text-center mb-12 flex flex-col items-center">
+                  <div
+                    onClick={(e) => handleElementClick(e, 'text:title')}
+                    className={`cursor-pointer transition-all rounded-lg p-2 -m-2 ${isEditor && selectedElement === 'text:title' ? 'ring-2 ring-blue-500 bg-blue-500/10' : isEditor ? 'hover:ring-2 hover:ring-blue-500/50 hover:bg-blue-500/5' : ''}`}
+                  >
+                    <h2 className="text-4xl md:text-5xl font-black mb-0 leading-tight select-none">{shop.design_title_text || "Colección"}</h2>
+                  </div>
+
+                  <div
+                    onClick={(e) => handleElementClick(e, 'text:subtitle')}
+                    className={`mt-2 cursor-pointer transition-all rounded-lg p-2 -m-2 ${isEditor && selectedElement === 'text:subtitle' ? 'ring-2 ring-blue-500 bg-blue-500/10' : isEditor ? 'hover:ring-2 hover:ring-blue-500/50 hover:bg-blue-500/5' : ''}`}
+                  >
+                    <p className="opacity-75 text-sm md:text-base select-none">{shop.design_subtitle_text}</p>
+                  </div>
               </div>
 
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
                   {products?.map((product) => (
-                      <TarjetaPersonalizable key={product.id} product={product} design={shop} />
+                      <TarjetaPersonalizable key={product.id} product={product} design={shop} isEditor={isEditor} />
                   ))}
               </div>
           </main>
 
-          {/* --- BOTÓN FLOTANTE FINAL (SIN TRUCOS) --- */}
-          {totalItems > 0 && (
+          {/* --- BOTÓN FLOTANTE FINAL (SIN TRUCOS) - OCULTO EN EDITOR --- */}
+          {!isEditor && totalItems > 0 && (
              <div className="fixed bottom-8 left-0 right-0 z-40 flex justify-center px-4 animate-in slide-in-from-bottom-4 fade-in duration-500">
                 <button
                     onClick={openCart} // <--- CLIC DIRECTO AL CONTEXTO
@@ -93,12 +116,13 @@ export default function CatalogoInteractivo({ products, shop }: { products: any[
   )
 }
 
-function TarjetaPersonalizable({ product, design }: { product: any, design: any }) {
+function TarjetaPersonalizable({ product, design, isEditor = false }: { product: any, design: any, isEditor?: boolean }) {
   const { addToCart } = useCart()
   const [quantity, setQuantity] = useState(1)
   const [isAdded, setIsAdded] = useState(false)
 
   const handleAdd = () => {
+    if (isEditor) return // No añadir al carrito en el editor
     for(let i=0; i<quantity; i++) addToCart(product)
     setIsAdded(true)
     setTimeout(() => setIsAdded(false), 1500)
