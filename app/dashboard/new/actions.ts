@@ -35,18 +35,19 @@ export async function createProduct(prevState: State, formData: FormData): Promi
     }
 
     // Subir Archivos
-    const uploadedUrls: string[] = []
-    
-    for (const file of validFiles) {
+    const uploadPromises = validFiles.map(async (file, index) => {
       const fileExt = file.name.split('.').pop()
-      const fileName = `${user.id}/${Date.now()}-${Math.random().toString(36).slice(2)}.${fileExt}`
+      const fileName = `${user.id}/${Date.now()}-${index}-${Math.random().toString(36).slice(2)}.${fileExt}`
 
       const { error } = await supabase.storage.from('product-media').upload(fileName, file)
-      if (error) continue 
+      if (error) return null
 
       const { data } = supabase.storage.from('product-media').getPublicUrl(fileName)
-      uploadedUrls.push(data.publicUrl)
-    }
+      return data.publicUrl
+    })
+
+    const results = await Promise.all(uploadPromises)
+    const uploadedUrls = results.filter((url): url is string => url !== null)
 
     // Guardar en DB
     const { error: dbError } = await supabase.from("products").insert({
