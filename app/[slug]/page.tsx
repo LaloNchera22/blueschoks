@@ -1,4 +1,4 @@
-import { createClient } from "@/utils/supabase/server"
+import { createAdminClient, createClient } from "@/utils/supabase/server"
 import { notFound } from "next/navigation"
 import { CartProvider } from "@/components/shop/cart-context"
 // IMPORTAMOS EL COMPONENTE VISUAL
@@ -9,7 +9,8 @@ import { cache } from "react"
 export const revalidate = 0;
 
 const getShop = cache(async (slug: string) => {
-  const supabase = await createClient()
+  // Usamos AdminClient para saltar RLS y que sea pública de verdad
+  const supabase = await createAdminClient()
   const { data } = await supabase
     .from("profiles")
     .select(`
@@ -47,7 +48,8 @@ export default async function ShopPage({ params }: { params: Promise<{ slug: str
 
   if (!shop) return notFound()
 
-  const supabase = await createClient()
+  // Usamos AdminClient para leer productos públicos sin restricción RLS de "solo owner"
+  const supabase = await createAdminClient()
 
   // 2. OBTENER PRODUCTOS
   const { data: products } = await supabase
