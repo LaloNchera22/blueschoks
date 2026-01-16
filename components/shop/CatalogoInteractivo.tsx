@@ -1,10 +1,10 @@
 "use client"
 
-import { useState, useEffect } from "react"
+import { useState, useEffect, useMemo } from "react"
 // Importamos openCart del contexto
 import { useCart, CartItem } from "./cart-context"
 import CartSidebar from "./cart-sidebar" 
-import { Plus, Minus, ShoppingBag, Check, Globe, Share2, Trash2, Send, X, ShoppingCart } from "lucide-react"
+import { Plus, Minus, ShoppingBag, Check, Globe, Share2, Trash2, Send, X, ShoppingCart, ChevronLeft, ChevronRight } from "lucide-react"
 import { useEditorStore } from "@/hooks/useEditorStore"
 import { motion, AnimatePresence } from "framer-motion"
 import confetti from "canvas-confetti"
@@ -34,6 +34,7 @@ interface Product {
   price: number;
   description?: string | null;
   image_url?: string | null;
+  images?: string[] | null;
   quantity?: number; 
   stock?: number;
   [key: string]: unknown;
@@ -286,11 +287,38 @@ export default function CatalogoInteractivo({ products, shop, isEditor = false }
   )
 }
 
-// --- TARJETA DE PRODUCTO REDISEÑADA (ESTILO NENI) ---
+// --- TARJETA DE PRODUCTO REDISEÑADA (ESTILO EDITORIAL/FASHION) ---
 function TarjetaCuadrada({ product, design, isEditor = false, index = 0 }: { product: Product, design: Shop, isEditor?: boolean, index?: number }) {
   const { addToCart } = useCart()
   const [quantity, setQuantity] = useState(1)
   const [isAdded, setIsAdded] = useState(false)
+  const [currentImageIndex, setCurrentImageIndex] = useState(0)
+  const [direction, setDirection] = useState(0)
+  const [isHovered, setIsHovered] = useState(false)
+
+  // 1. Lógica de Imágenes (Galería)
+  const allImages = useMemo(() => {
+    // Combinar images y image_url, priorizando images si existe
+    const images = (product.images && product.images.length > 0)
+        ? product.images
+        : (product.image_url ? [product.image_url] : []);
+
+    // Filtramos nulos y duplicados (básico)
+    return Array.from(new Set(images.filter(Boolean)));
+  }, [product]);
+
+  const hasMultipleImages = allImages.length > 1;
+
+  const paginate = (newDirection: number) => {
+    if (!hasMultipleImages) return;
+    setDirection(newDirection);
+    setCurrentImageIndex((prev) => {
+        let next = prev + newDirection;
+        if (next < 0) next = allImages.length - 1;
+        if (next >= allImages.length) next = 0;
+        return next;
+    });
+  };
 
   const handleAdd = (e: React.MouseEvent) => {
     e.stopPropagation()
@@ -305,101 +333,198 @@ function TarjetaCuadrada({ product, design, isEditor = false, index = 0 }: { pro
 
         confetti({
             origin: { x, y },
-            particleCount: 60,
-            spread: 70,
-            startVelocity: 30,
-            colors: [design.design_title_color || '#ea580c', '#FFD700'],
+            particleCount: 40,
+            spread: 50,
+            startVelocity: 25,
+            colors: [design.design_title_color || '#ea580c', '#ffffff'],
             disableForReducedMotion: true,
             zIndex: 9999
         });
     }
 
-    toast.success(`¡Listo! Agregado al carrito`, {
+    toast.success(`Agregado`, {
         description: `${quantity}x ${product.name}`,
         duration: 2000,
         position: "bottom-center",
-        icon: <Check className="text-green-500 animate-bounce" size={20} strokeWidth={3} />,
-        style: { fontWeight: 'bold', border: '2px solid #22c55e' }
+        icon: <ShoppingBag className="text-black" size={18} />,
+        className: "bg-white border border-gray-100 shadow-xl",
     })
 
     addToCart(product, quantity)
     setIsAdded(true)
-    setTimeout(() => setIsAdded(false), 2000)
+    setTimeout(() => setIsAdded(false), 1500)
     setQuantity(1) 
   }
 
-  // Color de énfasis para el precio y botón
-  const accentColor = design.design_title_color || '#0f172a' // Color de la tienda o negro por defecto
+  // Estilos Dinámicos
+  const isMinimal = design.design_card_style === 'minimal';
+  // Si es Minimal, es full-bleed (sin padding/border extra en contenedor principal para la imagen).
+  // Si es Border, añadimos un borde elegante.
+
+  // Fondo de la tarjeta: Usamos blanco para garantizar legibilidad estilo "Editorial",
+  // a menos que sea minimalista donde podría ser transparente si se desea,
+  // pero para seguridad visual usamos blanco o transparente según convenga.
+  // El usuario pidió "Mantén el fondo según shop.design_bg_color" -> Esto suele aplicar al wrapper general.
+  // Para la tarjeta, 'minimal' suele ser clean.
+
+  const cardClasses = isMinimal
+    ? "bg-transparent" // Full bleed, se funde con el fondo
+    : "bg-white border border-gray-100 hover:border-gray-200 shadow-sm"; // Border style
+
+  const titleColor = design.design_title_color || '#000000';
+
+  // Variantes para la animación de slide
+  const slideVariants = {
+    enter: (direction: number) => ({
+      x: direction > 0 ? "100%" : "-100%",
+      opacity: 0
+    }),
+    center: {
+      zIndex: 1,
+      x: 0,
+      opacity: 1
+    },
+    exit: (direction: number) => ({
+      zIndex: 0,
+      x: direction < 0 ? "100%" : "-100%",
+      opacity: 0
+    })
+  };
 
   return (
     <motion.div
-        initial={{ opacity: 0, y: 30 }}
+        initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.4, delay: index * 0.05, type: "spring", stiffness: 100 }}
-        // ESTILO BASE FIJO: Fondo blanco, borde visible, sombra definida.
-        className="group relative bg-white rounded-2xl overflow-hidden transition-all duration-300 w-full flex flex-col shadow-md border-2 border-slate-200 hover:border-slate-300 hover:shadow-xl"
+        transition={{ duration: 0.5, delay: index * 0.05 }}
+        className={`group relative flex flex-col overflow-hidden ${isMinimal ? '' : 'rounded-sm'} ${cardClasses}`}
+        onHoverStart={() => setIsHovered(true)}
+        onHoverEnd={() => setIsHovered(false)}
     >
-        {/* IMAGEN */}
-        <div className="w-full aspect-square bg-gray-100 relative overflow-hidden border-b border-slate-100">
-             {product.image_url ? (
-                <Image
-                    src={product.image_url}
-                    fill
-                    className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700"
-                    alt={product.name || "Producto"}
-                    sizes="(max-width: 768px) 50vw, 25vw"
-                />
-            ) : (
-                <div className="w-full h-full flex items-center justify-center opacity-20 bg-slate-50"><ShoppingBag size={48} className="text-slate-400"/></div>
-            )}
-             {/* Overlay sutil al pasar el mouse */}
-             <div className="absolute inset-0 bg-black/5 opacity-0 group-hover:opacity-100 transition-opacity"></div>
+        {/* --- 1. GALERÍA / IMAGEN (80-90% visual weight) --- */}
+        <div className={`relative w-full aspect-[3/4] overflow-hidden bg-gray-100 ${isMinimal ? '' : 'border-b border-gray-50'}`}>
+             <AnimatePresence initial={false} custom={direction} mode="popLayout">
+                <motion.div
+                    key={currentImageIndex}
+                    custom={direction}
+                    variants={slideVariants}
+                    initial="enter"
+                    animate="center"
+                    exit="exit"
+                    transition={{
+                        x: { type: "spring", stiffness: 300, damping: 30 },
+                        opacity: { duration: 0.2 }
+                    }}
+                    className="absolute inset-0 w-full h-full"
+                >
+                    {allImages.length > 0 ? (
+                        <Image
+                            src={allImages[currentImageIndex]}
+                            alt={product.name}
+                            fill
+                            className="object-cover"
+                            sizes="(max-width: 768px) 100vw, 33vw"
+                        />
+                    ) : (
+                        <div className="flex items-center justify-center w-full h-full bg-gray-50 text-gray-300">
+                            <ShoppingBag size={32} />
+                        </div>
+                    )}
+                </motion.div>
+             </AnimatePresence>
+
+             {/* Flechas de Navegación (Solo si hay múltiples y hover) */}
+             {hasMultipleImages && (
+                 <>
+                    {/* Flecha Izquierda */}
+                    <motion.button
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: isHovered ? 1 : 0 }}
+                        className="absolute left-3 top-1/2 -translate-y-1/2 w-8 h-8 flex items-center justify-center bg-white/90 backdrop-blur-sm rounded-full text-black shadow-sm hover:bg-white transition-colors z-10"
+                        onClick={(e) => { e.stopPropagation(); paginate(-1); }}
+                    >
+                        <ChevronLeft size={16} strokeWidth={2} />
+                    </motion.button>
+
+                    {/* Flecha Derecha */}
+                    <motion.button
+                         initial={{ opacity: 0 }}
+                         animate={{ opacity: isHovered ? 1 : 0 }}
+                         className="absolute right-3 top-1/2 -translate-y-1/2 w-8 h-8 flex items-center justify-center bg-white/90 backdrop-blur-sm rounded-full text-black shadow-sm hover:bg-white transition-colors z-10"
+                         onClick={(e) => { e.stopPropagation(); paginate(1); }}
+                    >
+                        <ChevronRight size={16} strokeWidth={2} />
+                    </motion.button>
+
+                    {/* Dots Indicadores */}
+                    <div className="absolute bottom-3 left-0 right-0 flex justify-center gap-1.5 z-10 pointer-events-none">
+                        {allImages.map((_, idx) => (
+                            <motion.div
+                                key={idx}
+                                animate={{
+                                    opacity: isHovered ? 1 : 0,
+                                    scale: idx === currentImageIndex ? 1.2 : 1
+                                }}
+                                className={`h-1.5 rounded-full shadow-sm transition-colors duration-300 ${idx === currentImageIndex ? 'w-1.5 bg-white' : 'w-1.5 bg-white/60'}`}
+                            />
+                        ))}
+                    </div>
+                 </>
+             )}
+
+             {/* Badge de Stock Agotado (Opcional, pero buena práctica UX) */}
+             {product.stock === 0 && (
+                 <div className="absolute top-2 right-2 bg-black/70 text-white text-[10px] font-bold px-2 py-1 uppercase tracking-wider backdrop-blur-sm">
+                     Agotado
+                 </div>
+             )}
         </div>
 
-        {/* CONTENIDO */}
-        <div className="p-4 flex flex-col flex-1 justify-between">
-            <div className="mb-4">
-                {/* PRECIO: Grande, arriba y con color de énfasis */}
-                <p className="font-black text-3xl tabular-nums leading-none mb-2" style={{ color: accentColor }}>
-                    ${product.price}
-                </p>
-                {/* TÍTULO: Debajo, fuerte y legible */}
-                <h3 className="font-bold text-slate-800 text-base leading-tight line-clamp-2 uppercase tracking-tight">
+        {/* --- 2. INFORMACIÓN Y ACCIONES --- */}
+        <div className="flex flex-col p-3 gap-2">
+
+            {/* Texto Minimalista */}
+            <div className="flex flex-col gap-0.5 text-left">
+                <h3 className="text-[15px] font-medium leading-tight text-gray-900 line-clamp-1" style={{ color: titleColor }}>
                     {product.name}
                 </h3>
+                <p className="text-sm font-light text-gray-500/90" style={{ color: titleColor ? `${titleColor}CC` : undefined }}>
+                    ${product.price}
+                </p>
             </div>
 
-            {/* CONTROLES */}
-            <div className="space-y-3" onClick={(e) => e.stopPropagation()}>
-                {/* Selector Numérico (Más sutil, estilo píldora) */}
-                <div className="flex items-center justify-center gap-4 bg-slate-50 rounded-full p-1 border border-slate-100 mx-auto w-3/4">
+            {/* Zona de Acción: Cantidad + Compra */}
+            <div className="flex items-center justify-between mt-1">
+
+                {/* Selector Cantidad (Estilo Cápsula Minimal) */}
+                <div className="flex items-center h-8 bg-gray-100/80 rounded-full px-1 border border-transparent hover:border-gray-200 transition-colors">
                     <button 
                         onClick={() => setQuantity(Math.max(1, quantity - 1))}
-                        className="w-8 h-8 flex items-center justify-center rounded-full hover:bg-white hover:shadow-sm active:scale-90 transition text-slate-600"
+                        className="w-7 h-full flex items-center justify-center text-gray-500 hover:text-black transition active:scale-90"
                     >
-                        <Minus size={16} strokeWidth={2.5} />
+                        <Minus size={14} />
                     </button>
-                    <span className="font-black text-lg w-8 text-center tabular-nums text-slate-900">{quantity}</span>
+                    <span className="text-xs font-semibold w-4 text-center text-gray-900 tabular-nums">{quantity}</span>
                     <button 
                         onClick={() => setQuantity(quantity + 1)}
-                        className="w-8 h-8 flex items-center justify-center rounded-full hover:bg-white hover:shadow-sm active:scale-90 transition text-slate-600"
+                        className="w-7 h-full flex items-center justify-center text-gray-500 hover:text-black transition active:scale-90"
                     >
-                        <Plus size={16} strokeWidth={2.5} />
+                        <Plus size={14} />
                     </button>
                 </div>
 
-                {/* BOTÓN AGREGAR: Grande, ancho completo, estilo bloque */}
+                {/* Botón de Compra (Circular/Icono) */}
                 <button
                     id={`btn-add-${product.id}`}
                     onClick={handleAdd}
-                    className={`w-full py-3.5 rounded-xl font-black text-sm uppercase tracking-widest flex items-center justify-center gap-2 transition-all active:scale-95 shadow-sm relative overflow-hidden
-                    ${isAdded ? 'bg-green-600 text-white' : 'text-white hover:opacity-90'}`}
-                    style={!isAdded ? { backgroundColor: accentColor } : undefined}
+                    className={`h-9 w-9 rounded-full flex items-center justify-center shadow-sm transition-all duration-300 active:scale-90
+                        ${isAdded ? 'bg-green-600 text-white' : 'bg-black text-white hover:bg-gray-800'}`}
+                    style={!isAdded && design.design_title_color ? { backgroundColor: design.design_title_color } : {}}
+                    title="Agregar al carrito"
                 >
                      {isAdded ? (
-                         <><Check size={20} strokeWidth={3} className="animate-bounce"/> ¡AGREGADO!</>
+                         <Check size={16} strokeWidth={3} />
                      ) : (
-                         <><ShoppingCart size={20} strokeWidth={3} /> AGREGAR AL CARRITO</>
+                         <ShoppingBag size={16} strokeWidth={2.5} />
                      )}
                 </button>
             </div>
