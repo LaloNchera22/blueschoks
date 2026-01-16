@@ -95,14 +95,14 @@ export default function AppSidebar({ shopUrl = "", userEmail = "usuario@email.co
 
             {/* BOTÓN COPIAR DINÁMICO */}
             <Button 
-                onClick={copyLink} 
-                variant="outline"
-                disabled={!hasShopUrl}
-                className={`w-full h-8 text-[10px] font-bold uppercase tracking-wide transition-all duration-300 ${
-                    copied 
-                    ? "bg-green-500 text-white border-green-500 hover:bg-green-600 hover:text-white" 
-                    : "bg-white border-slate-200 text-slate-700 hover:bg-slate-100"
-                }`}
+               onClick={copyLink} 
+               variant="outline"
+               disabled={!hasShopUrl}
+               className={`w-full h-8 text-[10px] font-bold uppercase tracking-wide transition-all duration-300 ${
+                  copied 
+                  ? "bg-green-500 text-white border-green-500 hover:bg-green-600 hover:text-white" 
+                  : "bg-white border-slate-200 text-slate-700 hover:bg-slate-100"
+               }`}
             >
                {copied ? (
                    <div className="flex items-center"><Check size={12} className="mr-2"/> Link Copiado</div>

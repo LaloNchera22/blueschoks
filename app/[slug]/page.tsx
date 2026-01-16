@@ -1,53 +1,50 @@
-import { createAdminClient } from "@/utils/supabase/server"
 import { notFound } from "next/navigation"
 import { CartProvider } from "@/components/shop/cart-context"
 import CatalogoInteractivo from "@/components/shop/CatalogoInteractivo"
 import { unstable_cache } from "next/cache"
 import { Metadata } from "next"
+// 👇 CAMBIO CLAVE: Usamos la librería base de Supabase, no la de Next.js
+import { createClient } from "@supabase/supabase-js"
 
-// CACHING STRATEGY:
-// We use unstable_cache to cache database results.
-// Tags are used for on-demand invalidation via Server Actions.
-// 1M Users Readiness: This prevents the DB from being hit on every page view.
+// Configuración segura para el cliente (No usa cookies, solo la llave pública)
+const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!
+const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+
+// -----------------------------------------------------------------------------
+// FUNCIONES DE CACHÉ (Optimizadas para velocidad)
+// -----------------------------------------------------------------------------
 
 const getShopCached = async (slug: string) => {
   return unstable_cache(
     async () => {
-      const supabase = await createAdminClient()
+      // Creamos un cliente "limpio" y anónimo solo para esta lectura
+      const supabase = createClient(supabaseUrl, supabaseAnonKey)
+      
       const { data } = await supabase
         .from("profiles")
-        .select(`
-          id,
-          shop_name,
-          whatsapp,
-          email,
-          avatar_url,
-          design_bg_color,
-          design_title_text,
-          design_subtitle_text,
-          design_title_color,
-          design_font,
-          design_card_style
-        `)
+        .select("*") // Traemos todo el perfil (diseño, whatsapp, etc)
         .eq("slug", slug)
         .single()
+      
       return data
     },
-    [`shop-data-${slug}`], // Cache Key
-    { tags: [`shop:${slug}`], revalidate: 3600 } // Revalidate every hour or on tag invalidation
+    [`shop-data-${slug}`], // Llave única del caché
+    { tags: [`shop:${slug}`], revalidate: 3600 } // Se actualiza cada hora
   )()
 }
 
 const getProductsCached = async (shopId: string) => {
   return unstable_cache(
     async () => {
-      const supabase = await createAdminClient()
+      const supabase = createClient(supabaseUrl, supabaseAnonKey)
+      
       const { data } = await supabase
         .from("products")
         .select("*")
         .eq("user_id", shopId)
-        .gt("stock", 0)
+        .eq("stock", 1) // Solo productos disponibles (stock > 0 o 1)
         .order("created_at", { ascending: false })
+      
       return data
     },
     [`shop-products-${shopId}`],
@@ -55,74 +52,46 @@ const getProductsCached = async (shopId: string) => {
   )()
 }
 
+// -----------------------------------------------------------------------------
+// METADATA (Para que se vea bonito en WhatsApp/Facebook)
+// -----------------------------------------------------------------------------
 export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }): Promise<Metadata> {
   const { slug } = await params
   const shop = await getShopCached(slug)
 
   if (!shop) return { title: "Tienda no encontrada" }
 
-  const title = shop.design_title_text || shop.shop_name || "Catálogo"
-  const description = shop.design_subtitle_text || "Explora nuestros productos exclusivos."
-  const image = shop.avatar_url || "/og-placeholder.png" // Fallback image
-
   return {
-    title,
-    description,
+    title: shop.design_title_text || shop.shop_name || "Catálogo Online",
+    description: shop.design_subtitle_text || "Mira mis productos disponibles.",
     openGraph: {
-      title,
-      description,
-      images: [
-        {
-          url: image,
-          width: 800,
-          height: 600,
-          alt: title,
-        },
-      ],
-      type: 'website',
-    },
-    twitter: {
-      card: 'summary_large_image',
-      title,
-      description,
-      images: [image],
+      images: [{ url: shop.avatar_url || "/og-placeholder.png" }],
     },
   }
 }
 
+// -----------------------------------------------------------------------------
+// PÁGINA PRINCIPAL
+// -----------------------------------------------------------------------------
 export default async function ShopPage({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params
 
-  // 1. OBTENER TIENDA (Cached)
+  // 1. Buscamos la tienda usando el SLUG de la URL
   const shop = await getShopCached(slug)
 
+  // 2. Si no existe la tienda con ese nombre, mostramos 404
   if (!shop) return notFound()
 
-  // 2. OBTENER PRODUCTOS (Cached)
+  // 3. Buscamos sus productos
   const products = await getProductsCached(shop.id)
-
-  // 3. JSON-LD STRUCTURED DATA FOR SEO
-  const jsonLd = {
-    '@context': 'https://schema.org',
-    '@type': 'Store',
-    name: shop.shop_name,
-    description: shop.design_subtitle_text,
-    image: shop.avatar_url,
-    telephone: shop.whatsapp,
-    url: `https://tutienda.com/${slug}`, // Ideally use env var for base URL
-  }
-
-  // 4. FILTRAR DUPLICADOS PARA EVITAR ERRORES DE KEY
-  // (Aunque la BD debería devolver únicos por ID, esto es una capa extra de seguridad)
-  const uniqueProducts = products ? Array.from(new Map(products.map(p => [p.id, p])).values()) : []
+  const safeProducts = products || []
 
   return (
     <CartProvider>
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+      <CatalogoInteractivo 
+          products={safeProducts} 
+          shop={shop} 
       />
-      <CatalogoInteractivo products={uniqueProducts} shop={shop} />
     </CartProvider>
   )
 }
