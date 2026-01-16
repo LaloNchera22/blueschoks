@@ -85,14 +85,14 @@ export default function CatalogoInteractivo({ products, shop, isEditor = false }
       {/* RENDERIZAMOS EL SIDEBAR SOLO SI NO ES EDITOR */}
       {!isEditor && <CartSidebar shop={shop} />}
 
-      {/* CONTENEDOR PRINCIPAL - LINKTREE STYLE */}
+      {/* CONTENEDOR PRINCIPAL */}
       <div 
           className="min-h-screen transition-all duration-500 flex flex-col items-center"
           style={{ backgroundColor: bgColor, color: textColor, fontFamily: fontValue }}
           onClick={() => isEditor && setSelectedElement('global')}
       >
-          {/* HEADER DE PERFIL (LINKTREE HEADER) */}
-          <header className="w-full max-w-md mx-auto pt-12 pb-6 px-6 flex flex-col items-center text-center">
+          {/* HEADER DE PERFIL (LINKTREE HEADER) - Always Centered & Compact */}
+          <header className="w-full max-w-md mx-auto pt-12 pb-8 px-6 flex flex-col items-center text-center">
 
               {/* AVATAR */}
               <div className="mb-4 relative">
@@ -124,22 +124,24 @@ export default function CatalogoInteractivo({ products, shop, isEditor = false }
                  <p className="opacity-80 text-sm leading-relaxed max-w-xs mx-auto">{shop.design_subtitle_text || shop.bio || "Bienvenido a mi colección de productos."}</p>
               </div>
 
-              {/* REDES SOCIALES (Placeholder/Example) */}
+              {/* REDES SOCIALES */}
               <div className="flex gap-4 mt-4 opacity-60">
                    {shop.whatsapp && (
                        <a href={`https://wa.me/${shop.whatsapp}`} target="_blank" rel="noopener noreferrer" className="p-2 rounded-full bg-current/5 hover:bg-current/10 transition-colors">
-                           <Globe size={18} /> {/* Using Globe as generic link icon if whatsapp icon not desired specifically */}
+                           <Globe size={18} />
                        </a>
                    )}
                    <button className="p-2 rounded-full bg-current/5 hover:bg-current/10 transition-colors"><Share2 size={18}/></button>
               </div>
           </header>
 
-          {/* LISTA DE PRODUCTOS (STACK) */}
-          <main className="w-full max-w-md mx-auto px-4 pb-32 flex flex-col gap-4">
-              {products?.map((product, idx) => (
-                  <TarjetaPersonalizable key={product.id} product={product} design={shop} isEditor={isEditor} index={idx} />
-              ))}
+          {/* LISTA DE PRODUCTOS (GRID RESPONSIVE) */}
+          <main className="w-full max-w-7xl mx-auto px-4 pb-32">
+              <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-6">
+                  {products?.map((product, idx) => (
+                      <TarjetaCuadrada key={product.id} product={product} design={shop} isEditor={isEditor} index={idx} />
+                  ))}
+              </div>
 
               {(!products || products.length === 0) && (
                   <div className="text-center py-12 opacity-50">
@@ -160,8 +162,8 @@ export default function CatalogoInteractivo({ products, shop, isEditor = false }
                  >
                     <button
                         onClick={openCart}
-                        className="pointer-events-auto shadow-2xl hover:scale-105 active:scale-95 transition-all flex items-center gap-3 pl-5 pr-6 py-3.5 rounded-full"
-                        style={{ backgroundColor: textColor === '#ffffff' ? '#000000' : textColor, color: bgColor === '#000000' ? '#ffffff' : bgColor }}
+                        className="pointer-events-auto shadow-2xl hover:scale-105 active:scale-95 transition-all flex items-center gap-3 pl-5 pr-6 py-3.5 rounded-full backdrop-blur-md"
+                        style={{ backgroundColor: (textColor === '#ffffff' ? '#000000' : textColor), color: (bgColor === '#000000' ? '#ffffff' : bgColor) }}
                     >
                         <div className="relative">
                             <ShoppingBag size={20} />
@@ -180,10 +182,11 @@ export default function CatalogoInteractivo({ products, shop, isEditor = false }
   )
 }
 
-function TarjetaPersonalizable({ product, design, isEditor = false, index = 0 }: { product: Product, design: Shop, isEditor?: boolean, index?: number }) {
+function TarjetaCuadrada({ product, design, isEditor = false, index = 0 }: { product: Product, design: Shop, isEditor?: boolean, index?: number }) {
   const { addToCart } = useCart()
   const [quantity, setQuantity] = useState(1)
   const [isAdded, setIsAdded] = useState(false)
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [expanded, setExpanded] = useState(false)
 
   const handleAdd = (e: React.MouseEvent) => {
@@ -221,68 +224,61 @@ function TarjetaPersonalizable({ product, design, isEditor = false, index = 0 }:
   }
 
   // Estilos Condicionales
-  const cardStyle = design.design_card_style || 'minimal'
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const isMinimal = cardStyle === 'minimal'
-  const isShadow = cardStyle === 'shadow' || cardStyle === 'Sombra' // Handle potential DB naming variations
+  const isShadow = design.design_card_style === 'shadow' || design.design_card_style === 'Sombra'
 
-  // Determinar colores de contraste para la tarjeta
+  // Si hay sombra, fondo blanco. Si no, transparente (minimal).
   const cardBg = isShadow ? '#ffffff' : 'transparent'
-  // Si es minimal (transparente), usamos el color de texto global. Si es shadow (blanco), usamos negro por defecto o el color global si es oscuro.
-  // Para simplificar: Shadow siempre blanco con texto negro/gris. Minimal hereda.
   const cardTextColor = isShadow ? '#000000' : 'currentColor'
-  const shadowClass = isShadow ? 'shadow-md border border-gray-100' : 'border border-current/10'
+  const shadowClass = isShadow ? 'shadow-lg border border-gray-100' : 'border border-current/10'
 
   return (
     <motion.div
-        initial={{ opacity: 0, scale: 0.95 }}
-        animate={{ opacity: 1, scale: 1 }}
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.4, delay: index * 0.05 }}
-        className={`group relative rounded-3xl overflow-hidden transition-all duration-300 w-full ${shadowClass}`}
+        className={`group relative rounded-2xl overflow-hidden transition-all duration-300 w-full flex flex-col ${shadowClass}`}
         style={{ backgroundColor: cardBg, color: cardTextColor }}
-        onClick={() => setExpanded(!expanded)}
     >
-        <div className="flex flex-row items-stretch h-full">
-            {/* IMAGEN A LA IZQUIERDA (Thumbnail Style) o FULL WIDTH si es muy vertical?
-                User req: "Lista de Productos (Stack)... imagen del producto debe verse bien... adaptándose".
-                Linktree style usually has image on left (thumbnail) OR full width card.
-                Let's go with a balanced approach: Image on Left (30-40%) + Content Right.
-            */}
-            <div className="w-1/3 min-w-[100px] bg-gray-100 relative">
-                 {product.image_url ? (
-                    <Image
-                        src={product.image_url}
-                        fill
-                        className="w-full h-full object-cover absolute inset-0"
-                        alt={product.name}
-                        sizes="(max-width: 768px) 33vw, 20vw"
-                    />
-                ) : (
-                    <div className="w-full h-full flex items-center justify-center opacity-20"><ShoppingBag size={24}/></div>
+        {/* IMAGEN CUADRADA */}
+        <div className="w-full aspect-square bg-gray-100 relative overflow-hidden">
+             {product.image_url ? (
+                <Image
+                    src={product.image_url}
+                    fill
+                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                    alt={product.name}
+                    sizes="(max-width: 768px) 50vw, 25vw"
+                />
+            ) : (
+                <div className="w-full h-full flex items-center justify-center opacity-20"><ShoppingBag size={32}/></div>
+            )}
+
+            {/* Overlay Gradient on hover only */}
+            <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"/>
+        </div>
+
+        {/* CONTENIDO DEBAJO */}
+        <div className="p-4 flex flex-col flex-1">
+            <div className="flex-1">
+                <h3 className="font-bold text-base leading-tight mb-1 line-clamp-2">{product.name}</h3>
+                {product.description && (
+                    <p className="text-xs opacity-70 line-clamp-1 mb-2 leading-relaxed">
+                        {product.description}
+                    </p>
                 )}
             </div>
 
-            {/* CONTENIDO */}
-            <div className="flex-1 p-4 flex flex-col justify-between min-h-[120px]">
-                <div>
-                    <h3 className="font-bold text-base leading-tight mb-1 line-clamp-2">{product.name}</h3>
-                    <p className="text-xs opacity-70 line-clamp-2 mb-2 leading-relaxed">
-                        {product.description || "Sin descripción."}
-                    </p>
-                </div>
+            <div className="flex items-center justify-between mt-3 pt-2 border-t border-current/10">
+                <span className="font-black text-lg tabular-nums">${product.price}</span>
 
-                <div className="flex items-center justify-between mt-2">
-                    <span className="font-black text-lg tabular-nums">${product.price}</span>
-
-                    <button
-                        id={`btn-add-${product.id}`}
-                        onClick={handleAdd}
-                        className={`w-8 h-8 rounded-full flex items-center justify-center transition-transform hover:scale-110 active:scale-90 ${isAdded ? 'bg-green-500 text-white' : 'bg-current text-white'}`}
-                        style={{ backgroundColor: isAdded ? undefined : (isShadow ? design.design_title_color || '#000000' : 'currentColor'), color: isShadow ? '#ffffff' : design.design_bg_color || '#ffffff' }}
-                    >
-                         {isAdded ? <Check size={14} /> : <Plus size={16} />}
-                    </button>
-                </div>
+                <button
+                    id={`btn-add-${product.id}`}
+                    onClick={handleAdd}
+                    className={`w-9 h-9 rounded-full flex items-center justify-center transition-all hover:scale-110 active:scale-90 ${isAdded ? 'bg-green-500 text-white' : 'bg-current text-white'}`}
+                    style={{ backgroundColor: isAdded ? undefined : (isShadow ? design.design_title_color || '#000000' : 'currentColor'), color: isShadow ? '#ffffff' : design.design_bg_color || '#ffffff' }}
+                >
+                     {isAdded ? <Check size={16} strokeWidth={3} /> : <Plus size={18} strokeWidth={3} />}
+                </button>
             </div>
         </div>
     </motion.div>

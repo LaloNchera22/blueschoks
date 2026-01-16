@@ -13,6 +13,7 @@ export default function AppSidebar({ shopUrl = "", userEmail = "usuario@email.co
   const isDesigner = pathname === "/dashboard/design"
 
   const hasShopUrl = shopUrl && shopUrl.length > 0;
+  // Ensure the link is clean and dynamic based on the slug
   const storeLink = hasShopUrl ? `/${shopUrl}` : '/dashboard/settings';
 
   const copyLink = () => {

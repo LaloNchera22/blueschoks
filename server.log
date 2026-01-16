@@ -9,8 +9,14 @@
   · serverActions
 
 ✓ Starting...
-✓ Ready in 1242ms
+Attention: Next.js now collects completely anonymous telemetry regarding usage.
+This information is used to shape Next.js' roadmap and prioritize features.
+You can learn more, including how to opt-out if you'd not like to participate in this anonymous program, by visiting the following URL:
+https://nextjs.org/telemetry
+
+✓ Ready in 1744ms
 ○ Compiling /[slug] ...
+SUPABASE_SERVICE_ROLE_KEY is missing. Falling back to ANON_KEY. This may cause 404s if RLS is strict.
 SUPABASE_SERVICE_ROLE_KEY is missing. Falling back to ANON_KEY. This may cause 404s if RLS is strict.
 ⨯ Error: supabaseUrl is required.
     at createAdminClient (utils/supabase/server.ts:11:32)
@@ -25,11 +31,10 @@ SUPABASE_SERVICE_ROLE_KEY is missing. Falling back to ANON_KEY. This may cause 4
   14 |     ) {
   digest: '1286886891'
 }
-SUPABASE_SERVICE_ROLE_KEY is missing. Falling back to ANON_KEY. This may cause 404s if RLS is strict.
 ⨯ Error: supabaseUrl is required.
     at createAdminClient (utils/supabase/server.ts:11:32)
     at tags (app/[slug]/page.tsx:16:47)
-    at async ShopPage (app/[slug]/page.tsx:100:16)
+    at async ShopPage (app/[slug]/page.tsx:97:16)
    9 |   if (!serviceRoleKey) {
   10 |     console.warn("SUPABASE_SERVICE_ROLE_KEY is missing. Falling back to ANON_KEY. This may cause 404s if RLS is strict.")
 > 11 |     return createSupabaseClient<Database>(
@@ -37,7 +42,6 @@ SUPABASE_SERVICE_ROLE_KEY is missing. Falling back to ANON_KEY. This may cause 4
   12 |       process.env.NEXT_PUBLIC_SUPABASE_URL!,
   13 |       process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
   14 |     ) {
-  digest: '2227861093'
+  digest: '3897507303'
 }
- GET /demo-shop 200 in 11.8s (compile: 8.6s, render: 3.2s)
-✓ Compiled in 98ms
+ GET /myshop 200 in 9.8s (compile: 9.3s, render: 470ms)
