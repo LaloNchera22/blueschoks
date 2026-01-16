@@ -1,4 +1,4 @@
-import { Check } from "lucide-react";
+import { Check, ArrowRight } from "lucide-react"; // Agregamos ArrowRight
 import Link from "next/link";
 
 export default function PricingPage() {
@@ -56,9 +56,18 @@ export default function PricingPage() {
         </div>
       </div>
       
-      <div className="mt-12 text-sm text-slate-500">
-        ¿Ya tienes cuenta? <Link href="/login" className="underline">Inicia sesión</Link>
+      {/* --- BOTÓN NUEVO: CONTINUAR GRATIS --- */}
+      <div className="mt-12 text-center animate-in fade-in slide-in-from-bottom-4 duration-1000">
+        <Link 
+          href="/dashboard" 
+          className="group inline-flex items-center gap-2 text-slate-500 hover:text-slate-900 font-medium transition-colors"
+        >
+          Continuar con Plan Gratuito
+          <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+        </Link>
+        <p className="text-xs text-slate-400 mt-2">Funciones limitadas · 5% de comisión por venta</p>
       </div>
+
     </div>
   )
 }
