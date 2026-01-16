@@ -26,11 +26,12 @@ export default function CartSidebar({ shop }: { shop: Shop }) {
   const whatsappLink = useMemo(() => {
     if (!shop || !shop.whatsapp) return null;
     const phone = shop.whatsapp.replace(/\D/g, ''); 
-    let message = `Hola *${shop.shop_name || 'Tienda'}*, quiero realizar el siguiente pedido:\n\n`
-    items.forEach((item: CartItem) => {
-        message += `▫️ ${item.quantity}x *${item.name}* - $${item.price * item.quantity}\n`
-    })
-    message += `\n*TOTAL: ${formatPrice(cartTotal)}*\n\nQuedo pendiente para el pago y envío.`
+    // Format: Hola, quiero pedir: 1x ProdA ($100), 2x ProdB ($50) Total: $200
+    let itemList = items.map((item: CartItem) => {
+        return `${item.quantity}x ${item.name} (${formatPrice(item.price * item.quantity)})`
+    }).join(", ");
+
+    let message = `Hola, quiero pedir:\n${itemList}\nTotal: ${formatPrice(cartTotal)}`
     return `https://wa.me/${phone}?text=${encodeURIComponent(message)}`
   }, [shop, items, cartTotal])
 
