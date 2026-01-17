@@ -47,29 +47,13 @@ interface EditorProps {
 }
 
 export default function FloatingDesignEditor({
-  design: initialDesign,
-  setDesign: setInitialDesign,
   onSave: externalOnSave,
   saving: externalSaving,
   isPro = false
 }: EditorProps) {
 
-  const { design, setDesign, selectedElement, setSelectedElement, isSaving, setIsSaving } = useEditorStore()
+  const { design, updateConfig, selectedElement, setSelectedElement, isSaving, setIsSaving } = useEditorStore()
   
-  // Sincronizar estado inicial si es necesario (solo una vez)
-  useEffect(() => {
-    if (initialDesign) {
-      setDesign(initialDesign)
-    }
-  }, [initialDesign, setDesign])
-
-  // Sincronizar hacia arriba cuando cambia el store (para mantener compatibilidad con page.tsx)
-  useEffect(() => {
-    if (setInitialDesign) {
-      setInitialDesign(design)
-    }
-  }, [design, setInitialDesign])
-
   const [showSuccess, setShowSuccess] = useState(false)
   const prevSavingRef = useRef(isSaving)
   const [showFontMenu, setShowFontMenu] = useState(false)
@@ -100,18 +84,24 @@ export default function FloatingDesignEditor({
 
   // Renderizar herramienta según contexto
   const renderTools = () => {
-    // A. MODO TEXTO (Título o Subtítulo)
-    if (selectedElement.startsWith('text')) {
+    // A. MODO HEADER TEXTO (Título o Subtítulo)
+    if (selectedElement.startsWith('header:')) {
+       const isTitle = selectedElement === 'header:title';
+       const currentText = isTitle ? design.header.title.text : design.header.subtitle.text;
+       // We assume title uses global font for now or its own if we added that granularity later
+       // The store logic for font currently updates global font in the old code, but let's stick to global for now or header specific if we want
+       const currentFont = design.global.font;
+
        return (
           <div className="flex items-center gap-2 h-full">
 
-             {/* 1. Selector de Fuente */}
+             {/* 1. Selector de Fuente (Global por ahora, o específica si se añade) */}
              <div className="relative">
                 <button
                   onClick={() => setShowFontMenu(!showFontMenu)}
                   className="h-10 px-4 rounded-xl bg-slate-50 hover:bg-slate-100 flex items-center gap-2 border border-slate-200 min-w-[140px] justify-between transition-colors"
                 >
-                   <span className="text-sm font-medium truncate max-w-[100px]">{canvaFonts.find(f => f.value === design.font)?.name || 'Fuente'}</span>
+                   <span className="text-sm font-medium truncate max-w-[100px]">{canvaFonts.find(f => f.value === currentFont)?.name || 'Fuente'}</span>
                    <Type size={14} className="opacity-50" />
                 </button>
 
@@ -121,13 +111,13 @@ export default function FloatingDesignEditor({
                            <button
                               key={f.name}
                               onClick={() => {
-                                  setDesign({ font: f.value })
+                                  updateConfig('global.font', f.value)
                                   setShowFontMenu(false)
                               }}
-                              className={`text-left px-3 py-2 rounded-lg text-sm hover:bg-slate-50 transition-colors flex justify-between items-center ${design.font === f.value ? 'bg-slate-900 text-white hover:bg-slate-800' : ''}`}
+                              className={`text-left px-3 py-2 rounded-lg text-sm hover:bg-slate-50 transition-colors flex justify-between items-center ${currentFont === f.value ? 'bg-slate-900 text-white hover:bg-slate-800' : ''}`}
                            >
                               <span style={{ fontFamily: f.value }}>{f.name}</span>
-                              {design.font === f.value && <Check size={12} />}
+                              {currentFont === f.value && <Check size={12} />}
                            </button>
                         ))}
                     </div>
@@ -138,22 +128,23 @@ export default function FloatingDesignEditor({
 
              {/* 2. Input Texto Directo */}
              <input
-                value={selectedElement === 'text:title' ? design.title_text : design.subtitle_text}
-                onChange={(e) => selectedElement === 'text:title' ? setDesign({ title_text: e.target.value }) : setDesign({ subtitle_text: e.target.value })}
+                value={currentText}
+                onChange={(e) => updateConfig(isTitle ? 'header.title.text' : 'header.subtitle.text', e.target.value)}
                 className="h-10 bg-slate-50 border border-slate-200 rounded-xl px-3 w-40 text-sm focus:outline-none focus:ring-2 focus:ring-slate-900"
                 placeholder="Escribe aquí..."
              />
 
              <div className="w-px h-6 bg-slate-200 mx-1"></div>
 
-             {/* 3. Color Texto */}
+             {/* 3. Color Texto (Solo Título por ahora en UI vieja, pero podemos soportar ambos) */}
+             {isTitle && (
              <div className="relative group">
                 <div className="w-10 h-10 rounded-xl border border-slate-200 flex items-center justify-center cursor-pointer hover:bg-slate-50 relative overflow-hidden">
-                    <div className="w-6 h-6 rounded-full border border-slate-200 shadow-sm" style={{ backgroundColor: design.title_color }}></div>
+                    <div className="w-6 h-6 rounded-full border border-slate-200 shadow-sm" style={{ backgroundColor: design.header.title.color }}></div>
                     <input
                         type="color"
-                        value={design.title_color}
-                        onChange={(e) => setDesign({ title_color: e.target.value })}
+                        value={design.header.title.color}
+                        onChange={(e) => updateConfig('header.title.color', e.target.value)}
                         className="absolute inset-0 opacity-0 cursor-pointer w-full h-full"
                     />
                 </div>
@@ -161,6 +152,7 @@ export default function FloatingDesignEditor({
                     Color
                 </span>
              </div>
+             )}
 
              {/* 4. Alineación (Simulada por ahora, ya que el diseño es centrado por defecto) */}
              <div className="flex bg-slate-50 rounded-xl border border-slate-200 p-1">
@@ -180,11 +172,11 @@ export default function FloatingDesignEditor({
              <div className="flex flex-col items-center gap-1 group cursor-pointer relative">
                  <div className="w-10 h-10 rounded-full border-2 border-slate-100 shadow-sm flex items-center justify-center relative overflow-hidden hover:scale-105 transition-transform bg-white">
                     <div className="w-full h-full absolute inset-0 opacity-20 bg-gradient-to-br from-indigo-500 via-purple-500 to-pink-500"></div>
-                    <div className="w-6 h-6 rounded-full shadow-inner border border-black/5" style={{ backgroundColor: design.bg_color }}></div>
+                    <div className="w-6 h-6 rounded-full shadow-inner border border-black/5" style={{ backgroundColor: design.global.backgroundColor }}></div>
                     <input
                         type="color"
-                        value={design.bg_color}
-                        onChange={(e) => setDesign({ bg_color: e.target.value })}
+                        value={design.global.backgroundColor}
+                        onChange={(e) => updateConfig('global.backgroundColor', e.target.value)}
                         className="absolute inset-0 opacity-0 cursor-pointer w-full h-full"
                     />
                  </div>
@@ -202,9 +194,9 @@ export default function FloatingDesignEditor({
                 ].map((style) => (
                     <button
                         key={style.id}
-                        onClick={() => setDesign({ card_style: style.id })}
+                        onClick={() => updateConfig('cards.globalDefaults.style', style.id)}
                         className={`px-3 py-1.5 rounded-full text-[10px] font-bold uppercase tracking-wide transition-all ${
-                            design.card_style === style.id
+                            design.cards.globalDefaults.style === style.id
                             ? 'bg-white text-slate-900 shadow-sm'
                             : 'text-slate-400 hover:text-slate-600'
                         }`}
@@ -269,7 +261,7 @@ export default function FloatingDesignEditor({
        {/* INDICADOR DE CONTEXTO */}
        {selectedElement !== 'global' && (
            <div className="bg-slate-900 text-white text-[10px] font-bold uppercase tracking-widest px-3 py-1.5 rounded-full shadow-lg pointer-events-auto animate-in fade-in zoom-in duration-300">
-               Editando: {selectedElement.replace('text:', '').toUpperCase()}
+               Editando: {selectedElement.replace('header:', '').toUpperCase()}
            </div>
        )}
 
