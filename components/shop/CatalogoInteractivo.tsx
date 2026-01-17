@@ -74,7 +74,7 @@ export default function CatalogoInteractivo({ products, shop, isEditor = false }
   const textColor = shop.design_title_color || "#000000"
 
   // Handler para clicks en el editor
-  const handleElementClick = (e: React.MouseEvent, type: 'global' | 'text:title' | 'text:subtitle') => {
+  const handleElementClick = (e: React.MouseEvent, type: 'global' | 'header:title' | 'header:subtitle') => {
     if (!isEditor) return
     e.stopPropagation()
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -132,16 +132,16 @@ export default function CatalogoInteractivo({ products, shop, isEditor = false }
 
               {/* TITULO / NOMBRE TIENDA */}
               <div
-                onClick={(e) => handleElementClick(e, 'text:title')}
-                className={`cursor-pointer transition-all rounded-xl px-4 py-2 ${isEditor && selectedElement === 'text:title' ? 'ring-2 ring-blue-500 bg-blue-500/10' : isEditor ? 'hover:ring-2 hover:ring-blue-500/50 hover:bg-blue-500/5' : ''}`}
+                onClick={(e) => handleElementClick(e, 'header:title')}
+                className={`cursor-pointer transition-all rounded-xl px-4 py-2 ${isEditor && selectedElement === 'header:title' ? 'ring-2 ring-blue-500 bg-blue-500/10' : isEditor ? 'hover:ring-2 hover:ring-blue-500/50 hover:bg-blue-500/5' : ''}`}
               >
                   <h1 className="text-2xl font-bold tracking-tight">{shop.design_title_text || shop.shop_name || "Mi Tienda"}</h1>
               </div>
 
               {/* BIO / DESCRIPCION */}
               <div
-                onClick={(e) => handleElementClick(e, 'text:subtitle')}
-                className={`mt-1 cursor-pointer transition-all rounded-lg px-2 py-1 ${isEditor && selectedElement === 'text:subtitle' ? 'ring-2 ring-blue-500 bg-blue-500/10' : isEditor ? 'hover:ring-2 hover:ring-blue-500/50 hover:bg-blue-500/5' : ''}`}
+                onClick={(e) => handleElementClick(e, 'header:subtitle')}
+                className={`mt-1 cursor-pointer transition-all rounded-lg px-2 py-1 ${isEditor && selectedElement === 'header:subtitle' ? 'ring-2 ring-blue-500 bg-blue-500/10' : isEditor ? 'hover:ring-2 hover:ring-blue-500/50 hover:bg-blue-500/5' : ''}`}
               >
                   <p className="opacity-80 text-sm leading-relaxed max-w-xs mx-auto">{shop.design_subtitle_text || shop.bio || "Bienvenido a mi colección de productos."}</p>
               </div>
