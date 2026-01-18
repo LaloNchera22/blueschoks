@@ -2,34 +2,4 @@
 > blueshock@0.1.0 dev
 > next dev
 
-▲ Next.js 16.1.1 (Turbopack)
-- Local:         http://localhost:3000
-- Network:       http://192.168.0.2:3000
-
-✓ Starting...
-Attention: Next.js now collects completely anonymous telemetry regarding usage.
-This information is used to shape Next.js' roadmap and prioritize features.
-You can learn more, including how to opt-out if you'd not like to participate in this anonymous program, by visiting the following URL:
-https://nextjs.org/telemetry
-
-✓ Ready in 1081ms
-○ Compiling /test-shop ...
-⨯ Error: Your project's URL and Key are required to create a Supabase client!
-
-Check your Supabase project's API settings to find these values
-
-https://supabase.com/dashboard/project/_/settings/api
-    at <unknown> (https://supabase.com/dashboard/project/_/settings/api)
-    at createClient (utils/supabase/server.ts:8:28)
-    at async Page (app/test-shop/page.tsx:7:20)
-   6 |   const cookieStore = await cookies()
-   7 |
->  8 |   return createServerClient<Database>(
-     |                            ^
-   9 |     process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  10 |     process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
-  11 |     { {
-  digest: '3328941515'
-}
- GET /test-shop?slug=tienda 500 in 4.9s (compile: 4.5s, render: 451ms)
-✓ Compiled in 234ms
+sh: 1: next: not found
