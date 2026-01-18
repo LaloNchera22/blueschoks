@@ -1,6 +1,6 @@
 import { redirect } from "next/navigation"
-import AppSidebar from "@/components/dashboard-sidebar" 
 import { getProfile, getUser } from "@/utils/user-data"
+import DashboardLayoutClient from "@/components/dashboard/dashboard-layout-client"
 
 export default async function DashboardLayout({
   children,
@@ -18,14 +18,11 @@ export default async function DashboardLayout({
   // Ahora los usuarios gratuitos PUEDEN entrar.
 
   return (
-    <div className="flex h-screen w-full bg-slate-50 overflow-hidden">
-      <AppSidebar 
-          shopUrl={profile?.slug || ""} 
-          userEmail={user.email || ""} 
-      />
-      <main className="flex-1 overflow-y-auto h-full relative">
-        {children}
-      </main>
-    </div>
+    <DashboardLayoutClient
+       shopUrl={profile?.slug || ""}
+       userEmail={user.email || ""}
+    >
+       {children}
+    </DashboardLayoutClient>
   )
 }

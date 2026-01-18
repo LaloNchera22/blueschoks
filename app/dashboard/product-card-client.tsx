@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useEffect, useTransition } from "react"
+import { useState, useEffect, useTransition, useMemo } from "react"
 import Image from "next/image"
 import Link from "next/link"
 import { Trash2, Edit, Play, Grid, Square, AlertCircle, Video, ChevronLeft, ChevronRight, RefreshCw } from "lucide-react"
@@ -37,12 +37,13 @@ export default function ProductCardClient({ product }: ProductCardProps) {
   const [isDeleting, setIsDeleting] = useState(false)
   const [isTogglingStock, setIsTogglingStock] = useState(false)
 
-  const rawMedia = Array.isArray(product.media) && product.media.length > 0
-    ? product.media
-    : (product.image_url ? [product.image_url] : [])
-
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const mediaList: string[] = rawMedia.filter((url: any) => typeof url === 'string' && url.length > 5)
+  const mediaList = useMemo(() => {
+    const rawMedia = Array.isArray(product.media) && product.media.length > 0
+      ? product.media
+      : (product.image_url ? [product.image_url] : [])
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    return rawMedia.filter((url: any) => typeof url === 'string' && url.length > 5)
+  }, [product.media, product.image_url])
   const hasMedia = mediaList.length > 0
 
   useEffect(() => {
