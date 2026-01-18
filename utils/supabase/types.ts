@@ -1,3 +1,5 @@
+import { DesignConfig } from '@/lib/types/design-system'
+
 export type Json =
   | string
   | number
@@ -26,6 +28,7 @@ export interface Database {
           design_title_color: string | null
           design_font: string | null
           design_card_style: string | null
+          design_config: DesignConfig | null
         }
         Insert: {
           id?: string
@@ -43,6 +46,7 @@ export interface Database {
           design_title_color?: string | null
           design_font?: string | null
           design_card_style?: string | null
+          design_config?: DesignConfig | null
         }
         Update: {
           id?: string
@@ -60,6 +64,7 @@ export interface Database {
           design_title_color?: string | null
           design_font?: string | null
           design_card_style?: string | null
+          design_config?: DesignConfig | null
         }
         Relationships: [
           {

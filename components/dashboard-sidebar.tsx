@@ -3,8 +3,9 @@
 import { useState } from "react"
 import Link from "next/link"
 import { usePathname } from "next/navigation"
-import { Package, Settings, Palette, Home, Copy, ExternalLink, Globe, LogOut, Check } from "lucide-react"
+import { Package, Settings, Palette, Home, Copy, ExternalLink, Globe, Check } from "lucide-react"
 import { Button } from "@/components/ui/button"
+import { UserNav } from "@/components/dashboard/user-nav"
 
 // Agregamos la prop 'userEmail' para mostrarlo abajo
 export default function AppSidebar({ shopUrl = "", userEmail = "usuario@email.com" }: { shopUrl?: string, userEmail?: string }) {
@@ -120,16 +121,9 @@ export default function AppSidebar({ shopUrl = "", userEmail = "usuario@email.co
       </div>
       )}
 
-      {/* FOOTER USUARIO (SIN FOTO, CON EMAIL) */}
-      <div className="p-4 mt-auto border-t border-slate-100">
-         <div className={`flex flex-col ${isDesigner ? "items-center gap-4" : "px-2"}`}>
-             {!isDesigner && <span className="text-xs font-bold text-slate-900 truncate mb-0.5">Mi Cuenta</span>}
-             {!isDesigner && <span className="text-[10px] text-slate-500 truncate font-medium mb-3">{userEmail}</span>}
-             
-             <Link href="/api/auth/signout" className={`text-[10px] font-bold text-red-500 hover:text-red-600 flex items-center gap-1.5 transition-colors ${isDesigner ? "justify-center w-full" : ""}`}>
-                 <LogOut size={isDesigner ? 16 : 12} /> {!isDesigner && "Cerrar Sesión"}
-             </Link>
-         </div>
+      {/* FOOTER USUARIO */}
+      <div className="p-3 mt-auto border-t border-slate-100">
+         <UserNav userEmail={userEmail} isCollapsed={isDesigner} />
       </div>
 
     </aside>

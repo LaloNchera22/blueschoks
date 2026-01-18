@@ -1,20 +1,40 @@
 import { create } from 'zustand'
+import { DesignConfig, DEFAULT_DESIGN_CONFIG } from '@/lib/types/design-system'
 
-export type DesignState = {
-  bg_color: string
-  title_text: string
-  subtitle_text: string
-  title_color: string
-  font: string
-  card_style: string
+// Helper to update nested objects safely
+function setNestedValue<T>(obj: T, path: string, value: any): T {
+  const keys = path.split('.')
+  const lastKey = keys.pop()
+  if (!lastKey) return obj
+
+  const newObj = JSON.parse(JSON.stringify(obj)) // Deep clone simplistic
+  let current = newObj
+  for (const key of keys) {
+    if (!current[key]) current[key] = {}
+    current = current[key]
+  }
+  current[lastKey] = value
+  return newObj
 }
 
-type ElementType = 'global' | 'text:title' | 'text:subtitle'
+export type DesignState = DesignConfig
+
+// Element types mapping to the JSON structure
+type ElementType =
+  | 'global'
+  | 'header:title'
+  | 'header:subtitle'
+  | 'header:bio'
+  | 'header:avatar'
+  | 'cards:globalDefaults'
 
 interface EditorState {
   // Design State
-  design: DesignState
-  setDesign: (design: Partial<DesignState>) => void
+  design: DesignConfig
+  // Replace the simple setDesign with a granular update
+  updateConfig: (path: string, value: any) => void
+  // Allow full replacement for initial load
+  setFullConfig: (config: DesignConfig) => void
 
   // Selection State
   selectedElement: ElementType
@@ -26,15 +46,13 @@ interface EditorState {
 }
 
 export const useEditorStore = create<EditorState>((set) => ({
-  design: {
-    bg_color: "#ffffff",
-    title_text: "Colección",
-    subtitle_text: "Nuevos lanzamientos disponibles",
-    title_color: "#000000",
-    font: "Inter, sans-serif",
-    card_style: "minimal"
-  },
-  setDesign: (newDesign) => set((state) => ({ design: { ...state.design, ...newDesign } })),
+  design: DEFAULT_DESIGN_CONFIG,
+
+  updateConfig: (path, value) => set((state) => ({
+    design: setNestedValue(state.design, path, value)
+  })),
+
+  setFullConfig: (config) => set({ design: config }),
 
   selectedElement: 'global',
   setSelectedElement: (element) => set({ selectedElement: element }),
