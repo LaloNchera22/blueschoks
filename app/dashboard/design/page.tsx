@@ -6,8 +6,8 @@ import CatalogoInteractivo from "@/components/shop/CatalogoInteractivo"
 import FloatingDesignEditor from "@/components/FloatingDesignEditor"
 import { CartProvider } from "@/components/shop/cart-context"
 import { useEditorStore } from "@/hooks/useEditorStore"
-import { saveDesignConfig } from "@/app/dashboard/actions/design-actions"
-import { DEFAULT_DESIGN_CONFIG, DesignConfig } from "@/lib/types/design-system"
+import { saveThemeConfig } from "@/app/dashboard/actions/design-actions"
+import { DEFAULT_THEME_CONFIG, ThemeConfig } from "@/lib/types/theme-config"
 
 export default function DesignPage() {
   const supabase = createClient()
@@ -17,7 +17,7 @@ export default function DesignPage() {
   const [products, setProducts] = useState<unknown[]>([])
 
   // Store global del editor
-  const { design, setFullConfig, setIsSaving } = useEditorStore()
+  const { theme, setFullThemeConfig, setIsSaving } = useEditorStore()
 
   useEffect(() => {
     const loadData = async () => {
@@ -31,43 +31,38 @@ export default function DesignPage() {
             setShopData(profile)
 
             // Cargar configuración existente o migrar/usar default
-            // Si design_config existe, lo usamos. Si no, mapeamos columnas viejas (Migración al vuelo)
-            let configToUse = DEFAULT_DESIGN_CONFIG;
+            let configToUse: ThemeConfig = DEFAULT_THEME_CONFIG;
 
-            if (profile.design_config) {
-               configToUse = profile.design_config as DesignConfig;
+            if (profile.theme_config && Object.keys(profile.theme_config).length > 0) {
+               configToUse = profile.theme_config as ThemeConfig;
             } else {
-               // Fallback: Mapear columnas viejas a la nueva estructura si existen
+               // Fallback: Mapear columnas viejas (si existen) a la nueva estructura theme_config
+               // Esto es una migración "on the fly" para que el usuario no vea defaults planos
                configToUse = {
-                  ...DEFAULT_DESIGN_CONFIG,
+                  ...DEFAULT_THEME_CONFIG,
                   global: {
-                     ...DEFAULT_DESIGN_CONFIG.global,
-                     backgroundColor: profile.design_bg_color || DEFAULT_DESIGN_CONFIG.global.backgroundColor,
-                     font: profile.design_font || DEFAULT_DESIGN_CONFIG.global.font,
+                     ...DEFAULT_THEME_CONFIG.global,
+                     backgroundValue: profile.design_bg_color || DEFAULT_THEME_CONFIG.global.backgroundValue,
                   },
                   header: {
-                     ...DEFAULT_DESIGN_CONFIG.header,
+                     ...DEFAULT_THEME_CONFIG.header,
                      title: {
-                        ...DEFAULT_DESIGN_CONFIG.header.title,
-                        text: profile.design_title_text || DEFAULT_DESIGN_CONFIG.header.title.text,
-                        color: profile.design_title_color || DEFAULT_DESIGN_CONFIG.header.title.color,
+                        ...DEFAULT_THEME_CONFIG.header.title,
+                        color: profile.design_title_color || DEFAULT_THEME_CONFIG.header.title.color,
+                        // Fallback font from legacy `design_font`
+                        fontFamily: (profile.design_font || 'Inter').split(',')[0].replace(/['"]/g, '').trim(),
                      },
                      subtitle: {
-                        ...DEFAULT_DESIGN_CONFIG.header.subtitle,
-                        text: profile.design_subtitle_text || DEFAULT_DESIGN_CONFIG.header.subtitle.text,
+                        ...DEFAULT_THEME_CONFIG.header.subtitle,
+                        // Assume same font or default
+                        fontFamily: (profile.design_font || 'Inter').split(',')[0].replace(/['"]/g, '').trim(),
                      }
                   },
-                  cards: {
-                    ...DEFAULT_DESIGN_CONFIG.cards,
-                    globalDefaults: {
-                        ...DEFAULT_DESIGN_CONFIG.cards.globalDefaults,
-                        style: (profile.design_card_style as any) || DEFAULT_DESIGN_CONFIG.cards.globalDefaults.style
-                    }
-                  }
+                  // Cards defaults remain from constant unless we want to infer from legacy styles
                }
             }
 
-            setFullConfig(configToUse)
+            setFullThemeConfig(configToUse)
             const { data: prod } = await supabase.from('products').select('*').eq('user_id', profile.id).limit(6)
             setProducts(prod || [])
         }
@@ -75,17 +70,17 @@ export default function DesignPage() {
     }
     loadData()
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [setFullConfig])
+  }, [])
 
   const handleSave = async () => {
     if (!isPro) return
     setIsSaving(true)
     
-    // Guardar usando la Server Action
-    const result = await saveDesignConfig(design)
+    // Guardar usando la Server Action (que debemos actualizar/crear)
+    // Usaremos la acción importada saveThemeConfig
+    const result = await saveThemeConfig(theme)
 
     if (!result.success) {
-        // Manejar error visualmente si es necesario
         console.error("Failed to save")
     }
 
@@ -94,19 +89,10 @@ export default function DesignPage() {
 
   if (loading) return <div className="h-full flex items-center justify-center text-xs font-bold uppercase tracking-widest">Cargando...</div>
 
-  // Mapear el nuevo objeto `design` a las props viejas que espera CatalogoInteractivo temporalmente
-  // O idealmente actualizar CatalogoInteractivo para aceptar `design_config`.
-  // Por ahora hacemos un adaptador para compatibilidad visual inmediata.
+  // Mapear el nuevo objeto `theme` para que CatalogoInteractivo lo entienda
   const previewShopData = {
       ...shopData,
-      design_config: design, // Pasamos el config completo
-      // Mantenemos compatibilidad hacia atrás
-      design_bg_color: design.global.backgroundColor,
-      design_title_text: design.header.title.text,
-      design_subtitle_text: design.header.subtitle.text,
-      design_title_color: design.header.title.color,
-      design_font: design.global.font,
-      design_card_style: design.cards.globalDefaults.style
+      theme_config: theme,
   }
 
   return (

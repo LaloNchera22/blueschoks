@@ -1,46 +1,44 @@
 "use client"
 
 import { useState, useEffect, useRef } from "react"
-import { X, Check, Loader2, AlignLeft, AlignCenter, AlignRight, Type, Move } from "lucide-react"
+import { X, Check, Loader2, Type, Move, Palette, Box } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { useEditorStore } from "@/hooks/useEditorStore"
+import { ThemeConfig } from "@/lib/types/theme-config"
 
 // LISTA AMPLIADA ESTILO CANVA (20+ Fuentes Populares)
-const canvaFonts = [
+const fonts = [
   // SANS SERIF (Modernas)
-  { name: 'Inter', value: 'Inter, sans-serif', category: 'Moderna' },
-  { name: 'Montserrat', value: 'Montserrat, sans-serif', category: 'Geométrica' },
-  { name: 'Open Sans', value: 'Open Sans, sans-serif', category: 'Legible' },
-  { name: 'Lato', value: 'Lato, sans-serif', category: 'Redonda' },
-  { name: 'Roboto', value: 'Roboto, sans-serif', category: 'Estándar' },
-  { name: 'Oswald', value: 'Oswald, sans-serif', category: 'Alta/Fuerte' },
+  { name: 'Inter', value: 'Inter, sans-serif' },
+  { name: 'Montserrat', value: 'Montserrat, sans-serif' },
+  { name: 'Open Sans', value: 'Open Sans, sans-serif' },
+  { name: 'Lato', value: 'Lato, sans-serif' },
+  { name: 'Roboto', value: 'Roboto, sans-serif' },
+  { name: 'Oswald', value: 'Oswald, sans-serif' },
   
   // SERIF (Elegantes)
-  { name: 'Playfair Display', value: 'Playfair Display, serif', category: 'Lujo' },
-  { name: 'Merriweather', value: 'Merriweather, serif', category: 'Editorial' },
-  { name: 'Lora', value: 'Lora, serif', category: 'Clásica' },
-  { name: 'Bodoni Moda', value: 'Bodoni Moda, serif', category: 'Fashion' },
+  { name: 'Playfair Display', value: 'Playfair Display, serif' },
+  { name: 'Merriweather', value: 'Merriweather, serif' },
+  { name: 'Lora', value: 'Lora, serif' },
+  { name: 'Bodoni Moda', value: 'Bodoni Moda, serif' },
   
   // CREATIVAS / DISPLAY
-  { name: 'Bebas Neue', value: 'Bebas Neue, sans-serif', category: 'Impacto' },
-  { name: 'Abril Fatface', value: 'Abril Fatface, cursive', category: 'Bold' },
-  { name: 'Righteous', value: 'Righteous, cursive', category: 'Futurista' },
+  { name: 'Bebas Neue', value: 'Bebas Neue, sans-serif' },
+  { name: 'Abril Fatface', value: 'Abril Fatface, cursive' },
+  { name: 'Righteous', value: 'Righteous, cursive' },
   
   // MANUSCRITAS (Script)
-  { name: 'Dancing Script', value: 'Dancing Script, cursive', category: 'Romántica' },
-  { name: 'Pacifico', value: 'Pacifico, cursive', category: 'Relax' },
-  { name: 'Satisfy', value: 'Satisfy, cursive', category: 'Firma' },
+  { name: 'Dancing Script', value: 'Dancing Script, cursive' },
+  { name: 'Pacifico', value: 'Pacifico, cursive' },
+  { name: 'Satisfy', value: 'Satisfy, cursive' },
   
   // CLÁSICAS WEB
-  { name: 'Arial', value: 'Arial, sans-serif', category: 'Básica' },
-  { name: 'Courier New', value: 'Courier New, monospace', category: 'Máquina' },
-  { name: 'Times New Roman', value: 'Times New Roman, serif', category: 'Formal' },
+  { name: 'Arial', value: 'Arial, sans-serif' },
+  { name: 'Courier New', value: 'Courier New, monospace' },
+  { name: 'Times New Roman', value: 'Times New Roman, serif' },
 ]
 
 interface EditorProps {
-  // Las props antiguas se mantienen por compatibilidad, pero usaremos el store principalmente
-  design?: Record<string, unknown>
-  setDesign?: (design: Record<string, unknown>) => void
   onSave?: () => void
   saving?: boolean
   isPro?: boolean
@@ -52,18 +50,17 @@ export default function FloatingDesignEditor({
   isPro = false
 }: EditorProps) {
 
-  const { design, updateConfig, selectedElement, setSelectedElement, isSaving, setIsSaving } = useEditorStore()
+  const { theme, updateThemeConfig, selectedComponent, setSelectedComponent, isSaving, setIsSaving } = useEditorStore()
   
   const [showSuccess, setShowSuccess] = useState(false)
   const prevSavingRef = useRef(isSaving)
   const [showFontMenu, setShowFontMenu] = useState(false)
+  const [activeFontField, setActiveFontField] = useState<string | null>(null)
 
   // Guardar real
   const handleSave = async () => {
      if (externalOnSave) {
         externalOnSave()
-     } else {
-        // Fallback save logic if needed
      }
   }
 
@@ -74,7 +71,6 @@ export default function FloatingDesignEditor({
 
   useEffect(() => {
     if (prevSavingRef.current === true && isSaving === false) {
-        // eslint-disable-next-line react-hooks/set-state-in-effect
         setShowSuccess(true)
         const timer = setTimeout(() => setShowSuccess(false), 3000)
         return () => clearTimeout(timer)
@@ -82,160 +78,217 @@ export default function FloatingDesignEditor({
     prevSavingRef.current = isSaving
   }, [isSaving])
 
+
+  // COMPONENTES UI REUTILIZABLES
+
+  const FontSelector = ({ currentFont, path, label }: { currentFont: string, path: string, label?: string }) => (
+    <div className="relative">
+        <button
+          onClick={() => {
+              setActiveFontField(path)
+              setShowFontMenu(true)
+          }}
+          className="h-9 px-3 rounded-lg bg-slate-50 hover:bg-slate-100 flex items-center gap-2 border border-slate-200 min-w-[120px] justify-between transition-colors"
+        >
+           <div className="flex flex-col items-start overflow-hidden">
+               {label && <span className="text-[9px] font-bold text-slate-400 uppercase leading-none mb-0.5">{label}</span>}
+               <span className="text-xs font-medium truncate max-w-[90px]">{fonts.find(f => f.value === currentFont)?.name || 'Fuente'}</span>
+           </div>
+           <Type size={12} className="opacity-50" />
+        </button>
+
+        {showFontMenu && activeFontField === path && (
+            <>
+                <div className="fixed inset-0 z-40" onClick={() => setShowFontMenu(false)}></div>
+                <div className="absolute bottom-full left-0 mb-2 w-56 bg-white rounded-xl shadow-xl border border-slate-100 max-h-[300px] overflow-y-auto p-1 grid gap-0.5 z-50">
+                    {fonts.map((f) => (
+                       <button
+                          key={f.name}
+                          onClick={() => {
+                              updateThemeConfig(path, f.value)
+                              setShowFontMenu(false)
+                          }}
+                          className={`text-left px-3 py-2 rounded-lg text-xs hover:bg-slate-50 transition-colors flex justify-between items-center ${currentFont === f.value ? 'bg-slate-900 text-white hover:bg-slate-800' : ''}`}
+                       >
+                          <span style={{ fontFamily: f.value }}>{f.name}</span>
+                          {currentFont === f.value && <Check size={12} />}
+                       </button>
+                    ))}
+                </div>
+            </>
+        )}
+     </div>
+  )
+
+  const ColorSelector = ({ color, path, label }: { color: string, path: string, label?: string }) => (
+    <div className="flex flex-col items-center gap-1 group relative">
+        <div className="w-9 h-9 rounded-lg border border-slate-200 flex items-center justify-center cursor-pointer hover:bg-slate-50 relative overflow-hidden">
+            <div className="w-5 h-5 rounded-full border border-slate-200 shadow-sm" style={{ backgroundColor: color }}></div>
+            <input
+                type="color"
+                value={color}
+                onChange={(e) => updateThemeConfig(path, e.target.value)}
+                className="absolute inset-0 opacity-0 cursor-pointer w-full h-full"
+            />
+        </div>
+        {label && <span className="text-[9px] font-bold uppercase tracking-wider text-slate-400 group-hover:text-slate-900 transition-colors">{label}</span>}
+    </div>
+  )
+
+  const SizeSelector = ({ size, path }: { size: string, path: string }) => {
+     // Simplificación de tamaños
+     const sizes = ['sm', 'base', 'lg', 'xl', '2xl', '3xl']
+     const currentIndex = sizes.indexOf(size) >= 0 ? sizes.indexOf(size) : 1
+
+     return (
+        <div className="flex items-center bg-slate-50 rounded-lg p-0.5 border border-slate-200">
+             <button
+                onClick={() => updateThemeConfig(path, sizes[Math.max(0, currentIndex - 1)])}
+                className="w-6 h-8 flex items-center justify-center hover:bg-white rounded text-xs font-bold"
+             >-</button>
+             <span className="text-[10px] w-8 text-center uppercase">{size}</span>
+             <button
+                onClick={() => updateThemeConfig(path, sizes[Math.min(sizes.length - 1, currentIndex + 1)])}
+                className="w-6 h-8 flex items-center justify-center hover:bg-white rounded text-xs font-bold"
+             >+</button>
+        </div>
+     )
+  }
+
   // Renderizar herramienta según contexto
   const renderTools = () => {
-    // A. MODO HEADER TEXTO (Título o Subtítulo)
-    if (selectedElement.startsWith('header:')) {
-       const isTitle = selectedElement === 'header:title';
-       const currentText = isTitle ? design.header.title.text : design.header.subtitle.text;
-       // We assume title uses global font for now or its own if we added that granularity later
-       // The store logic for font currently updates global font in the old code, but let's stick to global for now or header specific if we want
-       const currentFont = design.global.font;
-
-       return (
-          <div className="flex items-center gap-2 h-full">
-
-             {/* 1. Selector de Fuente (Global por ahora, o específica si se añade) */}
-             <div className="relative">
-                <button
-                  onClick={() => setShowFontMenu(!showFontMenu)}
-                  className="h-10 px-4 rounded-xl bg-slate-50 hover:bg-slate-100 flex items-center gap-2 border border-slate-200 min-w-[140px] justify-between transition-colors"
-                >
-                   <span className="text-sm font-medium truncate max-w-[100px]">{canvaFonts.find(f => f.value === currentFont)?.name || 'Fuente'}</span>
-                   <Type size={14} className="opacity-50" />
-                </button>
-
-                {showFontMenu && (
-                    <div className="absolute bottom-full left-0 mb-2 w-64 bg-white rounded-xl shadow-xl border border-slate-100 max-h-[300px] overflow-y-auto p-2 grid gap-1 z-50">
-                        {canvaFonts.map((f) => (
-                           <button
-                              key={f.name}
-                              onClick={() => {
-                                  updateConfig('global.font', f.value)
-                                  setShowFontMenu(false)
-                              }}
-                              className={`text-left px-3 py-2 rounded-lg text-sm hover:bg-slate-50 transition-colors flex justify-between items-center ${currentFont === f.value ? 'bg-slate-900 text-white hover:bg-slate-800' : ''}`}
-                           >
-                              <span style={{ fontFamily: f.value }}>{f.name}</span>
-                              {currentFont === f.value && <Check size={12} />}
-                           </button>
-                        ))}
-                    </div>
-                )}
-             </div>
-
-             <div className="w-px h-6 bg-slate-200 mx-1"></div>
-
-             {/* 2. Input Texto Directo */}
-             <input
-                value={currentText}
-                onChange={(e) => updateConfig(isTitle ? 'header.title.text' : 'header.subtitle.text', e.target.value)}
-                className="h-10 bg-slate-50 border border-slate-200 rounded-xl px-3 w-40 text-sm focus:outline-none focus:ring-2 focus:ring-slate-900"
-                placeholder="Escribe aquí..."
-             />
-
-             <div className="w-px h-6 bg-slate-200 mx-1"></div>
-
-             {/* 3. Color Texto (Solo Título por ahora en UI vieja, pero podemos soportar ambos) */}
-             {isTitle && (
-             <div className="relative group">
-                <div className="w-10 h-10 rounded-xl border border-slate-200 flex items-center justify-center cursor-pointer hover:bg-slate-50 relative overflow-hidden">
-                    <div className="w-6 h-6 rounded-full border border-slate-200 shadow-sm" style={{ backgroundColor: design.header.title.color }}></div>
-                    <input
-                        type="color"
-                        value={design.header.title.color}
-                        onChange={(e) => updateConfig('header.title.color', e.target.value)}
-                        className="absolute inset-0 opacity-0 cursor-pointer w-full h-full"
-                    />
-                </div>
-                <span className="absolute -top-8 left-1/2 -translate-x-1/2 bg-slate-900 text-white text-[10px] px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap pointer-events-none">
-                    Color
-                </span>
-             </div>
-             )}
-
-             {/* 4. Alineación (Simulada por ahora, ya que el diseño es centrado por defecto) */}
-             <div className="flex bg-slate-50 rounded-xl border border-slate-200 p-1">
-                 <button className="p-1.5 hover:bg-white hover:shadow-sm rounded-lg transition-all text-slate-400 hover:text-slate-900"><AlignLeft size={16}/></button>
-                 <button className="p-1.5 bg-white shadow-sm rounded-lg text-slate-900"><AlignCenter size={16}/></button>
-                 <button className="p-1.5 hover:bg-white hover:shadow-sm rounded-lg transition-all text-slate-400 hover:text-slate-900"><AlignRight size={16}/></button>
-             </div>
-          </div>
-       )
-    }
-
-    // B. MODO GLOBAL (Default)
-    return (
-        <div className="flex items-center gap-4 h-full">
-
-             {/* 1. Fondo Mágico (Color BG) */}
-             <div className="flex flex-col items-center gap-1 group cursor-pointer relative">
-                 <div className="w-10 h-10 rounded-full border-2 border-slate-100 shadow-sm flex items-center justify-center relative overflow-hidden hover:scale-105 transition-transform bg-white">
-                    <div className="w-full h-full absolute inset-0 opacity-20 bg-gradient-to-br from-indigo-500 via-purple-500 to-pink-500"></div>
-                    <div className="w-6 h-6 rounded-full shadow-inner border border-black/5" style={{ backgroundColor: design.global.backgroundColor }}></div>
-                    <input
-                        type="color"
-                        value={design.global.backgroundColor}
-                        onChange={(e) => updateConfig('global.backgroundColor', e.target.value)}
-                        className="absolute inset-0 opacity-0 cursor-pointer w-full h-full"
-                    />
-                 </div>
-                 <span className="text-[9px] font-bold uppercase tracking-wider text-slate-400 group-hover:text-slate-900 transition-colors">Fondo</span>
-             </div>
-
-             <div className="w-px h-8 bg-slate-100"></div>
-
-             {/* 2. Estilo Tarjetas */}
-             <div className="flex items-center bg-slate-50 rounded-full p-1 border border-slate-100">
-                {[
-                    { id: 'minimal', label: 'Minimal' },
-                    { id: 'border', label: 'Borde' },
-                    { id: 'shadow', label: 'Sombra' },
-                ].map((style) => (
+    switch (selectedComponent) {
+        case 'header_title':
+            return (
+                <div className="flex items-center gap-3 h-full animate-in fade-in slide-in-from-bottom-2">
+                    <FontSelector currentFont={theme.header.title.fontFamily} path="header.title.fontFamily" />
+                    <div className="w-px h-6 bg-slate-200"></div>
+                    <ColorSelector color={theme.header.title.color} path="header.title.color" label="Color" />
+                    <div className="w-px h-6 bg-slate-200"></div>
+                    <SizeSelector size={theme.header.title.fontSize} path="header.title.fontSize" />
+                    <div className="w-px h-6 bg-slate-200"></div>
                     <button
-                        key={style.id}
-                        onClick={() => updateConfig('cards.globalDefaults.style', style.id)}
-                        className={`px-3 py-1.5 rounded-full text-[10px] font-bold uppercase tracking-wide transition-all ${
-                            design.cards.globalDefaults.style === style.id
-                            ? 'bg-white text-slate-900 shadow-sm'
-                            : 'text-slate-400 hover:text-slate-600'
-                        }`}
+                        onClick={() => updateThemeConfig('header.title.bold', !theme.header.title.bold)}
+                        className={`h-9 w-9 rounded-lg flex items-center justify-center transition-colors font-bold ${theme.header.title.bold ? 'bg-slate-900 text-white' : 'bg-slate-50 text-slate-400 hover:text-slate-900'}`}
+                    >B</button>
+                </div>
+            )
+
+        case 'header_subtitle':
+        case 'header_bio': // Comparten lógica similar
+             const isBio = selectedComponent === 'header_bio'
+             const pathPrefix = isBio ? 'header.bio' : 'header.subtitle'
+             const currentConfig = isBio ? theme.header.bio : theme.header.subtitle
+
+             return (
+                <div className="flex items-center gap-3 h-full animate-in fade-in slide-in-from-bottom-2">
+                    <FontSelector currentFont={currentConfig.fontFamily} path={`${pathPrefix}.fontFamily`} />
+                    <div className="w-px h-6 bg-slate-200"></div>
+                    <ColorSelector color={currentConfig.color} path={`${pathPrefix}.color`} label="Color" />
+                    <div className="w-px h-6 bg-slate-200"></div>
+                    <SizeSelector size={currentConfig.fontSize} path={`${pathPrefix}.fontSize`} />
+                </div>
+             )
+
+        case 'product_card':
+             return (
+                <div className="flex items-center gap-3 h-full animate-in fade-in slide-in-from-bottom-2 overflow-x-auto pr-4 no-scrollbar">
+                    {/* Background Card */}
+                    <div className="flex items-center gap-2">
+                        <ColorSelector color={theme.cards.background} path="cards.background" label="Fondo" />
+                    </div>
+
+                    <div className="w-px h-6 bg-slate-200"></div>
+
+                    {/* Borde Toggle */}
+                    <button
+                        onClick={() => updateThemeConfig('cards.border', !theme.cards.border)}
+                        className={`px-3 py-1.5 rounded-lg text-[10px] font-bold uppercase tracking-wide border transition-all ${theme.cards.border ? 'bg-slate-900 text-white border-slate-900' : 'bg-white text-slate-400 border-slate-200'}`}
                     >
-                        {style.label}
+                        Borde
                     </button>
-                ))}
-             </div>
 
-             <div className="w-px h-8 bg-slate-100"></div>
+                    <div className="w-px h-6 bg-slate-200"></div>
 
-             {/* 3. Posición / Layout (Placeholder) */}
-             <button className="flex flex-col items-center gap-1 group">
-                 <div className="w-10 h-10 rounded-full bg-white border border-slate-100 flex items-center justify-center hover:bg-slate-50 transition-colors text-slate-400 group-hover:text-slate-900">
-                     <Move size={18} />
-                 </div>
-                 <span className="text-[9px] font-bold uppercase tracking-wider text-slate-400 group-hover:text-slate-900 transition-colors">Layout</span>
-             </button>
-        </div>
-    )
+                    {/* Texto Producto */}
+                    <FontSelector currentFont={theme.cards.productName.fontFamily} path="cards.productName.fontFamily" label="Fuente" />
+                    <ColorSelector color={theme.cards.productName.color} path="cards.productName.color" label="Texto" />
+                    <ColorSelector color={theme.cards.productPrice.color} path="cards.productPrice.color" label="Precio" />
+
+                    <div className="w-px h-6 bg-slate-200"></div>
+
+                    {/* Botón */}
+                    <div className="flex flex-col items-center gap-1">
+                        <span className="text-[9px] font-bold text-slate-400 uppercase">Botón</span>
+                        <div className="flex gap-1">
+                            <div className="w-6 h-6 rounded border cursor-pointer relative" style={{ backgroundColor: theme.cards.button.bg }}>
+                                <input type="color" value={theme.cards.button.bg} onChange={(e) => updateThemeConfig('cards.button.bg', e.target.value)} className="absolute inset-0 opacity-0 w-full h-full cursor-pointer"/>
+                            </div>
+                            <div className="w-6 h-6 rounded border cursor-pointer relative flex items-center justify-center bg-gray-100">
+                                <span className="text-[8px] font-bold" style={{ color: theme.cards.button.text }}>T</span>
+                                <input type="color" value={theme.cards.button.text} onChange={(e) => updateThemeConfig('cards.button.text', e.target.value)} className="absolute inset-0 opacity-0 w-full h-full cursor-pointer"/>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+             )
+
+        case 'global_bg':
+        default:
+            return (
+                <div className="flex items-center gap-4 h-full animate-in fade-in slide-in-from-bottom-2">
+                     <div className="flex flex-col items-center gap-1 group cursor-pointer relative">
+                         <div className="w-10 h-10 rounded-full border-2 border-slate-100 shadow-sm flex items-center justify-center relative overflow-hidden hover:scale-105 transition-transform bg-white">
+                            {theme.global.backgroundType === 'image' && <div className="absolute inset-0 bg-cover bg-center opacity-50" style={{ backgroundImage: `url(${theme.global.backgroundValue})`}}></div>}
+                            <div className="w-6 h-6 rounded-full shadow-inner border border-black/5 relative z-10" style={{ backgroundColor: theme.global.backgroundType === 'solid' ? theme.global.backgroundValue : 'transparent' }}></div>
+
+                            {/* Simple color picker for solid mode fallback */}
+                            <input
+                                type="color"
+                                value={theme.global.backgroundType === 'solid' ? theme.global.backgroundValue : '#ffffff'}
+                                onChange={(e) => {
+                                    updateThemeConfig('global.backgroundType', 'solid')
+                                    updateThemeConfig('global.backgroundValue', e.target.value)
+                                }}
+                                className="absolute inset-0 opacity-0 cursor-pointer w-full h-full z-20"
+                            />
+                         </div>
+                         <span className="text-[9px] font-bold uppercase tracking-wider text-slate-400 group-hover:text-slate-900 transition-colors">Fondo</span>
+                     </div>
+                </div>
+            )
+    }
+  }
+
+  // Nombre legible del componente seleccionado
+  const getSelectedLabel = () => {
+      switch(selectedComponent) {
+          case 'header_title': return 'Título';
+          case 'header_subtitle': return 'Subtítulo';
+          case 'header_bio': return 'Biografía';
+          case 'product_card': return 'Tarjetas';
+          case 'global_bg': return 'Global';
+          default: return '';
+      }
   }
 
   return (
     <div className="fixed bottom-8 left-1/2 -translate-x-1/2 z-50 flex flex-col items-center gap-4 w-full px-4 pointer-events-none">
 
        {/* BARRA FLOTANTE (ISLA) */}
-       <div className="bg-white shadow-[0_20px_50px_-12px_rgba(0,0,0,0.15)] rounded-2xl p-2 pl-4 pr-2 flex items-center justify-between pointer-events-auto border border-white/50 backdrop-blur-sm animate-in slide-in-from-bottom-6 duration-500 max-w-3xl w-auto mx-auto ring-1 ring-black/5">
+       <div className="bg-white shadow-[0_20px_50px_-12px_rgba(0,0,0,0.15)] rounded-2xl p-2 pl-4 pr-2 flex items-center justify-between pointer-events-auto border border-white/50 backdrop-blur-sm animate-in slide-in-from-bottom-6 duration-500 max-w-4xl w-auto mx-auto ring-1 ring-black/5">
 
             {/* ZONA DE HERRAMIENTAS (DINÁMICA) */}
-            <div className="flex items-center mr-6">
+            <div className="flex items-center mr-6 h-10">
                 {renderTools()}
             </div>
 
             {/* ZONA DE ACCIONES (GUARDAR / CERRAR) */}
             <div className="flex items-center gap-2 pl-4 border-l border-slate-100">
-                 {selectedElement !== 'global' && (
+                 {selectedComponent !== 'global_bg' && (
                      <Button
                         onClick={() => {
-                            setSelectedElement('global')
+                            setSelectedComponent('global_bg')
                             setShowFontMenu(false)
                         }}
                         variant="ghost"
@@ -259,9 +312,9 @@ export default function FloatingDesignEditor({
        </div>
 
        {/* INDICADOR DE CONTEXTO */}
-       {selectedElement !== 'global' && (
+       {selectedComponent !== 'global_bg' && (
            <div className="bg-slate-900 text-white text-[10px] font-bold uppercase tracking-widest px-3 py-1.5 rounded-full shadow-lg pointer-events-auto animate-in fade-in zoom-in duration-300">
-               Editando: {selectedElement.replace('header:', '').toUpperCase()}
+               Editando: {getSelectedLabel()}
            </div>
        )}
 

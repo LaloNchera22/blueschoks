@@ -6,6 +6,7 @@ import { useCart, CartItem } from "./cart-context"
 import CartSidebar from "./cart-sidebar" 
 import { Plus, Minus, ShoppingBag, Check, Globe, Share2, Trash2, Send, X, ShoppingCart, ChevronLeft, ChevronRight } from "lucide-react"
 import { useEditorStore } from "@/hooks/useEditorStore"
+import { ThemeConfig, DEFAULT_THEME_CONFIG } from "@/lib/types/theme-config"
 import { motion, AnimatePresence } from "framer-motion"
 import confetti from "canvas-confetti"
 import { toast } from "sonner"
@@ -14,6 +15,7 @@ import Image from "next/image"
 import { Button } from "@/components/ui/button"
 
 interface Shop {
+  // Legacy fields fallback
   design_font?: string | null;
   design_bg_color?: string | null;
   design_title_color?: string | null;
@@ -25,6 +27,10 @@ interface Shop {
   whatsapp?: string | null;
   avatar_url?: string | null;
   image_url?: string | null;
+
+  // New field
+  theme_config?: ThemeConfig;
+
   [key: string]: unknown;
 }
 
@@ -43,11 +49,14 @@ interface Product {
 export default function CatalogoInteractivo({ products, shop, isEditor = false }: { products: Product[], shop: Shop, isEditor?: boolean }) {
   // 1. Calculamos el total manualmente
   const { items, openCart, removeItem } = useCart()
-  const { setSelectedElement, selectedElement } = useEditorStore()
+  const { setSelectedComponent, selectedComponent, theme: editorTheme } = useEditorStore()
   
   const [isClient, setIsClient] = useState(false)
   const [scrolled, setScrolled] = useState(false)
   const [isCartOpen, setIsCartOpen] = useState(false) 
+
+  // Use editor theme if in editor mode, otherwise use shop.theme_config or legacy fallback
+  const theme = isEditor ? editorTheme : (shop.theme_config || DEFAULT_THEME_CONFIG);
 
   useEffect(() => {
       setIsClient(true)
@@ -66,19 +75,45 @@ export default function CatalogoInteractivo({ products, shop, isEditor = false }
 
   const totalItems = items?.reduce((acc: number, item: CartItem) => acc + (item.quantity || 0), 0) || 0
 
-  // LOGICA DE FUENTES
-  const fontValue = shop.design_font || 'Inter, sans-serif';
-  const fontName = fontValue.split(',')[0].replace(/['"]/g, '').trim();
-  const googleFontUrl = `https://fonts.googleapis.com/css2?family=${fontName.replace(/ /g, '+')}:wght@300;400;700;900&display=swap`;
-  const bgColor = shop.design_bg_color || "#f3f4f6" 
-  const textColor = shop.design_title_color || "#000000"
+  // LOGICA DE FUENTES Y ESTILOS
+  // Extraemos las fuentes usadas para cargarlas
+  const fontsToLoad = useMemo(() => {
+      const fonts = new Set<string>();
+      fonts.add(theme.header.title.fontFamily);
+      fonts.add(theme.header.subtitle.fontFamily);
+      fonts.add(theme.header.bio.fontFamily);
+      fonts.add(theme.cards.productName.fontFamily);
+      fonts.add(theme.cards.productPrice.fontFamily);
+
+      // Fallback legacy if using default theme which might just be Inter
+      if (!shop.theme_config && shop.design_font) {
+          fonts.add(shop.design_font.split(',')[0].replace(/['"]/g, '').trim());
+      }
+
+      return Array.from(fonts).map(f => {
+         const cleanName = f.split(',')[0].replace(/['"]/g, '').trim();
+         return cleanName;
+      }).filter(Boolean);
+  }, [theme, shop.design_font, shop.theme_config]);
+
+  // Construct Google Fonts URL
+  const googleFontsUrl = `https://fonts.googleapis.com/css2?${fontsToLoad.map(f => `family=${f.replace(/ /g, '+')}:wght@300;400;700;900`).join('&')}&display=swap`;
+
+  // Background Logic
+  const bgStyle = theme.global.backgroundType === 'image'
+    ? { backgroundImage: `url(${theme.global.backgroundValue})`, backgroundSize: 'cover', backgroundAttachment: 'fixed', backgroundPosition: 'center' }
+    : { backgroundColor: theme.global.backgroundType === 'solid' ? theme.global.backgroundValue : '#ffffff' };
+
+  // Legacy Fallback for Background if no theme config
+  const finalBgStyle = (!shop.theme_config && !isEditor && shop.design_bg_color)
+      ? { backgroundColor: shop.design_bg_color }
+      : bgStyle;
 
   // Handler para clicks en el editor
-  const handleElementClick = (e: React.MouseEvent, type: 'global' | 'header:title' | 'header:subtitle') => {
+  const handleElementClick = (e: React.MouseEvent, type: any) => {
     if (!isEditor) return
     e.stopPropagation()
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    setSelectedElement(type as any) 
+    setSelectedComponent(type)
   }
 
   // Generar mensaje de WhatsApp
@@ -101,7 +136,7 @@ export default function CatalogoInteractivo({ products, shop, isEditor = false }
 
   return (
     <>
-      <style jsx global>{`@import url('${googleFontUrl}');`}</style>
+      <style jsx global>{`@import url('${googleFontsUrl}');`}</style>
 
       {/* RENDERIZAMOS EL SIDEBAR SOLO SI NO ES EDITOR */}
       {!isEditor && <CartSidebar shop={shop} />}
@@ -109,8 +144,8 @@ export default function CatalogoInteractivo({ products, shop, isEditor = false }
       {/* CONTENEDOR PRINCIPAL */}
       <div 
           className="min-h-screen transition-all duration-500 flex flex-col items-center pb-32"
-          style={{ backgroundColor: bgColor, color: textColor, fontFamily: fontValue }}
-          onClick={() => isEditor && setSelectedElement('global')}
+          style={finalBgStyle}
+          onClick={() => isEditor && setSelectedComponent('global_bg')}
       >
           {/* HEADER DE PERFIL */}
           <header className="w-full max-w-md mx-auto pt-12 pb-8 px-6 flex flex-col items-center text-center">
@@ -132,18 +167,30 @@ export default function CatalogoInteractivo({ products, shop, isEditor = false }
 
               {/* TITULO / NOMBRE TIENDA */}
               <div
-                onClick={(e) => handleElementClick(e, 'header:title')}
-                className={`cursor-pointer transition-all rounded-xl px-4 py-2 ${isEditor && selectedElement === 'header:title' ? 'ring-2 ring-blue-500 bg-blue-500/10' : isEditor ? 'hover:ring-2 hover:ring-blue-500/50 hover:bg-blue-500/5' : ''}`}
+                onClick={(e) => handleElementClick(e, 'header_title')}
+                className={`cursor-pointer transition-all rounded-xl px-4 py-2 ${isEditor && selectedComponent === 'header_title' ? 'ring-2 ring-blue-500 bg-blue-500/10' : isEditor ? 'hover:ring-2 hover:ring-blue-500/50 hover:bg-blue-500/5' : ''}`}
+                style={{
+                    fontFamily: theme.header.title.fontFamily,
+                    color: theme.header.title.color,
+                }}
               >
-                  <h1 className="text-2xl font-bold tracking-tight">{shop.design_title_text || shop.shop_name || "Mi Tienda"}</h1>
+                  <h1 className={`font-bold tracking-tight text-${theme.header.title.fontSize} ${theme.header.title.bold ? 'font-black' : 'font-bold'}`} style={{ fontSize: getFontSize(theme.header.title.fontSize) }}>
+                      {shop.design_title_text || shop.shop_name || "Mi Tienda"}
+                  </h1>
               </div>
 
-              {/* BIO / DESCRIPCION */}
+              {/* SUBTITULO / BIO / DESCRIPCION */}
               <div
-                onClick={(e) => handleElementClick(e, 'header:subtitle')}
-                className={`mt-1 cursor-pointer transition-all rounded-lg px-2 py-1 ${isEditor && selectedElement === 'header:subtitle' ? 'ring-2 ring-blue-500 bg-blue-500/10' : isEditor ? 'hover:ring-2 hover:ring-blue-500/50 hover:bg-blue-500/5' : ''}`}
+                onClick={(e) => handleElementClick(e, 'header_subtitle')}
+                className={`mt-1 cursor-pointer transition-all rounded-lg px-2 py-1 ${isEditor && selectedComponent === 'header_subtitle' ? 'ring-2 ring-blue-500 bg-blue-500/10' : isEditor ? 'hover:ring-2 hover:ring-blue-500/50 hover:bg-blue-500/5' : ''}`}
+                style={{
+                    fontFamily: theme.header.subtitle.fontFamily,
+                    color: theme.header.subtitle.color,
+                }}
               >
-                  <p className="opacity-80 text-sm leading-relaxed max-w-xs mx-auto">{shop.design_subtitle_text || shop.bio || "Bienvenido a mi colección de productos."}</p>
+                  <p className="opacity-80 leading-relaxed max-w-xs mx-auto" style={{ fontSize: getFontSize(theme.header.subtitle.fontSize) }}>
+                      {shop.design_subtitle_text || shop.bio || "Bienvenido a mi colección de productos."}
+                  </p>
               </div>
 
               {/* REDES SOCIALES */}
@@ -161,7 +208,15 @@ export default function CatalogoInteractivo({ products, shop, isEditor = false }
           <main className="w-full max-w-7xl mx-auto px-4">
               <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-8">
                   {products?.map((product, idx) => (
-                      <TarjetaCuadrada key={product.id} product={product} design={shop} isEditor={isEditor} index={idx} />
+                      <TarjetaCuadrada
+                        key={product.id}
+                        product={product}
+                        theme={theme}
+                        isEditor={isEditor}
+                        index={idx}
+                        // Fallback color for legacy compatibility in confetti/styles
+                        accentColor={theme.header.title.color || shop.design_title_color}
+                      />
                   ))}
               </div>
 
@@ -186,8 +241,7 @@ export default function CatalogoInteractivo({ products, shop, isEditor = false }
                 <button
                     onClick={() => setIsCartOpen(true)}
                     className="pointer-events-auto bg-slate-900 text-white shadow-2xl hover:scale-105 active:scale-95 transition-all flex items-center gap-4 pl-4 pr-6 py-3 rounded-full border-2 border-white/10"
-                    // CORRECCIÓN AQUÍ: Usamos 'shop' en vez de 'design'
-                    style={{ backgroundColor: shop.design_title_color || '#0f172a' }}
+                    style={{ backgroundColor: theme.header.title.color || '#0f172a' }}
                 >
                     <div className="flex items-center gap-2 border-r border-white/20 pr-4">
                         <ShoppingBag size={20} className="text-white" />
@@ -288,8 +342,9 @@ export default function CatalogoInteractivo({ products, shop, isEditor = false }
 }
 
 // --- TARJETA DE PRODUCTO REDISEÑADA (ESTILO EDITORIAL/FASHION) ---
-function TarjetaCuadrada({ product, design, isEditor = false, index = 0 }: { product: Product, design: Shop, isEditor?: boolean, index?: number }) {
+function TarjetaCuadrada({ product, theme, isEditor = false, index = 0, accentColor }: { product: Product, theme: ThemeConfig, isEditor?: boolean, index?: number, accentColor?: string | null }) {
   const { addToCart } = useCart()
+  const { setSelectedComponent, selectedComponent } = useEditorStore()
   const [quantity, setQuantity] = useState(1)
   const [isAdded, setIsAdded] = useState(false)
   const [currentImageIndex, setCurrentImageIndex] = useState(0)
@@ -336,7 +391,7 @@ function TarjetaCuadrada({ product, design, isEditor = false, index = 0 }: { pro
             particleCount: 40,
             spread: 50,
             startVelocity: 25,
-            colors: [design.design_title_color || '#ea580c', '#ffffff'],
+            colors: [accentColor || theme.header.title.color || '#ea580c', '#ffffff'],
             disableForReducedMotion: true,
             zIndex: 9999
         });
@@ -357,21 +412,14 @@ function TarjetaCuadrada({ product, design, isEditor = false, index = 0 }: { pro
   }
 
   // Estilos Dinámicos
-  const isMinimal = design.design_card_style === 'minimal';
-  // Si es Minimal, es full-bleed (sin padding/border extra en contenedor principal para la imagen).
-  // Si es Border, añadimos un borde elegante.
+  // Si no hay theme (caso raro), usamos defaults
 
-  // Fondo de la tarjeta: Usamos blanco para garantizar legibilidad estilo "Editorial",
-  // a menos que sea minimalista donde podría ser transparente si se desea,
-  // pero para seguridad visual usamos blanco o transparente según convenga.
-  // El usuario pidió "Mantén el fondo según shop.design_bg_color" -> Esto suele aplicar al wrapper general.
-  // Para la tarjeta, 'minimal' suele ser clean.
-
-  const cardClasses = isMinimal
-    ? "bg-transparent" // Full bleed, se funde con el fondo
-    : "bg-white border border-gray-100 hover:border-gray-200 shadow-sm"; // Border style
-
-  const titleColor = design.design_title_color || '#000000';
+  // Card click to edit
+  const handleCardClick = (e: React.MouseEvent) => {
+      if(!isEditor) return
+      e.stopPropagation()
+      setSelectedComponent('product_card')
+  }
 
   // Variantes para la animación de slide
   const slideVariants = {
@@ -396,12 +444,20 @@ function TarjetaCuadrada({ product, design, isEditor = false, index = 0 }: { pro
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5, delay: index * 0.05 }}
-        className={`group relative flex flex-col overflow-hidden ${isMinimal ? '' : 'rounded-sm'} ${cardClasses}`}
+        className={`group relative flex flex-col overflow-hidden transition-all duration-300
+            ${theme.cards.border ? 'border' : ''}
+            ${isEditor && selectedComponent === 'product_card' ? 'ring-2 ring-blue-500' : isEditor ? 'hover:ring-2 hover:ring-blue-500/50' : ''}`}
+        style={{
+            backgroundColor: theme.cards.background,
+            borderColor: theme.cards.border ? 'rgba(0,0,0,0.1)' : 'transparent',
+            borderRadius: '0.5rem' // Default radius, could be configurable later
+        }}
         onHoverStart={() => setIsHovered(true)}
         onHoverEnd={() => setIsHovered(false)}
+        onClick={handleCardClick}
     >
         {/* --- 1. GALERÍA / IMAGEN (80-90% visual weight) --- */}
-        <div className={`relative w-full aspect-[3/4] overflow-hidden bg-gray-100 ${isMinimal ? '' : 'border-b border-gray-50'}`}>
+        <div className={`relative w-full aspect-[3/4] overflow-hidden bg-gray-100 ${theme.cards.border ? 'border-b border-gray-50' : ''}`}>
              <AnimatePresence initial={false} custom={direction} mode="popLayout">
                 <motion.div
                     key={currentImageIndex}
@@ -484,10 +540,24 @@ function TarjetaCuadrada({ product, design, isEditor = false, index = 0 }: { pro
 
             {/* Texto Minimalista */}
             <div className="flex flex-col gap-0.5 text-left">
-                <h3 className="text-[15px] font-medium leading-tight text-gray-900 line-clamp-1" style={{ color: titleColor }}>
+                <h3
+                    className="text-[15px] leading-tight line-clamp-1"
+                    style={{
+                        color: theme.cards.productName.color,
+                        fontFamily: theme.cards.productName.fontFamily,
+                        fontWeight: 500
+                    }}
+                >
                     {product.name}
                 </h3>
-                <p className="text-sm font-light text-gray-500/90" style={{ color: titleColor ? `${titleColor}CC` : undefined }}>
+                <p
+                    className="text-sm"
+                    style={{
+                        color: theme.cards.productPrice.color,
+                        fontFamily: theme.cards.productPrice.fontFamily,
+                        fontWeight: theme.cards.productPrice.weight === 'black' ? 900 : theme.cards.productPrice.weight === 'bold' ? 700 : 400
+                    }}
+                >
                     ${product.price}
                 </p>
             </div>
@@ -498,14 +568,14 @@ function TarjetaCuadrada({ product, design, isEditor = false, index = 0 }: { pro
                 {/* Selector Cantidad (Estilo Cápsula Minimal) */}
                 <div className="flex items-center h-8 bg-gray-100/80 rounded-full px-1 border border-transparent hover:border-gray-200 transition-colors">
                     <button 
-                        onClick={() => setQuantity(Math.max(1, quantity - 1))}
+                        onClick={(e) => { e.stopPropagation(); setQuantity(Math.max(1, quantity - 1)); }}
                         className="w-7 h-full flex items-center justify-center text-gray-500 hover:text-black transition active:scale-90"
                     >
                         <Minus size={14} />
                     </button>
                     <span className="text-xs font-semibold w-4 text-center text-gray-900 tabular-nums">{quantity}</span>
                     <button 
-                        onClick={() => setQuantity(quantity + 1)}
+                        onClick={(e) => { e.stopPropagation(); setQuantity(quantity + 1); }}
                         className="w-7 h-full flex items-center justify-center text-gray-500 hover:text-black transition active:scale-90"
                     >
                         <Plus size={14} />
@@ -516,19 +586,33 @@ function TarjetaCuadrada({ product, design, isEditor = false, index = 0 }: { pro
                 <button
                     id={`btn-add-${product.id}`}
                     onClick={handleAdd}
-                    className={`h-9 w-9 rounded-full flex items-center justify-center shadow-sm transition-all duration-300 active:scale-90
-                        ${isAdded ? 'bg-green-600 text-white' : 'bg-black text-white hover:bg-gray-800'}`}
-                    style={!isAdded && design.design_title_color ? { backgroundColor: design.design_title_color } : {}}
+                    className={`h-9 w-9 rounded-full flex items-center justify-center shadow-sm transition-all duration-300 active:scale-90`}
+                    style={{
+                        backgroundColor: isAdded ? '#16a34a' : theme.cards.button.bg,
+                        color: theme.cards.button.text
+                    }}
                     title="Agregar al carrito"
                 >
                      {isAdded ? (
-                         <Check size={16} strokeWidth={3} />
+                         <Check size={16} strokeWidth={3} color="#ffffff" />
                      ) : (
-                         <ShoppingBag size={16} strokeWidth={2.5} />
+                         <ShoppingBag size={16} strokeWidth={2.5} color={theme.cards.button.text} />
                      )}
                 </button>
             </div>
         </div>
     </motion.div>
   )
+}
+
+function getFontSize(size: string): string {
+    switch(size) {
+        case 'sm': return '0.875rem';
+        case 'base': return '1rem';
+        case 'lg': return '1.125rem';
+        case 'xl': return '1.25rem';
+        case '2xl': return '1.5rem';
+        case '3xl': return '1.875rem';
+        default: return '1rem';
+    }
 }
