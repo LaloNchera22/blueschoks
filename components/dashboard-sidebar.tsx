@@ -3,12 +3,22 @@
 import { useState } from "react"
 import Link from "next/link"
 import { usePathname } from "next/navigation"
-import { Package, Settings, Palette, Home, Copy, ExternalLink, Globe, Check } from "lucide-react"
+import { Package, Settings, Palette, Home, Copy, ExternalLink, Globe, Check, X } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { UserNav } from "@/components/dashboard/user-nav"
 
 // Agregamos la prop 'userEmail' para mostrarlo abajo
-export default function AppSidebar({ shopUrl = "", userEmail = "usuario@email.com" }: { shopUrl?: string, userEmail?: string }) {
+export default function AppSidebar({
+  shopUrl = "",
+  userEmail = "usuario@email.com",
+  isOpen = true,
+  onClose
+}: {
+  shopUrl?: string,
+  userEmail?: string,
+  isOpen?: boolean,
+  onClose?: () => void
+}) {
   const pathname = usePathname()
   const [copied, setCopied] = useState(false)
   const isDesigner = pathname === "/dashboard/design"
@@ -32,11 +42,26 @@ export default function AppSidebar({ shopUrl = "", userEmail = "usuario@email.co
       : "text-slate-600 hover:bg-slate-50 hover:text-slate-900"
     } ${isDesigner ? "justify-center px-0 w-10 h-10 mx-auto" : ""}`
 
+  // Width logic
+  let widthClass = "w-64"
+  if (!isOpen) widthClass = "w-0 border-none overflow-hidden"
+  else if (isDesigner) widthClass = "w-20"
+
   return (
-    <aside className={`${isDesigner ? "w-20" : "w-64"} bg-white border-r border-slate-200 h-full flex flex-col shrink-0 overflow-y-auto custom-scrollbar transition-all duration-300`}>
+    <aside className={`${widthClass} bg-white border-r border-slate-200 h-full flex flex-col shrink-0 overflow-y-auto custom-scrollbar transition-all duration-300 relative`}>
       
       {/* 1. HEADER */}
-      <div className={`p-6 pb-2 ${isDesigner ? "px-2 flex flex-col items-center" : ""}`}>
+      <div className={`p-6 pb-2 ${isDesigner ? "px-2 flex flex-col items-center" : ""} relative group`}>
+        {/* Close Button - Visible only on hover or always? Let's make it subtle top-right */}
+        {!isDesigner && isOpen && onClose && (
+           <button
+             onClick={onClose}
+             className="absolute top-6 right-4 text-slate-400 hover:text-slate-700 hover:bg-slate-100 rounded-full p-1 transition-colors"
+           >
+             <X size={16} />
+           </button>
+        )}
+
         <div className={`flex items-center gap-3 mb-6 ${isDesigner ? "justify-center mb-4" : ""}`}>
            <div className="bg-slate-900 text-white w-8 h-8 rounded-lg flex items-center justify-center font-black text-lg shrink-0">B</div>
            {!isDesigner && <span className="font-black text-lg tracking-tight text-slate-900">BLUESHOCKS</span>}
