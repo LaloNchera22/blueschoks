@@ -21,7 +21,9 @@ export default function AppSidebar({
 }) {
   const pathname = usePathname()
   const [copied, setCopied] = useState(false)
-  const isDesigner = pathname === "/dashboard/design"
+
+  // REMOVED: const isDesigner = pathname === "/dashboard/design"
+  // We want standard sidebar everywhere
 
   const hasShopUrl = shopUrl && shopUrl.length > 0;
   // Ensure the link is clean and dynamic based on the slug
@@ -40,20 +42,20 @@ export default function AppSidebar({
       pathname === path 
       ? "bg-slate-900 text-white shadow-md" 
       : "text-slate-600 hover:bg-slate-50 hover:text-slate-900"
-    } ${isDesigner ? "justify-center px-0 w-10 h-10 mx-auto" : ""}`
+    }`
 
-  // Width logic
+  // Width logic: Standard width or hidden
   let widthClass = "w-64"
   if (!isOpen) widthClass = "w-0 border-none overflow-hidden"
-  else if (isDesigner) widthClass = "w-20"
+  // REMOVED: else if (isDesigner) widthClass = "w-20"
 
   return (
     <aside className={`${widthClass} bg-white border-r border-slate-200 h-full flex flex-col shrink-0 overflow-y-auto custom-scrollbar transition-all duration-300 relative`}>
       
       {/* 1. HEADER */}
-      <div className={`p-6 pb-2 ${isDesigner ? "px-2 flex flex-col items-center" : ""} relative group`}>
+      <div className="p-6 pb-2 relative group">
         {/* Close Button - Visible only on hover or always? Let's make it subtle top-right */}
-        {!isDesigner && isOpen && onClose && (
+        {isOpen && onClose && (
            <button
              onClick={onClose}
              className="absolute top-6 right-4 text-slate-400 hover:text-slate-700 hover:bg-slate-100 rounded-full p-1 transition-colors"
@@ -62,12 +64,11 @@ export default function AppSidebar({
            </button>
         )}
 
-        <div className={`flex items-center gap-3 mb-6 ${isDesigner ? "justify-center mb-4" : ""}`}>
+        <div className="flex items-center gap-3 mb-6">
            <div className="bg-slate-900 text-white w-8 h-8 rounded-lg flex items-center justify-center font-black text-lg shrink-0">B</div>
-           {!isDesigner && <span className="font-black text-lg tracking-tight text-slate-900">BLUESHOCKS</span>}
+           <span className="font-black text-lg tracking-tight text-slate-900">BLUESHOCKS</span>
         </div>
 
-        {!isDesigner && (
         <div className="bg-amber-50 border border-amber-100 rounded-xl p-3 flex items-center gap-3 mb-6">
            <div className="bg-amber-100 text-amber-600 p-1.5 rounded-lg">
              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><path d="m2 4 3 12h14l3-12-6 7-4-7-4 7-6-7zm3 16h14"/></svg>
@@ -77,32 +78,28 @@ export default function AppSidebar({
              <p className="text-[10px] text-amber-600/80 font-medium">Cuenta activa</p>
            </div>
         </div>
-        )}
       </div>
 
       {/* 2. MENÚ DE NAVEGACIÓN */}
-      <div className={`px-4 space-y-1 ${isDesigner ? "px-2" : ""}`}>
-         {!isDesigner && (
+      <div className="px-4 space-y-1">
          <div className="px-2 mb-2">
             <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Gestión</span>
          </div>
-         )}
 
          <Link href="/dashboard/products" className={getItemClass("/dashboard/products")}>
-            <Package size={isDesigner ? 20 : 18} /> {!isDesigner && <span>Mis Productos</span>}
+            <Package size={18} /> <span>Mis Productos</span>
          </Link>
 
          <Link href="/dashboard/design" className={getItemClass("/dashboard/design")}>
-            <Palette size={isDesigner ? 20 : 18} /> {!isDesigner && <span>Diseño</span>}
+            <Palette size={18} /> <span>Diseño</span>
          </Link>
 
          <Link href="/dashboard/settings" className={getItemClass("/dashboard/settings")}>
-            <Settings size={isDesigner ? 20 : 18} /> {!isDesigner && <span>Configuración</span>}
+            <Settings size={18} /> <span>Configuración</span>
          </Link>
       </div>
 
       {/* 3. TU TIENDA ONLINE */}
-      {!isDesigner && (
       <div className="px-4 mt-8">
          <div className="px-2 mb-3">
             <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Tu Tienda Online</span>
@@ -144,11 +141,10 @@ export default function AppSidebar({
             </div>
          </div>
       </div>
-      )}
 
       {/* FOOTER USUARIO */}
       <div className="p-3 mt-auto border-t border-slate-100">
-         <UserNav userEmail={userEmail} isCollapsed={isDesigner} />
+         <UserNav userEmail={userEmail} isCollapsed={false} />
       </div>
 
     </aside>
