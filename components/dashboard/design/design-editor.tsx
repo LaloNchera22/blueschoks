@@ -1,11 +1,24 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { DesignConfig, LinkItem } from '@/lib/types/design-system';
+import { DesignConfig } from '@/lib/types/design-system';
 import { saveThemeConfig } from '@/app/dashboard/actions/design-actions';
-// We might need to cast the config to 'any' when saving if types mismatch with existing action
-// or update the action. For now, we assume strict adherence to 'DesignConfig' internally,
-// and we'll handle the save carefully.
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
+import {
+  Globe,
+  LayoutTemplate,
+  IdCard,
+  Share2,
+  Save,
+  Loader2,
+  Palette,
+  Type
+} from "lucide-react";
+import { toast } from 'sonner';
 
 interface DesignEditorProps {
   initialConfig: DesignConfig;
@@ -13,307 +26,306 @@ interface DesignEditorProps {
   slug: string;
 }
 
+type SectionId = 'global' | 'header' | 'cards' | 'socials';
+
+interface Section {
+  id: SectionId;
+  label: string;
+  icon: React.ElementType;
+  description: string;
+}
+
+const SECTIONS: Section[] = [
+  { id: 'global', label: 'Global', icon: Globe, description: 'Configuración general de colores y tipografía.' },
+  { id: 'header', label: 'Encabezado', icon: LayoutTemplate, description: 'Información de tu perfil y cabecera.' },
+  { id: 'cards', label: 'Tarjetas', icon: IdCard, description: 'Apariencia de las tarjetas de enlace.' },
+  { id: 'socials', label: 'Redes Sociales', icon: Share2, description: 'Gestión de enlaces sociales.' },
+];
+
 export default function DesignEditor({ initialConfig, userId, slug }: DesignEditorProps) {
   const [config, setConfig] = useState<DesignConfig>(initialConfig);
+  const [activeSection, setActiveSection] = useState<SectionId>('global');
   const [isSaving, setIsSaving] = useState(false);
-  const [activeTab, setActiveTab] = useState<'profile' | 'links' | 'appearance'>('profile');
-
-  // Prevent hydration mismatch
   const [mounted, setMounted] = useState(false);
-  useEffect(() => setMounted(true), []);
 
-  if (!mounted) return <div className="p-8">Loading editor...</div>;
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  // Función blindada para actualizaciones anidadas
+  const updateConfig = (path: string[], value: any) => {
+    setConfig((prev) => {
+      const newConfig = { ...prev };
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      let current: any = newConfig;
+
+      for (let i = 0; i < path.length - 1; i++) {
+        const key = path[i];
+        // Ensure structure exists
+        if (!current[key]) current[key] = {};
+        // Shallow copy for immutability at this level
+        current[key] = { ...current[key] };
+        current = current[key];
+      }
+
+      current[path[path.length - 1]] = value;
+      return newConfig;
+    });
+  };
 
   const handleSave = async () => {
     setIsSaving(true);
     try {
-      // We are saving to the 'theme_config' column via the existing action.
-      // We cast to 'any' because strict Typescript might complain if theme-config.ts
-      // hasn't been updated to match DesignConfig yet.
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const result = await saveThemeConfig(config as any);
-
-      if (!result.success) {
-        alert('Error saving changes');
+      if (result.success) {
+        toast.success("Diseño guardado correctamente");
+      } else {
+        toast.error("Error al guardar el diseño");
       }
-    } catch (e) {
-      console.error(e);
-      alert('Error saving changes');
+    } catch (error) {
+      console.error("Save error:", error);
+      toast.error("Error inesperado al guardar");
     } finally {
       setIsSaving(false);
     }
   };
 
-  const updateConfig = (section: keyof DesignConfig, value: any) => {
-    setConfig(prev => ({
-      ...prev,
-      [section]: value
-    }));
-  };
-
-  // Helper for deep updates
-  const updateNested = (section: keyof DesignConfig, key: string, value: any) => {
-    setConfig(prev => ({
-      ...prev,
-      [section]: {
-        ...(prev[section] as any),
-        [key]: value
-      }
-    }));
-  };
-
-  // Link Management
-  const addLink = () => {
-    const newLink: LinkItem = {
-      id: Math.random().toString(36).substr(2, 9),
-      platform: 'website',
-      url: '',
-      label: 'New Link',
-      active: true
-    };
-
-    // SAFETY: ensure socialLinks is an array before spreading
-    const currentLinks = Array.isArray(config.socialLinks) ? config.socialLinks : [];
-    updateConfig('socialLinks', [...currentLinks, newLink]);
-  };
-
-  const updateLink = (id: string, field: keyof LinkItem, value: any) => {
-    if (!Array.isArray(config.socialLinks)) return;
-
-    const newLinks = config.socialLinks.map(link =>
-      link.id === id ? { ...link, [field]: value } : link
+  if (!mounted) {
+    return (
+      <div className="flex items-center justify-center h-full">
+        <Loader2 className="h-8 w-8 animate-spin text-gray-500" />
+      </div>
     );
-    updateConfig('socialLinks', newLinks);
-  };
-
-  const removeLink = (id: string) => {
-    if (!Array.isArray(config.socialLinks)) return;
-    const newLinks = config.socialLinks.filter(link => link.id !== id);
-    updateConfig('socialLinks', newLinks);
-  };
+  }
 
   return (
-    <div className="flex h-full w-full">
-      {/* Editor Sidebar */}
-      <div className="w-[400px] flex-shrink-0 border-r bg-white h-full flex flex-col">
-        <div className="p-4 border-b flex justify-between items-center">
-          <h2 className="font-bold text-lg">Design Editor</h2>
-          <button
+    <div className="flex h-full w-full bg-gray-50/50">
+      {/* LEFT SIDEBAR - NAVIGATION */}
+      <div className="w-64 border-r bg-white h-full flex flex-col shadow-sm">
+        <div className="p-6 border-b">
+          <h2 className="font-bold text-xl flex items-center gap-2">
+            <Palette className="w-5 h-5 text-indigo-600" />
+            Diseño
+          </h2>
+          <p className="text-xs text-muted-foreground mt-1">Personaliza tu tienda</p>
+        </div>
+
+        <nav className="flex-1 p-4 space-y-2">
+          {SECTIONS.map((section) => {
+            const Icon = section.icon;
+            const isActive = activeSection === section.id;
+            return (
+              <Button
+                key={section.id}
+                variant={isActive ? "secondary" : "ghost"}
+                className={`w-full justify-start gap-3 h-12 ${isActive ? 'bg-indigo-50 text-indigo-700 font-medium' : 'text-gray-600'}`}
+                onClick={() => setActiveSection(section.id)}
+              >
+                <Icon className={`w-5 h-5 ${isActive ? 'text-indigo-600' : 'text-gray-400'}`} />
+                {section.label}
+              </Button>
+            );
+          })}
+        </nav>
+
+        <div className="p-4 border-t bg-gray-50/50">
+          <Button
+            className="w-full gap-2"
             onClick={handleSave}
             disabled={isSaving}
-            className="px-4 py-2 bg-black text-white rounded-md text-sm hover:bg-gray-800 disabled:opacity-50"
           >
-            {isSaving ? 'Saving...' : 'Save Changes'}
-          </button>
-        </div>
-
-        {/* Tabs */}
-        <div className="flex border-b">
-          {(['profile', 'links', 'appearance'] as const).map(tab => (
-            <button
-              key={tab}
-              onClick={() => setActiveTab(tab)}
-              className={`flex-1 py-3 text-sm font-medium ${activeTab === tab ? 'border-b-2 border-black text-black' : 'text-gray-500 hover:text-gray-700'}`}
-            >
-              {tab.charAt(0).toUpperCase() + tab.slice(1)}
-            </button>
-          ))}
-        </div>
-
-        {/* Content Area */}
-        <div className="flex-1 overflow-y-auto p-6 space-y-6">
-
-          {/* PROFILE TAB */}
-          {activeTab === 'profile' && (
-            <div className="space-y-4">
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Shop Name</label>
-                <input
-                  type="text"
-                  value={config.profile?.shopName || ''}
-                  onChange={(e) => updateNested('profile', 'shopName', e.target.value)}
-                  className="w-full p-2 border rounded-md"
-                />
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Bio</label>
-                <textarea
-                  value={config.profile?.bio || ''}
-                  onChange={(e) => updateNested('profile', 'bio', e.target.value)}
-                  className="w-full p-2 border rounded-md"
-                  rows={3}
-                />
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Avatar URL</label>
-                <input
-                  type="text"
-                  value={config.profile?.avatarUrl || ''}
-                  onChange={(e) => updateNested('profile', 'avatarUrl', e.target.value)}
-                  className="w-full p-2 border rounded-md"
-                />
-              </div>
-            </div>
-          )}
-
-          {/* LINKS TAB */}
-          {activeTab === 'links' && (
-            <div className="space-y-4">
-              <button
-                onClick={addLink}
-                className="w-full py-2 border-2 border-dashed border-gray-300 rounded-md text-gray-600 hover:border-gray-400 hover:text-gray-800"
-              >
-                + Add New Link
-              </button>
-
-              <div className="space-y-3">
-                {Array.isArray(config.socialLinks) && config.socialLinks.map((link, index) => (
-                  <div key={link.id} className="p-3 border rounded-md bg-gray-50 space-y-3">
-                    <div className="flex justify-between items-start">
-                      <span className="text-xs font-mono text-gray-400">#{index + 1}</span>
-                      <button onClick={() => removeLink(link.id)} className="text-red-500 text-xs hover:underline">Remove</button>
-                    </div>
-
-                    <div className="grid grid-cols-2 gap-2">
-                      <div>
-                        <label className="block text-xs font-medium text-gray-500">Label</label>
-                        <input
-                          type="text"
-                          value={link.label || ''}
-                          onChange={(e) => updateLink(link.id, 'label', e.target.value)}
-                          className="w-full p-1 text-sm border rounded"
-                        />
-                      </div>
-                      <div>
-                        <label className="block text-xs font-medium text-gray-500">Platform</label>
-                        <select
-                          value={link.platform}
-                          onChange={(e) => updateLink(link.id, 'platform', e.target.value)}
-                          className="w-full p-1 text-sm border rounded"
-                        >
-                          <option value="website">Website</option>
-                          <option value="instagram">Instagram</option>
-                          <option value="tiktok">TikTok</option>
-                          <option value="twitter">Twitter</option>
-                          <option value="facebook">Facebook</option>
-                          <option value="whatsapp">WhatsApp</option>
-                          <option value="other">Other</option>
-                        </select>
-                      </div>
-                    </div>
-                    <div>
-                      <label className="block text-xs font-medium text-gray-500">URL</label>
-                      <input
-                        type="text"
-                        value={link.url || ''}
-                        onChange={(e) => updateLink(link.id, 'url', e.target.value)}
-                        className="w-full p-1 text-sm border rounded"
-                        placeholder="https://..."
-                      />
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </div>
-          )}
-
-          {/* APPEARANCE TAB */}
-          {activeTab === 'appearance' && (
-            <div className="space-y-4">
-               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Background Color</label>
-                <div className="flex items-center gap-2">
-                  <input
-                    type="color"
-                    value={config.colors?.background || '#ffffff'}
-                    onChange={(e) => updateNested('colors', 'background', e.target.value)}
-                    className="h-8 w-8 rounded border"
-                  />
-                  <span className="text-sm text-gray-500">{config.colors?.background}</span>
-                </div>
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Text Color</label>
-                <div className="flex items-center gap-2">
-                  <input
-                    type="color"
-                    value={config.colors?.text || '#000000'}
-                    onChange={(e) => updateNested('colors', 'text', e.target.value)}
-                    className="h-8 w-8 rounded border"
-                  />
-                   <span className="text-sm text-gray-500">{config.colors?.text}</span>
-                </div>
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Card Background</label>
-                <div className="flex items-center gap-2">
-                  <input
-                    type="color"
-                    value={config.colors?.cardBackground || '#f3f4f6'}
-                    onChange={(e) => updateNested('colors', 'cardBackground', e.target.value)}
-                    className="h-8 w-8 rounded border"
-                  />
-                   <span className="text-sm text-gray-500">{config.colors?.cardBackground}</span>
-                </div>
-              </div>
-            </div>
-          )}
-
+            {isSaving ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />}
+            {isSaving ? "Guardando..." : "Guardar Cambios"}
+          </Button>
         </div>
       </div>
 
-      {/* Live Preview (Simplified for new component) */}
-      <div className="flex-1 bg-gray-100 flex items-center justify-center p-8">
-        <div className="bg-white rounded-[40px] shadow-2xl overflow-hidden w-[375px] h-[812px] border-8 border-gray-900 relative">
-          {/* Preview Header */}
-          <div className="absolute top-0 w-full h-12 bg-gray-100 border-b flex items-center justify-center text-xs text-gray-500 z-10">
-            Preview: /{slug}
+      {/* RIGHT CONTENT - SCROLL AREA */}
+      <div className="flex-1 overflow-y-auto p-8">
+        <div className="max-w-2xl mx-auto space-y-6">
+          <div className="mb-6">
+            <h1 className="text-2xl font-bold tracking-tight text-gray-900">
+              {SECTIONS.find(s => s.id === activeSection)?.label}
+            </h1>
+            <p className="text-gray-500">
+              {SECTIONS.find(s => s.id === activeSection)?.description}
+            </p>
           </div>
 
-          <div
-            className="w-full h-full overflow-y-auto pt-12 pb-8"
-            style={{
-              backgroundColor: config.colors?.background || '#ffffff',
-              color: config.colors?.text || '#000000',
-              fontFamily: config.fonts?.body || 'sans-serif'
-            }}
-          >
-            {/* Profile Header */}
-            <div className="p-6 text-center space-y-4">
-              {config.profile?.avatarUrl && (
-                <img
-                  src={config.profile.avatarUrl}
-                  alt="Avatar"
-                  className="w-24 h-24 rounded-full mx-auto object-cover border-4 border-white shadow-sm"
-                />
+          <Card className="border-none shadow-md">
+            <CardContent className="p-6 space-y-6">
+
+              {/* === GLOBAL SECTION === */}
+              {activeSection === 'global' && (
+                <div className="space-y-6">
+                  <div className="grid gap-2">
+                    <Label htmlFor="bg-color">Color de Fondo</Label>
+                    <div className="flex items-center gap-3">
+                      <div className="h-10 w-10 rounded-full border shadow-sm overflow-hidden flex-shrink-0">
+                        <input
+                          id="bg-color"
+                          type="color"
+                          className="h-[120%] w-[120%] -m-[10%] cursor-pointer"
+                          value={config.colors.background}
+                          onChange={(e) => updateConfig(['colors', 'background'], e.target.value)}
+                        />
+                      </div>
+                      <Input
+                        value={config.colors.background}
+                        onChange={(e) => updateConfig(['colors', 'background'], e.target.value)}
+                        className="font-mono"
+                      />
+                    </div>
+                  </div>
+
+                  <div className="grid gap-2">
+                    <Label htmlFor="text-color">Color de Texto Principal</Label>
+                    <div className="flex items-center gap-3">
+                      <div className="h-10 w-10 rounded-full border shadow-sm overflow-hidden flex-shrink-0">
+                        <input
+                          id="text-color"
+                          type="color"
+                          className="h-[120%] w-[120%] -m-[10%] cursor-pointer"
+                          value={config.colors.text}
+                          onChange={(e) => updateConfig(['colors', 'text'], e.target.value)}
+                        />
+                      </div>
+                      <Input
+                        value={config.colors.text}
+                        onChange={(e) => updateConfig(['colors', 'text'], e.target.value)}
+                        className="font-mono"
+                      />
+                    </div>
+                  </div>
+
+                  <div className="grid gap-2">
+                    <Label>Tipografía Global</Label>
+                    <div className="flex items-center gap-2 p-3 border rounded-md bg-gray-50 text-sm text-gray-500">
+                      <Type className="w-4 h-4" />
+                      <span>{config.fonts.body}</span>
+                      {/* Placeholder selector */}
+                    </div>
+                  </div>
+                </div>
               )}
-              <div>
-                <h1 className="text-xl font-bold" style={{ fontFamily: config.fonts?.heading }}>
-                  {config.profile?.shopName || 'My Shop'}
-                </h1>
-                <p className="text-sm opacity-80 mt-1">{config.profile?.bio}</p>
-              </div>
-            </div>
 
-            {/* Links */}
-            <div className="px-6 space-y-3">
-              {Array.isArray(config.socialLinks) && config.socialLinks.map(link => (
-                <a
-                  key={link.id}
-                  href={link.url}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="block p-4 text-center rounded-xl transition-transform hover:scale-[1.02] active:scale-95"
-                  style={{
-                    backgroundColor: config.colors?.cardBackground || '#f3f4f6',
-                    color: config.colors?.primary || '#000000'
-                  }}
-                >
-                  <span className="font-medium">{link.label || link.platform}</span>
-                </a>
-              ))}
-            </div>
-          </div>
+              {/* === HEADER SECTION === */}
+              {activeSection === 'header' && (
+                <div className="space-y-6">
+                  <div className="grid gap-2">
+                    <Label htmlFor="shop-name">Nombre de la Tienda</Label>
+                    <Input
+                      id="shop-name"
+                      placeholder="Ej: Mi Tienda Cool"
+                      value={config.profile.shopName || ''}
+                      onChange={(e) => updateConfig(['profile', 'shopName'], e.target.value)}
+                    />
+                  </div>
+
+                  <div className="grid gap-2">
+                    <Label htmlFor="bio">Biografía / Descripción</Label>
+                    <Textarea
+                      id="bio"
+                      placeholder="Describe tu tienda..."
+                      className="resize-none"
+                      rows={4}
+                      value={config.profile.bio || ''}
+                      onChange={(e) => updateConfig(['profile', 'bio'], e.target.value)}
+                    />
+                  </div>
+
+                  <div className="grid gap-2">
+                    <Label htmlFor="avatar">URL del Avatar</Label>
+                    <div className="flex gap-4 items-start">
+                      {config.profile.avatarUrl && (
+                        <img
+                          src={config.profile.avatarUrl}
+                          alt="Preview"
+                          className="w-12 h-12 rounded-full object-cover border"
+                        />
+                      )}
+                      <Input
+                        id="avatar"
+                        placeholder="https://..."
+                        value={config.profile.avatarUrl || ''}
+                        onChange={(e) => updateConfig(['profile', 'avatarUrl'], e.target.value)}
+                      />
+                    </div>
+                  </div>
+
+                   <div className="grid gap-2">
+                    <Label>Tipografía de Títulos</Label>
+                    <div className="flex items-center gap-2 p-3 border rounded-md bg-gray-50 text-sm text-gray-500">
+                      <Type className="w-4 h-4" />
+                      <span>{config.fonts.heading}</span>
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {/* === CARDS SECTION === */}
+              {activeSection === 'cards' && (
+                <div className="space-y-6">
+                  <div className="grid gap-2">
+                    <Label htmlFor="card-bg">Fondo de Tarjeta</Label>
+                    <div className="flex items-center gap-3">
+                      <div className="h-10 w-10 rounded-full border shadow-sm overflow-hidden flex-shrink-0">
+                        <input
+                          id="card-bg"
+                          type="color"
+                          className="h-[120%] w-[120%] -m-[10%] cursor-pointer"
+                          value={config.colors.cardBackground}
+                          onChange={(e) => updateConfig(['colors', 'cardBackground'], e.target.value)}
+                        />
+                      </div>
+                      <Input
+                        value={config.colors.cardBackground}
+                        onChange={(e) => updateConfig(['colors', 'cardBackground'], e.target.value)}
+                        className="font-mono"
+                      />
+                    </div>
+                  </div>
+
+                  <div className="grid gap-2">
+                    <Label htmlFor="primary-color">Color Primario (Botones/Acentos)</Label>
+                    <div className="flex items-center gap-3">
+                      <div className="h-10 w-10 rounded-full border shadow-sm overflow-hidden flex-shrink-0">
+                        <input
+                          id="primary-color"
+                          type="color"
+                          className="h-[120%] w-[120%] -m-[10%] cursor-pointer"
+                          value={config.colors.primary}
+                          onChange={(e) => updateConfig(['colors', 'primary'], e.target.value)}
+                        />
+                      </div>
+                      <Input
+                        value={config.colors.primary}
+                        onChange={(e) => updateConfig(['colors', 'primary'], e.target.value)}
+                        className="font-mono"
+                      />
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {/* === SOCIALS SECTION (SAFE VIEW) === */}
+              {activeSection === 'socials' && (
+                <div className="space-y-4">
+                  <div className="p-4 bg-yellow-50 border border-yellow-200 rounded-md text-sm text-yellow-800">
+                    Modo seguro activado: Visualización de datos crudos para prevenir errores.
+                  </div>
+
+                  <div className="relative">
+                    <pre className="p-4 rounded-md bg-slate-950 text-slate-50 text-xs overflow-x-auto font-mono border">
+                      {JSON.stringify(config.socialLinks, null, 2)}
+                    </pre>
+                  </div>
+                </div>
+              )}
+
+            </CardContent>
+          </Card>
         </div>
       </div>
     </div>
