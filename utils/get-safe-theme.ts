@@ -2,13 +2,27 @@ import { ThemeConfig } from "@/lib/types/theme-config";
 import { createClient } from "@/utils/supabase/server";
 import { Database } from "@/utils/supabase/types";
 
-// 1. Definición de la Fuente de la Verdad (DEFAULT_THEME)
-// Copia exacta y tipada para asegurar integridad sin depender de archivos externos
+// 1. CLEAN SOURCE OF TRUTH (DEFAULT_THEME)
+// Strict adherence to ThemeConfig interface. No ghost properties.
 export const DEFAULT_THEME: ThemeConfig = {
   header: {
-    title: { fontFamily: 'Inter', color: '#000000', fontSize: '2xl', bold: true },
-    subtitle: { fontFamily: 'Inter', color: '#666666', fontSize: 'lg', bold: false },
-    bio: { fontFamily: 'Roboto', color: '#666666', fontSize: 'sm' },
+    title: {
+      fontFamily: 'Inter',
+      color: '#000000',
+      fontSize: '2xl',
+      bold: true
+    },
+    subtitle: {
+      fontFamily: 'Inter',
+      color: '#666666',
+      fontSize: 'lg',
+      bold: false
+    },
+    bio: {
+      fontFamily: 'Roboto',
+      color: '#666666',
+      fontSize: 'sm'
+    },
     socialLinks: []
   },
   cards: {
@@ -31,22 +45,22 @@ export const DEFAULT_THEME: ThemeConfig = {
     addButton: {
       bgColor: '#000000',
       iconColor: '#ffffff',
-      shape: 'circle' // Literal exacto
+      shape: 'circle' as const // Literal strictness
     },
-    // Legacy fallbacks requeridos por la interfaz
+    // Optional/Legacy fields allowed by interface
     productName: { fontFamily: 'Inter', color: '#000000' },
     button: { bg: '#000000', text: '#ffffff' }
   },
   global: {
-    backgroundType: 'solid', // Literal exacto
+    backgroundType: 'solid' as const, // Literal strictness
     backgroundValue: '#f3f4f6'
   }
 };
 
 type Profile = Database['public']['Tables']['profiles']['Row'];
 
-// PERFIL DUMMY INFALIBLE
-// Se usa cuando Supabase falla o el usuario no tiene perfil, para evitar que la UI explote.
+// 2. BULLETPROOF DUMMY PROFILE
+// Used when Supabase fails or user has no profile, ensuring UI never crashes.
 export const DUMMY_PROFILE: Profile = {
   id: "dummy-user-fallback",
   updated_at: new Date().toISOString(),
@@ -67,9 +81,7 @@ export const DUMMY_PROFILE: Profile = {
   theme_config: DEFAULT_THEME
 };
 
-/**
- * Función auxiliar para realizar un Deep Merge seguro.
- */
+// 3. DEFENSIVE MERGE UTILS
 function deepMerge(target: any, source: any): any {
   if (typeof source !== 'object' || source === null) {
     return target;
@@ -82,7 +94,6 @@ function deepMerge(target: any, source: any): any {
     const targetValue = output[key];
 
     if (Array.isArray(sourceValue)) {
-      // Para arrays (ej: socialLinks), preferimos la fuente si es válida
       output[key] = sourceValue;
     } else if (
       typeof sourceValue === 'object' &&
@@ -91,10 +102,8 @@ function deepMerge(target: any, source: any): any {
       typeof targetValue === 'object' &&
       !Array.isArray(targetValue)
     ) {
-      // Recursión solo si ambos son objetos
       output[key] = deepMerge(targetValue, sourceValue);
     } else {
-      // Primitivos
       output[key] = sourceValue;
     }
   });
@@ -103,21 +112,20 @@ function deepMerge(target: any, source: any): any {
 }
 
 /**
- * getSafeTheme: La función Firewall.
- * Recibe CUALQUIER COSA y devuelve un ThemeConfig válido.
+ * getSafeTheme: The Firewall Function.
+ * Accepts ANYTHING and returns a valid ThemeConfig.
  */
 export function getSafeTheme(dbConfig: any): ThemeConfig {
   try {
-    // 1. Si es nulo o basura, devolver default
+    // 1. If null or garbage, return default
     if (!dbConfig || typeof dbConfig !== 'object') {
       return DEFAULT_THEME;
     }
 
-    // 2. Deep Merge defensivo
+    // 2. Defensive Deep Merge
     const merged = deepMerge(DEFAULT_THEME, dbConfig);
 
-    // 3. Sanitización específica de Literales (Union Types)
-    // Esto es crucial para evitar crasheos en componentes que esperan 'circle' | 'rounded' | 'square'
+    // 3. Specific Sanitization for Literals (Union Types)
     const validShapes = ['circle', 'rounded', 'square'];
     if (merged.cards?.addButton?.shape && !validShapes.includes(merged.cards.addButton.shape)) {
         merged.cards.addButton.shape = 'circle';
@@ -128,7 +136,7 @@ export function getSafeTheme(dbConfig: any): ThemeConfig {
         merged.global.backgroundType = 'solid';
     }
 
-    // 4. Double Casting final para silenciar TypeScript y asegurar compatibilidad
+    // 4. Final Double Casting to silence TypeScript and ensure compatibility
     return merged as unknown as ThemeConfig;
 
   } catch (error) {
@@ -138,14 +146,14 @@ export function getSafeTheme(dbConfig: any): ThemeConfig {
 }
 
 interface SafeProfileResponse {
-  profile: Profile; // NUNCA puede ser null
+  profile: Profile;
   config: ThemeConfig;
   error: string | null;
 }
 
 /**
- * getSafeProfile: Obtención segura de perfil + config.
- * GARANTÍA: Nunca devuelve profile: null. Si falla, devuelve DUMMY_PROFILE.
+ * getSafeProfile: Secure Profile + Config Fetching.
+ * GUARANTEE: Never returns profile: null. If it fails, returns DUMMY_PROFILE.
  */
 export async function getSafeProfile(userId: string): Promise<SafeProfileResponse> {
   const supabase = await createClient();
@@ -158,15 +166,15 @@ export async function getSafeProfile(userId: string): Promise<SafeProfileRespons
       .single();
 
     if (error || !profile) {
-      console.error("getSafeProfile Error or No Data:", error?.message);
+      console.warn("getSafeProfile Warning:", error?.message || "Profile not found");
       return {
-        profile: DUMMY_PROFILE, // FALLBACK ROBUSTO
+        profile: DUMMY_PROFILE,
         config: DEFAULT_THEME,
         error: error?.message || "Profile not found"
       };
     }
 
-    // Prioridad: theme_config > design_config
+    // Priority: theme_config > design_config
     const rawConfig = profile.theme_config || profile.design_config;
 
     return {
@@ -178,7 +186,7 @@ export async function getSafeProfile(userId: string): Promise<SafeProfileRespons
   } catch (e) {
     console.error("getSafeProfile CRITICAL FAILURE:", e);
     return {
-      profile: DUMMY_PROFILE, // FALLBACK ROBUSTO
+      profile: DUMMY_PROFILE,
       config: DEFAULT_THEME,
       error: "Critical failure in profile fetch"
     };
