@@ -1,132 +1,70 @@
-"use client"
-
-import { useState, useEffect } from "react"
-import { createClient } from "@/utils/supabase/client"
-import CatalogoInteractivo from "@/components/shop/CatalogoInteractivo"
-import { CartProvider } from "@/components/shop/cart-context"
-import { useEditorStore } from "@/hooks/useEditorStore"
-import { saveThemeConfig } from "@/app/dashboard/actions/design-actions"
+import { createClient } from "@/utils/supabase/server"
 import { DEFAULT_THEME_CONFIG, ThemeConfig } from "@/lib/types/theme-config"
-import dynamic from "next/dynamic"
+import DesignClient from "@/components/dashboard/design/design-client"
+import { redirect } from "next/navigation"
 
-// Dynamic Import for the Editor Component
-// This prevents the heavy editor logic from blocking the initial render of the page
-const FloatingDesignEditor = dynamic(() => import("@/components/FloatingDesignEditor"), {
-  ssr: false,
-  loading: () => null // Invisible loading since it's a floating element
-})
+// Define DEFAULT_CONFIG as requested to ensure a robust fallback structure
+// This is the source of truth for the default structure if the database returns null
+const DEFAULT_CONFIG = DEFAULT_THEME_CONFIG;
 
-export default function DesignPage() {
-  const supabase = createClient()
-  const [loading, setLoading] = useState(true)
-  const [isPro, setIsPro] = useState(false)
-  const [shopData, setShopData] = useState<Record<string, unknown> | null>(null)
-  const [products, setProducts] = useState<unknown[]>([])
+export default async function DesignPage() {
+  const supabase = await createClient()
 
-  // Store global del editor
-  const { theme, setFullThemeConfig, setIsSaving } = useEditorStore()
-
-  useEffect(() => {
-    const loadData = async () => {
-        const { data: { user } } = await supabase.auth.getUser()
-        if(!user) return
-
-        const { data: profile } = await supabase.from('profiles').select('*').eq('id', user.id).single()
-        
-        if(profile) {
-            setIsPro(profile.is_pro || false)
-            setShopData(profile)
-
-            // Cargar configuración existente o migrar/usar default
-            let configToUse: ThemeConfig = DEFAULT_THEME_CONFIG;
-
-            if (profile.theme_config && Object.keys(profile.theme_config).length > 0) {
-               configToUse = profile.theme_config as ThemeConfig;
-            } else {
-               // Fallback: Mapear columnas viejas (si existen) a la nueva estructura theme_config
-               // Esto es una migración "on the fly" para que el usuario no vea defaults planos
-               configToUse = {
-                  ...DEFAULT_THEME_CONFIG,
-                  global: {
-                     ...DEFAULT_THEME_CONFIG.global,
-                     backgroundValue: profile.design_bg_color || DEFAULT_THEME_CONFIG.global.backgroundValue,
-                  },
-                  header: {
-                     ...DEFAULT_THEME_CONFIG.header,
-                     title: {
-                        ...DEFAULT_THEME_CONFIG.header.title,
-                        color: profile.design_title_color || DEFAULT_THEME_CONFIG.header.title.color,
-                        // Fallback font from legacy `design_font`
-                        fontFamily: (profile.design_font || 'Inter').split(',')[0].replace(/['"]/g, '').trim(),
-                     },
-                     subtitle: {
-                        ...DEFAULT_THEME_CONFIG.header.subtitle,
-                        // Assume same font or default
-                        fontFamily: (profile.design_font || 'Inter').split(',')[0].replace(/['"]/g, '').trim(),
-                     }
-                  },
-                  // Cards defaults remain from constant unless we want to infer from legacy styles
-               }
-            }
-
-            setFullThemeConfig(configToUse)
-            const { data: prod } = await supabase.from('products').select('*').eq('user_id', profile.id).limit(6)
-            setProducts(prod || [])
-        }
-        setLoading(false)
-    }
-    loadData()
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [])
-
-  const handleSave = async () => {
-    if (!isPro) return
-    setIsSaving(true)
-    
-    // Guardar usando la Server Action actualizada
-    // Se envía el objeto completo 'theme' a la columna JSONB 'theme_config'
-    const result = await saveThemeConfig(theme)
-
-    if (!result.success) {
-        console.error("Failed to save")
-    }
-
-    setTimeout(() => setIsSaving(false), 1000)
+  const { data: { user } } = await supabase.auth.getUser()
+  if (!user) {
+    redirect('/login')
   }
 
-  if (loading) return <div className="h-full flex items-center justify-center text-xs font-bold uppercase tracking-widest">Cargando...</div>
+  // Fetch profile and products
+  const { data: profile } = await supabase.from('profiles').select('*').eq('id', user.id).single()
 
-  // Mapear el nuevo objeto `theme` para que CatalogoInteractivo lo entienda
-  const previewShopData = {
-      ...shopData,
-      theme_config: theme,
+  if (!profile) {
+     return <div>Perfil no encontrado</div>
   }
+
+  const isPro = profile.is_pro || false
+
+  // LOGIC TO HARDEN NULL VALUES
+  // We determine the config to use on the server side to prevent client crashes
+  let configToUse: ThemeConfig = DEFAULT_CONFIG;
+
+  if (profile.theme_config && Object.keys(profile.theme_config).length > 0) {
+      // Trust the database if it has content
+      configToUse = profile.theme_config as ThemeConfig;
+  } else {
+      // If null or empty, assign DEFAULT_CONFIG immediately (with migration logic if needed)
+      // Here we include the migration logic to preserve legacy settings if they exist
+      configToUse = {
+          ...DEFAULT_CONFIG,
+          global: {
+              ...DEFAULT_CONFIG.global,
+              backgroundValue: profile.design_bg_color || DEFAULT_CONFIG.global.backgroundValue,
+          },
+          header: {
+              ...DEFAULT_CONFIG.header,
+              title: {
+                  ...DEFAULT_CONFIG.header.title,
+                  color: profile.design_title_color || DEFAULT_CONFIG.header.title.color,
+                  // Fallback font from legacy `design_font`
+                  fontFamily: (profile.design_font || 'Inter').split(',')[0].replace(/['"]/g, '').trim(),
+              },
+              subtitle: {
+                  ...DEFAULT_CONFIG.header.subtitle,
+                  // Assume same font or default
+                  fontFamily: (profile.design_font || 'Inter').split(',')[0].replace(/['"]/g, '').trim(),
+              }
+          }
+      }
+  }
+
+  const { data: products } = await supabase.from('products').select('*').eq('user_id', profile.id).limit(6)
 
   return (
-    // CONTENEDOR PRINCIPAL: Ocupa el 100% y oculta desbordes
-    <div className="relative w-full h-full bg-slate-100 overflow-hidden">
-        
-        {/* VISTA PREVIA: Centrada y contenida */}
-        <div className="absolute inset-0 z-0 overflow-y-auto custom-scrollbar pb-32">
-             {/* Escalar contenido si es necesario para que se vea "fit" */}
-             <div className="min-h-full">
-                <CartProvider>
-                    <CatalogoInteractivo
-                        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                        products={products as any}
-                        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                        shop={previewShopData as any}
-                        isEditor={true}
-                    />
-                </CartProvider>
-             </div>
-        </div>
-
-        {/* EDITOR: Flotante encima de todo */}
-        <FloatingDesignEditor 
-            onSave={handleSave} 
-            isPro={isPro}
-        />
-    </div>
+    <DesignClient
+      initialShopData={profile}
+      initialProducts={products || []}
+      initialThemeConfig={configToUse}
+      isPro={isPro}
+    />
   )
 }
