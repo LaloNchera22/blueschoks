@@ -1,16 +1,12 @@
-import type { NextConfig } from "next";
-
-const nextConfig: NextConfig = {
-  experimental: {
-    serverActions: {
-      bodySizeLimit: '10mb', // Soluciona el error "Body exceeded 1 MB limit"
-    },
-  },
+/** @type {import('next').NextConfig} */
+const nextConfig = {
+  // ... otras configuraciones que ya tengas ...
+  
   images: {
     remotePatterns: [
       {
         protocol: 'https',
-        hostname: '**.supabase.co', // Permite imágenes de cualquier proyecto Supabase
+        hostname: '**', // Esto permite imágenes de CUALQUIER dominio https
       },
     ],
   },
