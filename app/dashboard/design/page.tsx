@@ -11,7 +11,8 @@ export default async function DesignPage() {
     redirect('/login')
   }
 
-  // REFACTOR: Use new safe utility
+  // "A Prueba de Balas": This utility ensures config is NEVER null.
+  // Even if DB returns null, it merges with DEFAULT_THEME instantly.
   const { config: safeConfig, profile } = await getSafeProfile(user.id, 'id')
 
   if (!profile) {

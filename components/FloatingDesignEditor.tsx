@@ -6,10 +6,16 @@ import { Button } from "@/components/ui/button"
 import { useEditorStore } from "@/hooks/useEditorStore"
 import dynamic from "next/dynamic"
 
-// Import UI components
-import { FontSelector, ColorSelector, SizeSelector } from "@/components/dashboard/design/editor-ui-components"
-
-// Dynamic Imports
+// Dynamic Imports for heavier or interactive tools
+const FontSelector = dynamic(() => import("@/components/dashboard/design/tools/font-selector"), {
+    loading: () => <div className="h-9 w-32 bg-slate-100 rounded animate-pulse" />
+})
+const ColorSelector = dynamic(() => import("@/components/dashboard/design/tools/color-selector"), {
+    loading: () => <div className="h-9 w-9 bg-slate-100 rounded animate-pulse" />
+})
+const SizeSelector = dynamic(() => import("@/components/dashboard/design/tools/size-selector"), {
+    loading: () => <div className="h-9 w-24 bg-slate-100 rounded animate-pulse" />
+})
 const SocialLinksTool = dynamic(() => import("@/components/dashboard/design/social-links-tool"), {
     loading: () => <div className="h-10 flex items-center px-4 text-xs text-slate-400 animate-pulse">Cargando herramientas sociales...</div>
 })
