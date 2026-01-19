@@ -42,6 +42,13 @@ export async function saveThemeConfig(config: ThemeConfig) {
   }
 
   try {
+    // Get slug for revalidation
+    const { data: profile } = await supabase
+      .from('profiles')
+      .select('slug')
+      .eq('id', user.id)
+      .single()
+
     const { error } = await supabase
       .from('profiles')
       .update({
@@ -53,7 +60,13 @@ export async function saveThemeConfig(config: ThemeConfig) {
     if (error) throw error
 
     revalidatePath('/dashboard/design')
-    revalidatePath('/[slug]', 'page') // Revalidate the shop page
+
+    if (profile?.slug) {
+      // Revalidate the specific shop page
+      // Note: 'page' type ensures we target the page route, not just layout
+      revalidatePath(`/${profile.slug}`, 'page')
+    }
+
     return { success: true }
   } catch (error) {
     console.error('Error saving theme config:', error)
