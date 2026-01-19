@@ -1,5 +1,5 @@
 import { createClient } from "@/utils/supabase/server"
-import { getSafeTheme } from "@/lib/data/get-safe-theme"
+import { getSafeProfile } from "@/utils/get-safe-theme"
 import DesignClient from "@/components/dashboard/design/design-client"
 import { redirect } from "next/navigation"
 
@@ -11,9 +11,8 @@ export default async function DesignPage() {
     redirect('/login')
   }
 
-  // REFACTOR: Use safe data fetching utility
-  // This replaces the fragile manual merging logic
-  const { config: safeConfig, profile } = await getSafeTheme(user.id, 'id')
+  // REFACTOR: Use new safe utility
+  const { config: safeConfig, profile } = await getSafeProfile(user.id, 'id')
 
   if (!profile) {
      return <div>Perfil no encontrado</div>

@@ -2,9 +2,23 @@ import { ThemeConfig } from "@/lib/types/theme-config";
 
 export const DEFAULT_THEME: ThemeConfig = {
   header: {
-    title: { fontFamily: 'Inter', color: '#000000', fontSize: '2xl', bold: true },
-    subtitle: { fontFamily: 'Inter', color: '#666666', fontSize: 'lg', bold: false },
-    bio: { fontFamily: 'Roboto', color: '#666666', fontSize: 'sm' },
+    title: {
+      fontFamily: 'Inter',
+      color: '#000000',
+      fontSize: '2xl',
+      bold: true
+    },
+    subtitle: {
+      fontFamily: 'Inter',
+      color: '#666666',
+      fontSize: 'lg',
+      bold: false
+    },
+    bio: {
+      fontFamily: 'Inter',
+      color: '#666666',
+      fontSize: 'sm'
+    },
     socialLinks: []
   },
   cards: {
@@ -29,7 +43,7 @@ export const DEFAULT_THEME: ThemeConfig = {
       iconColor: '#ffffff',
       shape: 'circle'
     },
-    // Legacy fallback
+    // Legacy fallback (optional)
     productName: { fontFamily: 'Inter', color: '#000000' },
     button: { bg: '#000000', text: '#ffffff' }
   },
