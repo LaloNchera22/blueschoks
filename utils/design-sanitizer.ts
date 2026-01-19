@@ -1,4 +1,4 @@
-import { DesignConfig, LinkItem } from '@/lib/types/design-system';
+import { DesignConfig, LinkItem, CheckoutConfig } from '@/lib/types/design-system';
 
 export const DEFAULT_DESIGN: DesignConfig = {
   colors: {
@@ -18,6 +18,13 @@ export const DEFAULT_DESIGN: DesignConfig = {
     shopName: '',
   },
   socialLinks: [],
+  checkout: {
+    whatsappNumber: '',
+    currency: 'MXN',
+    showQuantitySelector: true,
+    cartButtonText: 'Enviar Pedido',
+    buttonStyle: 'floating',
+  },
 };
 
 export function sanitizeDesign(raw: any, profileFallback?: any): DesignConfig {
@@ -59,6 +66,13 @@ export function sanitizeDesign(raw: any, profileFallback?: any): DesignConfig {
       label: typeof link.label === 'string' ? link.label : '',
       active: typeof link.active === 'boolean' ? link.active : true,
     })),
+    checkout: {
+      whatsappNumber: typeof raw.checkout?.whatsappNumber === 'string' ? raw.checkout.whatsappNumber : DEFAULT_DESIGN.checkout.whatsappNumber,
+      currency: typeof raw.checkout?.currency === 'string' ? raw.checkout.currency : DEFAULT_DESIGN.checkout.currency,
+      showQuantitySelector: typeof raw.checkout?.showQuantitySelector === 'boolean' ? raw.checkout.showQuantitySelector : DEFAULT_DESIGN.checkout.showQuantitySelector,
+      cartButtonText: typeof raw.checkout?.cartButtonText === 'string' ? raw.checkout.cartButtonText : DEFAULT_DESIGN.checkout.cartButtonText,
+      buttonStyle: (['floating', 'fixed'].includes(raw.checkout?.buttonStyle)) ? raw.checkout.buttonStyle : DEFAULT_DESIGN.checkout.buttonStyle,
+    },
   };
 
   return clean;

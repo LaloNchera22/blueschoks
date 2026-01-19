@@ -6,6 +6,14 @@ export interface LinkItem {
   active: boolean;
 }
 
+export interface CheckoutConfig {
+  whatsappNumber: string; // Number orders are sent to
+  currency: string; // e.g. "MXN", "USD"
+  showQuantitySelector: boolean; // Toggle for (- 1 +) in card
+  cartButtonText: string; // e.g. "Enviar Pedido"
+  buttonStyle: 'floating' | 'fixed'; // Cart button style
+}
+
 export interface DesignConfig {
   colors: {
     background: string;
@@ -24,4 +32,5 @@ export interface DesignConfig {
     shopName?: string;
   };
   socialLinks: LinkItem[];
+  checkout: CheckoutConfig;
 }
