@@ -11,16 +11,20 @@ export default async function DesignPage() {
     redirect('/login')
   }
 
-  // REFACTOR: Use new safe utility
-  const { config: safeConfig, profile } = await getSafeProfile(user.id, 'id')
+  // REFACTOR: Parallelize profile and products fetch
+  const [profileResult, productsResult] = await Promise.all([
+    getSafeProfile(user.id, 'id'),
+    supabase.from('products').select('*').eq('user_id', user.id).limit(6)
+  ])
+
+  const { config: safeConfig, profile } = profileResult
+  const { data: products } = productsResult
 
   if (!profile) {
      return <div>Perfil no encontrado</div>
   }
 
   const isPro = profile.is_pro || false
-
-  const { data: products } = await supabase.from('products').select('*').eq('user_id', profile.id).limit(6)
 
   return (
     <DesignClient
