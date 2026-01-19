@@ -76,8 +76,8 @@ export default function DesignPage() {
     if (!isPro) return
     setIsSaving(true)
     
-    // Guardar usando la Server Action (que debemos actualizar/crear)
-    // Usaremos la acción importada saveThemeConfig
+    // Guardar usando la Server Action actualizada
+    // Se envía el objeto completo 'theme' a la columna JSONB 'theme_config'
     const result = await saveThemeConfig(theme)
 
     if (!result.success) {
