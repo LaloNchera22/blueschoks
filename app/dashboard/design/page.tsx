@@ -11,15 +11,19 @@ export default async function DesignPage() {
     redirect('/login')
   }
 
-  // REFACTOR: Parallelize profile and products fetch
+  // SOLUCIÓN DEL CONFLICTO:
+  // Usamos Promise.all para cargar Perfil + Productos al mismo tiempo.
+  // Esto hace que la página cargue en la mitad de tiempo.
   const [profileResult, productsResult] = await Promise.all([
     getSafeProfile(user.id, 'id'),
     supabase.from('products').select('*').eq('user_id', user.id).limit(6)
   ])
 
+  // Desestructuramos los resultados
   const { config: safeConfig, profile } = profileResult
   const { data: products } = productsResult
 
+  // Validación de seguridad
   if (!profile) {
      return <div>Perfil no encontrado</div>
   }
@@ -29,7 +33,7 @@ export default async function DesignPage() {
   return (
     <DesignClient
       initialShopData={profile}
-      initialProducts={products || []}
+      initialProducts={products || []} // Pasamos los productos cargados (o array vacío si falla)
       initialThemeConfig={safeConfig}
       isPro={isPro}
     />

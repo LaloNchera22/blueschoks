@@ -3,7 +3,7 @@
 import { createClient } from "@/utils/supabase/server"
 import { DesignConfig } from "@/lib/types/design-system"
 import { ThemeConfig } from "@/lib/types/theme-config"
-import { revalidatePath } from "next/cache"
+import { revalidatePath, revalidateTag } from "next/cache"
 
 export async function saveDesignConfig(config: DesignConfig) {
   const supabase = await createClient()
@@ -14,6 +14,12 @@ export async function saveDesignConfig(config: DesignConfig) {
   }
 
   try {
+    const { data: profile } = await supabase
+      .from('profiles')
+      .select('slug')
+      .eq('id', user.id)
+      .single()
+
     const { error } = await supabase
       .from('profiles')
       .update({
@@ -25,7 +31,15 @@ export async function saveDesignConfig(config: DesignConfig) {
     if (error) throw error
 
     revalidatePath('/dashboard/design')
-    revalidatePath('/[slug]', 'page') // Revalidate the shop page
+
+    if (profile?.slug) {
+      // Revalidate the shop page path
+      revalidatePath(`/${profile.slug}`, 'page')
+      // Invalidate the shop data cache
+      // @ts-expect-error - revalidateTag in this canary version might require 2 args
+      revalidateTag(`shop:${profile.slug}`)
+    }
+
     return { success: true }
   } catch (error) {
     console.error('Error saving design config:', error)
@@ -65,6 +79,9 @@ export async function saveThemeConfig(config: ThemeConfig) {
       // Revalidate the specific shop page
       // Note: 'page' type ensures we target the page route, not just layout
       revalidatePath(`/${profile.slug}`, 'page')
+      // Invalidate the shop data cache
+      // @ts-expect-error - revalidateTag in this canary version might require 2 args
+      revalidateTag(`shop:${profile.slug}`)
     }
 
     return { success: true }

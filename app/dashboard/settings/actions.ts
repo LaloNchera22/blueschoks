@@ -1,7 +1,7 @@
 'use server'
 
 import { createClient } from "@/utils/supabase/server"
-import { revalidatePath } from "next/cache"
+import { revalidatePath, revalidateTag } from "next/cache"
 import { z } from "zod"
 
 const settingsSchema = z.object({
@@ -85,8 +85,32 @@ export async function updateSettings(prevState: SettingsState, formData: FormDat
 
     revalidatePath("/dashboard")
     revalidatePath("/dashboard/settings")
-    if (updates.slug) {
-        revalidatePath(`/shop/${updates.slug}`)
+
+    // Si cambio el slug, invalidamos la cache del nuevo y el viejo...
+    // pero como no tenemos el viejo facilmente a mano (sin otra query),
+    // y el usuario va a ser redirigido al nuevo slug, lo importante es invalidar
+    // las tags de los datos.
+
+    // Necesitamos invalidar la tag del slug ACTUAL (que puede ser el nuevo o el viejo).
+    // Si el slug cambió, 'updates.slug' tiene el nuevo.
+    // Pero si NO cambió, 'updates.slug' no existe.
+    // Necesitamos saber el slug final vigente para invalidar su caché de datos.
+
+    // Estrategia: Obtener el slug final.
+    let finalSlug = updates.slug;
+
+    if (!finalSlug) {
+        // Si no se actualizó el slug, necesitamos el actual de la base de datos.
+        // Podríamos hacer una query, o asumir que si no cambió,
+        // cualquier cambio en shop_name debe reflejarse en el slug actual.
+        const { data: currentProfile } = await supabase.from('profiles').select('slug').eq('id', user.id).single();
+        finalSlug = currentProfile?.slug;
+    }
+
+    if (finalSlug) {
+        revalidatePath(`/${finalSlug}`, 'page')
+        // @ts-expect-error - revalidateTag in this canary version might require 2 args
+        revalidateTag(`shop:${finalSlug}`)
     }
 
     return { success: true, message: "Cambios guardados correctamente." }

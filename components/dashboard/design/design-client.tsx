@@ -1,18 +1,30 @@
 "use client"
 
 import { useEffect } from "react"
-import CatalogoInteractivo from "@/components/shop/CatalogoInteractivo"
 import { CartProvider } from "@/components/shop/cart-context"
 import { useEditorStore } from "@/hooks/useEditorStore"
 import { saveThemeConfig } from "@/app/dashboard/actions/design-actions"
 import { ThemeConfig } from "@/lib/types/theme-config"
 import dynamic from "next/dynamic"
+import { Loader2 } from "lucide-react"
 
 // Dynamic Import for the Editor Component
 // This prevents the heavy editor logic from blocking the initial render of the page
 const FloatingDesignEditor = dynamic(() => import("@/components/FloatingDesignEditor"), {
   ssr: false,
   loading: () => null // Invisible loading since it's a floating element
+})
+
+// Dynamic Import for the Preview Component
+// This splits the heavy shop preview code (framer-motion, confetti, etc) into a separate chunk
+const CatalogoInteractivo = dynamic(() => import("@/components/shop/CatalogoInteractivo"), {
+  ssr: false,
+  loading: () => (
+    <div className="w-full h-full flex flex-col items-center justify-center text-slate-400 gap-2 min-h-[50vh]">
+      <Loader2 className="w-8 h-8 animate-spin text-slate-300" />
+      <p className="text-sm font-medium">Cargando vista previa...</p>
+    </div>
+  )
 })
 
 interface DesignClientProps {
@@ -72,9 +84,9 @@ export default function DesignClient({
              <div className="min-h-full">
                 <CartProvider>
                     <CatalogoInteractivo
-                        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+
                         products={initialProducts}
-                        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+
                         shop={previewShopData}
                         isEditor={true}
                     />

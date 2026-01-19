@@ -20,7 +20,6 @@ function deepMerge<T>(target: T, source: any): T {
   }
 
   // If source is not an object (and target is), we can't merge, so keep target to be safe?
-  // Or should we overwrite? If type mismatches, it's safer to keep default.
   if (typeof source !== 'object') {
     return target;
   }
@@ -46,7 +45,6 @@ function deepMerge<T>(target: T, source: any): T {
     }
     // Primitives: overwrite
     else {
-      // Basic type check could go here if we wanted to be super strict
       if (sourceValue !== undefined) {
         result[key] = sourceValue;
       }
@@ -59,9 +57,10 @@ function deepMerge<T>(target: T, source: any): T {
 /**
  * Merges a raw database configuration with the DEFAULT_THEME.
  * Handles nulls, partial objects, and legacy fields if needed.
+ * This is the "Bulletproof" utility requested.
  */
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-export function mergeTheme(dbConfig: any, legacyProfileData?: any): ThemeConfig {
+export function getSafeTheme(dbConfig: any, legacyProfileData?: any): ThemeConfig {
   let rawConfig = dbConfig || {};
 
   // Legacy Migration: If config is empty but we have legacy profile data
@@ -94,6 +93,9 @@ export function mergeTheme(dbConfig: any, legacyProfileData?: any): ThemeConfig 
   return safeConfig;
 }
 
+// Alias for compatibility if needed, but we prefer getSafeTheme
+export const mergeTheme = getSafeTheme;
+
 /**
  * Helper to get the profile and a safe theme config.
  */
@@ -117,7 +119,7 @@ export async function getSafeProfile(identifier: string, type: 'id' | 'slug' = '
     };
   }
 
-  const config = mergeTheme(profile.theme_config, profile);
+  const config = getSafeTheme(profile.theme_config, profile);
 
   return { config, profile };
 }
