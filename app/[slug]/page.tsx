@@ -4,9 +4,9 @@ import CatalogoInteractivo from "@/components/shop/CatalogoInteractivo"
 import { unstable_cache } from "next/cache"
 import { Metadata } from "next"
 import { createClient } from "@supabase/supabase-js"
-import { getSafeTheme } from "@/lib/data/get-safe-theme"
+import { getSafeProfile } from "@/utils/get-safe-theme"
 
-// Configuración segura para el cliente (No usa cookies, solo la llave pública)
+// Configuración segura para el cliente
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!
 const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
 
@@ -14,24 +14,15 @@ const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
 // FUNCIONES DE CACHÉ
 // -----------------------------------------------------------------------------
 
-// REFACTOR: Now utilizes getSafeTheme logic indirectly or directly.
-// Since getSafeTheme fetches the profile, we can use it here.
-// However, to maintain the existing cache behavior and ensuring we get the FULL profile
-// (getSafeTheme returns { config, profile }), we wrap it.
-
 const getShopSafeCached = async (slug: string) => {
   return unstable_cache(
     async () => {
-      // Use our new safe utility.
-      // It uses a fresh client internally or we could pass one if updated.
-      // For now, getSafeTheme uses its own client logic.
-      const { config, profile } = await getSafeTheme(slug, 'slug');
+      // Use the new safe utility
+      const { config, profile } = await getSafeProfile(slug, 'slug');
       
       if (!profile) return null;
 
-      // We attach the safe config back to the profile object
-      // so the UI components that read `profile.theme_config` get the safe version.
-      // This is crucial because existing components might still read from profile.
+      // Attach the safe config back to the profile object
       return {
         ...profile,
         theme_config: config
