@@ -2,8 +2,12 @@ import { createClient } from "@/utils/supabase/server";
 import { getSafeProfile, DEFAULT_THEME } from "@/utils/get-safe-theme";
 import DesignClient from "@/components/dashboard/design/design-client";
 import { redirect } from "next/navigation";
+import { Database } from "@/utils/supabase/types";
 
 export const dynamic = 'force-dynamic';
+
+type Product = Database['public']['Tables']['products']['Row'];
+type Profile = Database['public']['Tables']['profiles']['Row'];
 
 export default async function DesignPage() {
   const supabase = await createClient();
@@ -18,9 +22,9 @@ export default async function DesignPage() {
   }
 
   // 2. Fetching Paralelo y Robusto (Promise.all + Try/Catch Masivo)
-  let safeProfile = null;
+  let safeProfile: Profile | null = null;
   let safeConfig = DEFAULT_THEME;
-  let products: any[] = [];
+  let products: Product[] = [];
   let isPro = false;
 
   try {
@@ -41,9 +45,8 @@ export default async function DesignPage() {
     safeConfig = profileResult.config;
 
     // Determinar estado PRO de forma segura
-    // Asumimos que la columna es is_pro, si no existe será undefined -> false
-    if (safeProfile && 'is_pro' in safeProfile) {
-        isPro = Boolean(safeProfile.is_pro);
+    if (safeProfile && safeProfile.is_pro) {
+        isPro = true;
     }
 
     // Procesar resultado de productos
