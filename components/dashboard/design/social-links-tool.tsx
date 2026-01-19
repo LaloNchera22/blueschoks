@@ -30,6 +30,7 @@ export default function SocialLinksTool() {
             id: crypto.randomUUID(),
             platform: 'instagram',
             url: '',
+            active: true,
             style: {
                 backgroundColor: '#000000',
                 iconColor: '#ffffff',
