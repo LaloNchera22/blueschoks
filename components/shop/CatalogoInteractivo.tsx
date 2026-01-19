@@ -68,12 +68,12 @@ const CatalogoInteractivo = memo(function CatalogoInteractivo({ products, shop, 
       return () => window.removeEventListener('scroll', handleScroll)
   }, [])
 
-  // 2. Fórmulas de Totales
-  const total = items?.reduce((acc: number, item: CartItem) => {
+  // 2. Fórmulas de Totales (Optimizadas)
+  const total = useMemo(() => items?.reduce((acc: number, item: CartItem) => {
       return acc + (Number(item.price) * (item.quantity || 1))
-  }, 0) || 0
+  }, 0) || 0, [items])
 
-  const totalItems = items?.reduce((acc: number, item: CartItem) => acc + (item.quantity || 0), 0) || 0
+  const totalItems = useMemo(() => items?.reduce((acc: number, item: CartItem) => acc + (item.quantity || 0), 0) || 0, [items])
 
   // LOGICA DE FUENTES Y ESTILOS
   // Extraemos las fuentes usadas para cargarlas
