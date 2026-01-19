@@ -3,33 +3,42 @@ import { CartProvider } from "@/components/shop/cart-context"
 import CatalogoInteractivo from "@/components/shop/CatalogoInteractivo"
 import { unstable_cache } from "next/cache"
 import { Metadata } from "next"
-// 👇 CAMBIO CLAVE: Usamos la librería base de Supabase, no la de Next.js
 import { createClient } from "@supabase/supabase-js"
+import { getSafeTheme } from "@/lib/data/get-safe-theme"
 
 // Configuración segura para el cliente (No usa cookies, solo la llave pública)
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!
 const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
 
 // -----------------------------------------------------------------------------
-// FUNCIONES DE CACHÉ (Optimizadas para velocidad)
+// FUNCIONES DE CACHÉ
 // -----------------------------------------------------------------------------
 
-const getShopCached = async (slug: string) => {
+// REFACTOR: Now utilizes getSafeTheme logic indirectly or directly.
+// Since getSafeTheme fetches the profile, we can use it here.
+// However, to maintain the existing cache behavior and ensuring we get the FULL profile
+// (getSafeTheme returns { config, profile }), we wrap it.
+
+const getShopSafeCached = async (slug: string) => {
   return unstable_cache(
     async () => {
-      // Creamos un cliente "limpio" y anónimo solo para esta lectura
-      const supabase = createClient(supabaseUrl, supabaseAnonKey)
+      // Use our new safe utility.
+      // It uses a fresh client internally or we could pass one if updated.
+      // For now, getSafeTheme uses its own client logic.
+      const { config, profile } = await getSafeTheme(slug, 'slug');
       
-      const { data } = await supabase
-        .from("profiles")
-        .select("*") // Traemos todo el perfil (diseño, whatsapp, etc)
-        .eq("slug", slug)
-        .single()
-      
-      return data
+      if (!profile) return null;
+
+      // We attach the safe config back to the profile object
+      // so the UI components that read `profile.theme_config` get the safe version.
+      // This is crucial because existing components might still read from profile.
+      return {
+        ...profile,
+        theme_config: config
+      }
     },
-    [`shop-data-${slug}`], // Llave única del caché
-    { tags: [`shop:${slug}`], revalidate: 3600 } // Se actualiza cada hora
+    [`shop-data-safe-${slug}`],
+    { tags: [`shop:${slug}`], revalidate: 3600 }
   )()
 }
 
@@ -42,7 +51,7 @@ const getProductsCached = async (shopId: string) => {
         .from("products")
         .select("*")
         .eq("user_id", shopId)
-        .eq("stock", 1) // Solo productos disponibles (stock > 0 o 1)
+        .eq("stock", 1) // Solo productos disponibles
         .order("created_at", { ascending: false })
       
       return data
@@ -53,11 +62,11 @@ const getProductsCached = async (shopId: string) => {
 }
 
 // -----------------------------------------------------------------------------
-// METADATA (Para que se vea bonito en WhatsApp/Facebook)
+// METADATA
 // -----------------------------------------------------------------------------
 export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }): Promise<Metadata> {
   const { slug } = await params
-  const shop = await getShopCached(slug)
+  const shop = await getShopSafeCached(slug)
 
   if (!shop) return { title: "Tienda no encontrada" }
 
@@ -76,8 +85,8 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
 export default async function ShopPage({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params
 
-  // 1. Buscamos la tienda usando el SLUG de la URL
-  const shop = await getShopCached(slug)
+  // 1. Buscamos la tienda usando el SLUG de la URL (versión SEGURA)
+  const shop = await getShopSafeCached(slug)
 
   // 2. Si no existe la tienda con ese nombre, mostramos 404
   if (!shop) return notFound()
