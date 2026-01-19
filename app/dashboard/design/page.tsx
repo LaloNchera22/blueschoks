@@ -1,5 +1,6 @@
 import { createClient } from "@/utils/supabase/server";
-import { getSafeProfile, DEFAULT_THEME, DUMMY_PROFILE } from "@/utils/get-safe-theme";
+import { normalizeProfile, normalizeTheme } from "@/utils/theme-adapter";
+import { DEFAULT_THEME_CONFIG } from "@/lib/types/theme-config";
 import DesignClient from "@/components/dashboard/design/design-client";
 import { redirect } from "next/navigation";
 
@@ -16,53 +17,43 @@ export default async function DesignPage() {
     return redirect("/login");
   }
 
-  // ROBUST VARIABLES (Explicit Typing)
-  // Initialize with safe default values
+  // 1. RAW DATA FETCHING
+  // We fetch exactly what is in the DB, no hidden transformations yet.
+  // Using Promise.all for performance.
+  const [profileResult, productsResult] = await Promise.all([
+    supabase
+      .from('profiles')
+      .select('*')
+      .eq('id', user.id)
+      .single(),
+    supabase
+      .from('products')
+      .select('*')
+      .eq('user_id', user.id)
+      .order('created_at', { ascending: false })
+  ]);
+
+  // 2. NORMALIZATION LAYER (THE ADAPTER PATTERN)
+  // We act as if the DB data is "dirty" and scrub it before it touches the UI.
+
+  // A. Profile Scrubbing
+  // normalizeProfile handles missing slugs, null shop names, and deep theme_config merging.
+  // It guarantees a return object matching the Profile interface.
+  const safeProfile = normalizeProfile(profileResult.data || { id: user.id, email: user.email });
+
+  // B. Theme Scrubbing
+  // We extract the theme from the normalized profile to ensure consistency.
+  // normalizeProfile already runs normalizeTheme internally on the profile.theme_config,
+  // but we can extract it cleanly here for clarity in props.
+  const safeConfig = safeProfile.theme_config || normalizeTheme(null);
+
+  // C. Product Scrubbing
+  // Ensure we have an array, even if the query errored.
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  let products: any[] = [];
-  let safeConfig = DEFAULT_THEME;
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  let safeProfile: any = DUMMY_PROFILE;
-  let isPro = false;
+  const products: any[] = productsResult.data || [];
 
-  try {
-    // PARALLEL FETCHING
-    // Use Promise.all to load profile and products simultaneously
-    const [profileResult, productsResult] = await Promise.all([
-      getSafeProfile(user.id),
-      supabase
-        .from('products')
-        .select('*')
-        .eq('user_id', user.id)
-        .order('created_at', { ascending: false })
-    ]);
-
-    // 1. Process Profile and Configuration
-    // getSafeProfile is guaranteed to return a profile (real or dummy) and valid config
-    safeConfig = profileResult.config;
-    safeProfile = profileResult.profile;
-
-    // Check PRO status safely
-    if (safeProfile && safeProfile.is_pro) {
-        isPro = true;
-    }
-
-    // 2. Process Products
-    if (productsResult.error) {
-        console.error("DesignPage: Products fetch error:", productsResult.error);
-        // Products remains as []
-    } else {
-        products = productsResult.data || [];
-    }
-
-  } catch (criticalError) {
-    // CATCH-ALL TO PREVENT WHITE PAGE (500 ERROR)
-    console.error("DesignPage: CRITICAL UNHANDLED ERROR", criticalError);
-    // In the absolute worst case, UI loads with defaults and Dummy Profile
-    safeConfig = DEFAULT_THEME;
-    safeProfile = DUMMY_PROFILE;
-    products = [];
-    isPro = false;
+  if (productsResult.error) {
+    console.error("DesignPage: Error fetching products", productsResult.error);
   }
 
   return (
@@ -71,7 +62,7 @@ export default async function DesignPage() {
         initialShopData={safeProfile}
         initialProducts={products}
         initialThemeConfig={safeConfig}
-        isPro={isPro}
+        isPro={safeProfile.is_pro || false}
       />
     </div>
   );
