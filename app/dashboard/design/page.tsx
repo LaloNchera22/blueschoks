@@ -3,9 +3,8 @@ import { DEFAULT_THEME_CONFIG, ThemeConfig } from "@/lib/types/theme-config"
 import DesignClient from "@/components/dashboard/design/design-client"
 import { redirect } from "next/navigation"
 
-// Define DEFAULT_CONFIG as requested to ensure a robust fallback structure
-// This is the source of truth for the default structure if the database returns null
-const DEFAULT_CONFIG = DEFAULT_THEME_CONFIG;
+// Define SAFE_DEFAULTS with the required structure
+const SAFE_DEFAULTS = DEFAULT_THEME_CONFIG;
 
 export default async function DesignPage() {
   const supabase = await createClient()
@@ -15,7 +14,7 @@ export default async function DesignPage() {
     redirect('/login')
   }
 
-  // Fetch profile and products
+  // Fetch profile
   const { data: profile } = await supabase.from('profiles').select('*').eq('id', user.id).single()
 
   if (!profile) {
@@ -24,38 +23,87 @@ export default async function DesignPage() {
 
   const isPro = profile.is_pro || false
 
-  // LOGIC TO HARDEN NULL VALUES
-  // We determine the config to use on the server side to prevent client crashes
-  let configToUse: ThemeConfig = DEFAULT_CONFIG;
+  // 1. Get raw config from profile or empty object
+  let rawConfig: Partial<ThemeConfig> = profile.theme_config || {};
 
-  if (profile.theme_config && Object.keys(profile.theme_config).length > 0) {
-      // Trust the database if it has content
-      configToUse = profile.theme_config as ThemeConfig;
-  } else {
-      // If null or empty, assign DEFAULT_CONFIG immediately (with migration logic if needed)
-      // Here we include the migration logic to preserve legacy settings if they exist
-      configToUse = {
-          ...DEFAULT_CONFIG,
+  // 2. Legacy Migration Support:
+  // If rawConfig is empty, attempt to populate it from legacy columns
+  // so we don't lose the user's previous design settings.
+  if (Object.keys(rawConfig).length === 0) {
+      const legacyFont = (profile.design_font || 'Inter').split(',')[0].replace(/['"]/g, '').trim();
+
+      rawConfig = {
           global: {
-              ...DEFAULT_CONFIG.global,
-              backgroundValue: profile.design_bg_color || DEFAULT_CONFIG.global.backgroundValue,
+              backgroundValue: profile.design_bg_color
           },
           header: {
-              ...DEFAULT_CONFIG.header,
               title: {
-                  ...DEFAULT_CONFIG.header.title,
-                  color: profile.design_title_color || DEFAULT_CONFIG.header.title.color,
-                  // Fallback font from legacy `design_font`
-                  fontFamily: (profile.design_font || 'Inter').split(',')[0].replace(/['"]/g, '').trim(),
+                  color: profile.design_title_color,
+                  fontFamily: legacyFont
               },
               subtitle: {
-                  ...DEFAULT_CONFIG.header.subtitle,
-                  // Assume same font or default
-                  fontFamily: (profile.design_font || 'Inter').split(',')[0].replace(/['"]/g, '').trim(),
+                  fontFamily: legacyFont
               }
           }
-      }
+      } as Partial<ThemeConfig>;
   }
+
+  // 3. Fail-Safe Deep Merge Strategy
+  // We explicitly merge nested objects to ensure no property is missing or null.
+  const safeConfig: ThemeConfig = {
+    ...SAFE_DEFAULTS,
+    ...rawConfig,
+
+    header: {
+      ...SAFE_DEFAULTS.header,
+      ...(rawConfig.header || {}),
+      // Deep merge for title to ensure font/color/size/bold exist
+      title: {
+        ...SAFE_DEFAULTS.header.title,
+        ...(rawConfig.header?.title || {})
+      },
+      // Deep merge for subtitle
+      subtitle: {
+        ...SAFE_DEFAULTS.header.subtitle,
+        ...(rawConfig.header?.subtitle || {})
+      },
+      // Deep merge for bio
+      bio: {
+        ...SAFE_DEFAULTS.header.bio,
+        ...(rawConfig.header?.bio || {})
+      },
+      // Ensure socialLinks is always an array
+      socialLinks: Array.isArray(rawConfig.header?.socialLinks)
+        ? rawConfig.header!.socialLinks
+        : SAFE_DEFAULTS.header.socialLinks
+    },
+
+    cards: {
+      ...SAFE_DEFAULTS.cards,
+      ...(rawConfig.cards || {}),
+      productTitle: {
+        ...SAFE_DEFAULTS.cards.productTitle,
+        ...(rawConfig.cards?.productTitle || {})
+      },
+      productPrice: {
+        ...SAFE_DEFAULTS.cards.productPrice,
+        ...(rawConfig.cards?.productPrice || {})
+      },
+      quantitySelector: {
+        ...SAFE_DEFAULTS.cards.quantitySelector,
+        ...(rawConfig.cards?.quantitySelector || {})
+      },
+      addButton: {
+        ...SAFE_DEFAULTS.cards.addButton,
+        ...(rawConfig.cards?.addButton || {})
+      }
+    },
+
+    global: {
+      ...SAFE_DEFAULTS.global,
+      ...(rawConfig.global || {})
+    }
+  };
 
   const { data: products } = await supabase.from('products').select('*').eq('user_id', profile.id).limit(6)
 
@@ -63,7 +111,7 @@ export default async function DesignPage() {
     <DesignClient
       initialShopData={profile}
       initialProducts={products || []}
-      initialThemeConfig={configToUse}
+      initialThemeConfig={safeConfig}
       isPro={isPro}
     />
   )
