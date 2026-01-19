@@ -1,22 +1,21 @@
 "use client"
 
-import { useEffect, useState } from "react"
+import { useEffect, useState, useMemo } from "react"
 import { CartProvider } from "@/components/shop/cart-context"
 import { useEditorStore } from "@/hooks/useEditorStore"
 import { saveThemeConfig } from "@/app/dashboard/actions/design-actions"
 import { ThemeConfig } from "@/lib/types/theme-config"
+import { sanitizeThemeConfig } from "@/utils/theme-sanitizer" // IMPORT THE BRAIN
 import dynamic from "next/dynamic"
-import { Loader2, ExternalLink } from "lucide-react"
+import { Loader2, ExternalLink, Plus } from "lucide-react"
 
 // Dynamic Import for the Editor Component
-// This prevents the heavy editor logic from blocking the initial render of the page
 const FloatingDesignEditor = dynamic(() => import("@/components/FloatingDesignEditor"), {
   ssr: false,
-  loading: () => null // Invisible loading since it's a floating element
+  loading: () => null
 })
 
 // Dynamic Import for the Preview Component
-// This splits the heavy shop preview code (framer-motion, confetti, etc) into a separate chunk
 const CatalogoInteractivo = dynamic(() => import("@/components/shop/CatalogoInteractivo"), {
   ssr: false,
   loading: () => (
@@ -42,22 +41,26 @@ export default function DesignClient({
   initialThemeConfig,
   isPro
 }: DesignClientProps) {
-  // Store global del editor
-  const { theme, setFullThemeConfig, setIsSaving } = useEditorStore()
+  // 1. SANITIZATION AT THE GATE
+  // We do not trust the prop blindly. We pass it through the sanitizer immediately.
+  // This ensures that even if the server passed garbage, we work with a clean structure.
+  const sanitizedConfig = useMemo(() => {
+     return sanitizeThemeConfig(initialThemeConfig);
+  }, [initialThemeConfig]);
 
-  // Initialize store with server-fetched config
+  // Store global del editor
+  const { theme, setFullThemeConfig, setIsSaving, updateThemeConfig } = useEditorStore()
+
+  // Initialize store with CLEAN config
   useEffect(() => {
-    if (initialThemeConfig) {
-        setFullThemeConfig(initialThemeConfig)
-    }
-  }, [initialThemeConfig, setFullThemeConfig])
+    setFullThemeConfig(sanitizedConfig)
+  }, [sanitizedConfig, setFullThemeConfig])
 
   const handleSave = async () => {
     if (!isPro) return
     setIsSaving(true)
 
-    // Guardar usando la Server Action actualizada
-    // Se envía el objeto completo 'theme' a la columna JSONB 'theme_config'
+    // Save current state
     const result = await saveThemeConfig(theme)
 
     if (!result.success) {
@@ -67,18 +70,35 @@ export default function DesignClient({
     setTimeout(() => setIsSaving(false), 1000)
   }
 
-  // Mapear el nuevo objeto `theme` para que CatalogoInteractivo lo entienda
-  // Usamos 'theme' del store para que se actualice en tiempo real al editar
-  // Aseguramos que initialShopData exista para evitar crash
-  const safeShopData = initialShopData || {};
+  // Helper to add first link if empty
+  const handleAddFirstLink = () => {
+      const newLink = {
+        id: crypto.randomUUID(),
+        platform: 'instagram',
+        url: '',
+        active: true,
+        style: {
+            backgroundColor: '#000000',
+            iconColor: '#ffffff',
+            borderRadius: 'full' as const
+        }
+      };
+      // We know theme is valid because we sanitized it
+      const currentLinks = Array.isArray(theme?.header?.socialLinks) ? theme.header.socialLinks : [];
+      updateThemeConfig('header.socialLinks', [...currentLinks, newLink]);
+  };
 
+  // Safe Access for rendering
+  const safeShopData = initialShopData || {};
   const previewShopData = {
       ...safeShopData,
       theme_config: theme,
   }
 
-  // Generar URL de la tienda para mostrarla
-  // Usamos window.location.origin si estamos en el cliente, o un placeholder
+  // Check if social links are empty for the UI prompt
+  const hasSocialLinks = Array.isArray(theme?.header?.socialLinks) && theme.header.socialLinks.length > 0;
+
+  // URL Generation
   const [origin, setOrigin] = useState("");
   useEffect(() => {
     if (typeof window !== 'undefined') {
@@ -90,10 +110,9 @@ export default function DesignClient({
   const shopUrl = `${origin}/${shopSlug}`;
 
   return (
-    // CONTENEDOR PRINCIPAL: Ocupa el 100% y oculta desbordes
     <div className="relative w-full h-full bg-slate-100 overflow-hidden">
 
-        {/* SHOP LINK HEADER: Visibilidad Urgente solicitada por el usuario */}
+        {/* SHOP LINK HEADER */}
         <div className="absolute top-4 right-4 z-40 bg-white/90 backdrop-blur-sm px-4 py-2 rounded-full shadow-sm border border-slate-200 flex items-center gap-2 animate-in fade-in slide-in-from-top-4 duration-500">
             <div className="flex flex-col">
                 <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest leading-none mb-0.5">Tu Tienda</span>
@@ -104,13 +123,13 @@ export default function DesignClient({
             </div>
         </div>
 
-        {/* VISTA PREVIA: Centrada y contenida */}
+        {/* VISTA PREVIA */}
         <div className="absolute inset-0 z-0 overflow-y-auto custom-scrollbar pb-32">
-             {/* Escalar contenido si es necesario para que se vea "fit" */}
-             <div className="min-h-full">
+             <div className="min-h-full relative">
                 <CartProvider>
+                    {/* DEFENSIVE RENDERING: Check if products is array */}
                     <CatalogoInteractivo
-                        products={initialProducts || []}
+                        products={Array.isArray(initialProducts) ? initialProducts : []}
                         shop={previewShopData}
                         isEditor={true}
                     />
@@ -118,7 +137,20 @@ export default function DesignClient({
              </div>
         </div>
 
-        {/* EDITOR: Flotante encima de todo */}
+        {/* EMPTY STATE PROMPT FOR LINKS */}
+        {!hasSocialLinks && (
+            <div className="absolute bottom-32 left-1/2 -translate-x-1/2 z-30 animate-bounce">
+                <button
+                    onClick={handleAddFirstLink}
+                    className="bg-slate-900 text-white px-4 py-2 rounded-full shadow-lg text-xs font-bold flex items-center gap-2 hover:bg-slate-800 transition-colors"
+                >
+                    <Plus size={14} />
+                    Añadir primer enlace
+                </button>
+            </div>
+        )}
+
+        {/* EDITOR */}
         <FloatingDesignEditor
             onSave={handleSave}
             isPro={isPro}
