@@ -1,125 +1,177 @@
 import { ThemeConfig } from "@/lib/types/theme-config";
-import { DEFAULT_THEME } from "@/lib/theme-defaults";
-import { createAdminClient } from "@/utils/supabase/server";
+import { createClient } from "@/utils/supabase/server";
+
+// 1. DEFINICIÓN ROBUSTA DE DEFAULTS (Cumpliendo estrictamente ThemeConfig)
+// Usamos 'as const' para asegurar que los literales coincidan con los tipos union
+const DEFAULT_THEME_VALUES = {
+  header: {
+    title: {
+      fontFamily: 'Inter',
+      color: '#000000',
+      fontSize: '2xl',
+      bold: true
+    },
+    subtitle: {
+      fontFamily: 'Inter',
+      color: '#666666',
+      fontSize: 'lg',
+      bold: false
+    },
+    bio: {
+      fontFamily: 'Inter',
+      color: '#666666',
+      fontSize: 'sm'
+    },
+    socialLinks: []
+  },
+  cards: {
+    background: '#ffffff',
+    border: true,
+    productTitle: {
+      color: '#000000',
+      fontFamily: 'Inter',
+      fontWeight: 'bold'
+    },
+    productPrice: {
+      color: '#000000',
+      fontFamily: 'Inter'
+    },
+    quantitySelector: {
+      bgColor: '#f3f4f6',
+      textColor: '#111827',
+      borderColor: 'transparent'
+    },
+    addButton: {
+      bgColor: '#000000',
+      iconColor: '#ffffff',
+      shape: 'circle' as 'circle' | 'rounded' | 'square'
+    },
+    // Fallbacks para compatibilidad
+    productName: { fontFamily: 'Inter', color: '#000000' },
+    button: { bg: '#000000', text: '#ffffff' }
+  },
+  global: {
+    backgroundType: 'solid' as 'solid' | 'image' | 'gradient',
+    backgroundValue: '#f3f4f6'
+  }
+};
+
+// Exportamos la constante tipada para uso externo si es necesario
+export const DEFAULT_THEME: ThemeConfig = DEFAULT_THEME_VALUES as unknown as ThemeConfig;
 
 /**
- * Deep merges the source object into the target object (defensively).
- * Ensure that if a property exists in target (default) but is missing/undefined in source,
- * the target value is kept.
+ * Función auxiliar para realizar un Deep Merge seguro.
+ * Esto asegura que si el DB tiene un objeto parcial, no perdamos los defaults hermanos.
  */
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-function deepMerge<T>(target: T, source: any): T {
-  // If source is null or undefined, return target (defaults)
-  if (source === null || source === undefined) {
-    return target;
-  }
-
-  // If target is primitive, return source if available (and valid type), else target
+function deepMerge(target: any, source: any): any {
   if (typeof target !== 'object' || target === null) {
-    return source !== undefined ? source : target;
+    return source ?? target;
   }
 
-  // If source is not an object (and target is), we can't merge, so keep target to be safe?
-  if (typeof source !== 'object') {
+  if (typeof source !== 'object' || source === null) {
     return target;
   }
 
-  // Clone target
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const result: any = Array.isArray(target) ? [...target] : { ...target };
+  const output = { ...target };
 
-  for (const key of Object.keys(source)) {
-    const targetValue = result[key];
+  Object.keys(source).forEach(key => {
     const sourceValue = source[key];
+    const targetValue = output[key];
 
-    // Arrays: overwrite or merge? Typically overwrite configuration arrays (like social links).
     if (Array.isArray(sourceValue)) {
-      result[key] = sourceValue;
+      // Para arrays, preferimos el valor de la fuente (DB) si existe, reemplazando el default
+      output[key] = sourceValue;
+    } else if (typeof sourceValue === 'object' && sourceValue !== null && targetValue) {
+      // Recursión para objetos anidados
+      output[key] = deepMerge(targetValue, sourceValue);
+    } else {
+      // Asignación directa para primitivos
+      output[key] = sourceValue;
     }
-    // Objects: recursive merge
-    else if (
-      typeof targetValue === 'object' && targetValue !== null &&
-      typeof sourceValue === 'object' && sourceValue !== null
-    ) {
-      result[key] = deepMerge(targetValue, sourceValue);
-    }
-    // Primitives: overwrite
-    else {
-      if (sourceValue !== undefined) {
-        result[key] = sourceValue;
-      }
-    }
-  }
+  });
 
-  return result as T;
+  return output;
 }
 
 /**
- * Merges a raw database configuration with the DEFAULT_THEME.
- * Handles nulls, partial objects, and legacy fields if needed.
- * This is the "Bulletproof" utility requested.
+ * getSafeTheme: La función "A prueba de balas".
+ * Toma cualquier basura que venga de la DB y devuelve un ThemeConfig válido.
  */
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-export function getSafeTheme(dbConfig: any, legacyProfileData?: any): ThemeConfig {
-  let rawConfig = dbConfig || {};
+export function getSafeTheme(dbConfig: any): ThemeConfig {
+  try {
+    if (!dbConfig) {
+      return DEFAULT_THEME;
+    }
 
-  // Legacy Migration: If config is empty but we have legacy profile data
-  if (Object.keys(rawConfig).length === 0 && legacyProfileData) {
-     const legacyFont = (legacyProfileData.design_font || 'Inter').split(',')[0].replace(/['"]/g, '').trim();
-     rawConfig = {
-         global: {
-             backgroundValue: legacyProfileData.design_bg_color
-         },
-         header: {
-             title: {
-                 color: legacyProfileData.design_title_color,
-                 fontFamily: legacyFont
-             },
-             subtitle: {
-                 fontFamily: legacyFont
-             }
-         }
-     };
+    // Estrategia de Deep Merge: Defaults + DB Data
+    // Esto asegura que propiedades faltantes se rellenen con defaults.
+    const merged = deepMerge(DEFAULT_THEME_VALUES, dbConfig);
+
+    // SANITIZACIÓN FINAL Y DOUBLE CASTING
+    // 1. Aseguramos que propiedades críticas tengan valores válidos si el merge falló sutilmente
+    //    (Ej: shape inválido string en DB)
+
+    // Validación de shape
+    const validShapes = ['circle', 'rounded', 'square'];
+    if (merged.cards?.addButton?.shape && !validShapes.includes(merged.cards.addButton.shape)) {
+        merged.cards.addButton.shape = 'circle';
+    }
+
+    // Validación de backgroundType
+    const validBgTypes = ['solid', 'image', 'gradient'];
+    if (merged.global?.backgroundType && !validBgTypes.includes(merged.global.backgroundType)) {
+        merged.global.backgroundType = 'solid';
+    }
+
+    // DOUBLE CASTING: La magia para calmar a TypeScript
+    // Le decimos: "Confía en mí, esto es un ThemeConfig"
+    return merged as unknown as ThemeConfig;
+
+  } catch (error) {
+    console.error("CRITICAL: Error sanitizing theme, falling back to defaults", error);
+    return DEFAULT_THEME;
   }
-
-  // Deep merge on top of defaults
-  const safeConfig = deepMerge<ThemeConfig>(DEFAULT_THEME, rawConfig);
-
-  // Extra safeguards for arrays
-  if (!Array.isArray(safeConfig.header?.socialLinks)) {
-    safeConfig.header.socialLinks = [];
-  }
-
-  return safeConfig;
 }
 
-// Alias for compatibility if needed, but we prefer getSafeTheme
-export const mergeTheme = getSafeTheme;
-
 /**
- * Helper to get the profile and a safe theme config.
+ * getSafeProfile: Obtiene perfil y config de forma segura.
+ * Nunca lanza error, siempre devuelve una estructura válida.
  */
-export async function getSafeProfile(identifier: string, type: 'id' | 'slug' = 'id') {
-  const supabase = await createAdminClient();
-  let query = supabase.from('profiles').select('*');
+export async function getSafeProfile(userId: string) {
+  const supabase = await createClient();
 
-  if (type === 'id') {
-    query = query.eq('id', identifier);
-  } else {
-    query = query.eq('slug', identifier);
-  }
+  try {
+    const { data: profile, error } = await supabase
+      .from('profiles')
+      .select('*')
+      .eq('id', userId)
+      .single();
 
-  const { data: profile, error } = await query.single();
+    if (error) {
+      console.error("Error fetching profile:", error);
+      // Retornamos estructura dummy válida pero indicando error en consola
+      return {
+        profile: null,
+        config: DEFAULT_THEME,
+        error: error.message
+      };
+    }
 
-  if (error || !profile) {
-    console.error(`[getSafeProfile] Error fetching profile for ${type}:${identifier}`, error);
+    // Prioridad: theme_config (nuevo) > design_config (legacy) > null
+    const rawConfig = profile.theme_config || profile.design_config;
+
     return {
+      profile,
+      config: getSafeTheme(rawConfig),
+      error: null
+    };
+
+  } catch (e) {
+    console.error("Unexpected crash in getSafeProfile:", e);
+    return {
+      profile: null,
       config: DEFAULT_THEME,
-      profile: null
+      error: "Unexpected error"
     };
   }
-
-  const config = getSafeTheme(profile.theme_config, profile);
-
-  return { config, profile };
 }
