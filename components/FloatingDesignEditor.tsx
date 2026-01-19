@@ -190,6 +190,57 @@ export default function FloatingDesignEditor({
                 </div>
              )
 
+        case 'card_title':
+            return (
+                <div className="flex items-center gap-3 h-full animate-in fade-in slide-in-from-bottom-2">
+                    <FontSelector currentFont={theme.cards.productTitle.fontFamily} path="cards.productTitle.fontFamily" label="Fuente" />
+                    <ColorSelector color={theme.cards.productTitle.color} path="cards.productTitle.color" label="Color" />
+                    <div className="w-px h-6 bg-slate-200"></div>
+                    <button
+                        onClick={() => updateThemeConfig('cards.productTitle.fontWeight', theme.cards.productTitle.fontWeight === 'bold' ? 'normal' : 'bold')}
+                        className={`h-9 w-9 rounded-lg flex items-center justify-center transition-colors font-bold ${theme.cards.productTitle.fontWeight !== 'normal' ? 'bg-slate-900 text-white' : 'bg-slate-50 text-slate-400 hover:text-slate-900'}`}
+                    >B</button>
+                </div>
+            )
+
+        case 'card_price':
+            return (
+                <div className="flex items-center gap-3 h-full animate-in fade-in slide-in-from-bottom-2">
+                    <FontSelector currentFont={theme.cards.productPrice.fontFamily} path="cards.productPrice.fontFamily" label="Fuente" />
+                    <ColorSelector color={theme.cards.productPrice.color} path="cards.productPrice.color" label="Color" />
+                </div>
+            )
+
+        case 'card_qty':
+             return (
+                <div className="flex items-center gap-3 h-full animate-in fade-in slide-in-from-bottom-2">
+                    <ColorSelector color={theme.cards.quantitySelector.bgColor} path="cards.quantitySelector.bgColor" label="Fondo" />
+                    <ColorSelector color={theme.cards.quantitySelector.textColor} path="cards.quantitySelector.textColor" label="Texto" />
+                    <ColorSelector color={theme.cards.quantitySelector.borderColor} path="cards.quantitySelector.borderColor" label="Borde" />
+                </div>
+             )
+
+        case 'card_add_btn':
+             return (
+                <div className="flex items-center gap-3 h-full animate-in fade-in slide-in-from-bottom-2">
+                    <ColorSelector color={theme.cards.addButton.bgColor} path="cards.addButton.bgColor" label="Fondo" />
+                    <ColorSelector color={theme.cards.addButton.iconColor} path="cards.addButton.iconColor" label="Icono" />
+                    <div className="w-px h-6 bg-slate-200"></div>
+                     <div className="flex gap-1">
+                        {['circle', 'rounded', 'square'].map(shape => (
+                            <button
+                                key={shape}
+                                onClick={() => updateThemeConfig('cards.addButton.shape', shape)}
+                                className={`w-8 h-8 flex items-center justify-center border transition-all ${theme.cards.addButton.shape === shape ? 'bg-slate-900 text-white border-slate-900' : 'bg-white text-slate-400 border-slate-200 hover:bg-slate-50'}`}
+                                style={{ borderRadius: shape === 'circle' ? '9999px' : shape === 'square' ? '4px' : '10px'}}
+                            >
+                                <Box size={14} />
+                            </button>
+                        ))}
+                     </div>
+                </div>
+             )
+
         case 'product_card':
              return (
                 <div className="flex items-center gap-3 h-full animate-in fade-in slide-in-from-bottom-2 overflow-x-auto pr-4 no-scrollbar">
@@ -210,26 +261,7 @@ export default function FloatingDesignEditor({
 
                     <div className="w-px h-6 bg-slate-200"></div>
 
-                    {/* Texto Producto */}
-                    <FontSelector currentFont={theme.cards.productName.fontFamily} path="cards.productName.fontFamily" label="Fuente" />
-                    <ColorSelector color={theme.cards.productName.color} path="cards.productName.color" label="Texto" />
-                    <ColorSelector color={theme.cards.productPrice.color} path="cards.productPrice.color" label="Precio" />
-
-                    <div className="w-px h-6 bg-slate-200"></div>
-
-                    {/* Botón */}
-                    <div className="flex flex-col items-center gap-1">
-                        <span className="text-[9px] font-bold text-slate-400 uppercase">Botón</span>
-                        <div className="flex gap-1">
-                            <div className="w-6 h-6 rounded border cursor-pointer relative" style={{ backgroundColor: theme.cards.button.bg }}>
-                                <input type="color" value={theme.cards.button.bg} onChange={(e) => updateThemeConfig('cards.button.bg', e.target.value)} className="absolute inset-0 opacity-0 w-full h-full cursor-pointer"/>
-                            </div>
-                            <div className="w-6 h-6 rounded border cursor-pointer relative flex items-center justify-center bg-gray-100">
-                                <span className="text-[8px] font-bold" style={{ color: theme.cards.button.text }}>T</span>
-                                <input type="color" value={theme.cards.button.text} onChange={(e) => updateThemeConfig('cards.button.text', e.target.value)} className="absolute inset-0 opacity-0 w-full h-full cursor-pointer"/>
-                            </div>
-                        </div>
-                    </div>
+                    <span className="text-xs text-slate-400 italic px-2">Selecciona un elemento interno para editar</span>
                 </div>
              )
 
@@ -266,7 +298,11 @@ export default function FloatingDesignEditor({
           case 'header_title': return 'Título';
           case 'header_subtitle': return 'Subtítulo';
           case 'header_bio': return 'Biografía';
-          case 'product_card': return 'Tarjetas';
+          case 'product_card': return 'Tarjeta';
+          case 'card_title': return 'Título Prod.';
+          case 'card_price': return 'Precio';
+          case 'card_qty': return 'Selector Cant.';
+          case 'card_add_btn': return 'Botón Agregar';
           case 'global_bg': return 'Global';
           default: return '';
       }

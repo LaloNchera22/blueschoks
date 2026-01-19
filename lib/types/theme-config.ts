@@ -21,19 +21,28 @@ export interface ThemeConfig {
     cards: {
       background: string;
       border: boolean;
-      productName: {
-        fontFamily: string;
+      productTitle: {
         color: string;
+        fontFamily: string;
+        fontWeight: string; // 'normal', 'bold', 'black'
       };
       productPrice: {
-        fontFamily: string;
         color: string;
-        weight: string; // 'normal', 'bold', 'black'
+        fontFamily: string;
       };
-      button: {
-        bg: string;
-        text: string;
+      quantitySelector: {
+        bgColor: string;
+        textColor: string;
+        borderColor: string;
       };
+      addButton: {
+        bgColor: string;
+        iconColor: string;
+        shape: 'circle' | 'rounded' | 'square';
+      };
+      // Legacy fallback (optional, keeping to avoid breaking if referenced elsewhere briefly)
+      productName?: { fontFamily: string; color: string };
+      button?: { bg: string; text: string };
     };
     global: {
       backgroundType: 'solid' | 'image' | 'gradient';
@@ -50,8 +59,27 @@ export interface ThemeConfig {
     cards: {
       background: '#ffffff',
       border: true,
+      productTitle: {
+        color: '#000000',
+        fontFamily: 'Inter',
+        fontWeight: 'bold'
+      },
+      productPrice: {
+        color: '#000000',
+        fontFamily: 'Inter'
+      },
+      quantitySelector: {
+        bgColor: '#f3f4f6',
+        textColor: '#111827',
+        borderColor: 'transparent'
+      },
+      addButton: {
+        bgColor: '#000000',
+        iconColor: '#ffffff',
+        shape: 'circle'
+      },
+      // Keep legacy for safety during migration
       productName: { fontFamily: 'Inter', color: '#000000' },
-      productPrice: { fontFamily: 'Inter', color: '#000000', weight: 'bold' },
       button: { bg: '#000000', text: '#ffffff' }
     },
     global: {

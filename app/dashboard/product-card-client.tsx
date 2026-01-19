@@ -123,7 +123,7 @@ export default function ProductCardClient({ product }: ProductCardProps) {
                 <>
                     {viewMode === 'collage' && (
                         <div className="w-full h-full grid grid-cols-2 gap-0.5 overflow-y-auto bg-background p-0.5 absolute inset-0 z-10">
-                        {mediaList.map((url, idx) => (
+                        {mediaList.map((url: string, idx: number) => (
                             <div key={idx} className="relative aspect-square bg-muted overflow-hidden cursor-pointer hover:opacity-90" onClick={(e) => { e.preventDefault(); setViewMode('carousel'); setCurrentSlide(idx); }}>
                                 {isVideo(url) ? (
                                     <div className="w-full h-full flex items-center justify-center bg-black text-white relative">
@@ -160,7 +160,7 @@ export default function ProductCardClient({ product }: ProductCardProps) {
                                         </button>
                                     </div>
                                     <div className="absolute bottom-3 left-0 right-0 flex justify-center gap-1.5 z-20 pointer-events-none">
-                                        {mediaList.map((_, idx) => (
+                                        {mediaList.map((_: string, idx: number) => (
                                             <div key={idx} className={`transition-all duration-300 rounded-full shadow-sm ${idx === currentSlide ? 'bg-white w-2 h-2 scale-110' : 'bg-white/50 w-1.5 h-1.5'}`} />
                                         ))}
                                     </div>
