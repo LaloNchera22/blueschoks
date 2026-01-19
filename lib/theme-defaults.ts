@@ -43,7 +43,7 @@ export const DEFAULT_THEME: ThemeConfig = {
       iconColor: '#ffffff',
       shape: 'circle'
     },
-    // Legacy fallback (optional)
+    // Legacy fallback
     productName: { fontFamily: 'Inter', color: '#000000' },
     button: { bg: '#000000', text: '#ffffff' }
   },

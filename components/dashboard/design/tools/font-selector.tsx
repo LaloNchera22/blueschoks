@@ -1,5 +1,4 @@
-import { Type, Check, Box } from "lucide-react"
-import { useState } from "react"
+import { Type, Check } from "lucide-react"
 
 // LISTA AMPLIADA ESTILO CANVA (20+ Fuentes Populares)
 export const fonts = [
@@ -83,37 +82,4 @@ export const FontSelector = ({ currentFont, path, label, updateThemeConfig, acti
      </div>
 )
 
-export const ColorSelector = ({ color, path, label, updateThemeConfig }: { color: string, path: string, label?: string, updateThemeConfig: (path: string, value: any) => void }) => (
-    <div className="flex flex-col items-center gap-1 group relative">
-        <div className="w-9 h-9 rounded-lg border border-slate-200 flex items-center justify-center cursor-pointer hover:bg-slate-50 relative overflow-hidden">
-            <div className="w-5 h-5 rounded-full border border-slate-200 shadow-sm" style={{ backgroundColor: color }}></div>
-            <input
-                type="color"
-                value={color}
-                onChange={(e) => updateThemeConfig(path, e.target.value)}
-                className="absolute inset-0 opacity-0 cursor-pointer w-full h-full"
-            />
-        </div>
-        {label && <span className="text-[9px] font-bold uppercase tracking-wider text-slate-400 group-hover:text-slate-900 transition-colors">{label}</span>}
-    </div>
-)
-
-export const SizeSelector = ({ size, path, updateThemeConfig }: { size: string, path: string, updateThemeConfig: (path: string, value: any) => void }) => {
-     // Simplificación de tamaños
-     const sizes = ['sm', 'base', 'lg', 'xl', '2xl', '3xl']
-     const currentIndex = sizes.indexOf(size) >= 0 ? sizes.indexOf(size) : 1
-
-     return (
-        <div className="flex items-center bg-slate-50 rounded-lg p-0.5 border border-slate-200">
-             <button
-                onClick={() => updateThemeConfig(path, sizes[Math.max(0, currentIndex - 1)])}
-                className="w-6 h-8 flex items-center justify-center hover:bg-white rounded text-xs font-bold"
-             >-</button>
-             <span className="text-[10px] w-8 text-center uppercase">{size}</span>
-             <button
-                onClick={() => updateThemeConfig(path, sizes[Math.min(sizes.length - 1, currentIndex + 1)])}
-                className="w-6 h-8 flex items-center justify-center hover:bg-white rounded text-xs font-bold"
-             >+</button>
-        </div>
-     )
-}
+export default FontSelector;

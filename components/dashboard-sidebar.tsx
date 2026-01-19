@@ -132,7 +132,7 @@ export function AppSidebar({
             </Button>
             
             <div className="mt-2 pt-2 border-t border-slate-200/50 text-center">
-               <Link href="/dashboard/settings" className="text-[10px] font-bold text-slate-400 hover:text-slate-800 flex items-center justify-center gap-1 transition-colors uppercase">
+               <Link href="/dashboard/settings" className="text-[10px] font-bold text-slate-400 hover:text-slate-800 flex items-center justify-center gap-1 transition-colors uppercase" prefetch={false}>
                   <Globe size={10} /> Editar dominio
                </Link>
             </div>
