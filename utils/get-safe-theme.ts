@@ -1,87 +1,119 @@
-import { ThemeConfig, DEFAULT_THEME_CONFIG } from "@/lib/types/theme-config";
+import { ThemeConfig } from "@/lib/types/theme-config";
 import { createClient } from "@/utils/supabase/server";
 import { Database } from "@/utils/supabase/types";
 
-type Profile = Database['public']['Tables']['profiles']['Row'];
-
-// Exportamos la constante tipada para uso externo
-export const DEFAULT_THEME = DEFAULT_THEME_CONFIG;
+// 1. Definición de la Fuente de la Verdad (DEFAULT_THEME)
+// Copia exacta y tipada para asegurar integridad sin depender de archivos externos
+export const DEFAULT_THEME: ThemeConfig = {
+  header: {
+    title: { fontFamily: 'Inter', color: '#000000', fontSize: '2xl', bold: true },
+    subtitle: { fontFamily: 'Inter', color: '#666666', fontSize: 'lg', bold: false },
+    bio: { fontFamily: 'Roboto', color: '#666666', fontSize: 'sm' },
+    socialLinks: []
+  },
+  cards: {
+    background: '#ffffff',
+    border: true,
+    productTitle: {
+      color: '#000000',
+      fontFamily: 'Inter',
+      fontWeight: 'bold'
+    },
+    productPrice: {
+      color: '#000000',
+      fontFamily: 'Inter'
+    },
+    quantitySelector: {
+      bgColor: '#f3f4f6',
+      textColor: '#111827',
+      borderColor: 'transparent'
+    },
+    addButton: {
+      bgColor: '#000000',
+      iconColor: '#ffffff',
+      shape: 'circle' // Literal exacto
+    },
+    // Legacy fallbacks requeridos por la interfaz
+    productName: { fontFamily: 'Inter', color: '#000000' },
+    button: { bg: '#000000', text: '#ffffff' }
+  },
+  global: {
+    backgroundType: 'solid', // Literal exacto
+    backgroundValue: '#f3f4f6'
+  }
+};
 
 /**
  * Función auxiliar para realizar un Deep Merge seguro.
- * Tipado con genéricos para mantener la seguridad de tipos del target.
  */
-function deepMerge<T extends object>(target: T, source: unknown): T {
+function deepMerge(target: any, source: any): any {
   if (typeof source !== 'object' || source === null) {
     return target;
   }
 
-  // Usamos un casting intermedio controlado para manipular las propiedades
-  const output = { ...target } as Record<string, unknown>;
-  const sourceObj = source as Record<string, unknown>;
+  const output = { ...target };
 
-  Object.keys(sourceObj).forEach(key => {
-    const sourceValue = sourceObj[key];
+  Object.keys(source).forEach(key => {
+    const sourceValue = source[key];
     const targetValue = output[key];
 
     if (Array.isArray(sourceValue)) {
-      // Para arrays, preferimos el valor de la fuente (DB) si existe, reemplazando el default
+      // Para arrays (ej: socialLinks), preferimos la fuente si es válida
       output[key] = sourceValue;
     } else if (
       typeof sourceValue === 'object' &&
       sourceValue !== null &&
-      typeof targetValue === 'object' &&
       targetValue !== null &&
+      typeof targetValue === 'object' &&
       !Array.isArray(targetValue)
     ) {
-      // Recursión para objetos anidados
-      output[key] = deepMerge(targetValue as object, sourceValue);
+      // Recursión solo si ambos son objetos
+      output[key] = deepMerge(targetValue, sourceValue);
     } else {
-      // Asignación directa para primitivos
+      // Primitivos
       output[key] = sourceValue;
     }
   });
 
-  return output as T;
+  return output;
 }
 
 /**
- * getSafeTheme: La función "A prueba de balas".
- * Toma cualquier dato (unknown) que venga de la DB y devuelve un ThemeConfig válido.
+ * getSafeTheme: La función Firewall.
+ * Recibe CUALQUIER COSA y devuelve un ThemeConfig válido.
  */
-export function getSafeTheme(dbConfig: unknown): ThemeConfig {
+export function getSafeTheme(dbConfig: any): ThemeConfig {
   try {
-    if (!dbConfig) {
+    // 1. Si es nulo o basura, devolver default
+    if (!dbConfig || typeof dbConfig !== 'object') {
       return DEFAULT_THEME;
     }
 
-    // Estrategia de Deep Merge: Defaults + DB Data
-    // Esto asegura que propiedades faltantes se rellenen con defaults.
+    // 2. Deep Merge defensivo
     const merged = deepMerge(DEFAULT_THEME, dbConfig);
 
-    // SANITIZACIÓN FINAL
-    // Validamos propiedades críticas que podrían tener valores incorrectos desde la DB
-    // (Ej: strings arbitrarios donde se espera una union type)
-
-    // Validación de shape
+    // 3. Sanitización específica de Literales (Union Types)
+    // Esto es crucial para evitar crasheos en componentes que esperan 'circle' | 'rounded' | 'square'
     const validShapes = ['circle', 'rounded', 'square'];
     if (merged.cards?.addButton?.shape && !validShapes.includes(merged.cards.addButton.shape)) {
         merged.cards.addButton.shape = 'circle';
     }
 
-    // Validación de backgroundType
     const validBgTypes = ['solid', 'image', 'gradient'];
     if (merged.global?.backgroundType && !validBgTypes.includes(merged.global.backgroundType)) {
         merged.global.backgroundType = 'solid';
     }
 
-    return merged;
+    // 4. Double Casting final para silenciar TypeScript y asegurar compatibilidad
+    return merged as unknown as ThemeConfig;
 
   } catch (error) {
-    console.error("CRITICAL: Error sanitizing theme, falling back to defaults", error);
+    console.error("FIREWALL: Error sanitizing theme. Fallback to default.", error);
     return DEFAULT_THEME;
   }
 }
+
+type Profile = Database['public']['Tables']['profiles']['Row'];
 
 interface SafeProfileResponse {
   profile: Profile | null;
@@ -90,8 +122,7 @@ interface SafeProfileResponse {
 }
 
 /**
- * getSafeProfile: Obtiene perfil y config de forma segura.
- * Nunca lanza error, siempre devuelve una estructura válida y tipada.
+ * getSafeProfile: Obtención segura de perfil + config.
  */
 export async function getSafeProfile(userId: string): Promise<SafeProfileResponse> {
   const supabase = await createClient();
@@ -104,8 +135,7 @@ export async function getSafeProfile(userId: string): Promise<SafeProfileRespons
       .single();
 
     if (error) {
-      console.error("Error fetching profile:", error);
-      // Retornamos estructura válida pero indicando error en consola
+      console.error("getSafeProfile Error:", error.message);
       return {
         profile: null,
         config: DEFAULT_THEME,
@@ -113,22 +143,21 @@ export async function getSafeProfile(userId: string): Promise<SafeProfileRespons
       };
     }
 
-    // Prioridad: theme_config (nuevo) > design_config (legacy) > null
-    // Usamos unknown casting solo para extraer la propiedad si existe, ya que profile es tipado
+    // Prioridad: theme_config > design_config
     const rawConfig = profile.theme_config || profile.design_config;
 
     return {
-      profile,
+      profile: profile, // Supabase devuelve el tipo correcto
       config: getSafeTheme(rawConfig),
       error: null
     };
 
   } catch (e) {
-    console.error("Unexpected crash in getSafeProfile:", e);
+    console.error("getSafeProfile CRITICAL FAILURE:", e);
     return {
       profile: null,
       config: DEFAULT_THEME,
-      error: "Unexpected error"
+      error: "Critical failure in profile fetch"
     };
   }
 }
