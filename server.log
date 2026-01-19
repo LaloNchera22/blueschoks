@@ -1,3 +1,14 @@
 
-codigo_nuevo_de_jules
+> blueshock@0.1.0 dev
+> next dev
 
+▲ Next.js 16.1.1 (Turbopack)
+- Local:         http://localhost:3000
+- Network:       http://192.168.0.2:3000
+- Experiments (use with caution):
+  · serverActions
+
+✓ Starting...
+✓ Ready in 1122ms
+○ Compiling /test-social ...
+[?25h

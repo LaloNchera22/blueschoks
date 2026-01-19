@@ -4,7 +4,7 @@ import { useState, useEffect, useMemo } from "react"
 // Importamos openCart del contexto
 import { useCart, CartItem } from "./cart-context"
 import CartSidebar from "./cart-sidebar" 
-import { Plus, Minus, ShoppingBag, Check, Globe, Share2, Trash2, Send, X, ShoppingCart, ChevronLeft, ChevronRight } from "lucide-react"
+import { Plus, Minus, ShoppingBag, Check, Globe, Share2, Trash2, Send, X, ShoppingCart, ChevronLeft, ChevronRight, Facebook, Instagram, Twitter, Youtube, Linkedin, Mail, MessageCircle, Video, AtSign, Music } from "lucide-react"
 import { useEditorStore } from "@/hooks/useEditorStore"
 import { ThemeConfig, DEFAULT_THEME_CONFIG } from "@/lib/types/theme-config"
 import { motion, AnimatePresence } from "framer-motion"
@@ -195,13 +195,67 @@ export default function CatalogoInteractivo({ products, shop, isEditor = false }
               </div>
 
               {/* REDES SOCIALES */}
-              <div className="flex gap-4 mt-4 opacity-60">
-                    {shop.whatsapp && (
-                        <a href={`https://wa.me/${shop.whatsapp}`} target="_blank" rel="noopener noreferrer" className="p-2 rounded-full bg-current/5 hover:bg-current/10 transition-colors">
-                            <Globe size={18} />
-                        </a>
-                    )}
-                    <button className="p-2 rounded-full bg-current/5 hover:bg-current/10 transition-colors"><Share2 size={18}/></button>
+              <div
+                  onClick={(e) => handleElementClick(e, 'header_social')}
+                  className={`flex flex-wrap justify-center gap-3 mt-4 ${isEditor && selectedComponent === 'header_social' ? 'ring-2 ring-blue-500 bg-blue-500/10 p-2 rounded-xl' : isEditor ? 'hover:ring-2 hover:ring-blue-500/50 hover:bg-blue-500/5 p-2 rounded-xl' : ''}`}
+              >
+                   {/* Dynamic Links */}
+                   {theme.header.socialLinks && theme.header.socialLinks.map(link => {
+                        // Icon mapping
+                        const iconMap: Record<string, any> = {
+                            whatsapp: MessageCircle,
+                            instagram: Instagram,
+                            facebook: Facebook,
+                            x: Twitter,
+                            tiktok: Music,
+                            youtube: Youtube,
+                            linkedin: Linkedin,
+                            threads: AtSign,
+                            telegram: Send,
+                            website: Globe,
+                            email: Mail
+                        };
+                        const Icon = iconMap[link.platform] || Globe;
+
+                        return (
+                            <a
+                                key={link.id}
+                                href={link.url}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="w-10 h-10 flex items-center justify-center transition-transform hover:scale-110 shadow-sm"
+                                style={{
+                                    backgroundColor: link.style.backgroundColor,
+                                    color: link.style.iconColor,
+                                    borderRadius: link.style.borderRadius === 'full' ? '9999px' :
+                                                  link.style.borderRadius === 'lg' ? '12px' :
+                                                  link.style.borderRadius === 'md' ? '8px' : '0px'
+                                }}
+                            >
+                                <Icon size={18} />
+                            </a>
+                        )
+                   })}
+
+                   {/* Legacy Fallback / Default Add Button for Editor if empty */}
+                   {(!theme.header.socialLinks || theme.header.socialLinks.length === 0) && (
+                       <>
+                            {shop.whatsapp && (
+                                <a href={`https://wa.me/${shop.whatsapp}`} target="_blank" rel="noopener noreferrer" className="w-10 h-10 flex items-center justify-center rounded-full bg-slate-100 text-slate-600 hover:bg-slate-200 transition-colors">
+                                    <MessageCircle size={18} />
+                                </a>
+                            )}
+                            {!isEditor && (
+                                <button className="w-10 h-10 flex items-center justify-center rounded-full bg-slate-100 text-slate-600 hover:bg-slate-200 transition-colors"><Share2 size={18}/></button>
+                            )}
+
+                            {isEditor && !shop.whatsapp && (
+                                <div className="text-xs text-slate-400 border border-dashed border-slate-300 px-3 py-1 rounded-full">
+                                    Click para agregar redes
+                                </div>
+                            )}
+                       </>
+                   )}
               </div>
           </header>
 
