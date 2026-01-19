@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useEffect, useMemo } from "react"
+import { useState, useEffect, useMemo, memo } from "react"
 // Importamos openCart del contexto
 import { useCart, CartItem } from "./cart-context"
 import CartSidebar from "./cart-sidebar" 
@@ -46,7 +46,7 @@ interface Product {
   [key: string]: unknown;
 }
 
-export default function CatalogoInteractivo({ products, shop, isEditor = false }: { products: Product[], shop: Shop, isEditor?: boolean }) {
+const CatalogoInteractivo = memo(function CatalogoInteractivo({ products, shop, isEditor = false }: { products: Product[], shop: Shop, isEditor?: boolean }) {
   // 1. Calculamos el total manualmente
   const { items, openCart, removeItem } = useCart()
   const { setSelectedComponent, selectedComponent, theme: editorTheme } = useEditorStore()
@@ -394,10 +394,12 @@ export default function CatalogoInteractivo({ products, shop, isEditor = false }
       </AnimatePresence>
     </>
   )
-}
+})
+
+export default CatalogoInteractivo
 
 // --- TARJETA DE PRODUCTO REDISEÑADA (ESTILO EDITORIAL/FASHION) ---
-function TarjetaCuadrada({ product, theme, isEditor = false, index = 0, accentColor }: { product: Product, theme: ThemeConfig, isEditor?: boolean, index?: number, accentColor?: string | null }) {
+const TarjetaCuadrada = memo(function TarjetaCuadrada({ product, theme, isEditor = false, index = 0, accentColor }: { product: Product, theme: ThemeConfig, isEditor?: boolean, index?: number, accentColor?: string | null }) {
   const { addToCart } = useCart()
   const { setSelectedComponent, selectedComponent } = useEditorStore()
   const [quantity, setQuantity] = useState(1)
@@ -673,7 +675,7 @@ function TarjetaCuadrada({ product, theme, isEditor = false, index = 0, accentCo
         </div>
     </motion.div>
   )
-}
+})
 
 function getFontSize(size: string): string {
     switch(size) {

@@ -3,11 +3,18 @@
 import { useState, useEffect } from "react"
 import { createClient } from "@/utils/supabase/client"
 import CatalogoInteractivo from "@/components/shop/CatalogoInteractivo"
-import FloatingDesignEditor from "@/components/FloatingDesignEditor"
 import { CartProvider } from "@/components/shop/cart-context"
 import { useEditorStore } from "@/hooks/useEditorStore"
 import { saveThemeConfig } from "@/app/dashboard/actions/design-actions"
 import { DEFAULT_THEME_CONFIG, ThemeConfig } from "@/lib/types/theme-config"
+import dynamic from "next/dynamic"
+
+// Dynamic Import for the Editor Component
+// This prevents the heavy editor logic from blocking the initial render of the page
+const FloatingDesignEditor = dynamic(() => import("@/components/FloatingDesignEditor"), {
+  ssr: false,
+  loading: () => null // Invisible loading since it's a floating element
+})
 
 export default function DesignPage() {
   const supabase = createClient()

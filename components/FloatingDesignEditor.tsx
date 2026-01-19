@@ -1,43 +1,18 @@
 "use client"
 
 import { useState, useEffect, useRef } from "react"
-import { X, Check, Loader2, Type, Move, Palette, Box } from "lucide-react"
+import { X, Check, Loader2, Box } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { useEditorStore } from "@/hooks/useEditorStore"
-import { ThemeConfig } from "@/lib/types/theme-config"
-import SocialLinksTool from "@/components/dashboard/design/social-links-tool"
+import dynamic from "next/dynamic"
 
-// LISTA AMPLIADA ESTILO CANVA (20+ Fuentes Populares)
-const fonts = [
-  // SANS SERIF (Modernas)
-  { name: 'Inter', value: 'Inter, sans-serif' },
-  { name: 'Montserrat', value: 'Montserrat, sans-serif' },
-  { name: 'Open Sans', value: 'Open Sans, sans-serif' },
-  { name: 'Lato', value: 'Lato, sans-serif' },
-  { name: 'Roboto', value: 'Roboto, sans-serif' },
-  { name: 'Oswald', value: 'Oswald, sans-serif' },
-  
-  // SERIF (Elegantes)
-  { name: 'Playfair Display', value: 'Playfair Display, serif' },
-  { name: 'Merriweather', value: 'Merriweather, serif' },
-  { name: 'Lora', value: 'Lora, serif' },
-  { name: 'Bodoni Moda', value: 'Bodoni Moda, serif' },
-  
-  // CREATIVAS / DISPLAY
-  { name: 'Bebas Neue', value: 'Bebas Neue, sans-serif' },
-  { name: 'Abril Fatface', value: 'Abril Fatface, cursive' },
-  { name: 'Righteous', value: 'Righteous, cursive' },
-  
-  // MANUSCRITAS (Script)
-  { name: 'Dancing Script', value: 'Dancing Script, cursive' },
-  { name: 'Pacifico', value: 'Pacifico, cursive' },
-  { name: 'Satisfy', value: 'Satisfy, cursive' },
-  
-  // CLÁSICAS WEB
-  { name: 'Arial', value: 'Arial, sans-serif' },
-  { name: 'Courier New', value: 'Courier New, monospace' },
-  { name: 'Times New Roman', value: 'Times New Roman, serif' },
-]
+// Import UI components
+import { FontSelector, ColorSelector, SizeSelector } from "@/components/dashboard/design/editor-ui-components"
+
+// Dynamic Imports
+const SocialLinksTool = dynamic(() => import("@/components/dashboard/design/social-links-tool"), {
+    loading: () => <div className="h-10 flex items-center px-4 text-xs text-slate-400 animate-pulse">Cargando herramientas sociales...</div>
+})
 
 interface EditorProps {
   onSave?: () => void
@@ -79,81 +54,13 @@ export default function FloatingDesignEditor({
     prevSavingRef.current = isSaving
   }, [isSaving])
 
-
-  // COMPONENTES UI REUTILIZABLES
-
-  const FontSelector = ({ currentFont, path, label }: { currentFont: string, path: string, label?: string }) => (
-    <div className="relative">
-        <button
-          onClick={() => {
-              setActiveFontField(path)
-              setShowFontMenu(true)
-          }}
-          className="h-9 px-3 rounded-lg bg-slate-50 hover:bg-slate-100 flex items-center gap-2 border border-slate-200 min-w-[120px] justify-between transition-colors"
-        >
-           <div className="flex flex-col items-start overflow-hidden">
-               {label && <span className="text-[9px] font-bold text-slate-400 uppercase leading-none mb-0.5">{label}</span>}
-               <span className="text-xs font-medium truncate max-w-[90px]">{fonts.find(f => f.value === currentFont)?.name || 'Fuente'}</span>
-           </div>
-           <Type size={12} className="opacity-50" />
-        </button>
-
-        {showFontMenu && activeFontField === path && (
-            <>
-                <div className="fixed inset-0 z-40" onClick={() => setShowFontMenu(false)}></div>
-                <div className="absolute bottom-full left-0 mb-2 w-56 bg-white rounded-xl shadow-xl border border-slate-100 max-h-[300px] overflow-y-auto p-1 grid gap-0.5 z-50">
-                    {fonts.map((f) => (
-                       <button
-                          key={f.name}
-                          onClick={() => {
-                              updateThemeConfig(path, f.value)
-                              setShowFontMenu(false)
-                          }}
-                          className={`text-left px-3 py-2 rounded-lg text-xs hover:bg-slate-50 transition-colors flex justify-between items-center ${currentFont === f.value ? 'bg-slate-900 text-white hover:bg-slate-800' : ''}`}
-                       >
-                          <span style={{ fontFamily: f.value }}>{f.name}</span>
-                          {currentFont === f.value && <Check size={12} />}
-                       </button>
-                    ))}
-                </div>
-            </>
-        )}
-     </div>
-  )
-
-  const ColorSelector = ({ color, path, label }: { color: string, path: string, label?: string }) => (
-    <div className="flex flex-col items-center gap-1 group relative">
-        <div className="w-9 h-9 rounded-lg border border-slate-200 flex items-center justify-center cursor-pointer hover:bg-slate-50 relative overflow-hidden">
-            <div className="w-5 h-5 rounded-full border border-slate-200 shadow-sm" style={{ backgroundColor: color }}></div>
-            <input
-                type="color"
-                value={color}
-                onChange={(e) => updateThemeConfig(path, e.target.value)}
-                className="absolute inset-0 opacity-0 cursor-pointer w-full h-full"
-            />
-        </div>
-        {label && <span className="text-[9px] font-bold uppercase tracking-wider text-slate-400 group-hover:text-slate-900 transition-colors">{label}</span>}
-    </div>
-  )
-
-  const SizeSelector = ({ size, path }: { size: string, path: string }) => {
-     // Simplificación de tamaños
-     const sizes = ['sm', 'base', 'lg', 'xl', '2xl', '3xl']
-     const currentIndex = sizes.indexOf(size) >= 0 ? sizes.indexOf(size) : 1
-
-     return (
-        <div className="flex items-center bg-slate-50 rounded-lg p-0.5 border border-slate-200">
-             <button
-                onClick={() => updateThemeConfig(path, sizes[Math.max(0, currentIndex - 1)])}
-                className="w-6 h-8 flex items-center justify-center hover:bg-white rounded text-xs font-bold"
-             >-</button>
-             <span className="text-[10px] w-8 text-center uppercase">{size}</span>
-             <button
-                onClick={() => updateThemeConfig(path, sizes[Math.min(sizes.length - 1, currentIndex + 1)])}
-                className="w-6 h-8 flex items-center justify-center hover:bg-white rounded text-xs font-bold"
-             >+</button>
-        </div>
-     )
+  // Common Props for Selectors
+  const commonSelectorProps = {
+      updateThemeConfig,
+      activeFontField,
+      setActiveFontField,
+      showFontMenu,
+      setShowFontMenu
   }
 
   // Renderizar herramienta según contexto
@@ -162,11 +69,11 @@ export default function FloatingDesignEditor({
         case 'header_title':
             return (
                 <div className="flex items-center gap-3 h-full animate-in fade-in slide-in-from-bottom-2">
-                    <FontSelector currentFont={theme.header.title.fontFamily} path="header.title.fontFamily" />
+                    <FontSelector currentFont={theme.header.title.fontFamily} path="header.title.fontFamily" {...commonSelectorProps} />
                     <div className="w-px h-6 bg-slate-200"></div>
-                    <ColorSelector color={theme.header.title.color} path="header.title.color" label="Color" />
+                    <ColorSelector color={theme.header.title.color} path="header.title.color" label="Color" updateThemeConfig={updateThemeConfig} />
                     <div className="w-px h-6 bg-slate-200"></div>
-                    <SizeSelector size={theme.header.title.fontSize} path="header.title.fontSize" />
+                    <SizeSelector size={theme.header.title.fontSize} path="header.title.fontSize" updateThemeConfig={updateThemeConfig} />
                     <div className="w-px h-6 bg-slate-200"></div>
                     <button
                         onClick={() => updateThemeConfig('header.title.bold', !theme.header.title.bold)}
@@ -183,11 +90,11 @@ export default function FloatingDesignEditor({
 
              return (
                 <div className="flex items-center gap-3 h-full animate-in fade-in slide-in-from-bottom-2">
-                    <FontSelector currentFont={currentConfig.fontFamily} path={`${pathPrefix}.fontFamily`} />
+                    <FontSelector currentFont={currentConfig.fontFamily} path={`${pathPrefix}.fontFamily`} {...commonSelectorProps} />
                     <div className="w-px h-6 bg-slate-200"></div>
-                    <ColorSelector color={currentConfig.color} path={`${pathPrefix}.color`} label="Color" />
+                    <ColorSelector color={currentConfig.color} path={`${pathPrefix}.color`} label="Color" updateThemeConfig={updateThemeConfig} />
                     <div className="w-px h-6 bg-slate-200"></div>
-                    <SizeSelector size={currentConfig.fontSize} path={`${pathPrefix}.fontSize`} />
+                    <SizeSelector size={currentConfig.fontSize} path={`${pathPrefix}.fontSize`} updateThemeConfig={updateThemeConfig} />
                 </div>
              )
 
@@ -197,8 +104,8 @@ export default function FloatingDesignEditor({
         case 'card_title':
             return (
                 <div className="flex items-center gap-3 h-full animate-in fade-in slide-in-from-bottom-2">
-                    <FontSelector currentFont={theme.cards.productTitle.fontFamily} path="cards.productTitle.fontFamily" label="Fuente" />
-                    <ColorSelector color={theme.cards.productTitle.color} path="cards.productTitle.color" label="Color" />
+                    <FontSelector currentFont={theme.cards.productTitle.fontFamily} path="cards.productTitle.fontFamily" label="Fuente" {...commonSelectorProps} />
+                    <ColorSelector color={theme.cards.productTitle.color} path="cards.productTitle.color" label="Color" updateThemeConfig={updateThemeConfig} />
                     <div className="w-px h-6 bg-slate-200"></div>
                     <button
                         onClick={() => updateThemeConfig('cards.productTitle.fontWeight', theme.cards.productTitle.fontWeight === 'bold' ? 'normal' : 'bold')}
@@ -210,25 +117,25 @@ export default function FloatingDesignEditor({
         case 'card_price':
             return (
                 <div className="flex items-center gap-3 h-full animate-in fade-in slide-in-from-bottom-2">
-                    <FontSelector currentFont={theme.cards.productPrice.fontFamily} path="cards.productPrice.fontFamily" label="Fuente" />
-                    <ColorSelector color={theme.cards.productPrice.color} path="cards.productPrice.color" label="Color" />
+                    <FontSelector currentFont={theme.cards.productPrice.fontFamily} path="cards.productPrice.fontFamily" label="Fuente" {...commonSelectorProps} />
+                    <ColorSelector color={theme.cards.productPrice.color} path="cards.productPrice.color" label="Color" updateThemeConfig={updateThemeConfig} />
                 </div>
             )
 
         case 'card_qty':
              return (
                 <div className="flex items-center gap-3 h-full animate-in fade-in slide-in-from-bottom-2">
-                    <ColorSelector color={theme.cards.quantitySelector.bgColor} path="cards.quantitySelector.bgColor" label="Fondo" />
-                    <ColorSelector color={theme.cards.quantitySelector.textColor} path="cards.quantitySelector.textColor" label="Texto" />
-                    <ColorSelector color={theme.cards.quantitySelector.borderColor} path="cards.quantitySelector.borderColor" label="Borde" />
+                    <ColorSelector color={theme.cards.quantitySelector.bgColor} path="cards.quantitySelector.bgColor" label="Fondo" updateThemeConfig={updateThemeConfig} />
+                    <ColorSelector color={theme.cards.quantitySelector.textColor} path="cards.quantitySelector.textColor" label="Texto" updateThemeConfig={updateThemeConfig} />
+                    <ColorSelector color={theme.cards.quantitySelector.borderColor} path="cards.quantitySelector.borderColor" label="Borde" updateThemeConfig={updateThemeConfig} />
                 </div>
              )
 
         case 'card_add_btn':
              return (
                 <div className="flex items-center gap-3 h-full animate-in fade-in slide-in-from-bottom-2">
-                    <ColorSelector color={theme.cards.addButton.bgColor} path="cards.addButton.bgColor" label="Fondo" />
-                    <ColorSelector color={theme.cards.addButton.iconColor} path="cards.addButton.iconColor" label="Icono" />
+                    <ColorSelector color={theme.cards.addButton.bgColor} path="cards.addButton.bgColor" label="Fondo" updateThemeConfig={updateThemeConfig} />
+                    <ColorSelector color={theme.cards.addButton.iconColor} path="cards.addButton.iconColor" label="Icono" updateThemeConfig={updateThemeConfig} />
                     <div className="w-px h-6 bg-slate-200"></div>
                      <div className="flex gap-1">
                         {['circle', 'rounded', 'square'].map(shape => (
@@ -250,7 +157,7 @@ export default function FloatingDesignEditor({
                 <div className="flex items-center gap-3 h-full animate-in fade-in slide-in-from-bottom-2 overflow-x-auto pr-4 no-scrollbar">
                     {/* Background Card */}
                     <div className="flex items-center gap-2">
-                        <ColorSelector color={theme.cards.background} path="cards.background" label="Fondo" />
+                        <ColorSelector color={theme.cards.background} path="cards.background" label="Fondo" updateThemeConfig={updateThemeConfig} />
                     </div>
 
                     <div className="w-px h-6 bg-slate-200"></div>
