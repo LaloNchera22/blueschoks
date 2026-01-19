@@ -1,18 +1,14 @@
 import { createClient } from "@/utils/supabase/server";
 import { getSafeProfile, DEFAULT_THEME } from "@/utils/get-safe-theme";
+import { ThemeConfig } from "@/lib/types/theme-config";
 import DesignClient from "@/components/dashboard/design/design-client";
 import { redirect } from "next/navigation";
-import { Database } from "@/utils/supabase/types";
 
 export const dynamic = 'force-dynamic';
-
-type Product = Database['public']['Tables']['products']['Row'];
-type Profile = Database['public']['Tables']['profiles']['Row'];
 
 export default async function DesignPage() {
   const supabase = await createClient();
 
-  // 1. Verificación de Auth básica
   const {
     data: { user },
   } = await supabase.auth.getUser();
@@ -21,13 +17,16 @@ export default async function DesignPage() {
     return redirect("/login");
   }
 
-  // 2. Fetching Paralelo y Robusto (Promise.all + Try/Catch Masivo)
-  let safeProfile: Profile | null = null;
-  let safeConfig = DEFAULT_THEME;
-  let products: Product[] = [];
+  // VARIABLES ROBUSTAS (Explicit Typing)
+  // Usamos 'any' para productos como solicitado para evitar Type Hell temporalmente,
+  // pero mantenemos la estructura sólida para la config.
+  let products: any[] = [];
+  let safeConfig: ThemeConfig = DEFAULT_THEME;
+  let safeProfile: any = null;
   let isPro = false;
 
   try {
+    // FETCHING PARALELO
     const [profileResult, productsResult] = await Promise.all([
       getSafeProfile(user.id),
       supabase
@@ -37,35 +36,35 @@ export default async function DesignPage() {
         .order('created_at', { ascending: false })
     ]);
 
-    // Procesar resultado de perfil
+    // 1. Procesar Perfil y Configuración
     if (profileResult.error) {
-      console.error("DesignPage: Error loading profile", profileResult.error);
+        console.warn("DesignPage: Profile fetch warning:", profileResult.error);
     }
-    safeProfile = profileResult.profile;
+    // Siempre tendremos un config válido gracias al Firewall
     safeConfig = profileResult.config;
+    safeProfile = profileResult.profile;
 
-    // Determinar estado PRO de forma segura
     if (safeProfile && safeProfile.is_pro) {
         isPro = true;
     }
 
-    // Procesar resultado de productos
+    // 2. Procesar Productos
     if (productsResult.error) {
-      console.error("DesignPage: Error loading products", productsResult.error);
+        console.error("DesignPage: Products fetch error:", productsResult.error);
+        // Products se mantiene como []
     } else {
-      products = productsResult.data || [];
+        products = productsResult.data || [];
     }
 
   } catch (criticalError) {
-    console.error("CRITICAL CRASH PREVENTED in DesignPage:", criticalError);
-    // En caso de desastre total, usamos defaults y array vacío
+    // CATCH-ALL PARA EVITAR PÁGINA BLANCA
+    console.error("DesignPage: CRITICAL UNHANDLED ERROR", criticalError);
+    // En el peor caso, la UI cargará con defaults
     safeConfig = DEFAULT_THEME;
     products = [];
     isPro = false;
   }
 
-  // 3. Renderizado Seguro
-  // Mapeamos las props correctamente para el componente cliente DesignClient
   return (
     <div className="relative h-[calc(100vh-4rem)] w-full overflow-hidden bg-gray-50">
       <DesignClient
