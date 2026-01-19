@@ -83,15 +83,15 @@ export function AppSidebar({
             <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Gestión</span>
          </div>
 
-         <Link href="/dashboard/products" className={getItemClass("/dashboard/products")}>
+         <Link href="/dashboard/products" className={getItemClass("/dashboard/products")} prefetch={false}>
             <Package size={18} /> <span>Mis Productos</span>
          </Link>
 
-         <Link href="/dashboard/design" className={getItemClass("/dashboard/design")}>
+         <Link href="/dashboard/design" className={getItemClass("/dashboard/design")} prefetch={false}>
             <Palette size={18} /> <span>Diseño</span>
          </Link>
 
-         <Link href="/dashboard/settings" className={getItemClass("/dashboard/settings")}>
+         <Link href="/dashboard/settings" className={getItemClass("/dashboard/settings")} prefetch={false}>
             <Settings size={18} /> <span>Configuración</span>
          </Link>
       </div>
