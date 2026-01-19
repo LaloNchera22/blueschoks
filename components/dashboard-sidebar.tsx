@@ -8,7 +8,7 @@ import { Button } from "@/components/ui/button"
 import { UserNav } from "@/components/dashboard/user-nav"
 
 // Agregamos la prop 'userEmail' para mostrarlo abajo
-export default function AppSidebar({
+export function AppSidebar({
   shopUrl = "",
   userEmail = "usuario@email.com",
   isOpen = true,
@@ -21,9 +21,6 @@ export default function AppSidebar({
 }) {
   const pathname = usePathname()
   const [copied, setCopied] = useState(false)
-
-  // REMOVED: const isDesigner = pathname === "/dashboard/design"
-  // We want standard sidebar everywhere
 
   const hasShopUrl = shopUrl && shopUrl.length > 0;
   // Ensure the link is clean and dynamic based on the slug
@@ -44,21 +41,21 @@ export default function AppSidebar({
       : "text-slate-600 hover:bg-slate-50 hover:text-slate-900"
     }`
 
-  // Width logic: Standard width or hidden
-  let widthClass = "w-64"
-  if (!isOpen) widthClass = "w-0 border-none overflow-hidden"
-  // REMOVED: else if (isDesigner) widthClass = "w-20"
+  // Width logic: Standard width when open, 0 when closed.
+  // We strictly respect isOpen prop to avoid white columns or broken layouts.
+  const widthClass = isOpen ? "w-64" : "w-0 border-none overflow-hidden"
 
   return (
     <aside className={`${widthClass} bg-white border-r border-slate-200 h-full flex flex-col shrink-0 overflow-y-auto custom-scrollbar transition-all duration-300 relative`}>
       
       {/* 1. HEADER */}
       <div className="p-6 pb-2 relative group">
-        {/* Close Button - Visible only on hover or always? Let's make it subtle top-right */}
+        {/* Close Button */}
         {isOpen && onClose && (
            <button
              onClick={onClose}
-             className="absolute top-6 right-4 text-slate-400 hover:text-slate-700 hover:bg-slate-100 rounded-full p-1 transition-colors"
+             className="absolute top-6 right-4 text-slate-400 hover:text-slate-700 hover:bg-slate-100 rounded-full p-1 transition-colors z-50"
+             title="Cerrar menú"
            >
              <X size={16} />
            </button>
@@ -150,3 +147,4 @@ export default function AppSidebar({
     </aside>
   )
 }
+export default AppSidebar;

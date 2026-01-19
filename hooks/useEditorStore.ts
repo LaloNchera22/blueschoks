@@ -1,14 +1,7 @@
 import { create } from 'zustand'
 import { ThemeConfig, DEFAULT_THEME_CONFIG } from '@/lib/types/theme-config'
-import { produce } from 'immer'
 
 // Helper to update nested objects safely (using immer for immutability and simplicity)
-// If we don't want to install immer, we can stick to the manual way, but immer is standard in React apps.
-// The user asked for "updateThemeConfig(path, value) que actualice profundamente".
-// Since I can't easily install packages if they aren't there (I can but it takes time), I'll stick to a manual deep merge helper or the previous one.
-// The previous one `setNestedValue` was a bit risky with JSON.parse/stringify (loses functions, dates, etc - though config is JSON serializable).
-// Let's improve the manual helper.
-
 function setNestedValue<T>(obj: T, path: string, value: any): T {
     const keys = path.split('.')
     const lastKey = keys.pop()
@@ -34,9 +27,13 @@ function setNestedValue<T>(obj: T, path: string, value: any): T {
 export type SelectedComponentType =
   | 'global_bg'
   | 'header_title'
-  | 'header_subtitle' // Added for completeness
+  | 'header_subtitle'
   | 'header_bio'
   | 'product_card'
+  | 'card_title'
+  | 'card_price'
+  | 'card_qty'
+  | 'card_add_btn'
 
 interface EditorState {
   // Theme Config

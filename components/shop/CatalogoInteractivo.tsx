@@ -82,7 +82,8 @@ export default function CatalogoInteractivo({ products, shop, isEditor = false }
       fonts.add(theme.header.title.fontFamily);
       fonts.add(theme.header.subtitle.fontFamily);
       fonts.add(theme.header.bio.fontFamily);
-      fonts.add(theme.cards.productName.fontFamily);
+      // New atomic font sources
+      fonts.add(theme.cards.productTitle.fontFamily);
       fonts.add(theme.cards.productPrice.fontFamily);
 
       // Fallback legacy if using default theme which might just be Inter
@@ -377,7 +378,11 @@ function TarjetaCuadrada({ product, theme, isEditor = false, index = 0, accentCo
 
   const handleAdd = (e: React.MouseEvent) => {
     e.stopPropagation()
-    if (isEditor) return
+    // Si es editor, seleccionamos el componente botón
+    if (isEditor) {
+        setSelectedComponent('card_add_btn')
+        return
+    }
 
     // Efecto de Confeti
     const btn = document.getElementById(`btn-add-${product.id}`)
@@ -411,9 +416,6 @@ function TarjetaCuadrada({ product, theme, isEditor = false, index = 0, accentCo
     setQuantity(1) 
   }
 
-  // Estilos Dinámicos
-  // Si no hay theme (caso raro), usamos defaults
-
   // Card click to edit
   const handleCardClick = (e: React.MouseEvent) => {
       if(!isEditor) return
@@ -439,6 +441,13 @@ function TarjetaCuadrada({ product, theme, isEditor = false, index = 0, accentCo
     })
   };
 
+  // Helper para bordes de selección en editor
+  const getEditorRing = (component: string) => {
+      if (!isEditor) return '';
+      if (selectedComponent === component) return 'ring-2 ring-blue-500 bg-blue-500/10';
+      return 'hover:ring-2 hover:ring-blue-500/50 hover:bg-blue-500/5 cursor-pointer';
+  }
+
   return (
     <motion.div
         initial={{ opacity: 0, y: 20 }}
@@ -446,11 +455,11 @@ function TarjetaCuadrada({ product, theme, isEditor = false, index = 0, accentCo
         transition={{ duration: 0.5, delay: index * 0.05 }}
         className={`group relative flex flex-col overflow-hidden transition-all duration-300
             ${theme.cards.border ? 'border' : ''}
-            ${isEditor && selectedComponent === 'product_card' ? 'ring-2 ring-blue-500' : isEditor ? 'hover:ring-2 hover:ring-blue-500/50' : ''}`}
+            ${getEditorRing('product_card')}`}
         style={{
             backgroundColor: theme.cards.background,
             borderColor: theme.cards.border ? 'rgba(0,0,0,0.1)' : 'transparent',
-            borderRadius: '0.5rem' // Default radius, could be configurable later
+            borderRadius: '0.5rem' // Default radius
         }}
         onHoverStart={() => setIsHovered(true)}
         onHoverEnd={() => setIsHovered(false)}
@@ -491,7 +500,6 @@ function TarjetaCuadrada({ product, theme, isEditor = false, index = 0, accentCo
              {/* Flechas de Navegación (Solo si hay múltiples y hover) */}
              {hasMultipleImages && (
                  <>
-                    {/* Flecha Izquierda */}
                     <motion.button
                         initial={{ opacity: 0 }}
                         animate={{ opacity: isHovered ? 1 : 0 }}
@@ -501,7 +509,6 @@ function TarjetaCuadrada({ product, theme, isEditor = false, index = 0, accentCo
                         <ChevronLeft size={16} strokeWidth={2} />
                     </motion.button>
 
-                    {/* Flecha Derecha */}
                     <motion.button
                          initial={{ opacity: 0 }}
                          animate={{ opacity: isHovered ? 1 : 0 }}
@@ -511,7 +518,6 @@ function TarjetaCuadrada({ product, theme, isEditor = false, index = 0, accentCo
                         <ChevronRight size={16} strokeWidth={2} />
                     </motion.button>
 
-                    {/* Dots Indicadores */}
                     <div className="absolute bottom-3 left-0 right-0 flex justify-center gap-1.5 z-10 pointer-events-none">
                         {allImages.map((_, idx) => (
                             <motion.div
@@ -527,7 +533,6 @@ function TarjetaCuadrada({ product, theme, isEditor = false, index = 0, accentCo
                  </>
              )}
 
-             {/* Badge de Stock Agotado (Opcional, pero buena práctica UX) */}
              {product.stock === 0 && (
                  <div className="absolute top-2 right-2 bg-black/70 text-white text-[10px] font-bold px-2 py-1 uppercase tracking-wider backdrop-blur-sm">
                      Agotado
@@ -541,21 +546,23 @@ function TarjetaCuadrada({ product, theme, isEditor = false, index = 0, accentCo
             {/* Texto Minimalista */}
             <div className="flex flex-col gap-0.5 text-left">
                 <h3
-                    className="text-[15px] leading-tight line-clamp-1"
+                    onClick={(e) => { e.stopPropagation(); isEditor && setSelectedComponent('card_title') }}
+                    className={`text-[15px] leading-tight line-clamp-1 p-1 -m-1 rounded ${getEditorRing('card_title')}`}
                     style={{
-                        color: theme.cards.productName.color,
-                        fontFamily: theme.cards.productName.fontFamily,
-                        fontWeight: 500
+                        color: theme.cards.productTitle.color,
+                        fontFamily: theme.cards.productTitle.fontFamily,
+                        fontWeight: theme.cards.productTitle.fontWeight === 'black' ? 900 : theme.cards.productTitle.fontWeight === 'bold' ? 700 : 400
                     }}
                 >
                     {product.name}
                 </h3>
                 <p
-                    className="text-sm"
+                    onClick={(e) => { e.stopPropagation(); isEditor && setSelectedComponent('card_price') }}
+                    className={`text-sm w-fit p-1 -m-1 rounded ${getEditorRing('card_price')}`}
                     style={{
                         color: theme.cards.productPrice.color,
                         fontFamily: theme.cards.productPrice.fontFamily,
-                        fontWeight: theme.cards.productPrice.weight === 'black' ? 900 : theme.cards.productPrice.weight === 'bold' ? 700 : 400
+                        fontWeight: 400
                     }}
                 >
                     ${product.price}
@@ -566,37 +573,46 @@ function TarjetaCuadrada({ product, theme, isEditor = false, index = 0, accentCo
             <div className="flex items-center justify-between mt-1">
 
                 {/* Selector Cantidad (Estilo Cápsula Minimal) */}
-                <div className="flex items-center h-8 bg-gray-100/80 rounded-full px-1 border border-transparent hover:border-gray-200 transition-colors">
+                <div
+                    onClick={(e) => { e.stopPropagation(); isEditor && setSelectedComponent('card_qty') }}
+                    className={`flex items-center h-8 rounded-full px-1 border transition-colors ${getEditorRing('card_qty')}`}
+                    style={{
+                        backgroundColor: theme.cards.quantitySelector.bgColor,
+                        color: theme.cards.quantitySelector.textColor,
+                        borderColor: theme.cards.quantitySelector.borderColor
+                    }}
+                >
                     <button 
                         onClick={(e) => { e.stopPropagation(); setQuantity(Math.max(1, quantity - 1)); }}
-                        className="w-7 h-full flex items-center justify-center text-gray-500 hover:text-black transition active:scale-90"
+                        className="w-7 h-full flex items-center justify-center hover:opacity-70 transition active:scale-90"
                     >
                         <Minus size={14} />
                     </button>
-                    <span className="text-xs font-semibold w-4 text-center text-gray-900 tabular-nums">{quantity}</span>
+                    <span className="text-xs font-semibold w-4 text-center tabular-nums">{quantity}</span>
                     <button 
                         onClick={(e) => { e.stopPropagation(); setQuantity(quantity + 1); }}
-                        className="w-7 h-full flex items-center justify-center text-gray-500 hover:text-black transition active:scale-90"
+                        className="w-7 h-full flex items-center justify-center hover:opacity-70 transition active:scale-90"
                     >
                         <Plus size={14} />
                     </button>
                 </div>
 
-                {/* Botón de Compra (Circular/Icono) */}
+                {/* Botón de Compra */}
                 <button
                     id={`btn-add-${product.id}`}
                     onClick={handleAdd}
-                    className={`h-9 w-9 rounded-full flex items-center justify-center shadow-sm transition-all duration-300 active:scale-90`}
+                    className={`h-9 w-9 flex items-center justify-center shadow-sm transition-all duration-300 active:scale-90 ${getEditorRing('card_add_btn')}`}
                     style={{
-                        backgroundColor: isAdded ? '#16a34a' : theme.cards.button.bg,
-                        color: theme.cards.button.text
+                        backgroundColor: isAdded ? '#16a34a' : theme.cards.addButton.bgColor,
+                        color: theme.cards.addButton.iconColor,
+                        borderRadius: theme.cards.addButton.shape === 'circle' ? '9999px' : theme.cards.addButton.shape === 'square' ? '4px' : '12px'
                     }}
                     title="Agregar al carrito"
                 >
                      {isAdded ? (
                          <Check size={16} strokeWidth={3} color="#ffffff" />
                      ) : (
-                         <ShoppingBag size={16} strokeWidth={2.5} color={theme.cards.button.text} />
+                         <ShoppingBag size={16} strokeWidth={2.5} color={theme.cards.addButton.iconColor} />
                      )}
                 </button>
             </div>
