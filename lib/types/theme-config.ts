@@ -1,3 +1,14 @@
+export interface SocialLink {
+  id: string;
+  platform: 'whatsapp' | 'telegram' | 'instagram' | 'x' | 'facebook' | 'threads' | 'tiktok' | 'youtube' | 'linkedin' | 'website' | 'email';
+  url: string;
+  style: {
+    backgroundColor: string;
+    iconColor: string;
+    borderRadius: 'full' | 'lg' | 'md' | 'none';
+  }
+}
+
 export interface ThemeConfig {
     header: {
       title: {
@@ -17,6 +28,7 @@ export interface ThemeConfig {
         color: string;
         fontSize: string;
       };
+      socialLinks: SocialLink[];
     };
     cards: {
       background: string;
@@ -54,7 +66,8 @@ export interface ThemeConfig {
     header: {
       title: { fontFamily: 'Inter', color: '#000000', fontSize: '2xl', bold: true },
       subtitle: { fontFamily: 'Inter', color: '#666666', fontSize: 'lg', bold: false },
-      bio: { fontFamily: 'Roboto', color: '#666666', fontSize: 'sm' }
+      bio: { fontFamily: 'Roboto', color: '#666666', fontSize: 'sm' },
+      socialLinks: []
     },
     cards: {
       background: '#ffffff',

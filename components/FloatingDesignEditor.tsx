@@ -5,6 +5,7 @@ import { X, Check, Loader2, Type, Move, Palette, Box } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { useEditorStore } from "@/hooks/useEditorStore"
 import { ThemeConfig } from "@/lib/types/theme-config"
+import SocialLinksTool from "@/components/dashboard/design/social-links-tool"
 
 // LISTA AMPLIADA ESTILO CANVA (20+ Fuentes Populares)
 const fonts = [
@@ -190,6 +191,9 @@ export default function FloatingDesignEditor({
                 </div>
              )
 
+        case 'header_social':
+             return <SocialLinksTool />
+
         case 'card_title':
             return (
                 <div className="flex items-center gap-3 h-full animate-in fade-in slide-in-from-bottom-2">
@@ -298,6 +302,7 @@ export default function FloatingDesignEditor({
           case 'header_title': return 'Título';
           case 'header_subtitle': return 'Subtítulo';
           case 'header_bio': return 'Biografía';
+          case 'header_social': return 'Redes Sociales';
           case 'product_card': return 'Tarjeta';
           case 'card_title': return 'Título Prod.';
           case 'card_price': return 'Precio';

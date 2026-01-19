@@ -29,6 +29,7 @@ export type SelectedComponentType =
   | 'header_title'
   | 'header_subtitle'
   | 'header_bio'
+  | 'header_social'
   | 'product_card'
   | 'card_title'
   | 'card_price'
