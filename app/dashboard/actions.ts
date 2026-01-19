@@ -42,6 +42,17 @@ export async function deleteProduct(productId: string) {
 
   // Also revalidate the dashboard view
   revalidatePath('/dashboard')
+
+  // Revalidate the specific shop page
+  const { data: profile } = await supabase
+    .from('profiles')
+    .select('slug')
+    .eq('id', user.id)
+    .single()
+
+  if (profile?.slug) {
+    revalidatePath(`/${profile.slug}`)
+  }
 }
 
 export async function toggleStock(productId: string) {
@@ -92,4 +103,15 @@ export async function toggleStock(productId: string) {
 
   // Dashboard needs a refresh too
   revalidatePath('/dashboard')
+
+  // Revalidate the specific shop page
+  const { data: profile } = await supabase
+      .from('profiles')
+      .select('slug')
+      .eq('id', user.id)
+      .single()
+
+  if (profile?.slug) {
+      revalidatePath(`/${profile.slug}`)
+  }
 }

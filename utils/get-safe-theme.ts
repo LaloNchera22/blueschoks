@@ -1,11 +1,6 @@
 import { ThemeConfig } from "@/lib/types/theme-config";
 import { DEFAULT_THEME } from "@/lib/theme-defaults";
-import { createClient } from "@supabase/supabase-js";
-
-// Initialize a public client for reading data safely
-const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
-const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!;
-const supabase = createClient(supabaseUrl, supabaseAnonKey);
+import { createAdminClient } from "@/utils/supabase/server";
 
 /**
  * Deep merges the source object into the target object (defensively).
@@ -103,6 +98,7 @@ export function mergeTheme(dbConfig: any, legacyProfileData?: any): ThemeConfig 
  * Helper to get the profile and a safe theme config.
  */
 export async function getSafeProfile(identifier: string, type: 'id' | 'slug' = 'id') {
+  const supabase = await createAdminClient();
   let query = supabase.from('profiles').select('*');
 
   if (type === 'id') {

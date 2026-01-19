@@ -5,10 +5,7 @@ import { unstable_cache } from "next/cache"
 import { Metadata } from "next"
 import { createClient } from "@supabase/supabase-js"
 import { getSafeProfile } from "@/utils/get-safe-theme"
-
-// Configuración segura para el cliente
-const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!
-const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+import { createAdminClient } from "@/utils/supabase/server"
 
 // -----------------------------------------------------------------------------
 // FUNCIONES DE CACHÉ
@@ -36,7 +33,7 @@ const getShopSafeCached = async (slug: string) => {
 const getProductsCached = async (shopId: string) => {
   return unstable_cache(
     async () => {
-      const supabase = createClient(supabaseUrl, supabaseAnonKey)
+      const supabase = await createAdminClient()
       
       const { data } = await supabase
         .from("products")
