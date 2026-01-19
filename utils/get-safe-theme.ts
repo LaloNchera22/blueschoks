@@ -43,6 +43,30 @@ export const DEFAULT_THEME: ThemeConfig = {
   }
 };
 
+type Profile = Database['public']['Tables']['profiles']['Row'];
+
+// PERFIL DUMMY INFALIBLE
+// Se usa cuando Supabase falla o el usuario no tiene perfil, para evitar que la UI explote.
+export const DUMMY_PROFILE: Profile = {
+  id: "dummy-user-fallback",
+  updated_at: new Date().toISOString(),
+  shop_name: "Tienda Demo",
+  username: "tienda_demo",
+  whatsapp: null,
+  is_pro: false,
+  slug: "tienda-demo",
+  email: "demo@example.com",
+  avatar_url: null,
+  design_bg_color: null,
+  design_title_text: null,
+  design_subtitle_text: null,
+  design_title_color: null,
+  design_font: null,
+  design_card_style: null,
+  design_config: null,
+  theme_config: DEFAULT_THEME
+};
+
 /**
  * Función auxiliar para realizar un Deep Merge seguro.
  */
@@ -113,16 +137,15 @@ export function getSafeTheme(dbConfig: any): ThemeConfig {
   }
 }
 
-type Profile = Database['public']['Tables']['profiles']['Row'];
-
 interface SafeProfileResponse {
-  profile: Profile | null;
+  profile: Profile; // NUNCA puede ser null
   config: ThemeConfig;
   error: string | null;
 }
 
 /**
  * getSafeProfile: Obtención segura de perfil + config.
+ * GARANTÍA: Nunca devuelve profile: null. Si falla, devuelve DUMMY_PROFILE.
  */
 export async function getSafeProfile(userId: string): Promise<SafeProfileResponse> {
   const supabase = await createClient();
@@ -134,12 +157,12 @@ export async function getSafeProfile(userId: string): Promise<SafeProfileRespons
       .eq('id', userId)
       .single();
 
-    if (error) {
-      console.error("getSafeProfile Error:", error.message);
+    if (error || !profile) {
+      console.error("getSafeProfile Error or No Data:", error?.message);
       return {
-        profile: null,
+        profile: DUMMY_PROFILE, // FALLBACK ROBUSTO
         config: DEFAULT_THEME,
-        error: error.message
+        error: error?.message || "Profile not found"
       };
     }
 
@@ -147,7 +170,7 @@ export async function getSafeProfile(userId: string): Promise<SafeProfileRespons
     const rawConfig = profile.theme_config || profile.design_config;
 
     return {
-      profile: profile, // Supabase devuelve el tipo correcto
+      profile: profile,
       config: getSafeTheme(rawConfig),
       error: null
     };
@@ -155,7 +178,7 @@ export async function getSafeProfile(userId: string): Promise<SafeProfileRespons
   } catch (e) {
     console.error("getSafeProfile CRITICAL FAILURE:", e);
     return {
-      profile: null,
+      profile: DUMMY_PROFILE, // FALLBACK ROBUSTO
       config: DEFAULT_THEME,
       error: "Critical failure in profile fetch"
     };
