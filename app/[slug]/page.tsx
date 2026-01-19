@@ -4,26 +4,7 @@ import { createAdminClient } from '@/utils/supabase/server'
 import { DesignConfig } from '@/lib/types/design-system'
 import { CartProvider } from '@/components/shop/cart-context'
 import StoreClient from './store-client'
-
-// --- 1. CONFIGURACIÓN POR DEFECTO (Robustez) ---
-const DEFAULT_DESIGN: DesignConfig = {
-  colors: {
-    background: '#ffffff',
-    text: '#000000',
-    primary: '#000000',
-    cardBackground: '#f4f4f5'
-  },
-  fonts: {
-    heading: 'inter',
-    body: 'inter'
-  },
-  profile: {
-    shopName: 'Mi Tienda',
-    bio: '',
-    avatarUrl: ''
-  },
-  socialLinks: []
-}
+import { DEFAULT_DESIGN } from '@/utils/design-sanitizer'
 
 // --- 2. GENERATE METADATA ---
 export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }): Promise<Metadata> {
@@ -101,7 +82,14 @@ export default async function StorePage({ params }: { params: Promise<{ slug: st
       avatarUrl: rawConfig?.profile?.avatarUrl || profile.avatar_url || DEFAULT_DESIGN.profile.avatarUrl,
       displayName: rawConfig?.profile?.displayName
     },
-    socialLinks: Array.isArray(rawConfig?.socialLinks) ? rawConfig.socialLinks : DEFAULT_DESIGN.socialLinks
+    socialLinks: Array.isArray(rawConfig?.socialLinks) ? rawConfig.socialLinks : DEFAULT_DESIGN.socialLinks,
+    checkout: {
+      whatsappNumber: rawConfig?.checkout?.whatsappNumber || DEFAULT_DESIGN.checkout.whatsappNumber,
+      currency: rawConfig?.checkout?.currency || DEFAULT_DESIGN.checkout.currency,
+      showQuantitySelector: rawConfig?.checkout?.showQuantitySelector ?? DEFAULT_DESIGN.checkout.showQuantitySelector,
+      cartButtonText: rawConfig?.checkout?.cartButtonText || DEFAULT_DESIGN.checkout.cartButtonText,
+      buttonStyle: rawConfig?.checkout?.buttonStyle || DEFAULT_DESIGN.checkout.buttonStyle,
+    }
   }
 
   return (
