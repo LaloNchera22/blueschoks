@@ -27,19 +27,15 @@ export default function DashboardLayoutClient({
       />
 
       <main className="flex-1 overflow-y-auto h-full relative flex flex-col transition-all duration-300">
-        {/* Open Button - Visible only when closed */}
-        <div className={`
-            absolute top-4 left-4 z-50 transition-opacity duration-300
-            ${!isSidebarOpen ? "opacity-100 pointer-events-auto" : "opacity-0 pointer-events-none"}
-        `}>
+        <header className="sticky top-0 z-10 flex h-14 items-center gap-2 border-b bg-background/95 px-4 backdrop-blur supports-[backdrop-filter]:bg-background/60">
           <button
-            onClick={() => setIsSidebarOpen(true)}
-            className="bg-white p-2 rounded-lg border border-slate-200 shadow-sm text-slate-600 hover:text-slate-900 hover:bg-slate-50 transition-colors"
-            title="Abrir menú"
+            onClick={() => setIsSidebarOpen(!isSidebarOpen)}
+            className="p-2 rounded-lg hover:bg-slate-100 text-slate-600 transition-colors"
+            title={isSidebarOpen ? "Cerrar menú" : "Abrir menú"}
           >
             <PanelLeftOpen size={20} />
           </button>
-        </div>
+        </header>
 
         {children}
       </main>
