@@ -23,6 +23,15 @@ export interface CardStyle {
   titleColor: string;
 }
 
+export interface TextStyle {
+  fontFamily?: string;
+  bold?: boolean;
+  italic?: boolean;
+  align?: 'left' | 'center' | 'right';
+  color?: string;
+  size?: number;
+}
+
 export interface ProfileConfig {
   displayName?: string;
   bio?: string;
@@ -30,6 +39,8 @@ export interface ProfileConfig {
   shopName?: string;
   avatarShape?: 'circle' | 'rounded' | 'square';
   avatarBorderColor?: string;
+  titleStyle?: TextStyle;
+  bioStyle?: TextStyle;
 }
 
 export interface DesignConfig {

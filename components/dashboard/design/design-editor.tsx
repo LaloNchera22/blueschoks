@@ -18,7 +18,13 @@ import {
   Globe,
   Circle,
   Square,
-  Minus
+  Minus,
+  Bold,
+  Italic,
+  AlignLeft,
+  AlignCenter,
+  AlignRight,
+  Type
 } from 'lucide-react';
 import {
   DndContext,
@@ -178,7 +184,9 @@ export default function DesignEditor({ initialConfig, initialProducts, userId, s
       },
       profile: {
         ...DEFAULT_DESIGN.profile,
-        ...initialConfig.profile
+        ...initialConfig.profile,
+        titleStyle: initialConfig.profile?.titleStyle || {},
+        bioStyle: initialConfig.profile?.bioStyle || {}
       }
     };
   }, [initialConfig]);
@@ -286,6 +294,19 @@ export default function DesignEditor({ initialConfig, initialProducts, userId, s
     }
   }, [config.profile.avatarShape]);
 
+  // Helper for Text Styles
+  const getTextStyle = (type: 'title' | 'bio') => {
+    const styleConfig = type === 'title' ? config.profile.titleStyle : config.profile.bioStyle;
+    return {
+      fontFamily: styleConfig?.fontFamily || (type === 'title' ? config.fonts.heading : config.fonts.body),
+      fontWeight: styleConfig?.bold ? 'bold' : 'normal',
+      fontStyle: styleConfig?.italic ? 'italic' : 'normal',
+      textAlign: styleConfig?.align || 'center',
+      color: styleConfig?.color || config.colors.text,
+      fontSize: styleConfig?.size ? `${styleConfig.size}px` : undefined,
+    };
+  };
+
   return (
     <div className="w-full h-full relative overflow-hidden flex flex-col items-center justify-center font-sans bg-gray-50">
 
@@ -320,10 +341,10 @@ export default function DesignEditor({ initialConfig, initialProducts, userId, s
           setActiveTool('global');
         }}
       >
-        <div className="min-h-full pb-40 relative">
+        <div className="min-h-full pb-40 relative pt-32"> {/* Added pt-32 to avoid overlap with new top toolbar */}
           {/* 1. Header Section */}
           <div
-            className="pt-16 pb-8 px-6 flex flex-col items-center text-center transition-all"
+            className="pt-4 pb-8 px-6 flex flex-col items-center text-center transition-all"
           >
             {/* ATOMIC Avatar */}
             <div
@@ -358,7 +379,7 @@ export default function DesignEditor({ initialConfig, initialProducts, userId, s
                 "text-2xl font-bold leading-tight mb-2 cursor-pointer hover:opacity-80 decoration-blue-500/30 underline-offset-4",
                 activeTool === 'header-title' && "underline decoration-blue-500"
               )}
-              style={{ fontFamily: config.fonts.heading }}
+              style={getTextStyle('title')}
               onClick={(e) => {
                 e.stopPropagation();
                 setActiveTool('header-title');
@@ -373,6 +394,7 @@ export default function DesignEditor({ initialConfig, initialProducts, userId, s
                 "text-sm opacity-80 max-w-[300px] leading-relaxed mx-auto cursor-pointer hover:opacity-100 border border-transparent rounded px-2 -mx-2 transition-all",
                 activeTool === 'header-bio' && "border-blue-200 bg-blue-50/50"
               )}
+              style={getTextStyle('bio')}
               onClick={(e) => {
                 e.stopPropagation();
                 setActiveTool('header-bio');
@@ -506,13 +528,13 @@ export default function DesignEditor({ initialConfig, initialProducts, userId, s
         </div>
       </div>
 
-      {/* --- SMART TOOLBAR --- */}
-      <div className="fixed bottom-8 left-1/2 -translate-x-1/2 z-50">
-        <div className="h-16 pl-6 pr-2 rounded-full bg-white shadow-[0_8px_30px_rgb(0,0,0,0.12)] border border-gray-100 flex items-center gap-5 transition-all duration-300 ease-out backdrop-blur-md bg-white/90 supports-[backdrop-filter]:bg-white/60">
+      {/* --- SMART TOOLBAR (UPDATED POSITION & UI) --- */}
+      <div className="fixed top-20 left-1/2 -translate-x-1/2 z-50">
+        <div className="h-14 px-6 rounded-full bg-white/90 shadow-lg border border-gray-200 flex items-center gap-4 transition-all duration-300 ease-out backdrop-blur-md">
 
           {/* 1. GLOBAL TOOLS (Default) */}
           {activeTool === 'global' && (
-            <div className="flex items-center gap-5 animate-in fade-in slide-in-from-bottom-2 duration-300">
+            <div className="flex items-center gap-5 animate-in fade-in slide-in-from-top-2 duration-300">
                <div className="flex flex-col items-center gap-1 group">
                 <ColorCircle color={config.colors.background} onChange={(c) => updateConfig(['colors', 'background'], c)} />
                 <span className="text-[9px] text-gray-500 font-semibold uppercase tracking-wider group-hover:text-black transition-colors">Fondo</span>
@@ -535,6 +557,9 @@ export default function DesignEditor({ initialConfig, initialProducts, userId, s
                  <span className="text-[9px] text-gray-500 font-semibold uppercase tracking-wider group-hover:text-black transition-colors">Fuente</span>
               </div>
 
+              {/* Separator */}
+              <div className="w-px h-6 bg-gray-300" />
+
               {/* Socials Manager Button */}
               <button
                 onClick={() => setShowSocialsManager(!showSocialsManager)}
@@ -554,9 +579,118 @@ export default function DesignEditor({ initialConfig, initialProducts, userId, s
             </div>
           )}
 
-          {/* 2. HEADER AVATAR TOOLS */}
+          {/* 2. RICH TEXT TOOLS (Header Title & Bio) */}
+          {(activeTool === 'header-title' || activeTool === 'header-bio') && (
+             <div className="flex items-center gap-3 animate-in fade-in slide-in-from-top-2 duration-300">
+               {/* Font Family Dropdown */}
+               <div className="relative">
+                  <select
+                    value={(activeTool === 'header-title' ? config.profile.titleStyle?.fontFamily : config.profile.bioStyle?.fontFamily) || (activeTool === 'header-title' ? config.fonts.heading : config.fonts.body)}
+                    onChange={(e) => updateConfig(['profile', activeTool === 'header-title' ? 'titleStyle' : 'bioStyle', 'fontFamily'], e.target.value)}
+                    className="appearance-none bg-gray-50 border border-gray-200 rounded-full h-8 pl-3 pr-7 text-xs font-medium focus:outline-none focus:ring-2 focus:ring-black/5 cursor-pointer text-gray-700 hover:bg-gray-100 transition-colors w-24 truncate"
+                  >
+                    {FONTS.map(f => <option key={f.value} value={f.value}>{f.name}</option>)}
+                  </select>
+                  <ChevronDown className="w-3 h-3 absolute right-2 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none" />
+               </div>
+
+               {/* Separator */}
+               <div className="w-px h-6 bg-gray-300" />
+
+               {/* Style Toggles (Bold/Italic) */}
+               <div className="flex items-center bg-gray-50 rounded-lg p-0.5 border border-gray-200">
+                  <button
+                    onClick={() => {
+                        const styleKey = activeTool === 'header-title' ? 'titleStyle' : 'bioStyle';
+                        const current = activeTool === 'header-title' ? config.profile.titleStyle?.bold : config.profile.bioStyle?.bold;
+                        updateConfig(['profile', styleKey, 'bold'], !current);
+                    }}
+                    className={cn(
+                      "w-7 h-7 flex items-center justify-center rounded-md transition-all",
+                      (activeTool === 'header-title' ? config.profile.titleStyle?.bold : config.profile.bioStyle?.bold) ? "bg-white shadow-sm text-black" : "text-gray-500 hover:text-black"
+                    )}
+                  >
+                    <Bold className="w-4 h-4" />
+                  </button>
+                  <button
+                    onClick={() => {
+                        const styleKey = activeTool === 'header-title' ? 'titleStyle' : 'bioStyle';
+                        const current = activeTool === 'header-title' ? config.profile.titleStyle?.italic : config.profile.bioStyle?.italic;
+                        updateConfig(['profile', styleKey, 'italic'], !current);
+                    }}
+                    className={cn(
+                      "w-7 h-7 flex items-center justify-center rounded-md transition-all",
+                      (activeTool === 'header-title' ? config.profile.titleStyle?.italic : config.profile.bioStyle?.italic) ? "bg-white shadow-sm text-black" : "text-gray-500 hover:text-black"
+                    )}
+                  >
+                    <Italic className="w-4 h-4" />
+                  </button>
+               </div>
+
+               {/* Alignment Group */}
+               <div className="flex items-center bg-gray-50 rounded-lg p-0.5 border border-gray-200">
+                  {['left', 'center', 'right'].map((align) => (
+                    <button
+                      key={align}
+                      onClick={() => updateConfig(['profile', activeTool === 'header-title' ? 'titleStyle' : 'bioStyle', 'align'], align)}
+                      className={cn(
+                        "w-7 h-7 flex items-center justify-center rounded-md transition-all",
+                        ((activeTool === 'header-title' ? config.profile.titleStyle?.align : config.profile.bioStyle?.align) || 'center') === align ? "bg-white shadow-sm text-black" : "text-gray-500 hover:text-black"
+                      )}
+                    >
+                      {align === 'left' && <AlignLeft className="w-4 h-4" />}
+                      {align === 'center' && <AlignCenter className="w-4 h-4" />}
+                      {align === 'right' && <AlignRight className="w-4 h-4" />}
+                    </button>
+                  ))}
+               </div>
+
+               {/* Separator */}
+               <div className="w-px h-6 bg-gray-300" />
+
+               {/* Color */}
+               <ColorCircle
+                  color={(activeTool === 'header-title' ? config.profile.titleStyle?.color : config.profile.bioStyle?.color) || config.colors.text}
+                  onChange={(c) => updateConfig(['profile', activeTool === 'header-title' ? 'titleStyle' : 'bioStyle', 'color'], c)}
+               />
+
+               {/* Size (Simple +/-) - Optional per requirements, added as simple toggles if needed, but space is tight.
+                   Prompt said "Opcional si cabe". We have 5 groups.
+                   Let's add simple size buttons? Or maybe stick to prompt strictly.
+                   Prompt: "Un control simple [-] 16px [+]".
+               */}
+               <div className="flex items-center gap-1 bg-gray-50 rounded-full border border-gray-200 px-1 ml-1">
+                  <button
+                    onClick={() => {
+                        const styleKey = activeTool === 'header-title' ? 'titleStyle' : 'bioStyle';
+                        const currentSize = (activeTool === 'header-title' ? config.profile.titleStyle?.size : config.profile.bioStyle?.size) || (activeTool === 'header-title' ? 24 : 14);
+                        updateConfig(['profile', styleKey, 'size'], Math.max(10, currentSize - 1));
+                    }}
+                    className="w-6 h-6 flex items-center justify-center text-gray-500 hover:text-black"
+                  >
+                    <Minus className="w-3 h-3" />
+                  </button>
+                  <span className="text-[10px] font-medium w-4 text-center">
+                    {(activeTool === 'header-title' ? config.profile.titleStyle?.size : config.profile.bioStyle?.size) || (activeTool === 'header-title' ? 24 : 14)}
+                  </span>
+                   {/* Using Type icon as a plus equivalent or just custom plus */}
+                   <button
+                    onClick={() => {
+                        const styleKey = activeTool === 'header-title' ? 'titleStyle' : 'bioStyle';
+                        const currentSize = (activeTool === 'header-title' ? config.profile.titleStyle?.size : config.profile.bioStyle?.size) || (activeTool === 'header-title' ? 24 : 14);
+                        updateConfig(['profile', styleKey, 'size'], Math.min(64, currentSize + 1));
+                    }}
+                    className="w-6 h-6 flex items-center justify-center text-gray-500 hover:text-black"
+                  >
+                     <Type className="w-3 h-3" />
+                  </button>
+               </div>
+             </div>
+          )}
+
+          {/* 3. HEADER AVATAR TOOLS (Existing, but moved to top) */}
           {activeTool === 'header-avatar' && (
-            <div className="flex items-center gap-4 animate-in fade-in slide-in-from-bottom-2 duration-300">
+            <div className="flex items-center gap-4 animate-in fade-in slide-in-from-top-2 duration-300">
               {/* Image Input */}
               <input
                 type="text"
@@ -626,43 +760,9 @@ export default function DesignEditor({ initialConfig, initialProducts, userId, s
             </div>
           )}
 
-          {/* 3. HEADER TITLE TOOLS */}
-          {activeTool === 'header-title' && (
-             <div className="flex items-center gap-4 animate-in fade-in slide-in-from-bottom-2 duration-300">
-               <input
-                type="text"
-                value={config.profile.shopName || ''}
-                onChange={(e) => updateConfig(['profile', 'shopName'], e.target.value)}
-                placeholder="Nombre Tienda"
-                className="h-8 rounded-full border border-gray-200 bg-gray-50 px-3 text-xs w-36 focus:outline-none focus:ring-2 focus:ring-black/5"
-              />
-              <div className="flex flex-col items-center gap-1">
-                <ColorCircle color={config.colors.text} onChange={(c) => updateConfig(['colors', 'text'], c)} />
-                <span className="text-[9px] text-gray-500 font-semibold uppercase tracking-wider">Texto</span>
-              </div>
-             </div>
-          )}
-
-          {/* 4. HEADER BIO TOOLS */}
-          {activeTool === 'header-bio' && (
-             <div className="flex items-center gap-4 animate-in fade-in slide-in-from-bottom-2 duration-300">
-               <input
-                type="text"
-                value={config.profile.bio || ''}
-                onChange={(e) => updateConfig(['profile', 'bio'], e.target.value)}
-                placeholder="Descripción corta"
-                className="h-8 rounded-full border border-gray-200 bg-gray-50 px-3 text-xs w-48 focus:outline-none focus:ring-2 focus:ring-black/5"
-              />
-              <div className="flex flex-col items-center gap-1">
-                <ColorCircle color={config.colors.text} onChange={(c) => updateConfig(['colors', 'text'], c)} />
-                <span className="text-[9px] text-gray-500 font-semibold uppercase tracking-wider">Texto</span>
-              </div>
-             </div>
-          )}
-
-          {/* 5. ATOMIC SOCIAL ICON */}
+          {/* 5. ATOMIC SOCIAL ICON (Existing) */}
           {activeTool?.startsWith('social-icon-') && selectedSocialLink && (
-             <div className="flex items-center gap-4 animate-in fade-in slide-in-from-bottom-2 duration-300">
+             <div className="flex items-center gap-4 animate-in fade-in slide-in-from-top-2 duration-300">
                 <div className="flex flex-col items-center gap-1">
                   <ColorCircle
                     color={selectedSocialLink.color || config.colors.primary}
@@ -690,9 +790,9 @@ export default function DesignEditor({ initialConfig, initialProducts, userId, s
              </div>
           )}
 
-          {/* 6. CARD BUTTON TOOLS */}
+          {/* 6. CARD BUTTON TOOLS (Existing) */}
           {activeTool === 'card-button' && (
-            <div className="flex items-center gap-4 animate-in fade-in slide-in-from-bottom-2 duration-300">
+            <div className="flex items-center gap-4 animate-in fade-in slide-in-from-top-2 duration-300">
                <div className="flex flex-col items-center gap-1">
                   <ColorCircle color={config.cardStyle?.buttonColor || '#000000'} onChange={(c) => updateConfig(['cardStyle', 'buttonColor'], c)} />
                   <span className="text-[9px] text-gray-500 font-semibold uppercase tracking-wider">Fondo</span>
@@ -717,9 +817,9 @@ export default function DesignEditor({ initialConfig, initialProducts, userId, s
             </div>
           )}
 
-          {/* 7. CARD TITLE/PRICE TOOLS */}
+          {/* 7. CARD TITLE/PRICE TOOLS (Existing) */}
           {(activeTool === 'card-title' || activeTool === 'card-price') && (
-             <div className="flex items-center gap-4 animate-in fade-in slide-in-from-bottom-2 duration-300">
+             <div className="flex items-center gap-4 animate-in fade-in slide-in-from-top-2 duration-300">
                 <div className="flex flex-col items-center gap-1">
                   <ColorCircle
                     color={activeTool === 'card-title' ? (config.cardStyle?.titleColor || config.colors.text) : (config.cardStyle?.priceColor || config.colors.text)}
