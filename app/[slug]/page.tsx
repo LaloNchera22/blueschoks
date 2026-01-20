@@ -89,6 +89,13 @@ export default async function StorePage({ params }: { params: Promise<{ slug: st
       showQuantitySelector: rawConfig?.checkout?.showQuantitySelector ?? DEFAULT_DESIGN.checkout.showQuantitySelector,
       cartButtonText: rawConfig?.checkout?.cartButtonText || DEFAULT_DESIGN.checkout.cartButtonText,
       buttonStyle: rawConfig?.checkout?.buttonStyle || DEFAULT_DESIGN.checkout.buttonStyle,
+    },
+    cardStyle: {
+      borderRadius: rawConfig?.cardStyle?.borderRadius ?? DEFAULT_DESIGN.cardStyle.borderRadius,
+      buttonColor: rawConfig?.cardStyle?.buttonColor || DEFAULT_DESIGN.cardStyle.buttonColor,
+      buttonTextColor: rawConfig?.cardStyle?.buttonTextColor || DEFAULT_DESIGN.cardStyle.buttonTextColor,
+      priceColor: rawConfig?.cardStyle?.priceColor || DEFAULT_DESIGN.cardStyle.priceColor,
+      titleColor: rawConfig?.cardStyle?.titleColor || DEFAULT_DESIGN.cardStyle.titleColor,
     }
   }
 
