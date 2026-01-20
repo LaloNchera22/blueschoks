@@ -15,6 +15,7 @@ export function StickyHeader({ isSidebarOpen, onOpen }: StickyHeaderProps) {
     `}>
       <button
         onClick={onOpen}
+        suppressHydrationWarning={true}
         className="bg-white p-2 rounded-lg border border-slate-200 shadow-sm text-slate-600 hover:text-slate-900 hover:bg-slate-50 transition-colors"
         title="Abrir menú"
       >
