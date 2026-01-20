@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState, useEffect, useMemo } from 'react';
+import Image from 'next/image';
 import {
   Palette,
   User,
@@ -19,6 +20,7 @@ import { toast } from 'sonner';
 
 import { DesignConfig, LinkItem } from '@/lib/types/design-system';
 import { saveDesignConfig } from '@/app/dashboard/actions/design-actions';
+import { Database } from '@/utils/supabase/types';
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -28,43 +30,72 @@ import { cn } from "@/lib/utils";
 
 // --- TYPES ---
 
+type Product = Database['public']['Tables']['products']['Row'];
+
 interface DesignEditorProps {
   initialConfig: DesignConfig;
+  initialProducts: Product[];
   userId: string;
   slug: string;
 }
 
-type ToolType = 'global' | 'profile' | 'cards' | 'socials' | null;
+// "header" maps to the Profile/Header section as requested
+type ToolType = 'global' | 'header' | 'cards' | 'socials' | null;
 
 // --- DUMMY DATA FOR PREVIEW ---
+// Used only if no real products are passed
 const DUMMY_PRODUCTS = [
-  { id: 1, title: 'Camiseta Básica', price: '$25.00', image: 'https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?w=500&auto=format&fit=crop&q=60' },
-  { id: 2, title: 'Gorra Urbana', price: '$15.00', image: 'https://images.unsplash.com/photo-1588850561407-ed78c282e89b?w=500&auto=format&fit=crop&q=60' },
-  { id: 3, title: 'Sneakers Pro', price: '$120.00', image: 'https://images.unsplash.com/photo-1552346154-21d32810aba3?w=500&auto=format&fit=crop&q=60' },
-  { id: 4, title: 'Mochila Viaje', price: '$45.00', image: 'https://images.unsplash.com/photo-1553062407-98eeb64c6a62?w=500&auto=format&fit=crop&q=60' },
+  { id: '1', name: 'Camiseta Básica', price: 25.00, image_url: 'https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?w=500&auto=format&fit=crop&q=60' },
+  { id: '2', name: 'Gorra Urbana', price: 15.00, image_url: 'https://images.unsplash.com/photo-1588850561407-ed78c282e89b?w=500&auto=format&fit=crop&q=60' },
+  { id: '3', name: 'Sneakers Pro', price: 120.00, image_url: 'https://images.unsplash.com/photo-1552346154-21d32810aba3?w=500&auto=format&fit=crop&q=60' },
+  { id: '4', name: 'Mochila Viaje', price: 45.00, image_url: 'https://images.unsplash.com/photo-1553062407-98eeb64c6a62?w=500&auto=format&fit=crop&q=60' },
 ];
 
 // --- STORE PREVIEW COMPONENT ---
-// This component renders inside the "Phone"
-const StorePreview = ({ config }: { config: DesignConfig }) => {
+interface StorePreviewProps {
+    config: DesignConfig;
+    products: Product[];
+    onSelectTool: (tool: ToolType) => void;
+}
+
+const StorePreview = ({ config, products, onSelectTool }: StorePreviewProps) => {
   const { colors, fonts, profile, checkout } = config;
+
+  // Use real products or fallback to dummy
+  const displayProducts = products.length > 0 ? products : DUMMY_PRODUCTS;
 
   return (
     <div
-      className="w-full h-full overflow-y-auto scrollbar-hide flex flex-col"
+      className="w-full h-full overflow-y-auto scrollbar-hide flex flex-col relative group/preview"
       style={{
         backgroundColor: colors.background,
         color: colors.text,
         fontFamily: fonts.body
       }}
+      onClick={() => onSelectTool('global')} // Background Zone
     >
-      {/* Header */}
-      <div className="p-6 flex flex-col items-center text-center space-y-4 pt-12">
-        <div className="w-24 h-24 rounded-full overflow-hidden border-4 border-white/20 shadow-lg">
+        {/* Background Hint (only visible when hovering global area but not inner zones) */}
+        {/* We rely on the inner zones stopping propagation to differentiate actions */}
+
+      {/* Header Zone */}
+      <div
+        className="p-6 flex flex-col items-center text-center space-y-4 pt-12 cursor-pointer hover:ring-2 hover:ring-indigo-500 hover:bg-black/5 transition-all rounded-b-3xl"
+        onClick={(e) => {
+            e.stopPropagation();
+            onSelectTool('header');
+        }}
+      >
+        <div className="w-24 h-24 rounded-full overflow-hidden border-4 border-white/20 shadow-lg relative bg-gray-200">
           {profile.avatarUrl ? (
-            <img src={profile.avatarUrl} alt="Avatar" className="w-full h-full object-cover" />
+            <Image
+                src={profile.avatarUrl}
+                alt="Avatar"
+                fill
+                className="object-cover"
+                sizes="96px"
+            />
           ) : (
-            <div className="w-full h-full bg-gray-200 flex items-center justify-center text-gray-400">
+            <div className="w-full h-full flex items-center justify-center text-gray-400">
               <User className="w-8 h-8" />
             </div>
           )}
@@ -82,7 +113,7 @@ const StorePreview = ({ config }: { config: DesignConfig }) => {
         </div>
 
         {/* Social Pills */}
-        <div className="flex gap-2 flex-wrap justify-center">
+        <div className="flex gap-2 flex-wrap justify-center pointer-events-none">
             {config.socialLinks?.filter(l => l.active).map((link, i) => (
                 <div
                     key={i}
@@ -94,21 +125,41 @@ const StorePreview = ({ config }: { config: DesignConfig }) => {
         </div>
       </div>
 
-      {/* Grid of Products */}
-      <div className="flex-1 px-4 pb-20">
+      {/* Grid of Products Zone */}
+      <div className="flex-1 px-4 pb-20 mt-4">
         <div className="grid grid-cols-2 gap-3">
-          {DUMMY_PRODUCTS.map((product) => (
+          {displayProducts.map((product) => (
             <div
               key={product.id}
-              className="rounded-xl overflow-hidden shadow-sm flex flex-col"
+              className="rounded-xl overflow-hidden shadow-sm flex flex-col cursor-pointer hover:ring-2 hover:ring-indigo-500 transition-all group/card"
               style={{ backgroundColor: colors.cardBackground }}
+              onClick={(e) => {
+                  e.stopPropagation();
+                  onSelectTool('cards');
+              }}
             >
               <div className="aspect-square bg-gray-100 relative">
-                 <img src={product.image} alt={product.title} className="w-full h-full object-cover" />
+                 {product.image_url ? (
+                     <Image
+                        src={product.image_url}
+                        alt={product.name}
+                        fill
+                        className="object-cover"
+                        sizes="(max-width: 768px) 50vw, 33vw"
+                     />
+                 ) : (
+                    <div className="w-full h-full flex items-center justify-center text-gray-300 bg-gray-50">
+                        <Smartphone className="w-8 h-8" />
+                    </div>
+                 )}
               </div>
               <div className="p-3 flex flex-col gap-1">
-                <span className="text-xs font-medium opacity-90 line-clamp-1">{product.title}</span>
-                <span className="text-sm font-bold">{product.price}</span>
+                <span className="text-xs font-medium opacity-90 line-clamp-1 group-hover/card:text-indigo-600 transition-colors">
+                    {product.name}
+                </span>
+                <span className="text-sm font-bold">
+                    ${typeof product.price === 'number' ? product.price.toFixed(2) : product.price}
+                </span>
                 {checkout?.showQuantitySelector && (
                     <div className="flex items-center gap-2 mt-1 text-xs opacity-50">
                         <span>-</span> 1 <span>+</span>
@@ -121,12 +172,12 @@ const StorePreview = ({ config }: { config: DesignConfig }) => {
       </div>
 
       {/* Sticky Cart Button Preview */}
-      <div className="absolute bottom-6 left-0 right-0 px-6">
+      <div className="absolute bottom-6 left-0 right-0 px-6 pointer-events-none">
           <div
             className="w-full py-3 rounded-full text-center font-bold text-sm shadow-xl"
             style={{
                 backgroundColor: colors.primary,
-                color: '#ffffff' // Assuming white text on primary for now, could be calculated
+                color: '#ffffff'
             }}
           >
               {checkout?.cartButtonText || 'Ver Carrito'}
@@ -139,7 +190,7 @@ const StorePreview = ({ config }: { config: DesignConfig }) => {
 
 // --- MAIN EDITOR COMPONENT ---
 
-export default function DesignEditor({ initialConfig, userId, slug }: DesignEditorProps) {
+export default function DesignEditor({ initialConfig, initialProducts, userId, slug }: DesignEditorProps) {
   const [config, setConfig] = useState<DesignConfig>(initialConfig);
   const [activeTool, setActiveTool] = useState<ToolType>(null);
   const [isSaving, setIsSaving] = useState(false);
@@ -215,7 +266,7 @@ export default function DesignEditor({ initialConfig, userId, slug }: DesignEdit
         <div className="relative z-0 transform transition-all duration-500 ease-in-out">
             <div className="w-[380px] h-[750px] bg-white rounded-[40px] border-[8px] border-gray-900 shadow-2xl overflow-hidden relative mx-auto">
                 {/* Status Bar Fake */}
-                <div className="absolute top-0 left-0 right-0 h-6 bg-black/20 z-10 flex justify-between px-6 items-center">
+                <div className="absolute top-0 left-0 right-0 h-6 bg-black/20 z-10 flex justify-between px-6 items-center pointer-events-none">
                     <div className="text-[10px] text-white font-medium">9:41</div>
                     <div className="flex gap-1">
                         <div className="w-3 h-3 bg-white/80 rounded-full"></div>
@@ -224,10 +275,14 @@ export default function DesignEditor({ initialConfig, userId, slug }: DesignEdit
                 </div>
 
                 {/* Island / Notch */}
-                <div className="absolute top-2 left-1/2 -translate-x-1/2 w-24 h-6 bg-black rounded-full z-20"></div>
+                <div className="absolute top-2 left-1/2 -translate-x-1/2 w-24 h-6 bg-black rounded-full z-20 pointer-events-none"></div>
 
                 {/* Content */}
-                <StorePreview config={config} />
+                <StorePreview
+                    config={config}
+                    products={initialProducts}
+                    onSelectTool={setActiveTool}
+                />
             </div>
         </div>
 
@@ -238,7 +293,7 @@ export default function DesignEditor({ initialConfig, userId, slug }: DesignEdit
                     <div className="flex justify-between items-center mb-4 border-b pb-2">
                         <h3 className="font-semibold text-gray-800 capitalize">
                             {activeTool === 'global' && 'Estilos Globales'}
-                            {activeTool === 'profile' && 'Perfil de Tienda'}
+                            {activeTool === 'header' && 'Perfil de Tienda'}
                             {activeTool === 'cards' && 'Tarjetas de Producto'}
                             {activeTool === 'socials' && 'Enlaces Sociales'}
                         </h3>
@@ -295,8 +350,8 @@ export default function DesignEditor({ initialConfig, userId, slug }: DesignEdit
                             </div>
                         )}
 
-                        {/* PROFILE TOOLS */}
-                        {activeTool === 'profile' && (
+                        {/* PROFILE / HEADER TOOLS */}
+                        {activeTool === 'header' && (
                             <div className="space-y-4">
                                 <div className="space-y-2">
                                     <Label className="text-xs">Nombre de la Tienda</Label>
@@ -425,8 +480,8 @@ export default function DesignEditor({ initialConfig, userId, slug }: DesignEdit
             <DockButton
                 icon={User}
                 label="Perfil"
-                isActive={activeTool === 'profile'}
-                onClick={() => toggleTool('profile')}
+                isActive={activeTool === 'header'}
+                onClick={() => toggleTool('header')}
             />
             <DockButton
                 icon={LayoutTemplate}

@@ -16,19 +16,23 @@ export default async function DesignPage() {
     return redirect("/login");
   }
 
-  // 1. Fetch RAW data
-  const { data: profile, error } = await supabase
-    .from('profiles')
-    .select('*')
-    .eq('id', user.id)
-    .single();
+  // 1. Fetch RAW data (Profile & Products)
+  // We use Promise.all to fetch in parallel
+  const [profileResponse, productsResponse] = await Promise.all([
+    supabase.from('profiles').select('*').eq('id', user.id).single(),
+    supabase.from('products').select('*').eq('user_id', user.id).order('created_at', { ascending: false })
+  ]);
 
-  if (error || !profile) {
-    console.error("DesignPage: Error fetching profile", error);
+  const profile = profileResponse.data;
+  const products = productsResponse.data || [];
+
+  if (profileResponse.error || !profile) {
+    console.error("DesignPage: Error fetching profile", profileResponse.error);
     // Even if DB fails, return a working UI with defaults
     return (
       <DesignEditor
         initialConfig={DEFAULT_DESIGN}
+        initialProducts={[]}
         userId={user.id}
         slug={user.id} // Fallback slug
       />
@@ -52,6 +56,7 @@ export default async function DesignPage() {
     <div className="h-[calc(100vh-4rem)] w-full bg-gray-50 overflow-hidden">
       <DesignEditor
         initialConfig={cleanConfig}
+        initialProducts={products}
         userId={user.id}
         slug={validSlug}
       />
