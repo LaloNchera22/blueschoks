@@ -41,7 +41,8 @@ export default async function DesignPage() {
   // The sanitizer will perform a HARD RESET if the structure doesn't match the new DesignConfig.
 
   // Note: We pass the profile to help populate default fields like shopName/avatar if config is missing.
-  const rawConfig = profile.theme_config || profile.design_config;
+  // FIX: Prioritize design_config (new) over theme_config (legacy) to ensure persistence.
+  const rawConfig = profile.design_config || profile.theme_config;
   const cleanConfig = sanitizeDesign(rawConfig, profile);
 
   // Guarantee valid slug
