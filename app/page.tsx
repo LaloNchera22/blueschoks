@@ -32,18 +32,18 @@ export default function LandingPage() {
         <div className="flex flex-col items-center w-full transform -translate-y-4"> {/* Pequeño ajuste visual hacia arriba */}
 
             {/* Badge */}
-            <div className="inline-flex items-center gap-2 bg-slate-100 border border-slate-200 text-slate-600 px-3 py-1 rounded-full text-[10px] sm:text-xs font-bold uppercase tracking-wide mb-5 shadow-sm">
+            <div className="inline-flex items-center gap-2 bg-slate-100 border border-slate-200 text-slate-600 px-4 py-1.5 rounded-full text-[10px] sm:text-xs font-bold uppercase tracking-wide mb-8 shadow-sm">
               <span>✨ La nueva forma de vender online</span>
             </div>
 
             {/* Título: Tamaños ajustados para no comerse toda la pantalla en laptops */}
-            <h1 className="text-4xl md:text-6xl lg:text-7xl font-black tracking-tighter text-[#0F172A] mb-4 leading-[1.05]">
+            <h1 className="text-4xl md:text-6xl lg:text-7xl font-black tracking-tighter text-[#0F172A] mb-6 leading-[1.15]">
               Tu Tienda Online <br />
               En 30 Segundos.
             </h1>
 
             {/* Subtítulo */}
-            <p className="text-base md:text-lg text-slate-500 max-w-xl mb-8 leading-relaxed mx-auto font-medium">
+            <p className="text-base md:text-lg text-slate-500 max-w-xl mb-10 leading-relaxed mx-auto font-medium">
               Crea tu catálogo digital, comparte el link y recibe pedidos directamente en tu WhatsApp. Sin comisiones.
             </p>
 
