@@ -1,27 +1,21 @@
 'use client';
 
-import React, { useState, useMemo, useEffect, useRef } from 'react';
+import React, { useState, useMemo } from 'react';
 import Image from 'next/image';
 import { toast } from 'sonner';
 import {
-  Type,
-  Palette,
-  Bold,
   Save,
   Loader2,
   ChevronDown,
   Smartphone,
-  Check,
   Instagram,
   Facebook,
   Twitter,
   Link as LinkIcon,
   MessageCircle,
-  Plus,
   Trash2,
-  MoveHorizontal,
-  Globe,
-  MoreHorizontal
+  MoreHorizontal,
+  Globe
 } from 'lucide-react';
 import {
   DndContext,
@@ -30,7 +24,6 @@ import {
   PointerSensor,
   useSensor,
   useSensors,
-  DragOverlay
 } from '@dnd-kit/core';
 import {
   arrayMove,
@@ -275,211 +268,221 @@ export default function DesignEditor({ initialConfig, initialProducts, userId, s
   }, [activeTool, config.socialLinks]);
 
   return (
-    <div className="w-full h-[calc(100vh-64px)] relative overflow-hidden flex flex-col items-center justify-center font-sans bg-gray-50">
+    <div className="w-full h-[calc(100vh-60px)] relative overflow-hidden flex flex-col items-center justify-center font-sans bg-gray-50">
 
       {/* --- ATMOSPHERIC BACKGROUND --- */}
       <div
-        className="absolute inset-0 transition-colors duration-1000 ease-in-out"
+        className="absolute inset-0 transition-colors duration-1000 ease-in-out pointer-events-none"
         style={{ backgroundColor: config.colors.background }}
       />
       {/* Blurred overlay that takes the primary color to create atmosphere */}
       <div
-        className="absolute inset-0 opacity-40 backdrop-blur-3xl"
+        className="absolute inset-0 opacity-40 backdrop-blur-3xl pointer-events-none"
         style={{
           background: `radial-gradient(circle at 50% 50%, ${config.colors.primary} 0%, transparent 70%)`
         }}
       />
-      <div className="absolute inset-0 bg-white/20 backdrop-blur-3xl" />
+      <div className="absolute inset-0 bg-white/20 backdrop-blur-3xl pointer-events-none" />
 
 
-      {/* --- PREVIEW CANVAS (Floating Window) --- */}
-      <div className="relative z-10 w-full max-w-[420px] h-[calc(100%-100px)] max-h-[800px] shadow-2xl shadow-black/20 rounded-[32px] border border-white/40 overflow-hidden flex flex-col my-6 ring-1 ring-black/5 bg-white">
-
-        {/* --- INTERACTIVE STORE CONTENT --- */}
+      {/* --- EDGE-TO-EDGE STORE CONTENT (Full Width/Height Scrollable) --- */}
+      <div
+        className={cn(
+          "w-full h-full overflow-y-auto [&::-webkit-scrollbar]:hidden [-ms-overflow-style:'none'] [scrollbar-width:none] relative z-10",
+          activeTool === 'global' && "outline-none" // Removed visible ring for immersion
+        )}
+        style={{
+          // We don't force background here to let the atmospheric background show through,
+          // or we can set it to config.colors.background if opaque is desired.
+          // Based on "immersive", we likely want the atmospheric background to be THE background.
+          // However, to ensure text legibility, we might want the store to have its own background color.
+          // The prompt says "flotando sobre el fondo atmosférico".
+          // But also "La tienda debe verse como si ocupara toda la pantalla".
+          // If we make this transparent, we see the atmosphere.
+          // If we set bg color, we see the color.
+          // I will set the background color but ensure it matches the theme.
+          // The Atmospheric background is already derived from config.colors.background.
+          // So setting backgroundColor here to transparent allows the "Atmosphere" (radial gradient) to show.
+          // If I set it to solid config.colors.background, I lose the atmosphere.
+          // I will set it to transparent here so the parent's atmospheric background acts as the store background.
+          backgroundColor: 'transparent',
+          color: config.colors.text,
+          fontFamily: config.fonts.body
+        }}
+        onClick={(e) => {
+          e.stopPropagation();
+          setActiveTool('global');
+        }}
+      >
+        {/* 1. Header Section */}
         <div
           className={cn(
-            "w-full h-full overflow-y-auto scrollbar-hide transition-colors duration-300 relative",
-            activeTool === 'global' && "ring-inset ring-4 ring-blue-500/20"
+            "pt-16 pb-8 px-6 flex flex-col items-center text-center cursor-pointer transition-all",
+            activeTool === 'header' && "bg-black/5 rounded-xl mx-4 mt-12"
           )}
-          style={{
-            backgroundColor: config.colors.background,
-            color: config.colors.text,
-            fontFamily: config.fonts.body
-          }}
           onClick={(e) => {
             e.stopPropagation();
-            setActiveTool('global');
+            setActiveTool('header');
           }}
         >
-          {/* 1. Header Section */}
-          <div
-            className={cn(
-              "pt-16 pb-8 px-6 flex flex-col items-center text-center cursor-pointer transition-all hover:bg-black/5",
-              activeTool === 'header' && "ring-2 ring-blue-500 ring-offset-2 ring-offset-transparent bg-black/5 rounded-xl mx-2 mt-12"
+          {/* Avatar */}
+          <div className="w-24 h-24 rounded-full overflow-hidden bg-gray-100 mb-4 border-4 border-white shadow-sm relative">
+            {config.profile.avatarUrl ? (
+              <Image src={config.profile.avatarUrl} alt="Shop Avatar" fill className="object-cover" />
+            ) : (
+              <div className="w-full h-full flex items-center justify-center text-gray-400">
+                <Smartphone className="w-8 h-8" />
+              </div>
             )}
-            onClick={(e) => {
-              e.stopPropagation();
-              setActiveTool('header');
-            }}
+          </div>
+
+          {/* Shop Info */}
+          <h1
+            className="text-2xl font-bold leading-tight mb-2"
+            style={{ fontFamily: config.fonts.heading }}
           >
-            {/* Avatar */}
-            <div className="w-24 h-24 rounded-full overflow-hidden bg-gray-100 mb-4 border-4 border-white shadow-sm relative">
-              {config.profile.avatarUrl ? (
-                <Image src={config.profile.avatarUrl} alt="Shop Avatar" fill className="object-cover" />
-              ) : (
-                <div className="w-full h-full flex items-center justify-center text-gray-400">
-                  <Smartphone className="w-8 h-8" />
-                </div>
-              )}
-            </div>
+            {config.profile.shopName || 'Mi Tienda'}
+          </h1>
+          <p className="text-sm opacity-80 max-w-[300px] leading-relaxed mx-auto">
+            {config.profile.bio || 'Bienvenido a mi tienda online'}
+          </p>
 
-            {/* Shop Info */}
-            <h1
-              className="text-2xl font-bold leading-tight mb-2"
-              style={{ fontFamily: config.fonts.heading }}
-            >
-              {config.profile.shopName || 'Mi Tienda'}
-            </h1>
-            <p className="text-sm opacity-80 max-w-[240px] leading-relaxed">
-              {config.profile.bio || 'Bienvenido a mi tienda online'}
-            </p>
-
-            {/* Social Icons (Atomic) */}
-            <div className="flex flex-wrap justify-center gap-3 mt-6">
-              {config.socialLinks.map((link) => {
-                const Icon = PLATFORMS.find(p => p.id === link.platform)?.icon || LinkIcon;
-                const isSelected = activeTool === `social-icon-${link.id}`;
-                return (
-                  <button
-                    key={link.id}
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      setActiveTool(`social-icon-${link.id}` as ToolType);
-                    }}
-                    className={cn(
-                      "w-10 h-10 flex items-center justify-center rounded-full transition-all hover:scale-110 shadow-sm",
-                      isSelected ? "ring-2 ring-blue-500 ring-offset-2" : "hover:shadow-md"
-                    )}
-                    style={{
-                      backgroundColor: link.color || config.colors.primary,
-                      color: '#ffffff' // Assuming white icons for contrast
-                    }}
-                  >
-                    <Icon className="w-5 h-5" strokeWidth={1.5} />
-                  </button>
-                )
-              })}
-              {config.socialLinks.length === 0 && (
-                <div className="text-xs text-gray-400 border border-dashed border-gray-300 rounded-full px-3 py-1">
-                  Sin redes sociales
-                </div>
-              )}
-            </div>
-          </div>
-
-          {/* 2. Products Grid (Card 2.0) */}
-          <div className="px-4 pb-32">
-            <div className="grid grid-cols-2 gap-3">
-              {displayProducts.map((p) => (
-                <div
-                  key={p.id}
-                  className="rounded-xl overflow-hidden shadow-sm flex flex-col group relative"
-                  style={{ backgroundColor: config.colors.cardBackground }}
+          {/* Social Icons (Atomic) */}
+          <div className="flex flex-wrap justify-center gap-3 mt-6">
+            {config.socialLinks.map((link) => {
+              const Icon = PLATFORMS.find(p => p.id === link.platform)?.icon || LinkIcon;
+              const isSelected = activeTool === `social-icon-${link.id}`;
+              return (
+                <button
+                  key={link.id}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setActiveTool(`social-icon-${link.id}` as ToolType);
+                  }}
+                  className={cn(
+                    "w-10 h-10 flex items-center justify-center rounded-full transition-all hover:scale-110 shadow-sm",
+                    isSelected ? "ring-2 ring-blue-500 ring-offset-2" : "hover:shadow-md"
+                  )}
+                  style={{
+                    backgroundColor: link.color || config.colors.primary,
+                    color: '#ffffff'
+                  }}
                 >
-                  {/* Image Aspect Ratio 4:5 */}
-                  <div className="aspect-[4/5] bg-gray-100 relative overflow-hidden">
-                    {p.image_url && (
-                      <Image
-                        src={p.image_url}
-                        alt={p.name}
-                        fill
-                        className="object-cover group-hover:scale-105 transition-transform duration-500"
-                      />
-                    )}
-                    {/* Quantity Selector Visual */}
-                    <div className="absolute bottom-2 right-2 bg-white/90 backdrop-blur-sm rounded-full px-2 py-1 text-[10px] font-medium shadow-sm flex items-center gap-2">
-                       <span>-</span> 1 <span>+</span>
-                    </div>
-                  </div>
+                  <Icon className="w-5 h-5" strokeWidth={1.5} />
+                </button>
+              )
+            })}
+            {config.socialLinks.length === 0 && (
+              <div className="text-xs text-gray-400 border border-dashed border-gray-300 rounded-full px-3 py-1">
+                Sin redes sociales
+              </div>
+            )}
+          </div>
+        </div>
 
-                  <div className="p-3 flex flex-col gap-1">
-                     {/* Atomic Title */}
-                     <p
-                       className={cn(
-                         "text-xs font-medium opacity-90 line-clamp-1 cursor-pointer hover:underline decoration-1 underline-offset-2",
-                         activeTool === 'card-title' && "ring-1 ring-blue-500 bg-blue-50/50 rounded px-1 -mx-1"
-                       )}
-                       style={{ color: config.cardStyle?.titleColor || config.colors.text }}
-                       onClick={(e) => {
-                         e.stopPropagation();
-                         setActiveTool('card-title');
-                       }}
-                     >
-                       {p.name}
-                     </p>
-
-                     {/* Atomic Price */}
-                     <p
-                       className={cn(
-                        "text-sm font-bold mt-0.5 cursor-pointer hover:opacity-80",
-                        activeTool === 'card-price' && "ring-1 ring-blue-500 bg-blue-50/50 rounded px-1 -mx-1 w-fit"
-                       )}
-                       style={{ color: config.cardStyle?.priceColor || config.colors.text }}
-                       onClick={(e) => {
-                         e.stopPropagation();
-                         setActiveTool('card-price');
-                       }}
-                     >
-                       ${Number(p.price).toFixed(2)}
-                     </p>
-
-                     {/* Atomic Button */}
-                     <button
-                        className={cn(
-                          "mt-2 w-full h-8 flex items-center justify-center text-xs font-medium transition-all hover:opacity-90 active:scale-95",
-                          activeTool === 'card-button' && "ring-2 ring-blue-500 ring-offset-1"
-                        )}
-                        style={{
-                          backgroundColor: config.cardStyle?.buttonColor || config.colors.primary,
-                          color: config.cardStyle?.buttonTextColor || '#ffffff',
-                          borderRadius: `${config.cardStyle?.borderRadius || 8}px`
-                        }}
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          setActiveTool('card-button');
-                        }}
-                     >
-                       Agregar
-                     </button>
+        {/* 2. Products Grid (Card 2.0) */}
+        {/* Added max-w-md to keep grid reasonable on desktop even if "full width" */}
+        <div className="px-4 pb-32 max-w-2xl mx-auto">
+          <div className="grid grid-cols-2 gap-3">
+            {displayProducts.map((p) => (
+              <div
+                key={p.id}
+                className="rounded-xl overflow-hidden shadow-sm flex flex-col group relative"
+                style={{ backgroundColor: config.colors.cardBackground }}
+              >
+                {/* Image Aspect Ratio 4:5 */}
+                <div className="aspect-[4/5] bg-gray-100 relative overflow-hidden">
+                  {p.image_url && (
+                    <Image
+                      src={p.image_url}
+                      alt={p.name}
+                      fill
+                      className="object-cover group-hover:scale-105 transition-transform duration-500"
+                    />
+                  )}
+                  {/* Quantity Selector Visual */}
+                  <div className="absolute bottom-2 right-2 bg-white/90 backdrop-blur-sm rounded-full px-2 py-1 text-[10px] font-medium shadow-sm flex items-center gap-2">
+                      <span>-</span> 1 <span>+</span>
                   </div>
                 </div>
-              ))}
-            </div>
-          </div>
 
-          {/* Floating Cart Button Preview (Static) */}
-          <div className="absolute bottom-6 left-0 right-0 px-6 pointer-events-none z-20">
-             <div
-                className="w-full h-12 rounded-full flex items-center justify-center font-bold text-white shadow-xl"
-                style={{ backgroundColor: config.colors.primary }}
-             >
-                {config.checkout?.cartButtonText || 'Ver Carrito'}
-             </div>
-          </div>
+                <div className="p-3 flex flex-col gap-1">
+                    {/* Atomic Title */}
+                    <p
+                      className={cn(
+                        "text-xs font-medium opacity-90 line-clamp-1 cursor-pointer hover:underline decoration-1 underline-offset-2",
+                        activeTool === 'card-title' && "ring-1 ring-blue-500 bg-blue-50/50 rounded px-1 -mx-1"
+                      )}
+                      style={{ color: config.cardStyle?.titleColor || config.colors.text }}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        setActiveTool('card-title');
+                      }}
+                    >
+                      {p.name}
+                    </p>
 
+                    {/* Atomic Price */}
+                    <p
+                      className={cn(
+                      "text-sm font-bold mt-0.5 cursor-pointer hover:opacity-80",
+                      activeTool === 'card-price' && "ring-1 ring-blue-500 bg-blue-50/50 rounded px-1 -mx-1 w-fit"
+                      )}
+                      style={{ color: config.cardStyle?.priceColor || config.colors.text }}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        setActiveTool('card-price');
+                      }}
+                    >
+                      ${Number(p.price).toFixed(2)}
+                    </p>
+
+                    {/* Atomic Button */}
+                    <button
+                      className={cn(
+                        "mt-2 w-full h-8 flex items-center justify-center text-xs font-medium transition-all hover:opacity-90 active:scale-95",
+                        activeTool === 'card-button' && "ring-2 ring-blue-500 ring-offset-1"
+                      )}
+                      style={{
+                        backgroundColor: config.cardStyle?.buttonColor || config.colors.primary,
+                        color: config.cardStyle?.buttonTextColor || '#ffffff',
+                        borderRadius: `${config.cardStyle?.borderRadius || 8}px`
+                      }}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        setActiveTool('card-button');
+                      }}
+                    >
+                      Agregar
+                    </button>
+                </div>
+              </div>
+            ))}
+          </div>
         </div>
+
+        {/* Floating Cart Button Preview (Static) */}
+        <div className="fixed bottom-32 left-0 right-0 px-6 pointer-events-none z-20 flex justify-center">
+            <div
+              className="w-full max-w-sm h-12 rounded-full flex items-center justify-center font-bold text-white shadow-xl"
+              style={{ backgroundColor: config.colors.primary }}
+            >
+              {config.checkout?.cartButtonText || 'Ver Carrito'}
+            </div>
+        </div>
+
       </div>
 
       {/* --- SMART TOOLBAR --- */}
       <div className="fixed bottom-8 left-1/2 -translate-x-1/2 z-50">
-        <div className="h-16 pl-6 pr-2 rounded-full bg-white shadow-[0_8px_30px_rgb(0,0,0,0.12)] border border-gray-100 flex items-center gap-5 transition-all duration-300 ease-out">
+        <div className="h-16 pl-6 pr-2 rounded-full bg-white shadow-[0_8px_30px_rgb(0,0,0,0.12)] border border-gray-100 flex items-center gap-5 transition-all duration-300 ease-out backdrop-blur-md bg-white/90 supports-[backdrop-filter]:bg-white/60">
 
           {/* 1. GLOBAL TOOLS (Default) */}
           {activeTool === 'global' && (
             <div className="flex items-center gap-5 animate-in fade-in slide-in-from-bottom-2 duration-300">
                <div className="flex flex-col items-center gap-1 group">
                 <ColorCircle color={config.colors.background} onChange={(c) => updateConfig(['colors', 'background'], c)} />
-                <span className="text-[9px] text-gray-400 font-semibold uppercase tracking-wider group-hover:text-gray-600 transition-colors">Fondo</span>
+                <span className="text-[9px] text-gray-500 font-semibold uppercase tracking-wider group-hover:text-black transition-colors">Fondo</span>
               </div>
 
               <div className="flex flex-col items-center gap-1 group">
@@ -496,7 +499,7 @@ export default function DesignEditor({ initialConfig, initialProducts, userId, s
                     </select>
                     <ChevronDown className="w-3 h-3 absolute right-2 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none" />
                  </div>
-                 <span className="text-[9px] text-gray-400 font-semibold uppercase tracking-wider group-hover:text-gray-600 transition-colors">Fuente</span>
+                 <span className="text-[9px] text-gray-500 font-semibold uppercase tracking-wider group-hover:text-black transition-colors">Fuente</span>
               </div>
 
               {/* Socials Manager Button */}
@@ -513,7 +516,7 @@ export default function DesignEditor({ initialConfig, initialProducts, userId, s
                 )}>
                   <MoreHorizontal className="w-4 h-4" />
                 </div>
-                <span className="text-[9px] text-gray-400 font-semibold uppercase tracking-wider group-hover:text-gray-600 transition-colors">Redes</span>
+                <span className="text-[9px] text-gray-500 font-semibold uppercase tracking-wider group-hover:text-black transition-colors">Redes</span>
               </button>
             </div>
           )}
@@ -530,7 +533,7 @@ export default function DesignEditor({ initialConfig, initialProducts, userId, s
               />
               <div className="flex flex-col items-center gap-1">
                 <ColorCircle color={config.colors.text} onChange={(c) => updateConfig(['colors', 'text'], c)} />
-                <span className="text-[9px] text-gray-400 font-semibold uppercase tracking-wider">Texto</span>
+                <span className="text-[9px] text-gray-500 font-semibold uppercase tracking-wider">Texto</span>
               </div>
              </div>
           )}
@@ -543,7 +546,7 @@ export default function DesignEditor({ initialConfig, initialProducts, userId, s
                     color={selectedSocialLink.color || config.colors.primary}
                     onChange={(c) => updateSocialLink(selectedSocialLink.id, 'color', c)}
                   />
-                  <span className="text-[9px] text-gray-400 font-semibold uppercase tracking-wider">Icono</span>
+                  <span className="text-[9px] text-gray-500 font-semibold uppercase tracking-wider">Icono</span>
                 </div>
 
                 <div className="w-px h-6 bg-gray-200" />
@@ -570,11 +573,11 @@ export default function DesignEditor({ initialConfig, initialProducts, userId, s
             <div className="flex items-center gap-4 animate-in fade-in slide-in-from-bottom-2 duration-300">
                <div className="flex flex-col items-center gap-1">
                   <ColorCircle color={config.cardStyle?.buttonColor || '#000000'} onChange={(c) => updateConfig(['cardStyle', 'buttonColor'], c)} />
-                  <span className="text-[9px] text-gray-400 font-semibold uppercase tracking-wider">Fondo</span>
+                  <span className="text-[9px] text-gray-500 font-semibold uppercase tracking-wider">Fondo</span>
                </div>
                <div className="flex flex-col items-center gap-1">
                   <ColorCircle color={config.cardStyle?.buttonTextColor || '#ffffff'} onChange={(c) => updateConfig(['cardStyle', 'buttonTextColor'], c)} />
-                  <span className="text-[9px] text-gray-400 font-semibold uppercase tracking-wider">Texto</span>
+                  <span className="text-[9px] text-gray-500 font-semibold uppercase tracking-wider">Texto</span>
                </div>
 
                <div className="flex flex-col items-center gap-1 w-24">
@@ -587,7 +590,7 @@ export default function DesignEditor({ initialConfig, initialProducts, userId, s
                     onChange={(e) => updateConfig(['cardStyle', 'borderRadius'], Number(e.target.value))}
                     className="w-full h-1 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-black"
                   />
-                  <span className="text-[9px] text-gray-400 font-semibold uppercase tracking-wider">Redondez</span>
+                  <span className="text-[9px] text-gray-500 font-semibold uppercase tracking-wider">Redondez</span>
                </div>
             </div>
           )}
@@ -600,7 +603,7 @@ export default function DesignEditor({ initialConfig, initialProducts, userId, s
                     color={activeTool === 'card-title' ? (config.cardStyle?.titleColor || config.colors.text) : (config.cardStyle?.priceColor || config.colors.text)}
                     onChange={(c) => updateConfig(['cardStyle', activeTool === 'card-title' ? 'titleColor' : 'priceColor'], c)}
                   />
-                  <span className="text-[9px] text-gray-400 font-semibold uppercase tracking-wider">Color</span>
+                  <span className="text-[9px] text-gray-500 font-semibold uppercase tracking-wider">Color</span>
                 </div>
              </div>
           )}
