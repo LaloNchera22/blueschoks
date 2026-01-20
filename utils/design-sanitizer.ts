@@ -1,4 +1,4 @@
-import { DesignConfig, LinkItem, CheckoutConfig } from '@/lib/types/design-system';
+import { DesignConfig, LinkItem, CheckoutConfig, CardStyle } from '@/lib/types/design-system';
 
 export const DEFAULT_DESIGN: DesignConfig = {
   colors: {
@@ -24,6 +24,13 @@ export const DEFAULT_DESIGN: DesignConfig = {
     showQuantitySelector: true,
     cartButtonText: 'Enviar Pedido',
     buttonStyle: 'floating',
+  },
+  cardStyle: {
+    borderRadius: 12,
+    buttonColor: '#000000',
+    buttonTextColor: '#ffffff',
+    priceColor: '#000000',
+    titleColor: '#000000',
   },
 };
 
@@ -65,6 +72,7 @@ export function sanitizeDesign(raw: any, profileFallback?: any): DesignConfig {
       url: typeof link.url === 'string' ? link.url : '',
       label: typeof link.label === 'string' ? link.label : '',
       active: typeof link.active === 'boolean' ? link.active : true,
+      color: typeof link.color === 'string' ? link.color : undefined,
     })),
     checkout: {
       whatsappNumber: typeof raw.checkout?.whatsappNumber === 'string' ? raw.checkout.whatsappNumber : DEFAULT_DESIGN.checkout.whatsappNumber,
@@ -73,6 +81,13 @@ export function sanitizeDesign(raw: any, profileFallback?: any): DesignConfig {
       cartButtonText: typeof raw.checkout?.cartButtonText === 'string' ? raw.checkout.cartButtonText : DEFAULT_DESIGN.checkout.cartButtonText,
       buttonStyle: (['floating', 'fixed'].includes(raw.checkout?.buttonStyle)) ? raw.checkout.buttonStyle : DEFAULT_DESIGN.checkout.buttonStyle,
     },
+    cardStyle: {
+      borderRadius: typeof raw.cardStyle?.borderRadius === 'number' ? raw.cardStyle.borderRadius : DEFAULT_DESIGN.cardStyle.borderRadius,
+      buttonColor: typeof raw.cardStyle?.buttonColor === 'string' ? raw.cardStyle.buttonColor : DEFAULT_DESIGN.cardStyle.buttonColor,
+      buttonTextColor: typeof raw.cardStyle?.buttonTextColor === 'string' ? raw.cardStyle.buttonTextColor : DEFAULT_DESIGN.cardStyle.buttonTextColor,
+      priceColor: typeof raw.cardStyle?.priceColor === 'string' ? raw.cardStyle.priceColor : DEFAULT_DESIGN.cardStyle.priceColor,
+      titleColor: typeof raw.cardStyle?.titleColor === 'string' ? raw.cardStyle.titleColor : DEFAULT_DESIGN.cardStyle.titleColor,
+    }
   };
 
   return clean;

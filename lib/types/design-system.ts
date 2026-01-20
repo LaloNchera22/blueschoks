@@ -4,6 +4,7 @@ export interface LinkItem {
   url: string;
   label: string;
   active: boolean;
+  color?: string;
 }
 
 export interface CheckoutConfig {
@@ -12,6 +13,14 @@ export interface CheckoutConfig {
   showQuantitySelector: boolean; // Toggle for (- 1 +) in card
   cartButtonText: string; // e.g. "Enviar Pedido"
   buttonStyle: 'floating' | 'fixed'; // Cart button style
+}
+
+export interface CardStyle {
+  borderRadius: number;
+  buttonColor: string;
+  buttonTextColor: string;
+  priceColor: string;
+  titleColor: string;
 }
 
 export interface DesignConfig {
@@ -33,4 +42,5 @@ export interface DesignConfig {
   };
   socialLinks: LinkItem[];
   checkout: CheckoutConfig;
+  cardStyle: CardStyle;
 }
