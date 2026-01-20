@@ -16,6 +16,8 @@ export const DEFAULT_DESIGN: DesignConfig = {
     bio: '',
     avatarUrl: '',
     shopName: '',
+    avatarShape: 'circle',
+    avatarBorderColor: undefined, // Default to no border or handle null as no border
   },
   socialLinks: [],
   checkout: {
@@ -65,6 +67,8 @@ export function sanitizeDesign(raw: any, profileFallback?: any): DesignConfig {
       bio: typeof raw.profile?.bio === 'string' ? raw.profile.bio : DEFAULT_DESIGN.profile.bio,
       avatarUrl: typeof raw.profile?.avatarUrl === 'string' ? raw.profile.avatarUrl : (profileFallback?.avatar_url || DEFAULT_DESIGN.profile.avatarUrl),
       shopName: typeof raw.profile?.shopName === 'string' ? raw.profile.shopName : (profileFallback?.shop_name || DEFAULT_DESIGN.profile.shopName),
+      avatarShape: ['circle', 'rounded', 'square'].includes(raw.profile?.avatarShape) ? raw.profile.avatarShape : DEFAULT_DESIGN.profile.avatarShape,
+      avatarBorderColor: typeof raw.profile?.avatarBorderColor === 'string' ? raw.profile.avatarBorderColor : DEFAULT_DESIGN.profile.avatarBorderColor,
     },
     socialLinks: raw.socialLinks.map((link: any): LinkItem => ({
       id: typeof link.id === 'string' ? link.id : Math.random().toString(36).substr(2, 9),
