@@ -23,6 +23,15 @@ export interface CardStyle {
   titleColor: string;
 }
 
+export interface ProfileConfig {
+  displayName?: string;
+  bio?: string;
+  avatarUrl?: string;
+  shopName?: string;
+  avatarShape?: 'circle' | 'rounded' | 'square';
+  avatarBorderColor?: string;
+}
+
 export interface DesignConfig {
   colors: {
     background: string;
@@ -34,12 +43,7 @@ export interface DesignConfig {
     heading: string;
     body: string;
   };
-  profile: {
-    displayName?: string;
-    bio?: string;
-    avatarUrl?: string;
-    shopName?: string;
-  };
+  profile: ProfileConfig;
   socialLinks: LinkItem[];
   checkout: CheckoutConfig;
   cardStyle: CardStyle;

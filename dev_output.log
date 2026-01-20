@@ -2,17 +2,13 @@
 > blueshock@0.1.0 dev
 > next dev
 
-▲ Next.js 16.1.1 (Turbopack)
+▲ Next.js 16.1.4 (Turbopack)
 - Local:         http://localhost:3000
 - Network:       http://192.168.0.2:3000
 
 ✓ Starting...
-Attention: Next.js now collects completely anonymous telemetry regarding usage.
-This information is used to shape Next.js' roadmap and prioritize features.
-You can learn more, including how to opt-out if you'd not like to participate in this anonymous program, by visiting the following URL:
-https://nextjs.org/telemetry
-
-✓ Ready in 1143ms
+✓ Ready in 1105ms
 ○ Compiling /test-design ...
- GET /test-design 200 in 6.2s (compile: 5.9s, render: 357ms)
-✓ Compiled in 96ms
+ GET /test-design 200 in 4.6s (compile: 4.2s, render: 403ms)
+ GET /test-design 200 in 246ms (compile: 107ms, render: 139ms)
+ GET /test-design 200 in 285ms (compile: 126ms, render: 159ms)

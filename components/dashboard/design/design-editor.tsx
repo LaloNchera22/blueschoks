@@ -15,7 +15,10 @@ import {
   MessageCircle,
   Trash2,
   MoreHorizontal,
-  Globe
+  Globe,
+  Circle,
+  Square,
+  Minus
 } from 'lucide-react';
 import {
   DndContext,
@@ -53,7 +56,9 @@ interface DesignEditorProps {
 // "Atom" selection key
 type ToolType =
   | 'global'
-  | 'header'
+  | 'header-avatar'
+  | 'header-title'
+  | 'header-bio'
   | 'card-title'
   | 'card-price'
   | 'card-button'
@@ -77,7 +82,7 @@ const FONTS = [
 
 const PLATFORMS = [
   { id: 'instagram', icon: Instagram, label: 'Instagram' },
-  { id: 'tiktok', icon: MessageCircle, label: 'TikTok' }, // Using MessageCircle as generic for now or custom path if needed
+  { id: 'tiktok', icon: MessageCircle, label: 'TikTok' },
   { id: 'whatsapp', icon: MessageCircle, label: 'WhatsApp' },
   { id: 'twitter', icon: Twitter, label: 'Twitter' },
   { id: 'facebook', icon: Facebook, label: 'Facebook' },
@@ -170,6 +175,10 @@ export default function DesignEditor({ initialConfig, initialProducts, userId, s
       cardStyle: {
         ...DEFAULT_DESIGN.cardStyle,
         ...initialConfig.cardStyle
+      },
+      profile: {
+        ...DEFAULT_DESIGN.profile,
+        ...initialConfig.profile
       }
     };
   }, [initialConfig]);
@@ -267,8 +276,18 @@ export default function DesignEditor({ initialConfig, initialProducts, userId, s
     return null;
   }, [activeTool, config.socialLinks]);
 
+  // Derive Avatar Shape Styles
+  const avatarClasses = useMemo(() => {
+    switch(config.profile.avatarShape) {
+      case 'square': return 'rounded-none';
+      case 'rounded': return 'rounded-2xl';
+      case 'circle':
+      default: return 'rounded-full';
+    }
+  }, [config.profile.avatarShape]);
+
   return (
-    <div className="w-full h-[calc(100vh-60px)] relative overflow-hidden flex flex-col items-center justify-center font-sans bg-gray-50">
+    <div className="w-full h-full relative overflow-hidden flex flex-col items-center justify-center font-sans bg-gray-50">
 
       {/* --- ATMOSPHERIC BACKGROUND --- */}
       <div
@@ -289,22 +308,9 @@ export default function DesignEditor({ initialConfig, initialProducts, userId, s
       <div
         className={cn(
           "w-full h-full overflow-y-auto [&::-webkit-scrollbar]:hidden [-ms-overflow-style:'none'] [scrollbar-width:none] relative z-10",
-          activeTool === 'global' && "outline-none" // Removed visible ring for immersion
+          activeTool === 'global' && "outline-none"
         )}
         style={{
-          // We don't force background here to let the atmospheric background show through,
-          // or we can set it to config.colors.background if opaque is desired.
-          // Based on "immersive", we likely want the atmospheric background to be THE background.
-          // However, to ensure text legibility, we might want the store to have its own background color.
-          // The prompt says "flotando sobre el fondo atmosférico".
-          // But also "La tienda debe verse como si ocupara toda la pantalla".
-          // If we make this transparent, we see the atmosphere.
-          // If we set bg color, we see the color.
-          // I will set the background color but ensure it matches the theme.
-          // The Atmospheric background is already derived from config.colors.background.
-          // So setting backgroundColor here to transparent allows the "Atmosphere" (radial gradient) to show.
-          // If I set it to solid config.colors.background, I lose the atmosphere.
-          // I will set it to transparent here so the parent's atmospheric background acts as the store background.
           backgroundColor: 'transparent',
           color: config.colors.text,
           fontFamily: config.fonts.body
@@ -314,163 +320,190 @@ export default function DesignEditor({ initialConfig, initialProducts, userId, s
           setActiveTool('global');
         }}
       >
-        {/* 1. Header Section */}
-        <div
-          className={cn(
-            "pt-16 pb-8 px-6 flex flex-col items-center text-center cursor-pointer transition-all",
-            activeTool === 'header' && "bg-black/5 rounded-xl mx-4 mt-12"
-          )}
-          onClick={(e) => {
-            e.stopPropagation();
-            setActiveTool('header');
-          }}
-        >
-          {/* Avatar */}
-          <div className="w-24 h-24 rounded-full overflow-hidden bg-gray-100 mb-4 border-4 border-white shadow-sm relative">
-            {config.profile.avatarUrl ? (
-              <Image src={config.profile.avatarUrl} alt="Shop Avatar" fill className="object-cover" />
-            ) : (
-              <div className="w-full h-full flex items-center justify-center text-gray-400">
-                <Smartphone className="w-8 h-8" />
-              </div>
-            )}
-          </div>
-
-          {/* Shop Info */}
-          <h1
-            className="text-2xl font-bold leading-tight mb-2"
-            style={{ fontFamily: config.fonts.heading }}
+        <div className="min-h-full pb-40 relative">
+          {/* 1. Header Section */}
+          <div
+            className="pt-16 pb-8 px-6 flex flex-col items-center text-center transition-all"
           >
-            {config.profile.shopName || 'Mi Tienda'}
-          </h1>
-          <p className="text-sm opacity-80 max-w-[300px] leading-relaxed mx-auto">
-            {config.profile.bio || 'Bienvenido a mi tienda online'}
-          </p>
-
-          {/* Social Icons (Atomic) */}
-          <div className="flex flex-wrap justify-center gap-3 mt-6">
-            {config.socialLinks.map((link) => {
-              const Icon = PLATFORMS.find(p => p.id === link.platform)?.icon || LinkIcon;
-              const isSelected = activeTool === `social-icon-${link.id}`;
-              return (
-                <button
-                  key={link.id}
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    setActiveTool(`social-icon-${link.id}` as ToolType);
-                  }}
-                  className={cn(
-                    "w-10 h-10 flex items-center justify-center rounded-full transition-all hover:scale-110 shadow-sm",
-                    isSelected ? "ring-2 ring-blue-500 ring-offset-2" : "hover:shadow-md"
-                  )}
-                  style={{
-                    backgroundColor: link.color || config.colors.primary,
-                    color: '#ffffff'
-                  }}
-                >
-                  <Icon className="w-5 h-5" strokeWidth={1.5} />
-                </button>
-              )
-            })}
-            {config.socialLinks.length === 0 && (
-              <div className="text-xs text-gray-400 border border-dashed border-gray-300 rounded-full px-3 py-1">
-                Sin redes sociales
+            {/* ATOMIC Avatar */}
+            <div
+              className={cn(
+                "w-24 h-24 overflow-hidden bg-gray-100 mb-4 border-4 shadow-sm relative cursor-pointer group transition-all duration-300",
+                avatarClasses,
+                activeTool === 'header-avatar' && "ring-2 ring-blue-500 ring-offset-4 scale-105"
+              )}
+              style={{
+                borderColor: config.profile.avatarBorderColor || 'transparent'
+              }}
+              onClick={(e) => {
+                e.stopPropagation();
+                setActiveTool('header-avatar');
+              }}
+            >
+              {config.profile.avatarUrl ? (
+                <Image src={config.profile.avatarUrl} alt="Shop Avatar" fill className="object-cover" />
+              ) : (
+                <div className="w-full h-full flex items-center justify-center text-gray-400">
+                  <Smartphone className="w-8 h-8" />
+                </div>
+              )}
+              <div className="absolute inset-0 bg-black/20 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                <span className="text-white text-xs font-bold">Editar</span>
               </div>
-            )}
-          </div>
-        </div>
+            </div>
 
-        {/* 2. Products Grid (Card 2.0) */}
-        {/* Added max-w-md to keep grid reasonable on desktop even if "full width" */}
-        <div className="px-4 pb-32 max-w-2xl mx-auto">
-          <div className="grid grid-cols-2 gap-3">
-            {displayProducts.map((p) => (
-              <div
-                key={p.id}
-                className="rounded-xl overflow-hidden shadow-sm flex flex-col group relative"
-                style={{ backgroundColor: config.colors.cardBackground }}
-              >
-                {/* Image Aspect Ratio 4:5 */}
-                <div className="aspect-[4/5] bg-gray-100 relative overflow-hidden">
-                  {p.image_url && (
-                    <Image
-                      src={p.image_url}
-                      alt={p.name}
-                      fill
-                      className="object-cover group-hover:scale-105 transition-transform duration-500"
-                    />
-                  )}
-                  {/* Quantity Selector Visual */}
-                  <div className="absolute bottom-2 right-2 bg-white/90 backdrop-blur-sm rounded-full px-2 py-1 text-[10px] font-medium shadow-sm flex items-center gap-2">
-                      <span>-</span> 1 <span>+</span>
+            {/* ATOMIC Shop Title */}
+            <h1
+              className={cn(
+                "text-2xl font-bold leading-tight mb-2 cursor-pointer hover:opacity-80 decoration-blue-500/30 underline-offset-4",
+                activeTool === 'header-title' && "underline decoration-blue-500"
+              )}
+              style={{ fontFamily: config.fonts.heading }}
+              onClick={(e) => {
+                e.stopPropagation();
+                setActiveTool('header-title');
+              }}
+            >
+              {config.profile.shopName || 'Mi Tienda'}
+            </h1>
+
+            {/* ATOMIC Bio */}
+            <p
+              className={cn(
+                "text-sm opacity-80 max-w-[300px] leading-relaxed mx-auto cursor-pointer hover:opacity-100 border border-transparent rounded px-2 -mx-2 transition-all",
+                activeTool === 'header-bio' && "border-blue-200 bg-blue-50/50"
+              )}
+              onClick={(e) => {
+                e.stopPropagation();
+                setActiveTool('header-bio');
+              }}
+            >
+              {config.profile.bio || 'Bienvenido a mi tienda online'}
+            </p>
+
+            {/* Social Icons (Atomic) */}
+            <div className="flex flex-wrap justify-center gap-3 mt-6">
+              {config.socialLinks.map((link) => {
+                const Icon = PLATFORMS.find(p => p.id === link.platform)?.icon || LinkIcon;
+                const isSelected = activeTool === `social-icon-${link.id}`;
+                return (
+                  <button
+                    key={link.id}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      setActiveTool(`social-icon-${link.id}` as ToolType);
+                    }}
+                    className={cn(
+                      "w-10 h-10 flex items-center justify-center rounded-full transition-all hover:scale-110 shadow-sm",
+                      isSelected ? "ring-2 ring-blue-500 ring-offset-2 scale-110" : "hover:shadow-md"
+                    )}
+                    style={{
+                      backgroundColor: link.color || config.colors.primary,
+                      color: '#ffffff'
+                    }}
+                  >
+                    <Icon className="w-5 h-5" strokeWidth={1.5} />
+                  </button>
+                )
+              })}
+              {config.socialLinks.length === 0 && (
+                <div className="text-xs text-gray-400 border border-dashed border-gray-300 rounded-full px-3 py-1">
+                  Sin redes sociales
+                </div>
+              )}
+            </div>
+          </div>
+
+          {/* 2. Products Grid (Card 2.0) */}
+          <div className="px-4 max-w-2xl mx-auto">
+            <div className="grid grid-cols-2 gap-3">
+              {displayProducts.map((p) => (
+                <div
+                  key={p.id}
+                  className="rounded-xl overflow-hidden shadow-sm flex flex-col group relative"
+                  style={{ backgroundColor: config.colors.cardBackground }}
+                >
+                  {/* Image Aspect Ratio 4:5 */}
+                  <div className="aspect-[4/5] bg-gray-100 relative overflow-hidden">
+                    {p.image_url && (
+                      <Image
+                        src={p.image_url}
+                        alt={p.name}
+                        fill
+                        className="object-cover group-hover:scale-105 transition-transform duration-500"
+                      />
+                    )}
+                    {/* Quantity Selector Visual */}
+                    <div className="absolute bottom-2 right-2 bg-white/90 backdrop-blur-sm rounded-full px-2 py-1 text-[10px] font-medium shadow-sm flex items-center gap-2">
+                        <span>-</span> 1 <span>+</span>
+                    </div>
+                  </div>
+
+                  <div className="p-3 flex flex-col gap-1">
+                      {/* Atomic Title */}
+                      <p
+                        className={cn(
+                          "text-xs font-medium opacity-90 line-clamp-1 cursor-pointer hover:underline decoration-1 underline-offset-2",
+                          activeTool === 'card-title' && "ring-1 ring-blue-500 bg-blue-50/50 rounded px-1 -mx-1"
+                        )}
+                        style={{ color: config.cardStyle?.titleColor || config.colors.text }}
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          setActiveTool('card-title');
+                        }}
+                      >
+                        {p.name}
+                      </p>
+
+                      {/* Atomic Price */}
+                      <p
+                        className={cn(
+                        "text-sm font-bold mt-0.5 cursor-pointer hover:opacity-80",
+                        activeTool === 'card-price' && "ring-1 ring-blue-500 bg-blue-50/50 rounded px-1 -mx-1 w-fit"
+                        )}
+                        style={{ color: config.cardStyle?.priceColor || config.colors.text }}
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          setActiveTool('card-price');
+                        }}
+                      >
+                        ${Number(p.price).toFixed(2)}
+                      </p>
+
+                      {/* Atomic Button */}
+                      <button
+                        className={cn(
+                          "mt-2 w-full h-8 flex items-center justify-center text-xs font-medium transition-all hover:opacity-90 active:scale-95",
+                          activeTool === 'card-button' && "ring-2 ring-blue-500 ring-offset-1"
+                        )}
+                        style={{
+                          backgroundColor: config.cardStyle?.buttonColor || config.colors.primary,
+                          color: config.cardStyle?.buttonTextColor || '#ffffff',
+                          borderRadius: `${config.cardStyle?.borderRadius || 8}px`
+                        }}
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          setActiveTool('card-button');
+                        }}
+                      >
+                        Agregar
+                      </button>
                   </div>
                 </div>
+              ))}
+            </div>
+          </div>
 
-                <div className="p-3 flex flex-col gap-1">
-                    {/* Atomic Title */}
-                    <p
-                      className={cn(
-                        "text-xs font-medium opacity-90 line-clamp-1 cursor-pointer hover:underline decoration-1 underline-offset-2",
-                        activeTool === 'card-title' && "ring-1 ring-blue-500 bg-blue-50/50 rounded px-1 -mx-1"
-                      )}
-                      style={{ color: config.cardStyle?.titleColor || config.colors.text }}
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        setActiveTool('card-title');
-                      }}
-                    >
-                      {p.name}
-                    </p>
-
-                    {/* Atomic Price */}
-                    <p
-                      className={cn(
-                      "text-sm font-bold mt-0.5 cursor-pointer hover:opacity-80",
-                      activeTool === 'card-price' && "ring-1 ring-blue-500 bg-blue-50/50 rounded px-1 -mx-1 w-fit"
-                      )}
-                      style={{ color: config.cardStyle?.priceColor || config.colors.text }}
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        setActiveTool('card-price');
-                      }}
-                    >
-                      ${Number(p.price).toFixed(2)}
-                    </p>
-
-                    {/* Atomic Button */}
-                    <button
-                      className={cn(
-                        "mt-2 w-full h-8 flex items-center justify-center text-xs font-medium transition-all hover:opacity-90 active:scale-95",
-                        activeTool === 'card-button' && "ring-2 ring-blue-500 ring-offset-1"
-                      )}
-                      style={{
-                        backgroundColor: config.cardStyle?.buttonColor || config.colors.primary,
-                        color: config.cardStyle?.buttonTextColor || '#ffffff',
-                        borderRadius: `${config.cardStyle?.borderRadius || 8}px`
-                      }}
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        setActiveTool('card-button');
-                      }}
-                    >
-                      Agregar
-                    </button>
-                </div>
+          {/* Main Action Button (WhatsApp/Cart) - ABSOLUTE POSITIONING */}
+          <div className="absolute bottom-4 right-4 z-20">
+              <div
+                className="h-12 px-6 rounded-full flex items-center justify-center font-bold text-white shadow-xl cursor-pointer hover:scale-105 transition-transform"
+                style={{ backgroundColor: config.colors.primary }}
+              >
+                {config.checkout?.cartButtonText || 'Enviar Pedido'}
               </div>
-            ))}
           </div>
         </div>
-
-        {/* Floating Cart Button Preview (Static) */}
-        <div className="fixed bottom-32 left-0 right-0 px-6 pointer-events-none z-20 flex justify-center">
-            <div
-              className="w-full max-w-sm h-12 rounded-full flex items-center justify-center font-bold text-white shadow-xl"
-              style={{ backgroundColor: config.colors.primary }}
-            >
-              {config.checkout?.cartButtonText || 'Ver Carrito'}
-            </div>
-        </div>
-
       </div>
 
       {/* --- SMART TOOLBAR --- */}
@@ -521,8 +554,80 @@ export default function DesignEditor({ initialConfig, initialProducts, userId, s
             </div>
           )}
 
-          {/* 2. HEADER TOOLS */}
-          {activeTool === 'header' && (
+          {/* 2. HEADER AVATAR TOOLS */}
+          {activeTool === 'header-avatar' && (
+            <div className="flex items-center gap-4 animate-in fade-in slide-in-from-bottom-2 duration-300">
+              {/* Image Input */}
+              <input
+                type="text"
+                value={config.profile.avatarUrl || ''}
+                onChange={(e) => updateConfig(['profile', 'avatarUrl'], e.target.value)}
+                placeholder="URL de Imagen"
+                className="h-8 rounded-full border border-gray-200 bg-gray-50 px-3 text-xs w-32 focus:outline-none focus:ring-2 focus:ring-black/5"
+              />
+
+              {/* Shape Selector */}
+              <div className="flex items-center bg-gray-50 rounded-full p-1 border border-gray-100">
+                <button
+                  onClick={() => updateConfig(['profile', 'avatarShape'], 'circle')}
+                  className={cn(
+                    "w-6 h-6 rounded-full flex items-center justify-center transition-all",
+                    config.profile.avatarShape === 'circle' ? "bg-white shadow-sm text-black" : "text-gray-400 hover:text-gray-600"
+                  )}
+                  title="Círculo"
+                >
+                  <Circle className="w-3 h-3" />
+                </button>
+                <button
+                  onClick={() => updateConfig(['profile', 'avatarShape'], 'rounded')}
+                  className={cn(
+                    "w-6 h-6 rounded-full flex items-center justify-center transition-all",
+                    config.profile.avatarShape === 'rounded' ? "bg-white shadow-sm text-black" : "text-gray-400 hover:text-gray-600"
+                  )}
+                  title="Cuadrado Redondeado"
+                >
+                  <div className="w-3 h-3 border-2 border-current rounded-sm" />
+                </button>
+                <button
+                  onClick={() => updateConfig(['profile', 'avatarShape'], 'square')}
+                  className={cn(
+                    "w-6 h-6 rounded-full flex items-center justify-center transition-all",
+                    config.profile.avatarShape === 'square' ? "bg-white shadow-sm text-black" : "text-gray-400 hover:text-gray-600"
+                  )}
+                  title="Cuadrado"
+                >
+                  <Square className="w-3 h-3" />
+                </button>
+              </div>
+
+              {/* Border Toggle/Color */}
+              <div className="flex flex-col items-center gap-1">
+                 <div className="flex items-center gap-1 relative">
+                    <ColorCircle
+                        color={config.profile.avatarBorderColor || 'transparent'}
+                        onChange={(c) => updateConfig(['profile', 'avatarBorderColor'], c)}
+                        size="sm"
+                    />
+                    {config.profile.avatarBorderColor && (
+                        <button
+                            onClick={(e) => {
+                                e.stopPropagation();
+                                updateConfig(['profile', 'avatarBorderColor'], undefined);
+                            }}
+                            className="absolute -top-1 -right-1 bg-gray-100 border border-gray-300 rounded-full p-0.5 hover:bg-gray-200 transition-colors shadow-sm z-10"
+                            title="Quitar borde"
+                        >
+                            <Minus size={10} className="text-gray-600" />
+                        </button>
+                    )}
+                 </div>
+                 <span className="text-[9px] text-gray-500 font-semibold uppercase tracking-wider">Borde</span>
+              </div>
+            </div>
+          )}
+
+          {/* 3. HEADER TITLE TOOLS */}
+          {activeTool === 'header-title' && (
              <div className="flex items-center gap-4 animate-in fade-in slide-in-from-bottom-2 duration-300">
                <input
                 type="text"
@@ -538,7 +643,24 @@ export default function DesignEditor({ initialConfig, initialProducts, userId, s
              </div>
           )}
 
-          {/* 3. ATOMIC SOCIAL ICON */}
+          {/* 4. HEADER BIO TOOLS */}
+          {activeTool === 'header-bio' && (
+             <div className="flex items-center gap-4 animate-in fade-in slide-in-from-bottom-2 duration-300">
+               <input
+                type="text"
+                value={config.profile.bio || ''}
+                onChange={(e) => updateConfig(['profile', 'bio'], e.target.value)}
+                placeholder="Descripción corta"
+                className="h-8 rounded-full border border-gray-200 bg-gray-50 px-3 text-xs w-48 focus:outline-none focus:ring-2 focus:ring-black/5"
+              />
+              <div className="flex flex-col items-center gap-1">
+                <ColorCircle color={config.colors.text} onChange={(c) => updateConfig(['colors', 'text'], c)} />
+                <span className="text-[9px] text-gray-500 font-semibold uppercase tracking-wider">Texto</span>
+              </div>
+             </div>
+          )}
+
+          {/* 5. ATOMIC SOCIAL ICON */}
           {activeTool?.startsWith('social-icon-') && selectedSocialLink && (
              <div className="flex items-center gap-4 animate-in fade-in slide-in-from-bottom-2 duration-300">
                 <div className="flex flex-col items-center gap-1">
@@ -568,7 +690,7 @@ export default function DesignEditor({ initialConfig, initialProducts, userId, s
              </div>
           )}
 
-          {/* 4. CARD BUTTON TOOLS */}
+          {/* 6. CARD BUTTON TOOLS */}
           {activeTool === 'card-button' && (
             <div className="flex items-center gap-4 animate-in fade-in slide-in-from-bottom-2 duration-300">
                <div className="flex flex-col items-center gap-1">
@@ -595,7 +717,7 @@ export default function DesignEditor({ initialConfig, initialProducts, userId, s
             </div>
           )}
 
-          {/* 5. CARD TITLE/PRICE TOOLS */}
+          {/* 7. CARD TITLE/PRICE TOOLS */}
           {(activeTool === 'card-title' || activeTool === 'card-price') && (
              <div className="flex items-center gap-4 animate-in fade-in slide-in-from-bottom-2 duration-300">
                 <div className="flex flex-col items-center gap-1">
