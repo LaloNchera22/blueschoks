@@ -343,10 +343,10 @@ export default function DesignEditor({ initialConfig, initialProducts, userId, s
       >
         {/* --- SMART TOOLBAR (UPDATED POSITION & UI) --- */}
         <div
-          className="sticky top-6 mx-auto z-40 w-max mb-8"
+          className="sticky top-6 mx-auto z-40 w-fit mb-8"
           onClick={(e) => e.stopPropagation()}
         >
-          <div className="h-14 px-6 rounded-full bg-white/90 shadow-lg border border-gray-200 flex items-center gap-4 transition-all duration-300 ease-out backdrop-blur-md">
+          <div className="h-14 px-6 rounded-full bg-white/90 shadow-xl border border-gray-200 flex items-center gap-4 transition-all duration-300 ease-out backdrop-blur-md">
 
             {/* 1. GLOBAL TOOLS (Default) */}
             {activeTool === 'global' && (
