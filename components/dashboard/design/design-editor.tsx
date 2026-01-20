@@ -104,18 +104,17 @@ export default function DesignEditor({ initialConfig, initialProducts, userId, s
   const displayProducts = initialProducts.length > 0 ? initialProducts : DUMMY_PRODUCTS;
 
   return (
-    <div className="w-full h-[calc(100vh-64px)] relative bg-gray-50 overflow-hidden flex flex-col items-center justify-center font-sans">
+    <div className="w-full h-[calc(100vh-64px)] relative overflow-hidden flex flex-col items-center justify-center font-sans">
 
-      {/* BACKGROUND PATTERN */}
-      <div className="absolute inset-0 opacity-[0.03] pointer-events-none" style={{ backgroundImage: 'radial-gradient(#000 1px, transparent 1px)', backgroundSize: '20px 20px' }} />
+      {/* ATMOSPHERIC BACKGROUND */}
+      <div
+        className="absolute inset-0 transition-colors duration-500"
+        style={{ backgroundColor: config.colors.background }}
+      />
+      <div className="absolute inset-0 bg-black/20 backdrop-blur-3xl" />
 
-      {/* --- PREVIEW CANVAS --- */}
-      <div className="relative z-10 w-[360px] h-[720px] shadow-2xl rounded-[3rem] border-[8px] border-gray-900 bg-gray-900 overflow-hidden ring-4 ring-black/5">
-
-        {/* Phone Notch/Status Bar Area */}
-        <div className="absolute top-0 w-full h-8 z-20 bg-black/20 flex justify-between px-6 items-center backdrop-blur-sm pointer-events-none">
-           <div className="w-16 h-4 bg-black/40 rounded-full mx-auto" />
-        </div>
+      {/* --- PREVIEW CANVAS (Floating Window) --- */}
+      <div className="relative z-10 w-full max-w-[420px] h-[calc(100%-60px)] max-h-[800px] shadow-2xl shadow-black/30 rounded-[32px] border border-white/10 overflow-hidden flex flex-col my-6">
 
         {/* --- INTERACTIVE STORE PREVIEW --- */}
         <div
@@ -170,7 +169,7 @@ export default function DesignEditor({ initialConfig, initialProducts, userId, s
           {/* Products Grid Section */}
           <div
             className={cn(
-              "px-4 pb-24 transition-all cursor-pointer",
+              "px-4 pb-32 transition-all cursor-pointer", // Increased bottom padding to 32 (8rem) to clear toolbar
               activeTool === 'cards' && "ring-2 ring-indigo-500 ring-offset-2 ring-offset-transparent bg-black/5 rounded-xl mx-2 py-4"
             )}
             onClick={(e) => {
