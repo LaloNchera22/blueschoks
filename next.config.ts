@@ -1,14 +1,18 @@
-/** @type {import('next').NextConfig} */
-const nextConfig = {
-  // ... otras configuraciones que ya tengas ...
-  
+import type { NextConfig } from "next";
+
+const nextConfig: NextConfig = {
   images: {
     remotePatterns: [
       {
         protocol: 'https',
-        hostname: '**', // Esto permite imágenes de CUALQUIER dominio https
+        hostname: '**',
       },
     ],
+  },
+  experimental: {
+    serverActions: {
+      bodySizeLimit: '5mb', // Aumentamos el límite a 5 MB
+    },
   },
 };
 
