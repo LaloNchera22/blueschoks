@@ -37,8 +37,7 @@ export async function deleteProduct(productId: string) {
   // 4. Revalidate
   // Invalidate the cache for this user's products in the public shop
   // Next 16.1.1 workaround: pass undefined as second argument if required by type def
-  // @ts-expect-error - revalidateTag in this canary version might require 2 args
-  revalidateTag(`products:${user.id}`)
+  revalidateTag(`products:${user.id}`, 'max')
 
   // Also revalidate the dashboard view
   revalidatePath('/dashboard')
@@ -98,8 +97,7 @@ export async function toggleStock(productId: string) {
 
   // 4. Revalidate
   // This tag invalidates the specific query in the public shop
-  // @ts-expect-error - revalidateTag in this canary version might require 2 args
-  revalidateTag(`products:${user.id}`)
+  revalidateTag(`products:${user.id}`, 'max')
 
   // Dashboard needs a refresh too
   revalidatePath('/dashboard')

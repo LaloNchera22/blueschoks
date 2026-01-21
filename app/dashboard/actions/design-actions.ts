@@ -36,8 +36,7 @@ export async function saveDesignConfig(config: DesignConfig) {
       // Revalidate the shop page path
       revalidatePath(`/${profile.slug}`, 'layout')
       // Invalidate the shop data cache
-      // @ts-expect-error - revalidateTag in this canary version might require 2 args
-      revalidateTag(`shop:${profile.slug}`, 'layout')
+      revalidateTag(`shop:${profile.slug}`, 'max')
     }
 
     return { success: true }
@@ -79,8 +78,7 @@ export async function saveThemeConfig(config: ThemeConfig) {
       // Revalidate the specific shop page
       revalidatePath(`/${profile.slug}`, 'layout')
       // Invalidate the shop data cache
-      // @ts-expect-error - revalidateTag in this canary version might require 2 args
-      revalidateTag(`shop:${profile.slug}`, 'layout')
+      revalidateTag(`shop:${profile.slug}`, 'max')
     }
 
     return { success: true }
