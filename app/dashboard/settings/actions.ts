@@ -109,8 +109,7 @@ export async function updateSettings(prevState: SettingsState, formData: FormDat
 
     if (finalSlug) {
         revalidatePath(`/${finalSlug}`, 'page')
-        // @ts-expect-error - revalidateTag in this canary version might require 2 args
-        revalidateTag(`shop:${finalSlug}`)
+        revalidateTag(`shop:${finalSlug}`, 'max')
     }
 
     return { success: true, message: "Cambios guardados correctamente." }
