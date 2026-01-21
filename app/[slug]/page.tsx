@@ -13,17 +13,19 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
 
   const { data: profile } = await supabase
     .from('profiles')
-    .select('shop_name, design_title_text, design_subtitle_text, avatar_url, theme_config')
+    .select('shop_name, design_title_text, design_subtitle_text, avatar_url, theme_config, design_config')
     .eq('slug', slug)
     .single()
 
   if (!profile) return { title: 'Tienda no encontrada' }
 
-  // Intentar sacar datos del nuevo config, fallback al viejo/DB
-  const config = profile.theme_config as unknown as DesignConfig
-  const title = config?.profile?.shopName || profile.shop_name || 'Tienda'
-  const desc = config?.profile?.bio || profile.design_subtitle_text || 'Bienvenido a mi tienda'
-  const image = config?.profile?.avatarUrl || profile.avatar_url
+  // Prioritize design_config (new source), fall back to theme_config (legacy)
+  const rawConfig = (profile.design_config || profile.theme_config) as unknown as Partial<DesignConfig> | null
+
+  // Use optional chaining carefully
+  const title = rawConfig?.profile?.shopName || profile.shop_name || 'Tienda'
+  const desc = rawConfig?.profile?.bio || profile.design_subtitle_text || 'Bienvenido a mi tienda'
+  const image = rawConfig?.profile?.avatarUrl || profile.avatar_url
 
   return {
     title,
@@ -44,7 +46,7 @@ export default async function StorePage({ params }: { params: Promise<{ slug: st
   // 1. Fetch Profile
   const { data: profile } = await supabase
     .from('profiles')
-    .select('*')
+    .select('*, design_config') // Explicitly select design_config to ensure it's available even if * misses it due to types
     .eq('slug', slug)
     .single()
 
@@ -61,9 +63,8 @@ export default async function StorePage({ params }: { params: Promise<{ slug: st
     .order('created_at', { ascending: false })
 
   // 3. Adapt Design Config (Merge)
-  // Casting 'theme_config' to DesignConfig since DB types might imply it's ThemeConfig (legacy) or generic JSON
-  // We use the new DEFAULT_DESIGN to ensure strict typing for the UI
-  const rawConfig = profile.theme_config as unknown as Partial<DesignConfig> | null
+  // Prioritize design_config (new source), fall back to theme_config (legacy)
+  const rawConfig = (profile.design_config || profile.theme_config) as unknown as Partial<DesignConfig> | null
 
   const config: DesignConfig = {
     colors: {
