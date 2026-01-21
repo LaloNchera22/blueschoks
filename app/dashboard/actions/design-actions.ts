@@ -36,8 +36,11 @@ export async function saveDesignConfig(config: DesignConfig) {
       // Revalidate the shop page path
       revalidatePath(`/${profile.slug}`, 'layout')
       // Invalidate the shop data cache
-      revalidateTag(`shop:${profile.slug}`, 'max')
+      // revalidateTag(`shop:${profile.slug}`, 'max')
     }
+
+    // Force global revalidation to ensure stale data is purged
+    revalidatePath('/', 'layout')
 
     return { success: true }
   } catch (error) {
@@ -78,8 +81,11 @@ export async function saveThemeConfig(config: ThemeConfig) {
       // Revalidate the specific shop page
       revalidatePath(`/${profile.slug}`, 'layout')
       // Invalidate the shop data cache
-      revalidateTag(`shop:${profile.slug}`, 'max')
+      // revalidateTag(`shop:${profile.slug}`, 'max')
     }
+
+    // Force global revalidation to ensure stale data is purged
+    revalidatePath('/', 'layout')
 
     return { success: true }
   } catch (error) {
