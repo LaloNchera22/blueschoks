@@ -30,14 +30,14 @@ export async function saveDesignConfig(config: DesignConfig) {
 
     if (error) throw error
 
-    revalidatePath('/dashboard/design')
+    revalidatePath('/dashboard/design', 'layout')
 
     if (profile?.slug) {
       // Revalidate the shop page path
-      revalidatePath(`/${profile.slug}`, 'page')
+      revalidatePath(`/${profile.slug}`, 'layout')
       // Invalidate the shop data cache
       // @ts-expect-error - revalidateTag in this canary version might require 2 args
-      revalidateTag(`shop:${profile.slug}`)
+      revalidateTag(`shop:${profile.slug}`, 'layout')
     }
 
     return { success: true }
@@ -73,15 +73,14 @@ export async function saveThemeConfig(config: ThemeConfig) {
 
     if (error) throw error
 
-    revalidatePath('/dashboard/design')
+    revalidatePath('/dashboard/design', 'layout')
 
     if (profile?.slug) {
       // Revalidate the specific shop page
-      // Note: 'page' type ensures we target the page route, not just layout
-      revalidatePath(`/${profile.slug}`, 'page')
+      revalidatePath(`/${profile.slug}`, 'layout')
       // Invalidate the shop data cache
       // @ts-expect-error - revalidateTag in this canary version might require 2 args
-      revalidateTag(`shop:${profile.slug}`)
+      revalidateTag(`shop:${profile.slug}`, 'layout')
     }
 
     return { success: true }

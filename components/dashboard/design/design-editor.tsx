@@ -26,6 +26,7 @@ import {
   AlignRight,
   Type
 } from 'lucide-react';
+import { useRouter } from 'next/navigation';
 import {
   DndContext,
   closestCenter,
@@ -174,6 +175,7 @@ function SortableSocialItem({ id, link, onDelete }: { id: string, link: LinkItem
 // --- MAIN COMPONENT ---
 
 export default function DesignEditor({ initialConfig, initialProducts, userId, slug }: DesignEditorProps) {
+  const router = useRouter();
   // Ensure we have valid defaults for new fields if they don't exist yet
   const safeInitialConfig = useMemo(() => {
     return {
@@ -229,6 +231,7 @@ export default function DesignEditor({ initialConfig, initialProducts, userId, s
       const result = await saveDesignConfig(config);
       if (result.success) {
         toast.success("Diseño guardado correctamente");
+        router.refresh();
       } else {
         toast.error("Error al guardar cambios");
       }
