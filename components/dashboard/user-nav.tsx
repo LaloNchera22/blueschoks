@@ -40,6 +40,7 @@ export function UserNav({ userEmail, avatarUrl, isCollapsed }: UserNavProps) {
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
         <Button
+            suppressHydrationWarning={true}
             variant="ghost"
             className={`relative h-12 w-full justify-start rounded-xl px-2 hover:bg-slate-100 ${isCollapsed ? "px-0 justify-center" : ""}`}
         >
