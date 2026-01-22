@@ -20,12 +20,10 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
   if (!profile) return { title: 'Tienda no encontrada' }
 
   // Prioritize design_config (new source), fall back to theme_config (legacy)
-  const rawConfig = (profile.design_config || profile.theme_config) as unknown as Partial<DesignConfig> | null
-
-  // Use optional chaining carefully
-  const title = rawConfig?.profile?.shopName || profile.shop_name || 'Tienda'
-  const desc = rawConfig?.profile?.bio || profile.design_subtitle_text || 'Bienvenido a mi tienda'
-  const image = rawConfig?.profile?.avatarUrl || profile.avatar_url
+  const config = (profile.design_config || profile.theme_config) as unknown as DesignConfig
+  const title = config?.profile?.shopName || profile.shop_name || 'Mi Tienda'
+  const desc = config?.profile?.bio || profile.design_subtitle_text || 'Bienvenido a mi tienda'
+  const image = config?.profile?.avatarUrl || profile.avatar_url
 
   return {
     title,
