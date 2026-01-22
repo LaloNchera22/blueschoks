@@ -629,7 +629,7 @@ export default function DesignEditor({ initialConfig, initialProducts, userId, s
                     "w-6 h-6 rounded-full flex items-center justify-center transition-all",
                     config.profile.avatarShape === 'none' ? "bg-white shadow-sm text-black" : "text-gray-400 hover:text-gray-600"
                   )}
-                  title="Cuadrado (Recto)"
+                  title="Cuadrado Recto (Sin Borde)"
                 >
                   <Square className="w-3 h-3" />
                 </button>
