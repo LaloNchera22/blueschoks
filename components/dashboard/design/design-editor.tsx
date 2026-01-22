@@ -375,6 +375,26 @@ export default function DesignEditor({ initialConfig, initialProducts, userId, s
 
   return (
     <div className="w-full h-full relative overflow-hidden flex flex-col items-center justify-center font-sans bg-gray-50">
+      <style>{`
+        /* Hide Next.js Dev Tools and Toasts in Editor Preview */
+        [data-nextjs-toast],
+        [data-nextjs-toast-wrapper],
+        .nextjs-toast-errors-parent,
+        #nextjs-dev-tools-overlay,
+        nextjs-portal,
+        nextjs-portal-entrance {
+          display: none !important;
+          opacity: 0 !important;
+          visibility: hidden !important;
+          pointer-events: none !important;
+          z-index: -9999 !important;
+          width: 0 !important;
+          height: 0 !important;
+        }
+
+        /* Attempt to target shadow roots if possible via simple selectors, though tricky in CSS */
+        /* Note: Shadow DOM blocking requires JS usually, but some tools expose a wrapper. */
+      `}</style>
 
       {/* --- ATMOSPHERIC BACKGROUND --- */}
       <div
@@ -742,7 +762,7 @@ export default function DesignEditor({ initialConfig, initialProducts, userId, s
         <div className="flex justify-center pb-32 px-4 pt-32"> {/* Added pt-32 to account for floating toolbar */}
           <div className="w-full max-w-[420px] origin-top scale-[0.9] 2xl:scale-100 transition-transform bg-transparent">
              <div
-               className="min-h-[800px] pb-40 relative shadow-2xl rounded-[32px] overflow-hidden bg-white/50 ring-8 ring-black/5"
+               className="h-full min-h-[800px] pb-40 relative shadow-2xl rounded-[32px] overflow-hidden bg-neutral-900 ring-8 ring-black/5"
                style={{ backgroundColor: config.colors.background }}
              >
                 {/* FIX: REMOVED STICKY HEADER VISUAL TO REMOVE FAKE HEADER BAR */}
