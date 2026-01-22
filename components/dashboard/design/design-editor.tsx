@@ -104,6 +104,24 @@ const PLATFORMS = [
   { id: 'other', icon: LinkIcon, label: 'Otro' },
 ];
 
+// --- HELPER FUNCTIONS ---
+
+const getContrastColor = (hexcolor: string) => {
+  // If no color or invalid, default to black
+  if (!hexcolor || !hexcolor.startsWith('#')) return '#000000';
+
+  // Convert to RGB
+  const r = parseInt(hexcolor.substring(1,3), 16);
+  const g = parseInt(hexcolor.substring(3,5), 16);
+  const b = parseInt(hexcolor.substring(5,7), 16);
+
+  // Calculate luminance (YIQ)
+  const yiq = ((r*299)+(g*587)+(b*114))/1000;
+
+  // Return black or white based on luminance
+  return (yiq >= 128) ? '#000000' : '#ffffff';
+}
+
 // --- HELPER COMPONENTS ---
 
 const ColorCircle = ({
@@ -334,6 +352,326 @@ export default function DesignEditor({ initialConfig, initialProducts, userId, s
       />
       <div className="absolute inset-0 bg-white/20 backdrop-blur-3xl pointer-events-none" />
 
+      {/* --- SMART TOOLBAR (FIX: MOVED OUTSIDE SCROLL FLOW & ABSOLUTE POSITIONED) --- */}
+      <div
+        className="absolute top-6 left-1/2 -translate-x-1/2 z-50 w-max mb-4 pointer-events-auto"
+        onClick={(e) => e.stopPropagation()}
+      >
+        <div className="h-14 px-6 rounded-full bg-white/90 shadow-lg border border-gray-200 flex items-center gap-4 transition-all duration-300 ease-out backdrop-blur-md">
+
+          {/* 1. GLOBAL TOOLS (Default) */}
+          {activeTool === 'global' && (
+            <div className="flex items-center gap-5 animate-in fade-in slide-in-from-top-2 duration-300">
+               <div className="flex flex-col items-center gap-1 group">
+                <ColorCircle
+                  color={config.colors.background}
+                  onChange={(c) => {
+                    updateConfig(['colors', 'background'], c);
+                    // FIX: Auto-adapt text color for contrast
+                    const contrastColor = getContrastColor(c);
+                    updateConfig(['colors', 'text'], contrastColor);
+                  }}
+                />
+                <span className="text-[9px] text-gray-500 font-semibold uppercase tracking-wider group-hover:text-black transition-colors">Fondo</span>
+              </div>
+
+              <div className="flex flex-col items-center gap-1 group">
+                 <div className="relative">
+                    <select
+                      value={config.fonts.body}
+                      onChange={(e) => {
+                        updateConfig(['fonts', 'body'], e.target.value);
+                        updateConfig(['fonts', 'heading'], e.target.value);
+                      }}
+                      className="appearance-none bg-gray-50 border border-gray-200 rounded-full h-8 pl-3 pr-7 text-xs font-medium focus:outline-none focus:ring-2 focus:ring-black/5 cursor-pointer text-gray-700 hover:bg-gray-100 transition-colors"
+                    >
+                      {FONTS.map(f => <option key={f.value} value={f.value}>{f.name}</option>)}
+                    </select>
+                    <ChevronDown className="w-3 h-3 absolute right-2 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none" />
+                 </div>
+                 <span className="text-[9px] text-gray-500 font-semibold uppercase tracking-wider group-hover:text-black transition-colors">Fuente</span>
+              </div>
+
+              {/* Separator */}
+              <div className="w-px h-6 bg-gray-300" />
+
+              {/* Socials Manager Button */}
+              <button
+                onClick={() => setShowSocialsManager(!showSocialsManager)}
+                className={cn(
+                  "flex flex-col items-center gap-1 group",
+                  showSocialsManager && "opacity-100"
+                )}
+              >
+                <div className={cn(
+                  "w-8 h-8 rounded-full border border-gray-200 flex items-center justify-center transition-all",
+                  showSocialsManager ? "bg-black text-white border-black" : "bg-white text-gray-600 hover:bg-gray-50 hover:scale-105"
+                )}>
+                  <MoreHorizontal className="w-4 h-4" />
+                </div>
+                <span className="text-[9px] text-gray-500 font-semibold uppercase tracking-wider group-hover:text-black transition-colors">Redes</span>
+              </button>
+            </div>
+          )}
+
+          {/* 2. RICH TEXT TOOLS (Header Title & Bio) */}
+          {(activeTool === 'header-title' || activeTool === 'header-bio') && (
+             <div className="flex items-center gap-3 animate-in fade-in slide-in-from-top-2 duration-300">
+               {/* Font Family Dropdown */}
+               <div className="relative">
+                  <select
+                    value={(activeTool === 'header-title' ? config.profile.titleStyle?.fontFamily : config.profile.bioStyle?.fontFamily) || (activeTool === 'header-title' ? config.fonts.heading : config.fonts.body)}
+                    onChange={(e) => updateConfig(['profile', activeTool === 'header-title' ? 'titleStyle' : 'bioStyle', 'fontFamily'], e.target.value)}
+                    className="appearance-none bg-gray-50 border border-gray-200 rounded-full h-8 pl-3 pr-7 text-xs font-medium focus:outline-none focus:ring-2 focus:ring-black/5 cursor-pointer text-gray-700 hover:bg-gray-100 transition-colors w-24 truncate"
+                  >
+                    {FONTS.map(f => <option key={f.value} value={f.value}>{f.name}</option>)}
+                  </select>
+                  <ChevronDown className="w-3 h-3 absolute right-2 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none" />
+               </div>
+
+               {/* Separator */}
+               <div className="w-px h-6 bg-gray-300" />
+
+               {/* Style Toggles (Bold/Italic) */}
+               <div className="flex items-center bg-gray-50 rounded-lg p-0.5 border border-gray-200">
+                  <button
+                    onClick={() => {
+                        const styleKey = activeTool === 'header-title' ? 'titleStyle' : 'bioStyle';
+                        const current = activeTool === 'header-title' ? config.profile.titleStyle?.bold : config.profile.bioStyle?.bold;
+                        updateConfig(['profile', styleKey, 'bold'], !current);
+                    }}
+                    className={cn(
+                      "w-7 h-7 flex items-center justify-center rounded-md transition-all",
+                      (activeTool === 'header-title' ? config.profile.titleStyle?.bold : config.profile.bioStyle?.bold) ? "bg-white shadow-sm text-black" : "text-gray-500 hover:text-black"
+                    )}
+                  >
+                    <Bold className="w-4 h-4" />
+                  </button>
+                  <button
+                    onClick={() => {
+                        const styleKey = activeTool === 'header-title' ? 'titleStyle' : 'bioStyle';
+                        const current = activeTool === 'header-title' ? config.profile.titleStyle?.italic : config.profile.bioStyle?.italic;
+                        updateConfig(['profile', styleKey, 'italic'], !current);
+                    }}
+                    className={cn(
+                      "w-7 h-7 flex items-center justify-center rounded-md transition-all",
+                      (activeTool === 'header-title' ? config.profile.titleStyle?.italic : config.profile.bioStyle?.italic) ? "bg-white shadow-sm text-black" : "text-gray-500 hover:text-black"
+                    )}
+                  >
+                    <Italic className="w-4 h-4" />
+                  </button>
+               </div>
+
+               {/* Alignment Group */}
+               <div className="flex items-center bg-gray-50 rounded-lg p-0.5 border border-gray-200">
+                  {['left', 'center', 'right'].map((align) => (
+                    <button
+                      key={align}
+                      onClick={() => updateConfig(['profile', activeTool === 'header-title' ? 'titleStyle' : 'bioStyle', 'align'], align)}
+                      className={cn(
+                        "w-7 h-7 flex items-center justify-center rounded-md transition-all",
+                        ((activeTool === 'header-title' ? config.profile.titleStyle?.align : config.profile.bioStyle?.align) || 'center') === align ? "bg-white shadow-sm text-black" : "text-gray-500 hover:text-black"
+                      )}
+                    >
+                      {align === 'left' && <AlignLeft className="w-4 h-4" />}
+                      {align === 'center' && <AlignCenter className="w-4 h-4" />}
+                      {align === 'right' && <AlignRight className="w-4 h-4" />}
+                    </button>
+                  ))}
+               </div>
+
+               {/* Separator */}
+               <div className="w-px h-6 bg-gray-300" />
+
+               {/* Color */}
+               <ColorCircle
+                  color={(activeTool === 'header-title' ? config.profile.titleStyle?.color : config.profile.bioStyle?.color) || config.colors.text}
+                  onChange={(c) => updateConfig(['profile', activeTool === 'header-title' ? 'titleStyle' : 'bioStyle', 'color'], c)}
+               />
+
+               {/* Size (Simple +/-) */}
+               <div className="flex items-center gap-1 bg-gray-50 rounded-full border border-gray-200 px-1 ml-1">
+                  <button
+                    onClick={() => {
+                        const styleKey = activeTool === 'header-title' ? 'titleStyle' : 'bioStyle';
+                        const currentSize = (activeTool === 'header-title' ? config.profile.titleStyle?.size : config.profile.bioStyle?.size) || (activeTool === 'header-title' ? 24 : 14);
+                        updateConfig(['profile', styleKey, 'size'], Math.max(10, currentSize - 1));
+                    }}
+                    className="w-6 h-6 flex items-center justify-center text-gray-500 hover:text-black"
+                  >
+                    <Minus className="w-3 h-3" />
+                  </button>
+                  <span className="text-[10px] font-medium w-4 text-center">
+                    {(activeTool === 'header-title' ? config.profile.titleStyle?.size : config.profile.bioStyle?.size) || (activeTool === 'header-title' ? 24 : 14)}
+                  </span>
+                   <button
+                    onClick={() => {
+                        const styleKey = activeTool === 'header-title' ? 'titleStyle' : 'bioStyle';
+                        const currentSize = (activeTool === 'header-title' ? config.profile.titleStyle?.size : config.profile.bioStyle?.size) || (activeTool === 'header-title' ? 24 : 14);
+                        updateConfig(['profile', styleKey, 'size'], Math.min(64, currentSize + 1));
+                    }}
+                    className="w-6 h-6 flex items-center justify-center text-gray-500 hover:text-black"
+                  >
+                     <Type className="w-3 h-3" />
+                  </button>
+               </div>
+             </div>
+          )}
+
+          {/* 3. HEADER AVATAR TOOLS (Existing, but moved to top) */}
+          {activeTool === 'header-avatar' && (
+            <div className="flex items-center gap-4 animate-in fade-in slide-in-from-top-2 duration-300">
+              {/* Image Input */}
+              <input
+                type="text"
+                value={config.profile.avatarUrl || ''}
+                onChange={(e) => updateConfig(['profile', 'avatarUrl'], e.target.value)}
+                placeholder="URL de Imagen"
+                className="h-8 rounded-full border border-gray-200 bg-gray-50 px-3 text-xs w-32 focus:outline-none focus:ring-2 focus:ring-black/5"
+              />
+
+              {/* Shape Selector */}
+              <div className="flex items-center bg-gray-50 rounded-full p-1 border border-gray-100">
+                <button
+                  onClick={() => updateConfig(['profile', 'avatarShape'], 'circle')}
+                  className={cn(
+                    "w-6 h-6 rounded-full flex items-center justify-center transition-all",
+                    config.profile.avatarShape === 'circle' ? "bg-white shadow-sm text-black" : "text-gray-400 hover:text-gray-600"
+                  )}
+                  title="Círculo"
+                >
+                  <Circle className="w-3 h-3" />
+                </button>
+                <button
+                  onClick={() => updateConfig(['profile', 'avatarShape'], 'rounded')}
+                  className={cn(
+                    "w-6 h-6 rounded-full flex items-center justify-center transition-all",
+                    config.profile.avatarShape === 'rounded' ? "bg-white shadow-sm text-black" : "text-gray-400 hover:text-gray-600"
+                  )}
+                  title="Cuadrado Redondeado"
+                >
+                  <div className="w-3 h-3 border-2 border-current rounded-sm" />
+                </button>
+                <button
+                  onClick={() => updateConfig(['profile', 'avatarShape'], 'square')}
+                  className={cn(
+                    "w-6 h-6 rounded-full flex items-center justify-center transition-all",
+                    config.profile.avatarShape === 'square' ? "bg-white shadow-sm text-black" : "text-gray-400 hover:text-gray-600"
+                  )}
+                  title="Cuadrado"
+                >
+                  <Square className="w-3 h-3" />
+                </button>
+              </div>
+
+              {/* Border Toggle/Color */}
+              <div className="flex flex-col items-center gap-1">
+                 <div className="flex items-center gap-1 relative">
+                    <ColorCircle
+                        color={config.profile.avatarBorderColor || 'transparent'}
+                        onChange={(c) => updateConfig(['profile', 'avatarBorderColor'], c)}
+                        size="sm"
+                    />
+                    {config.profile.avatarBorderColor && (
+                        <button
+                            onClick={(e) => {
+                                e.stopPropagation();
+                                updateConfig(['profile', 'avatarBorderColor'], undefined);
+                            }}
+                            className="absolute -top-1 -right-1 bg-gray-100 border border-gray-300 rounded-full p-0.5 hover:bg-gray-200 transition-colors shadow-sm z-10"
+                            title="Quitar borde"
+                        >
+                            <Minus size={10} className="text-gray-600" />
+                        </button>
+                    )}
+                 </div>
+                 <span className="text-[9px] text-gray-500 font-semibold uppercase tracking-wider">Borde</span>
+              </div>
+            </div>
+          )}
+
+          {/* 5. ATOMIC SOCIAL ICON (Existing) */}
+          {activeTool?.startsWith('social-icon-') && selectedSocialLink && (
+             <div className="flex items-center gap-4 animate-in fade-in slide-in-from-top-2 duration-300">
+                <div className="flex flex-col items-center gap-1">
+                  <ColorCircle
+                    color={selectedSocialLink.color || config.colors.primary}
+                    onChange={(c) => updateSocialLink(selectedSocialLink.id, 'color', c)}
+                  />
+                  <span className="text-[9px] text-gray-500 font-semibold uppercase tracking-wider">Icono</span>
+                </div>
+
+                <div className="w-px h-6 bg-gray-200" />
+
+                <input
+                  type="text"
+                  value={selectedSocialLink.url}
+                  onChange={(e) => updateSocialLink(selectedSocialLink.id, 'url', e.target.value)}
+                  placeholder="https://..."
+                  className="h-8 rounded-full border border-gray-200 bg-gray-50 px-3 text-xs w-48 focus:outline-none focus:ring-2 focus:ring-black/5"
+                />
+
+                <button
+                  onClick={() => handleRemoveSocial(selectedSocialLink.id)}
+                  className="w-8 h-8 flex items-center justify-center rounded-full bg-red-50 text-red-500 hover:bg-red-100 hover:text-red-600 transition-colors"
+                >
+                  <Trash2 className="w-4 h-4" />
+                </button>
+             </div>
+          )}
+
+          {/* 6. CARD BUTTON TOOLS (Existing) */}
+          {activeTool === 'card-button' && (
+            <div className="flex items-center gap-4 animate-in fade-in slide-in-from-top-2 duration-300">
+               <div className="flex flex-col items-center gap-1">
+                  <ColorCircle color={config.cardStyle?.buttonColor || '#000000'} onChange={(c) => updateConfig(['cardStyle', 'buttonColor'], c)} />
+                  <span className="text-[9px] text-gray-500 font-semibold uppercase tracking-wider">Fondo</span>
+               </div>
+               <div className="flex flex-col items-center gap-1">
+                  <ColorCircle color={config.cardStyle?.buttonTextColor || '#ffffff'} onChange={(c) => updateConfig(['cardStyle', 'buttonTextColor'], c)} />
+                  <span className="text-[9px] text-gray-500 font-semibold uppercase tracking-wider">Texto</span>
+               </div>
+
+               <div className="flex flex-col items-center gap-1 w-24">
+                  <input
+                    type="range"
+                    min="0"
+                    max="24"
+                    step="2"
+                    value={config.cardStyle?.borderRadius || 8}
+                    onChange={(e) => updateConfig(['cardStyle', 'borderRadius'], Number(e.target.value))}
+                    className="w-full h-1 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-black"
+                  />
+                  <span className="text-[9px] text-gray-500 font-semibold uppercase tracking-wider">Redondez</span>
+               </div>
+            </div>
+          )}
+
+          {/* 7. CARD TITLE/PRICE TOOLS (Existing) */}
+          {(activeTool === 'card-title' || activeTool === 'card-price') && (
+             <div className="flex items-center gap-4 animate-in fade-in slide-in-from-top-2 duration-300">
+                <div className="flex flex-col items-center gap-1">
+                  <ColorCircle
+                    color={activeTool === 'card-title' ? (config.cardStyle?.titleColor || config.colors.text) : (config.cardStyle?.priceColor || config.colors.text)}
+                    onChange={(c) => updateConfig(['cardStyle', activeTool === 'card-title' ? 'titleColor' : 'priceColor'], c)}
+                  />
+                  <span className="text-[9px] text-gray-500 font-semibold uppercase tracking-wider">Color</span>
+                </div>
+             </div>
+          )}
+
+          {/* SAVE BUTTON (Always visible on right) */}
+          <div className="pl-4 ml-auto border-l border-gray-200 py-1">
+            <button
+              onClick={handleSave}
+              disabled={isSaving}
+              className="bg-black hover:bg-gray-800 text-white rounded-full w-10 h-10 flex items-center justify-center transition-all disabled:opacity-50 disabled:cursor-not-allowed shadow-sm"
+            >
+              {isSaving ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />}
+            </button>
+          </div>
+        </div>
+      </div>
 
       {/* --- EDGE-TO-EDGE STORE CONTENT (Full Width/Height Scrollable) --- */}
       <div
@@ -350,353 +688,17 @@ export default function DesignEditor({ initialConfig, initialProducts, userId, s
           setActiveTool('global');
         }}
       >
-        {/* --- SMART TOOLBAR (UPDATED POSITION & UI) --- */}
-        <div
-          className="sticky top-6 mx-auto z-50 w-max mb-4 pointer-events-auto"
-          onClick={(e) => e.stopPropagation()}
-        >
-          <div className="h-14 px-6 rounded-full bg-white/90 shadow-lg border border-gray-200 flex items-center gap-4 transition-all duration-300 ease-out backdrop-blur-md">
-
-            {/* 1. GLOBAL TOOLS (Default) */}
-            {activeTool === 'global' && (
-              <div className="flex items-center gap-5 animate-in fade-in slide-in-from-top-2 duration-300">
-                 <div className="flex flex-col items-center gap-1 group">
-                  <ColorCircle color={config.colors.background} onChange={(c) => updateConfig(['colors', 'background'], c)} />
-                  <span className="text-[9px] text-gray-500 font-semibold uppercase tracking-wider group-hover:text-black transition-colors">Fondo</span>
-                </div>
-
-                <div className="flex flex-col items-center gap-1 group">
-                   <div className="relative">
-                      <select
-                        value={config.fonts.body}
-                        onChange={(e) => {
-                          updateConfig(['fonts', 'body'], e.target.value);
-                          updateConfig(['fonts', 'heading'], e.target.value);
-                        }}
-                        className="appearance-none bg-gray-50 border border-gray-200 rounded-full h-8 pl-3 pr-7 text-xs font-medium focus:outline-none focus:ring-2 focus:ring-black/5 cursor-pointer text-gray-700 hover:bg-gray-100 transition-colors"
-                      >
-                        {FONTS.map(f => <option key={f.value} value={f.value}>{f.name}</option>)}
-                      </select>
-                      <ChevronDown className="w-3 h-3 absolute right-2 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none" />
-                   </div>
-                   <span className="text-[9px] text-gray-500 font-semibold uppercase tracking-wider group-hover:text-black transition-colors">Fuente</span>
-                </div>
-
-                {/* Separator */}
-                <div className="w-px h-6 bg-gray-300" />
-
-                {/* Socials Manager Button */}
-                <button
-                  onClick={() => setShowSocialsManager(!showSocialsManager)}
-                  className={cn(
-                    "flex flex-col items-center gap-1 group",
-                    showSocialsManager && "opacity-100"
-                  )}
-                >
-                  <div className={cn(
-                    "w-8 h-8 rounded-full border border-gray-200 flex items-center justify-center transition-all",
-                    showSocialsManager ? "bg-black text-white border-black" : "bg-white text-gray-600 hover:bg-gray-50 hover:scale-105"
-                  )}>
-                    <MoreHorizontal className="w-4 h-4" />
-                  </div>
-                  <span className="text-[9px] text-gray-500 font-semibold uppercase tracking-wider group-hover:text-black transition-colors">Redes</span>
-                </button>
-              </div>
-            )}
-
-            {/* 2. RICH TEXT TOOLS (Header Title & Bio) */}
-            {(activeTool === 'header-title' || activeTool === 'header-bio') && (
-               <div className="flex items-center gap-3 animate-in fade-in slide-in-from-top-2 duration-300">
-                 {/* Font Family Dropdown */}
-                 <div className="relative">
-                    <select
-                      value={(activeTool === 'header-title' ? config.profile.titleStyle?.fontFamily : config.profile.bioStyle?.fontFamily) || (activeTool === 'header-title' ? config.fonts.heading : config.fonts.body)}
-                      onChange={(e) => updateConfig(['profile', activeTool === 'header-title' ? 'titleStyle' : 'bioStyle', 'fontFamily'], e.target.value)}
-                      className="appearance-none bg-gray-50 border border-gray-200 rounded-full h-8 pl-3 pr-7 text-xs font-medium focus:outline-none focus:ring-2 focus:ring-black/5 cursor-pointer text-gray-700 hover:bg-gray-100 transition-colors w-24 truncate"
-                    >
-                      {FONTS.map(f => <option key={f.value} value={f.value}>{f.name}</option>)}
-                    </select>
-                    <ChevronDown className="w-3 h-3 absolute right-2 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none" />
-                 </div>
-
-                 {/* Separator */}
-                 <div className="w-px h-6 bg-gray-300" />
-
-                 {/* Style Toggles (Bold/Italic) */}
-                 <div className="flex items-center bg-gray-50 rounded-lg p-0.5 border border-gray-200">
-                    <button
-                      onClick={() => {
-                          const styleKey = activeTool === 'header-title' ? 'titleStyle' : 'bioStyle';
-                          const current = activeTool === 'header-title' ? config.profile.titleStyle?.bold : config.profile.bioStyle?.bold;
-                          updateConfig(['profile', styleKey, 'bold'], !current);
-                      }}
-                      className={cn(
-                        "w-7 h-7 flex items-center justify-center rounded-md transition-all",
-                        (activeTool === 'header-title' ? config.profile.titleStyle?.bold : config.profile.bioStyle?.bold) ? "bg-white shadow-sm text-black" : "text-gray-500 hover:text-black"
-                      )}
-                    >
-                      <Bold className="w-4 h-4" />
-                    </button>
-                    <button
-                      onClick={() => {
-                          const styleKey = activeTool === 'header-title' ? 'titleStyle' : 'bioStyle';
-                          const current = activeTool === 'header-title' ? config.profile.titleStyle?.italic : config.profile.bioStyle?.italic;
-                          updateConfig(['profile', styleKey, 'italic'], !current);
-                      }}
-                      className={cn(
-                        "w-7 h-7 flex items-center justify-center rounded-md transition-all",
-                        (activeTool === 'header-title' ? config.profile.titleStyle?.italic : config.profile.bioStyle?.italic) ? "bg-white shadow-sm text-black" : "text-gray-500 hover:text-black"
-                      )}
-                    >
-                      <Italic className="w-4 h-4" />
-                    </button>
-                 </div>
-
-                 {/* Alignment Group */}
-                 <div className="flex items-center bg-gray-50 rounded-lg p-0.5 border border-gray-200">
-                    {['left', 'center', 'right'].map((align) => (
-                      <button
-                        key={align}
-                        onClick={() => updateConfig(['profile', activeTool === 'header-title' ? 'titleStyle' : 'bioStyle', 'align'], align)}
-                        className={cn(
-                          "w-7 h-7 flex items-center justify-center rounded-md transition-all",
-                          ((activeTool === 'header-title' ? config.profile.titleStyle?.align : config.profile.bioStyle?.align) || 'center') === align ? "bg-white shadow-sm text-black" : "text-gray-500 hover:text-black"
-                        )}
-                      >
-                        {align === 'left' && <AlignLeft className="w-4 h-4" />}
-                        {align === 'center' && <AlignCenter className="w-4 h-4" />}
-                        {align === 'right' && <AlignRight className="w-4 h-4" />}
-                      </button>
-                    ))}
-                 </div>
-
-                 {/* Separator */}
-                 <div className="w-px h-6 bg-gray-300" />
-
-                 {/* Color */}
-                 <ColorCircle
-                    color={(activeTool === 'header-title' ? config.profile.titleStyle?.color : config.profile.bioStyle?.color) || config.colors.text}
-                    onChange={(c) => updateConfig(['profile', activeTool === 'header-title' ? 'titleStyle' : 'bioStyle', 'color'], c)}
-                 />
-
-                 {/* Size (Simple +/-) */}
-                 <div className="flex items-center gap-1 bg-gray-50 rounded-full border border-gray-200 px-1 ml-1">
-                    <button
-                      onClick={() => {
-                          const styleKey = activeTool === 'header-title' ? 'titleStyle' : 'bioStyle';
-                          const currentSize = (activeTool === 'header-title' ? config.profile.titleStyle?.size : config.profile.bioStyle?.size) || (activeTool === 'header-title' ? 24 : 14);
-                          updateConfig(['profile', styleKey, 'size'], Math.max(10, currentSize - 1));
-                      }}
-                      className="w-6 h-6 flex items-center justify-center text-gray-500 hover:text-black"
-                    >
-                      <Minus className="w-3 h-3" />
-                    </button>
-                    <span className="text-[10px] font-medium w-4 text-center">
-                      {(activeTool === 'header-title' ? config.profile.titleStyle?.size : config.profile.bioStyle?.size) || (activeTool === 'header-title' ? 24 : 14)}
-                    </span>
-                     <button
-                      onClick={() => {
-                          const styleKey = activeTool === 'header-title' ? 'titleStyle' : 'bioStyle';
-                          const currentSize = (activeTool === 'header-title' ? config.profile.titleStyle?.size : config.profile.bioStyle?.size) || (activeTool === 'header-title' ? 24 : 14);
-                          updateConfig(['profile', styleKey, 'size'], Math.min(64, currentSize + 1));
-                      }}
-                      className="w-6 h-6 flex items-center justify-center text-gray-500 hover:text-black"
-                    >
-                       <Type className="w-3 h-3" />
-                    </button>
-                 </div>
-               </div>
-            )}
-
-            {/* 3. HEADER AVATAR TOOLS (Existing, but moved to top) */}
-            {activeTool === 'header-avatar' && (
-              <div className="flex items-center gap-4 animate-in fade-in slide-in-from-top-2 duration-300">
-                {/* Image Input */}
-                <input
-                  type="text"
-                  value={config.profile.avatarUrl || ''}
-                  onChange={(e) => updateConfig(['profile', 'avatarUrl'], e.target.value)}
-                  placeholder="URL de Imagen"
-                  className="h-8 rounded-full border border-gray-200 bg-gray-50 px-3 text-xs w-32 focus:outline-none focus:ring-2 focus:ring-black/5"
-                />
-
-                {/* Shape Selector */}
-                <div className="flex items-center bg-gray-50 rounded-full p-1 border border-gray-100">
-                  <button
-                    onClick={() => updateConfig(['profile', 'avatarShape'], 'circle')}
-                    className={cn(
-                      "w-6 h-6 rounded-full flex items-center justify-center transition-all",
-                      config.profile.avatarShape === 'circle' ? "bg-white shadow-sm text-black" : "text-gray-400 hover:text-gray-600"
-                    )}
-                    title="Círculo"
-                  >
-                    <Circle className="w-3 h-3" />
-                  </button>
-                  <button
-                    onClick={() => updateConfig(['profile', 'avatarShape'], 'rounded')}
-                    className={cn(
-                      "w-6 h-6 rounded-full flex items-center justify-center transition-all",
-                      config.profile.avatarShape === 'rounded' ? "bg-white shadow-sm text-black" : "text-gray-400 hover:text-gray-600"
-                    )}
-                    title="Cuadrado Redondeado"
-                  >
-                    <div className="w-3 h-3 border-2 border-current rounded-sm" />
-                  </button>
-                  <button
-                    onClick={() => updateConfig(['profile', 'avatarShape'], 'square')}
-                    className={cn(
-                      "w-6 h-6 rounded-full flex items-center justify-center transition-all",
-                      config.profile.avatarShape === 'square' ? "bg-white shadow-sm text-black" : "text-gray-400 hover:text-gray-600"
-                    )}
-                    title="Cuadrado"
-                  >
-                    <Square className="w-3 h-3" />
-                  </button>
-                </div>
-
-                {/* Border Toggle/Color */}
-                <div className="flex flex-col items-center gap-1">
-                   <div className="flex items-center gap-1 relative">
-                      <ColorCircle
-                          color={config.profile.avatarBorderColor || 'transparent'}
-                          onChange={(c) => updateConfig(['profile', 'avatarBorderColor'], c)}
-                          size="sm"
-                      />
-                      {config.profile.avatarBorderColor && (
-                          <button
-                              onClick={(e) => {
-                                  e.stopPropagation();
-                                  updateConfig(['profile', 'avatarBorderColor'], undefined);
-                              }}
-                              className="absolute -top-1 -right-1 bg-gray-100 border border-gray-300 rounded-full p-0.5 hover:bg-gray-200 transition-colors shadow-sm z-10"
-                              title="Quitar borde"
-                          >
-                              <Minus size={10} className="text-gray-600" />
-                          </button>
-                      )}
-                   </div>
-                   <span className="text-[9px] text-gray-500 font-semibold uppercase tracking-wider">Borde</span>
-                </div>
-              </div>
-            )}
-
-            {/* 5. ATOMIC SOCIAL ICON (Existing) */}
-            {activeTool?.startsWith('social-icon-') && selectedSocialLink && (
-               <div className="flex items-center gap-4 animate-in fade-in slide-in-from-top-2 duration-300">
-                  <div className="flex flex-col items-center gap-1">
-                    <ColorCircle
-                      color={selectedSocialLink.color || config.colors.primary}
-                      onChange={(c) => updateSocialLink(selectedSocialLink.id, 'color', c)}
-                    />
-                    <span className="text-[9px] text-gray-500 font-semibold uppercase tracking-wider">Icono</span>
-                  </div>
-
-                  <div className="w-px h-6 bg-gray-200" />
-
-                  <input
-                    type="text"
-                    value={selectedSocialLink.url}
-                    onChange={(e) => updateSocialLink(selectedSocialLink.id, 'url', e.target.value)}
-                    placeholder="https://..."
-                    className="h-8 rounded-full border border-gray-200 bg-gray-50 px-3 text-xs w-48 focus:outline-none focus:ring-2 focus:ring-black/5"
-                  />
-
-                  <button
-                    onClick={() => handleRemoveSocial(selectedSocialLink.id)}
-                    className="w-8 h-8 flex items-center justify-center rounded-full bg-red-50 text-red-500 hover:bg-red-100 hover:text-red-600 transition-colors"
-                  >
-                    <Trash2 className="w-4 h-4" />
-                  </button>
-               </div>
-            )}
-
-            {/* 6. CARD BUTTON TOOLS (Existing) */}
-            {activeTool === 'card-button' && (
-              <div className="flex items-center gap-4 animate-in fade-in slide-in-from-top-2 duration-300">
-                 <div className="flex flex-col items-center gap-1">
-                    <ColorCircle color={config.cardStyle?.buttonColor || '#000000'} onChange={(c) => updateConfig(['cardStyle', 'buttonColor'], c)} />
-                    <span className="text-[9px] text-gray-500 font-semibold uppercase tracking-wider">Fondo</span>
-                 </div>
-                 <div className="flex flex-col items-center gap-1">
-                    <ColorCircle color={config.cardStyle?.buttonTextColor || '#ffffff'} onChange={(c) => updateConfig(['cardStyle', 'buttonTextColor'], c)} />
-                    <span className="text-[9px] text-gray-500 font-semibold uppercase tracking-wider">Texto</span>
-                 </div>
-
-                 <div className="flex flex-col items-center gap-1 w-24">
-                    <input
-                      type="range"
-                      min="0"
-                      max="24"
-                      step="2"
-                      value={config.cardStyle?.borderRadius || 8}
-                      onChange={(e) => updateConfig(['cardStyle', 'borderRadius'], Number(e.target.value))}
-                      className="w-full h-1 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-black"
-                    />
-                    <span className="text-[9px] text-gray-500 font-semibold uppercase tracking-wider">Redondez</span>
-                 </div>
-              </div>
-            )}
-
-            {/* 7. CARD TITLE/PRICE TOOLS (Existing) */}
-            {(activeTool === 'card-title' || activeTool === 'card-price') && (
-               <div className="flex items-center gap-4 animate-in fade-in slide-in-from-top-2 duration-300">
-                  <div className="flex flex-col items-center gap-1">
-                    <ColorCircle
-                      color={activeTool === 'card-title' ? (config.cardStyle?.titleColor || config.colors.text) : (config.cardStyle?.priceColor || config.colors.text)}
-                      onChange={(c) => updateConfig(['cardStyle', activeTool === 'card-title' ? 'titleColor' : 'priceColor'], c)}
-                    />
-                    <span className="text-[9px] text-gray-500 font-semibold uppercase tracking-wider">Color</span>
-                  </div>
-               </div>
-            )}
-
-            {/* SAVE BUTTON (Always visible on right) */}
-            <div className="pl-4 ml-auto border-l border-gray-200 py-1">
-              <button
-                onClick={handleSave}
-                disabled={isSaving}
-                className="bg-black hover:bg-gray-800 text-white rounded-full w-10 h-10 flex items-center justify-center transition-all disabled:opacity-50 disabled:cursor-not-allowed shadow-sm"
-              >
-                {isSaving ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />}
-              </button>
-            </div>
-          </div>
-        </div>
-
         {/* --- PREVIEW AREA (NEW STORE CLIENT STRUCTURE) --- */}
-        <div className="flex justify-center pb-32 px-4">
+        <div className="flex justify-center pb-32 px-4 pt-32"> {/* Added pt-32 to account for floating toolbar */}
           <div className="w-full max-w-[420px] origin-top scale-[0.9] 2xl:scale-100 transition-transform bg-transparent">
              <div
                className="min-h-[800px] pb-40 relative shadow-2xl rounded-[32px] overflow-hidden bg-white/50 ring-8 ring-black/5"
                style={{ backgroundColor: config.colors.background }}
              >
-                {/* --- 1. STICKY HEADER VISUAL --- */}
-                <div className="sticky top-0 z-40 w-full">
-                   <div className="absolute inset-0 bg-white/70 backdrop-blur-md border-b border-gray-100/50 shadow-sm" />
-                   <div className="relative flex items-center justify-between py-4 px-6">
-                      {/* Left: Avatar/Name (Visible on mobile) */}
-                      <div className="flex items-center gap-3">
-                         <div className="h-8 w-8 overflow-hidden rounded-full border border-gray-200 shadow-sm relative">
-                            {config.profile.avatarUrl ? (
-                                <Image src={config.profile.avatarUrl} alt="Logo" fill className="object-cover" />
-                            ) : (
-                                <div className="w-full h-full bg-gray-200" />
-                            )}
-                         </div>
-                         <span className="font-bold text-sm tracking-tight truncate max-w-[120px]" style={{ color: config.colors.text }}>
-                             {config.profile.shopName || 'Mi Tienda'}
-                         </span>
-                      </div>
-                      {/* Right: Cart Icon */}
-                      <div className="w-8 h-8 flex items-center justify-center rounded-full hover:bg-gray-100/50 text-gray-700">
-                          <ShoppingBag className="w-5 h-5" style={{ color: config.colors.text }} strokeWidth={2} />
-                      </div>
-                   </div>
-                </div>
-
+                {/* FIX: REMOVED STICKY HEADER VISUAL TO REMOVE FAKE HEADER BAR */}
 
                 {/* --- 2. HERO SECTION --- */}
-                <div className="flex flex-col items-center text-center pt-8 pb-10 px-6">
+                <div className="flex flex-col items-center text-center pt-16 pb-10 px-6"> {/* Increased pt-8 to pt-16 for visual balance without header */}
                    {/* AVATAR */}
                    <div
                      className="relative mb-6 group cursor-pointer"
@@ -777,7 +779,8 @@ export default function DesignEditor({ initialConfig, initialProducts, userId, s
 
                 {/* --- 3. PRODUCT GRID --- */}
                 <div className="px-4 pb-12">
-                   <div className="grid grid-cols-2 gap-3">
+                   {/* FIX: ENSURE 2 COLUMNS AND LARGER GAP */}
+                   <div className="grid grid-cols-2 gap-4">
                       {displayProducts.map((p) => (
                           <div
                             key={p.id}

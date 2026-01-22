@@ -14,12 +14,10 @@ This information is used to shape Next.js' roadmap and prioritize features.
 You can learn more, including how to opt-out if you'd not like to participate in this anonymous program, by visiting the following URL:
 https://nextjs.org/telemetry
 
-✓ Ready in 1160ms
-○ Compiling /preview-design ...
- GET /preview-design 200 in 8.1s (compile: 7.2s, render: 962ms)
- GET /preview-design 200 in 95ms (compile: 7ms, render: 88ms)
-✓ Compiled in 74ms
- GET /preview-design 200 in 395ms (compile: 167ms, render: 228ms)
- GET /preview-design 200 in 80ms (compile: 5ms, render: 75ms)
- GET /preview-design 200 in 97ms (compile: 8ms, render: 89ms)
-✓ Compiled in 74ms
+✓ Ready in 1122ms
+○ Compiling /verify-editor ...
+ GET /verify-editor 200 in 6.0s (compile: 5.6s, render: 466ms)
+ GET /verify-editor 200 in 115ms (compile: 5ms, render: 110ms)
+⨯ The requested resource "https://placehold.co/400" has type "image/svg+xml" but dangerouslyAllowSVG is disabled. Consider adding the "unoptimized" property to the <Image>.
+✓ Compiled in 80ms
+ GET / 200 in 1085ms (compile: 878ms, render: 207ms)
