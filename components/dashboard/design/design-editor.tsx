@@ -353,7 +353,8 @@ export default function DesignEditor({ initialConfig, initialProducts, userId, s
   // Derive Avatar Shape Styles
   const avatarClasses = useMemo(() => {
     switch(config.profile.avatarShape) {
-      case 'square': return 'rounded-none';
+      case 'none': return 'rounded-none';
+      case 'square': return 'rounded-2xl';
       case 'rounded': return 'rounded-2xl';
       case 'circle':
       default: return 'rounded-full';
@@ -613,22 +614,22 @@ export default function DesignEditor({ initialConfig, initialProducts, userId, s
                   <Circle className="w-3 h-3" />
                 </button>
                 <button
-                  onClick={() => updateConfig(['profile', 'avatarShape'], 'rounded')}
+                  onClick={() => updateConfig(['profile', 'avatarShape'], 'square')}
                   className={cn(
                     "w-6 h-6 rounded-full flex items-center justify-center transition-all",
-                    config.profile.avatarShape === 'rounded' ? "bg-white shadow-sm text-black" : "text-gray-400 hover:text-gray-600"
+                    (config.profile.avatarShape === 'square' || config.profile.avatarShape === 'rounded') ? "bg-white shadow-sm text-black" : "text-gray-400 hover:text-gray-600"
                   )}
                   title="Cuadrado Redondeado"
                 >
                   <div className="w-3 h-3 border-2 border-current rounded-sm" />
                 </button>
                 <button
-                  onClick={() => updateConfig(['profile', 'avatarShape'], 'square')}
+                  onClick={() => updateConfig(['profile', 'avatarShape'], 'none')}
                   className={cn(
                     "w-6 h-6 rounded-full flex items-center justify-center transition-all",
-                    config.profile.avatarShape === 'square' ? "bg-white shadow-sm text-black" : "text-gray-400 hover:text-gray-600"
+                    config.profile.avatarShape === 'none' ? "bg-white shadow-sm text-black" : "text-gray-400 hover:text-gray-600"
                   )}
-                  title="Cuadrado"
+                  title="Cuadrado (Recto)"
                 >
                   <Square className="w-3 h-3" />
                 </button>

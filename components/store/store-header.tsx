@@ -109,11 +109,27 @@ export function StoreHero({ config }: StoreHeaderProps) {
     const primaryColor = config?.colors?.primary || '#000000'
     const textColor = config?.colors?.text || '#1f2937'
 
+    const avatarShapeClass = React.useMemo(() => {
+        switch (config?.profile?.avatarShape) {
+            case 'none': return 'rounded-none'
+            case 'square': return 'rounded-2xl'
+            case 'rounded': return 'rounded-2xl'
+            case 'circle':
+            default: return 'rounded-full'
+        }
+    }, [config?.profile?.avatarShape])
+
     return (
         <div className="flex flex-col items-center text-center pt-8 pb-10 px-4">
             <div className="relative mb-6 group">
-                <div className="absolute -inset-1 bg-gradient-to-r from-gray-200 to-gray-100 rounded-full blur opacity-50 group-hover:opacity-75 transition duration-500"></div>
-                <div className="relative h-32 w-32 overflow-hidden rounded-full border-4 border-white shadow-xl">
+                <div className={cn(
+                    "absolute -inset-1 bg-gradient-to-r from-gray-200 to-gray-100 blur opacity-50 group-hover:opacity-75 transition duration-500",
+                    avatarShapeClass
+                )}></div>
+                <div className={cn(
+                    "relative h-32 w-32 overflow-hidden border-4 border-white shadow-xl",
+                    avatarShapeClass
+                )}>
                     <Image
                         src={avatarUrl}
                         alt={shopName}

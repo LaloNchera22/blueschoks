@@ -37,7 +37,7 @@ export interface ProfileConfig {
   bio?: string;
   avatarUrl?: string;
   shopName?: string;
-  avatarShape?: 'circle' | 'rounded' | 'square';
+  avatarShape?: 'circle' | 'rounded' | 'square' | 'none';
   avatarBorderColor?: string;
   titleStyle?: TextStyle;
   bioStyle?: TextStyle;
