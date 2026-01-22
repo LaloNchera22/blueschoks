@@ -30,9 +30,11 @@ import {
   Check,
   Music2,
   Mail,
-  ExternalLink
+  ExternalLink,
+  Upload
 } from 'lucide-react';
 import { useRouter } from 'next/navigation';
+import { createClient } from '@/utils/supabase/client';
 import {
   DndContext,
   closestCenter,
@@ -222,6 +224,7 @@ export default function DesignEditor({ initialConfig, initialProducts, userId, s
   const [activeTool, setActiveTool] = useState<ToolType>('global');
   const [isSaving, setIsSaving] = useState(false);
   const [showSocialsManager, setShowSocialsManager] = useState(false);
+  const [isUploadingImage, setIsUploadingImage] = useState(false);
 
   // Degen state for drag and drop
   const sensors = useSensors(
@@ -265,6 +268,41 @@ export default function DesignEditor({ initialConfig, initialProducts, userId, s
     } finally {
       setIsSaving(false);
     }
+  };
+
+  const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    if (file.size > 5 * 1024 * 1024) {
+      toast.error("La imagen debe ser menor a 5MB");
+      return;
+    }
+
+    setIsUploadingImage(true);
+    const supabase = createClient();
+    const fileExt = file.name.split('.').pop();
+    const fileName = `${userId}-${Date.now()}.${fileExt}`;
+    const filePath = `${fileName}`;
+
+    const { error: uploadError } = await supabase.storage
+      .from('avatars')
+      .upload(filePath, file);
+
+    if (uploadError) {
+      console.error(uploadError);
+      toast.error("Error al subir imagen");
+      setIsUploadingImage(false);
+      return;
+    }
+
+    const { data: { publicUrl } } = supabase.storage
+      .from('avatars')
+      .getPublicUrl(filePath);
+
+    updateConfig(['profile', 'avatarUrl'], publicUrl);
+    setIsUploadingImage(false);
+    toast.success("Avatar actualizado");
   };
 
   // Socials Management Logic
@@ -521,14 +559,26 @@ export default function DesignEditor({ initialConfig, initialProducts, userId, s
           {/* 3. HEADER AVATAR TOOLS (Existing, but moved to top) */}
           {activeTool === 'header-avatar' && (
             <div className="flex items-center gap-4 animate-in fade-in slide-in-from-top-2 duration-300">
-              {/* Image Input */}
-              <input
-                type="text"
-                value={config.profile.avatarUrl || ''}
-                onChange={(e) => updateConfig(['profile', 'avatarUrl'], e.target.value)}
-                placeholder="URL de Imagen"
-                className="h-8 rounded-full border border-gray-200 bg-gray-50 px-3 text-xs w-32 focus:outline-none focus:ring-2 focus:ring-black/5"
-              />
+              {/* Image Input (Replaced) */}
+              <label className="relative cursor-pointer group">
+                  <input
+                    type="file"
+                    accept="image/*"
+                    onChange={handleImageUpload}
+                    className="hidden"
+                    disabled={isUploadingImage}
+                  />
+                  <div className="flex items-center gap-2 h-8 rounded-full border border-gray-200 bg-gray-50 px-3 hover:bg-gray-100 transition-colors cursor-pointer">
+                     {isUploadingImage ? (
+                        <Loader2 className="w-3 h-3 animate-spin text-gray-500" />
+                     ) : (
+                        <Upload className="w-3 h-3 text-gray-500" />
+                     )}
+                     <span className="text-xs font-medium text-gray-600">
+                        {isUploadingImage ? 'Subiendo...' : 'Subir Foto'}
+                     </span>
+                  </div>
+              </label>
 
               {/* Shape Selector */}
               <div className="flex items-center bg-gray-50 rounded-full p-1 border border-gray-100">
@@ -707,7 +757,8 @@ export default function DesignEditor({ initialConfig, initialProducts, userId, s
                        <div className="absolute -inset-1 bg-gradient-to-r from-gray-200 to-gray-100 rounded-full blur opacity-50 group-hover:opacity-75 transition duration-500"></div>
                        <div
                           className={cn(
-                            "relative h-32 w-32 overflow-hidden rounded-full border-4 shadow-xl transition-all",
+                            "relative h-32 w-32 overflow-hidden border-4 shadow-xl transition-all",
+                             avatarClasses,
                              activeTool === 'header-avatar' && "ring-4 ring-blue-500 ring-offset-2"
                           )}
                           style={{ borderColor: config.profile.avatarBorderColor || '#ffffff' }}
