@@ -1,0 +1,155 @@
+"use client"
+
+import React from 'react'
+import Image from 'next/image'
+import Link from 'next/link'
+import {
+  Instagram,
+  Twitter,
+  Facebook,
+  Globe,
+  MessageCircle,
+  Mail,
+  Music2,
+  ExternalLink,
+  ShoppingBag
+} from 'lucide-react'
+import { DesignConfig, LinkItem } from '@/lib/types/design-system'
+import { useCart } from '@/components/shop/cart-context'
+import { Badge } from "@/components/ui/badge"
+import { Button } from "@/components/ui/button"
+import { cn } from '@/lib/utils'
+
+interface StoreHeaderProps {
+  config: DesignConfig
+}
+
+const getSocialIcon = (platform: string) => {
+  switch (platform.toLowerCase()) {
+    case 'instagram': return <Instagram className="w-5 h-5" />
+    case 'tiktok': return <Music2 className="w-5 h-5" />
+    case 'twitter': return <Twitter className="w-5 h-5" />
+    case 'facebook': return <Facebook className="w-5 h-5" />
+    case 'whatsapp': return <MessageCircle className="w-5 h-5" />
+    case 'website': return <Globe className="w-5 h-5" />
+    case 'email': return <Mail className="w-5 h-5" />
+    default: return <ExternalLink className="w-5 h-5" />
+  }
+}
+
+export function StoreHeader({ config }: StoreHeaderProps) {
+  const { cartCount, openCart } = useCart()
+
+  const shopName = config?.profile?.shopName || 'Mi Tienda'
+  const bio = config?.profile?.bio
+  const avatarUrl = config?.profile?.avatarUrl || 'https://via.placeholder.com/150'
+  const socialLinks = Array.isArray(config?.socialLinks) ? config.socialLinks.filter(l => l.active) : []
+
+  // Derived styles
+  const primaryColor = config?.colors?.primary || '#000000'
+  const textColor = config?.colors?.text || '#1f2937'
+
+  return (
+    <div className="sticky top-0 z-40 w-full transition-all duration-300">
+      {/* Background with blur */}
+      <div className="absolute inset-0 bg-white/70 backdrop-blur-md border-b border-gray-100/50 shadow-sm" />
+
+      <div className="relative mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+        <div className="flex items-center justify-between py-4">
+
+          {/* Left: Brand / Avatar (Small version for sticky header could go here, but for now we keep it centered or simple) */}
+          <div className="flex items-center gap-3">
+             {/* Mobile: Show small avatar next to name if scrolled? For now, keep it simple. */}
+             <div className="h-10 w-10 overflow-hidden rounded-full border border-gray-200 shadow-sm relative md:hidden">
+                <Image src={avatarUrl} alt={shopName} fill className="object-cover" />
+             </div>
+             <span className="font-bold text-lg tracking-tight md:hidden" style={{ color: textColor }}>{shopName}</span>
+          </div>
+
+          {/* Right: Cart Trigger */}
+          <div className="flex items-center gap-4">
+            <Button
+              variant="ghost"
+              size="icon"
+              className="relative rounded-full hover:bg-gray-100/80 transition-all"
+              onClick={openCart}
+              aria-label="Abrir carrito"
+            >
+              <ShoppingBag className="h-6 w-6" style={{ color: textColor }} strokeWidth={2} />
+              {cartCount > 0 && (
+                <Badge
+                  className="absolute -top-1 -right-1 h-5 w-5 flex items-center justify-center rounded-full p-0 text-[10px] border-2 border-white shadow-sm"
+                  style={{ backgroundColor: primaryColor }}
+                >
+                  {cartCount}
+                </Badge>
+              )}
+            </Button>
+          </div>
+        </div>
+
+        {/* Hero Section (Only visible when at top usually, but here we integrate it into the flow) */}
+        {/* We will render the large hero OUTSIDE the sticky header in the main layout,
+            so this component handles the 'sticky' top bar + controls.
+            However, for this specific request, the user wants a "Header (Hero Section)".
+
+            Let's split: StoreNavbar (Sticky) vs StoreHero (Content).
+        */}
+      </div>
+    </div>
+  )
+}
+
+export function StoreHero({ config }: StoreHeaderProps) {
+    const shopName = config?.profile?.shopName || 'Mi Tienda'
+    const bio = config?.profile?.bio
+    const avatarUrl = config?.profile?.avatarUrl || 'https://via.placeholder.com/150'
+    const socialLinks = Array.isArray(config?.socialLinks) ? config.socialLinks.filter(l => l.active) : []
+
+    const primaryColor = config?.colors?.primary || '#000000'
+    const textColor = config?.colors?.text || '#1f2937'
+
+    return (
+        <div className="flex flex-col items-center text-center pt-8 pb-10 px-4">
+            <div className="relative mb-6 group">
+                <div className="absolute -inset-1 bg-gradient-to-r from-gray-200 to-gray-100 rounded-full blur opacity-50 group-hover:opacity-75 transition duration-500"></div>
+                <div className="relative h-32 w-32 overflow-hidden rounded-full border-4 border-white shadow-xl">
+                    <Image
+                        src={avatarUrl}
+                        alt={shopName}
+                        fill
+                        className="object-cover transition-transform duration-700 group-hover:scale-110"
+                        priority
+                    />
+                </div>
+            </div>
+
+            <h1 className="text-3xl md:text-5xl font-extrabold tracking-tight mb-3" style={{ color: textColor }}>
+                {shopName}
+            </h1>
+
+            {bio && (
+                <p className="max-w-xl text-lg text-muted-foreground leading-relaxed mb-6 font-medium opacity-90">
+                    {bio}
+                </p>
+            )}
+
+             {/* Social Links */}
+             {socialLinks.length > 0 && (
+                <div className="flex flex-wrap justify-center gap-3">
+                  {socialLinks.map((link) => (
+                    <Link
+                      key={link.id}
+                      href={link.url}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="p-3 rounded-full bg-gray-50 text-gray-600 hover:bg-gray-100 hover:text-gray-900 hover:scale-110 transition-all duration-300 border border-gray-100 shadow-sm"
+                    >
+                      {getSocialIcon(link.platform)}
+                    </Link>
+                  ))}
+                </div>
+              )}
+        </div>
+    )
+}

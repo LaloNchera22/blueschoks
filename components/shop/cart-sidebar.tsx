@@ -49,34 +49,29 @@ export default function CartSidebar({ shop }: { shop: Shop }) {
         <SheetTitle className="hidden">Carrito de Compras</SheetTitle>
         
         {/* HEADER */}
-        <div className="p-5 border-b border-gray-100 bg-white/80 backdrop-blur-md flex justify-between items-center shadow-sm z-10 shrink-0 sticky top-0">
-            <div className="flex items-center gap-3">
-                <div className="bg-slate-900 text-white p-2.5 rounded-xl shadow-lg shadow-slate-900/20">
-                    <ShoppingBag size={18} strokeWidth={2.5} />
-                </div>
-                <div className="flex flex-col">
-                    <span className="font-bold text-lg text-slate-900 leading-none">Tu Pedido</span>
-                    <span className="text-slate-400 text-xs font-medium mt-1">{validItems.length} productos</span>
-                </div>
+        <div className="p-6 border-b border-gray-100 bg-white/95 backdrop-blur-sm flex justify-between items-center z-10 shrink-0 sticky top-0">
+            <div className="flex flex-col">
+                <h2 className="font-bold text-xl text-slate-900 tracking-tight">Tu Bolsa</h2>
+                <span className="text-slate-500 text-sm font-medium">{validItems.length} productos</span>
             </div>
-            <Button variant="ghost" size="icon" onClick={closeCart} className="rounded-full hover:bg-slate-100 text-slate-500 transition-all hover:rotate-90">
-                <X size={22} strokeWidth={2.5} />
+            <Button variant="outline" size="icon" onClick={closeCart} className="h-10 w-10 rounded-full border-gray-200 text-slate-900 hover:bg-gray-50 transition-all">
+                <X size={20} />
             </Button>
         </div>
 
         {/* LISTA DE PRODUCTOS */}
-        <div className="flex-1 overflow-y-auto p-5 space-y-4 bg-gray-50/50 custom-scrollbar">
+        <div className="flex-1 overflow-y-auto p-5 space-y-5 bg-white custom-scrollbar">
             {validItems.length === 0 ? (
                 <div className="h-full flex flex-col items-center justify-center text-gray-400 space-y-6">
-                    <div className="w-24 h-24 bg-gray-100 rounded-full flex items-center justify-center mb-2 animate-pulse">
-                         <ShoppingBag size={48} className="opacity-20" />
+                    <div className="w-20 h-20 bg-gray-50 rounded-full flex items-center justify-center mb-2">
+                         <ShoppingBag size={40} className="opacity-30" />
                     </div>
                     <div className="text-center">
-                        <p className="text-lg font-bold text-slate-700 mb-1">Tu carrito está vacío</p>
-                        <p className="text-sm font-medium opacity-60">¡Agrega algunos productos para empezar!</p>
+                        <p className="text-lg font-bold text-slate-800 mb-1">Tu bolsa está vacía</p>
+                        <p className="text-sm font-medium opacity-60">Parece que aún no has elegido nada.</p>
                     </div>
-                    <Button variant="outline" onClick={closeCart} className="rounded-full px-8 border-slate-200 text-slate-700 hover:bg-slate-50 font-bold">
-                        Explorar Tienda
+                    <Button variant="outline" onClick={closeCart} className="rounded-full px-8 border-gray-200 text-slate-800 hover:bg-gray-50 font-semibold">
+                        Seguir Comprando
                     </Button>
                 </div>
             ) : (
@@ -84,18 +79,19 @@ export default function CartSidebar({ shop }: { shop: Shop }) {
                     {validItems.map((item: CartItem) => (
                         <motion.div
                             key={item.id}
-                            initial={{ opacity: 0, y: 20 }}
+                            initial={{ opacity: 0, y: 10 }}
                             animate={{ opacity: 1, y: 0 }}
-                            exit={{ opacity: 0, x: -50 }}
+                            exit={{ opacity: 0, height: 0, marginBottom: 0 }}
                             layout
-                            className="flex gap-4 bg-white p-3 rounded-2xl border border-gray-100 shadow-[0_2px_8px_rgba(0,0,0,0.04)] hover:shadow-md transition-shadow"
+                            className="flex gap-5"
                         >
-                            <div className="w-20 h-20 bg-gray-100 rounded-xl overflow-hidden shrink-0 border border-gray-100 relative group">
+                            {/* Product Image */}
+                            <div className="w-20 h-24 bg-gray-100 rounded-lg overflow-hidden shrink-0 relative group">
                                 {item.image_url ? (
                                     <Image
                                       src={item.image_url}
                                       fill
-                                      className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
+                                      className="w-full h-full object-cover"
                                       alt={item.name || "Producto"}
                                       sizes="80px"
                                     />
@@ -104,21 +100,25 @@ export default function CartSidebar({ shop }: { shop: Shop }) {
                                 )}
                             </div>
                             
-                            <div className="flex-1 flex flex-col justify-between py-0.5">
-                                <div className="flex justify-between items-start gap-2">
-                                    <h4 className="font-bold text-sm line-clamp-2 leading-tight text-slate-800">{item.name}</h4>
-                                    <button onClick={() => removeFromCart(item.id)} className="text-gray-300 hover:text-red-500 transition-colors p-1.5 -mr-2 -mt-2 rounded-full hover:bg-red-50">
+                            {/* Product Info */}
+                            <div className="flex-1 flex flex-col py-1">
+                                <div className="flex justify-between items-start gap-2 mb-1">
+                                    <h4 className="font-semibold text-sm line-clamp-2 leading-snug text-slate-900">{item.name}</h4>
+                                    <button onClick={() => removeFromCart(item.id)} className="text-gray-300 hover:text-red-500 transition-colors p-1 -mr-2 -mt-1 rounded-full">
                                         <Trash2 size={16} />
                                     </button>
                                 </div>
 
-                                <div className="flex items-end justify-between mt-2">
-                                    <div className="flex items-center gap-1 bg-gray-50 rounded-lg p-1 border border-gray-200/50 shadow-sm">
-                                        <button onClick={() => removeItem(item.id)} className="w-6 h-6 flex items-center justify-center bg-white rounded-md shadow-sm border border-gray-100 text-slate-600 hover:scale-105 active:scale-95 transition-all"><Minus size={12} strokeWidth={3}/></button>
-                                        <span className="text-xs font-bold w-6 text-center tabular-nums text-slate-900">{item.quantity}</span>
-                                        <button onClick={() => addToCart(item)} className="w-6 h-6 flex items-center justify-center bg-white rounded-md shadow-sm border border-gray-100 text-slate-600 hover:scale-105 active:scale-95 transition-all"><Plus size={12} strokeWidth={3}/></button>
+                                <span className="text-sm font-medium text-muted-foreground mb-auto">{formatPrice(item.price)}</span>
+
+                                <div className="flex items-center justify-between mt-3">
+                                    {/* Quantity Selector */}
+                                    <div className="flex items-center gap-3 border border-gray-200 rounded-full px-1 py-1">
+                                        <button onClick={() => removeItem(item.id)} className="w-6 h-6 flex items-center justify-center rounded-full hover:bg-gray-100 text-slate-600 transition-colors"><Minus size={14} /></button>
+                                        <span className="text-sm font-semibold w-4 text-center tabular-nums text-slate-900">{item.quantity}</span>
+                                        <button onClick={() => addToCart(item)} className="w-6 h-6 flex items-center justify-center rounded-full hover:bg-gray-100 text-slate-600 transition-colors"><Plus size={14} /></button>
                                     </div>
-                                    <span className="font-black text-sm text-slate-900">{formatPrice(item.price * item.quantity)}</span>
+                                    <span className="font-bold text-sm text-slate-900">{formatPrice(item.price * item.quantity)}</span>
                                 </div>
                             </div>
                         </motion.div>
@@ -129,14 +129,14 @@ export default function CartSidebar({ shop }: { shop: Shop }) {
 
         {/* FOOTER */}
         {validItems.length > 0 && (
-            <div className="p-6 border-t border-gray-100 bg-white shadow-[0_-10px_40px_rgba(0,0,0,0.05)] z-10 shrink-0">
-                <div className="space-y-3 mb-6">
+            <div className="p-6 border-t border-gray-100 bg-white z-10 shrink-0">
+                <div className="space-y-2 mb-6">
                      <div className="flex justify-between items-center text-slate-500 text-sm">
                         <span>Subtotal</span>
                         <span>{formatPrice(cartTotal)}</span>
                     </div>
-                    <div className="flex justify-between items-center">
-                        <span className="text-base font-bold text-slate-900">Total a Pagar</span>
+                    <div className="flex justify-between items-center border-t border-dashed border-gray-200 pt-2 mt-2">
+                        <span className="text-lg font-bold text-slate-900">Total</span>
                         <span className="text-2xl font-black text-slate-900">{formatPrice(cartTotal)}</span>
                     </div>
                 </div>
@@ -146,23 +146,20 @@ export default function CartSidebar({ shop }: { shop: Shop }) {
                         href={whatsappLink}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="w-full bg-gradient-to-r from-[#25D366] to-[#128C7E] hover:from-[#20bd5a] hover:to-[#0e6f64] text-white py-4 rounded-2xl font-bold flex items-center justify-center gap-3 transition-all shadow-lg hover:shadow-xl hover:-translate-y-1 active:scale-95 group text-center no-underline relative overflow-hidden"
+                        className="w-full bg-black text-white py-4 rounded-full font-bold flex items-center justify-center gap-2 transition-all hover:bg-gray-900 active:scale-95 group text-center no-underline relative overflow-hidden shadow-lg shadow-gray-200"
                     >
-                        <div className="absolute inset-0 bg-white/20 translate-y-full group-hover:translate-y-0 transition-transform duration-300 rounded-2xl"></div>
-                        <MessageCircle size={24} className="group-hover:rotate-12 transition-transform" />
-                        <span className="relative z-10">Completar Pedido por WhatsApp</span>
-                        <ArrowRight size={18} className="opacity-60 group-hover:translate-x-1 transition-transform relative z-10"/>
+                        <span>Checkout por WhatsApp</span>
+                        <ArrowRight size={18} className="group-hover:translate-x-1 transition-transform"/>
                     </a>
                 ) : (
                     <button 
                         onClick={() => alert("⚠️ Error: El dueño de la tienda no ha configurado su número de WhatsApp en el Panel de Control.")}
-                        className="w-full bg-gray-200 text-gray-500 py-4 rounded-xl font-bold flex items-center justify-center gap-3 cursor-not-allowed opacity-70"
+                        className="w-full bg-gray-100 text-gray-400 py-4 rounded-full font-bold flex items-center justify-center gap-3 cursor-not-allowed"
                     >
-                        <MessageCircle size={22} />
+                        <MessageCircle size={20} />
                         <span>WhatsApp no configurado</span>
                     </button>
                 )}
-                <p className="text-center text-[10px] text-gray-400 mt-4 font-medium uppercase tracking-wider">Pago seguro y envío coordinado</p>
             </div>
         )}
       </SheetContent>
