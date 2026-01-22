@@ -24,7 +24,13 @@ import {
   AlignLeft,
   AlignCenter,
   AlignRight,
-  Type
+  Type,
+  ShoppingBag,
+  Plus,
+  Check,
+  Music2,
+  Mail,
+  ExternalLink
 } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import {
@@ -89,11 +95,12 @@ const FONTS = [
 
 const PLATFORMS = [
   { id: 'instagram', icon: Instagram, label: 'Instagram' },
-  { id: 'tiktok', icon: MessageCircle, label: 'TikTok' },
+  { id: 'tiktok', icon: Music2, label: 'TikTok' },
   { id: 'whatsapp', icon: MessageCircle, label: 'WhatsApp' },
   { id: 'twitter', icon: Twitter, label: 'Twitter' },
   { id: 'facebook', icon: Facebook, label: 'Facebook' },
   { id: 'website', icon: Globe, label: 'Website' },
+  { id: 'email', icon: Mail, label: 'Email' },
   { id: 'other', icon: LinkIcon, label: 'Otro' },
 ];
 
@@ -335,7 +342,6 @@ export default function DesignEditor({ initialConfig, initialProducts, userId, s
           activeTool === 'global' && "outline-none"
         )}
         style={{
-          backgroundColor: 'transparent',
           color: config.colors.text,
           fontFamily: config.fonts.body
         }}
@@ -346,7 +352,7 @@ export default function DesignEditor({ initialConfig, initialProducts, userId, s
       >
         {/* --- SMART TOOLBAR (UPDATED POSITION & UI) --- */}
         <div
-          className="sticky top-6 mx-auto z-40 w-max mb-8"
+          className="sticky top-6 mx-auto z-50 w-max mb-4 pointer-events-auto"
           onClick={(e) => e.stopPropagation()}
         >
           <div className="h-14 px-6 rounded-full bg-white/90 shadow-lg border border-gray-200 flex items-center gap-4 transition-all duration-300 ease-out backdrop-blur-md">
@@ -657,192 +663,194 @@ export default function DesignEditor({ initialConfig, initialProducts, userId, s
           </div>
         </div>
 
-        {/* --- PREVIEW AREA --- */}
+        {/* --- PREVIEW AREA (NEW STORE CLIENT STRUCTURE) --- */}
         <div className="flex justify-center pb-32 px-4">
-          <div className="w-full max-w-[420px] origin-top scale-[0.9] 2xl:scale-100 transition-transform">
-             <div className="min-h-full pb-40 relative">
-                {/* 1. Header Section */}
-                <div
-                  className="pt-4 pb-8 px-6 flex flex-col items-center text-center transition-all"
-                >
-                  {/* ATOMIC Avatar */}
-                  <div
-                    className={cn(
-                      "w-24 h-24 overflow-hidden bg-gray-100 mb-4 border-4 shadow-sm relative cursor-pointer group transition-all duration-300",
-                      avatarClasses,
-                      activeTool === 'header-avatar' && "ring-2 ring-blue-500 ring-offset-4 scale-105"
-                    )}
-                    style={{
-                      borderColor: config.profile.avatarBorderColor || 'transparent'
-                    }}
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      setActiveTool('header-avatar');
-                    }}
-                  >
-                    {config.profile.avatarUrl ? (
-                      <Image src={config.profile.avatarUrl} alt="Shop Avatar" fill className="object-cover" />
-                    ) : (
-                      <div className="w-full h-full flex items-center justify-center text-gray-400">
-                        <Smartphone className="w-8 h-8" />
+          <div className="w-full max-w-[420px] origin-top scale-[0.9] 2xl:scale-100 transition-transform bg-transparent">
+             <div
+               className="min-h-[800px] pb-40 relative shadow-2xl rounded-[32px] overflow-hidden bg-white/50 ring-8 ring-black/5"
+               style={{ backgroundColor: config.colors.background }}
+             >
+                {/* --- 1. STICKY HEADER VISUAL --- */}
+                <div className="sticky top-0 z-40 w-full">
+                   <div className="absolute inset-0 bg-white/70 backdrop-blur-md border-b border-gray-100/50 shadow-sm" />
+                   <div className="relative flex items-center justify-between py-4 px-6">
+                      {/* Left: Avatar/Name (Visible on mobile) */}
+                      <div className="flex items-center gap-3">
+                         <div className="h-8 w-8 overflow-hidden rounded-full border border-gray-200 shadow-sm relative">
+                            {config.profile.avatarUrl ? (
+                                <Image src={config.profile.avatarUrl} alt="Logo" fill className="object-cover" />
+                            ) : (
+                                <div className="w-full h-full bg-gray-200" />
+                            )}
+                         </div>
+                         <span className="font-bold text-sm tracking-tight truncate max-w-[120px]" style={{ color: config.colors.text }}>
+                             {config.profile.shopName || 'Mi Tienda'}
+                         </span>
                       </div>
-                    )}
-                    <div className="absolute inset-0 bg-black/20 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
-                      <span className="text-white text-xs font-bold">Editar</span>
-                    </div>
-                  </div>
+                      {/* Right: Cart Icon */}
+                      <div className="w-8 h-8 flex items-center justify-center rounded-full hover:bg-gray-100/50 text-gray-700">
+                          <ShoppingBag className="w-5 h-5" style={{ color: config.colors.text }} strokeWidth={2} />
+                      </div>
+                   </div>
+                </div>
 
-                  {/* ATOMIC Shop Title */}
-                  <h1
-                    className={cn(
-                      "text-2xl font-bold leading-tight mb-2 cursor-pointer hover:opacity-80 decoration-blue-500/30 underline-offset-4",
-                      activeTool === 'header-title' && "underline decoration-blue-500"
-                    )}
-                    style={getTextStyle('title')}
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      setActiveTool('header-title');
-                    }}
-                  >
-                    {config.profile.shopName || 'Mi Tienda'}
-                  </h1>
 
-                  {/* ATOMIC Bio */}
-                  <p
-                    className={cn(
-                      "text-sm opacity-80 max-w-[300px] leading-relaxed mx-auto cursor-pointer hover:opacity-100 border border-transparent rounded px-2 -mx-2 transition-all",
-                      activeTool === 'header-bio' && "border-blue-200 bg-blue-50/50"
-                    )}
-                    style={getTextStyle('bio')}
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      setActiveTool('header-bio');
-                    }}
-                  >
-                    {config.profile.bio || 'Bienvenido a mi tienda online'}
-                  </p>
-
-                  {/* Social Icons (Atomic) */}
-                  <div className="flex flex-wrap justify-center gap-3 mt-6">
-                    {config.socialLinks.map((link) => {
-                      const Icon = PLATFORMS.find(p => p.id === link.platform)?.icon || LinkIcon;
-                      const isSelected = activeTool === `social-icon-${link.id}`;
-                      return (
-                        <button
-                          key={link.id}
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            setActiveTool(`social-icon-${link.id}` as ToolType);
-                          }}
+                {/* --- 2. HERO SECTION --- */}
+                <div className="flex flex-col items-center text-center pt-8 pb-10 px-6">
+                   {/* AVATAR */}
+                   <div
+                     className="relative mb-6 group cursor-pointer"
+                     onClick={(e) => { e.stopPropagation(); setActiveTool('header-avatar'); }}
+                   >
+                       <div className="absolute -inset-1 bg-gradient-to-r from-gray-200 to-gray-100 rounded-full blur opacity-50 group-hover:opacity-75 transition duration-500"></div>
+                       <div
                           className={cn(
-                            "w-10 h-10 flex items-center justify-center rounded-full transition-all hover:scale-110 shadow-sm",
-                            isSelected ? "ring-2 ring-blue-500 ring-offset-2 scale-110" : "hover:shadow-md"
+                            "relative h-32 w-32 overflow-hidden rounded-full border-4 shadow-xl transition-all",
+                             activeTool === 'header-avatar' && "ring-4 ring-blue-500 ring-offset-2"
                           )}
-                          style={{
-                            backgroundColor: link.color || config.colors.primary,
-                            color: '#ffffff'
-                          }}
-                        >
-                          <Icon className="w-5 h-5" strokeWidth={1.5} />
-                        </button>
-                      )
-                    })}
-                    {config.socialLinks.length === 0 && (
-                      <div className="text-xs text-gray-400 border border-dashed border-gray-300 rounded-full px-3 py-1">
-                        Sin redes sociales
-                      </div>
-                    )}
-                  </div>
-                </div>
+                          style={{ borderColor: config.profile.avatarBorderColor || '#ffffff' }}
+                       >
+                           {config.profile.avatarUrl ? (
+                               <Image src={config.profile.avatarUrl} alt="Avatar" fill className="object-cover transition-transform duration-700 group-hover:scale-110" />
+                           ) : (
+                               <div className="w-full h-full flex items-center justify-center bg-gray-100 text-gray-300">
+                                   <Smartphone className="w-10 h-10" />
+                               </div>
+                           )}
+                           {/* Hover Overlay */}
+                           <div className="absolute inset-0 bg-black/30 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                              <span className="text-white text-xs font-bold">Editar</span>
+                           </div>
+                       </div>
+                   </div>
 
-                {/* 2. Products Grid (Card 2.0) */}
-                <div className="px-4 max-w-2xl mx-auto">
-                  <div className="grid grid-cols-2 gap-3">
-                    {displayProducts.map((p) => (
-                      <div
-                        key={p.id}
-                        className="rounded-xl overflow-hidden shadow-sm flex flex-col group relative"
-                        style={{ backgroundColor: config.colors.cardBackground }}
-                      >
-                        {/* Image Aspect Ratio 4:5 */}
-                        <div className="aspect-[4/5] bg-gray-100 relative overflow-hidden">
-                          {p.image_url && (
-                            <Image
-                              src={p.image_url}
-                              alt={p.name}
-                              fill
-                              className="object-cover group-hover:scale-105 transition-transform duration-500"
-                            />
-                          )}
-                          {/* Quantity Selector Visual */}
-                          <div className="absolute bottom-2 right-2 bg-white/90 backdrop-blur-sm rounded-full px-2 py-1 text-[10px] font-medium shadow-sm flex items-center gap-2">
-                              <span>-</span> 1 <span>+</span>
+                   {/* SHOP NAME */}
+                   <h1
+                     className={cn(
+                       "text-3xl font-extrabold tracking-tight mb-3 cursor-pointer hover:opacity-80 transition-opacity",
+                        activeTool === 'header-title' && "underline decoration-blue-500 decoration-2 underline-offset-4"
+                     )}
+                     style={getTextStyle('title')}
+                     onClick={(e) => { e.stopPropagation(); setActiveTool('header-title'); }}
+                   >
+                       {config.profile.shopName || 'Mi Tienda'}
+                   </h1>
+
+                   {/* BIO */}
+                   <p
+                     className={cn(
+                       "max-w-xl text-lg text-muted-foreground leading-relaxed mb-6 font-medium opacity-90 cursor-pointer hover:bg-black/5 rounded px-2 -mx-2 transition-colors",
+                       activeTool === 'header-bio' && "ring-2 ring-blue-500 bg-blue-50/50"
+                     )}
+                     style={getTextStyle('bio')}
+                     onClick={(e) => { e.stopPropagation(); setActiveTool('header-bio'); }}
+                   >
+                       {config.profile.bio || 'Bienvenido a mi tienda online'}
+                   </p>
+
+                   {/* SOCIALS */}
+                   <div className="flex flex-wrap justify-center gap-3">
+                       {config.socialLinks.map((link) => {
+                           const Icon = PLATFORMS.find(p => p.id === link.platform)?.icon || LinkIcon;
+                           const isSelected = activeTool === `social-icon-${link.id}`;
+                           return (
+                               <button
+                                  key={link.id}
+                                  onClick={(e) => { e.stopPropagation(); setActiveTool(`social-icon-${link.id}` as ToolType); }}
+                                  className={cn(
+                                      "p-3 rounded-full bg-gray-50 text-gray-600 hover:bg-gray-100 hover:text-gray-900 transition-all duration-300 border border-gray-100 shadow-sm",
+                                      isSelected && "ring-2 ring-blue-500 ring-offset-2 scale-110"
+                                  )}
+                                  style={{ color: link.color ? link.color : undefined }}
+                               >
+                                   <Icon className="w-5 h-5" />
+                               </button>
+                           )
+                       })}
+                       {config.socialLinks.length === 0 && (
+                          <div className="text-xs text-gray-400 border border-dashed border-gray-300 rounded-full px-4 py-2">
+                             Sin redes sociales
                           </div>
-                        </div>
-
-                        <div className="p-3 flex flex-col gap-1">
-                            {/* Atomic Title */}
-                            <p
-                              className={cn(
-                                "text-xs font-medium opacity-90 line-clamp-1 cursor-pointer hover:underline decoration-1 underline-offset-2",
-                                activeTool === 'card-title' && "ring-1 ring-blue-500 bg-blue-50/50 rounded px-1 -mx-1"
-                              )}
-                              style={{ color: config.cardStyle?.titleColor || config.colors.text }}
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                setActiveTool('card-title');
-                              }}
-                            >
-                              {p.name}
-                            </p>
-
-                            {/* Atomic Price */}
-                            <p
-                              className={cn(
-                              "text-sm font-bold mt-0.5 cursor-pointer hover:opacity-80",
-                              activeTool === 'card-price' && "ring-1 ring-blue-500 bg-blue-50/50 rounded px-1 -mx-1 w-fit"
-                              )}
-                              style={{ color: config.cardStyle?.priceColor || config.colors.text }}
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                setActiveTool('card-price');
-                              }}
-                            >
-                              ${Number(p.price).toFixed(2)}
-                            </p>
-
-                            {/* Atomic Button */}
-                            <button
-                              className={cn(
-                                "mt-2 w-full h-8 flex items-center justify-center text-xs font-medium transition-all hover:opacity-90 active:scale-95",
-                                activeTool === 'card-button' && "ring-2 ring-blue-500 ring-offset-1"
-                              )}
-                              style={{
-                                backgroundColor: config.cardStyle?.buttonColor || config.colors.primary,
-                                color: config.cardStyle?.buttonTextColor || '#ffffff',
-                                borderRadius: `${config.cardStyle?.borderRadius || 8}px`
-                              }}
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                setActiveTool('card-button');
-                              }}
-                            >
-                              Agregar
-                            </button>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
+                       )}
+                   </div>
                 </div>
 
-                {/* Main Action Button (WhatsApp/Cart) - ABSOLUTE POSITIONING */}
-                <div className="absolute bottom-4 right-4 z-20">
-                    <div
-                      className="h-12 px-6 rounded-full flex items-center justify-center font-bold text-white shadow-xl cursor-pointer hover:scale-105 transition-transform"
-                      style={{ backgroundColor: config.colors.primary }}
-                    >
-                      {config.checkout?.cartButtonText || 'Enviar Pedido'}
-                    </div>
+                {/* --- 3. PRODUCT GRID --- */}
+                <div className="px-4 pb-12">
+                   <div className="grid grid-cols-2 gap-3">
+                      {displayProducts.map((p) => (
+                          <div
+                            key={p.id}
+                            className="group relative flex flex-col gap-3"
+                          >
+                             {/* IMAGE CARD */}
+                             <div
+                               className="relative aspect-[3/4] w-full overflow-hidden rounded-2xl bg-gray-100 shadow-sm transition-all duration-500 hover:shadow-lg"
+                               style={{ backgroundColor: config.colors.cardBackground || '#ffffff' }}
+                             >
+                                {p.image_url ? (
+                                    <Image
+                                       src={p.image_url}
+                                       alt={p.name}
+                                       fill
+                                       className="object-cover transition-transform duration-700 ease-in-out group-hover:scale-105"
+                                    />
+                                ) : (
+                                    <div className="flex h-full w-full items-center justify-center text-gray-300 bg-gray-50">
+                                       <span className="text-[10px] font-medium">Sin imagen</span>
+                                    </div>
+                                )}
+
+                                {/* FLOATING BUTTON (EDITABLE) */}
+                                <div className="absolute bottom-3 right-3 z-10">
+                                   <button
+                                     onClick={(e) => { e.stopPropagation(); setActiveTool('card-button'); }}
+                                     className={cn(
+                                         "h-10 w-10 flex items-center justify-center rounded-full shadow-lg transition-all duration-300 hover:scale-110 active:scale-90",
+                                         activeTool === 'card-button' && "ring-4 ring-blue-500 ring-offset-2"
+                                     )}
+                                     style={{
+                                         backgroundColor: config.cardStyle?.buttonColor || config.colors.primary,
+                                         color: config.cardStyle?.buttonTextColor || '#ffffff',
+                                         borderRadius: config.cardStyle?.borderRadius ? `${config.cardStyle.borderRadius}px` : '9999px' // default to full rounded if not set
+                                     }}
+                                   >
+                                       <Plus className="h-5 w-5" />
+                                   </button>
+                                </div>
+                             </div>
+
+                             {/* INFO */}
+                             <div className="flex flex-col gap-1 px-1">
+                                 <h3
+                                   className={cn(
+                                       "font-medium text-base leading-snug line-clamp-2 cursor-pointer hover:underline decoration-1 underline-offset-2",
+                                       activeTool === 'card-title' && "bg-blue-50 ring-2 ring-blue-500 rounded px-1 -mx-1"
+                                   )}
+                                   style={{ color: config.cardStyle?.titleColor || config.colors.text }}
+                                   onClick={(e) => { e.stopPropagation(); setActiveTool('card-title'); }}
+                                 >
+                                     {p.name}
+                                 </h3>
+                                 <p
+                                   className={cn(
+                                       "font-bold text-lg tracking-tight cursor-pointer hover:opacity-70 w-fit",
+                                       activeTool === 'card-price' && "bg-blue-50 ring-2 ring-blue-500 rounded px-1 -mx-1"
+                                   )}
+                                   style={{ color: config.cardStyle?.priceColor || config.colors.primary }}
+                                   onClick={(e) => { e.stopPropagation(); setActiveTool('card-price'); }}
+                                 >
+                                     ${Number(p.price).toFixed(2)}
+                                 </p>
+                             </div>
+                          </div>
+                      ))}
+                   </div>
+                </div>
+
+                {/* Footer Credits */}
+                <div className="text-center pb-8 opacity-40">
+                   <p className="text-[10px] font-medium">Powered by EzShop</p>
                 </div>
              </div>
           </div>
