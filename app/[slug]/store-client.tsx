@@ -63,21 +63,23 @@ export default function StoreClient({ profile, products, config }: StoreClientPr
   };
 
   // Avatar Shape & Border Logic
-  const { shapeClass, borderClass } = useMemo(() => {
-    // Prioritize frameStyle (from editor/user report), fallback to avatarShape
+  const { avatarClasses, shapeClass, frameStyle, borderColor } = useMemo(() => {
     const frameStyle = (config.profile as any).frameStyle || config.profile.avatarShape || 'circle';
+    const borderColor = (config.profile as any).borderColor || config.profile.avatarBorderColor || '#ffffff';
 
-    let sClass = 'rounded-full';
-    let bClass = 'border-4 shadow-xl';
+    const shapeClass = cn(
+      frameStyle === 'circle' && "rounded-full",
+      (frameStyle === 'square' || frameStyle === 'rounded') && "rounded-2xl",
+      frameStyle === 'none' && "rounded-none"
+    );
 
-    if (frameStyle === 'none') {
-      sClass = 'rounded-none';
-      bClass = 'border-0';
-    } else if (frameStyle === 'square' || frameStyle === 'rounded') {
-      sClass = 'rounded-2xl';
-    }
+    const avatarClasses = cn(
+      "relative h-32 w-32 overflow-hidden shadow-xl",
+      shapeClass,
+      frameStyle === 'none' ? "border-0" : "border-4"
+    );
 
-    return { shapeClass: sClass, borderClass: bClass };
+    return { avatarClasses, shapeClass, frameStyle, borderColor };
   }, [config.profile]);
 
   const socialLinks = Array.isArray(config?.socialLinks) ? config.socialLinks.filter(l => l.active) : []
@@ -108,12 +110,8 @@ export default function StoreClient({ profile, products, config }: StoreClientPr
                          shapeClass
                     )}></div>
                     <div
-                        className={cn(
-                          "relative h-32 w-32 overflow-hidden",
-                          shapeClass,
-                          borderClass
-                        )}
-                        style={{ borderColor: config.profile.avatarBorderColor || '#ffffff' }}
+                        className={avatarClasses}
+                        style={{ borderColor: frameStyle !== 'none' ? borderColor : 'transparent' }}
                     >
                         {config.profile.avatarUrl ? (
                             <Image
