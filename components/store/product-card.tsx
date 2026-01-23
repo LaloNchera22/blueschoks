@@ -60,6 +60,10 @@ export function ProductCard({ product, config }: ProductCardProps) {
   const priceFont = styleConfig?.priceFont || undefined
   const footerBg = styleConfig?.footerBackground || undefined
 
+  // Prioritize product-specific colors over global card style
+  const titleColor = styleConfig?.titleColor || cardStyle.titleColor
+  const priceColor = styleConfig?.priceColor || cardStyle.priceColor
+
   return (
     <motion.div
       layout
@@ -116,7 +120,7 @@ export function ProductCard({ product, config }: ProductCardProps) {
             <h3
               className="font-medium text-base leading-snug line-clamp-2"
               style={{
-                color: cardStyle.titleColor,
+                color: titleColor,
                 fontFamily: titleFont
               }}
             >
@@ -126,7 +130,7 @@ export function ProductCard({ product, config }: ProductCardProps) {
         <p
           className="font-bold text-lg tracking-tight"
           style={{
-            color: cardStyle.priceColor,
+            color: priceColor,
             fontFamily: priceFont
           }}
         >

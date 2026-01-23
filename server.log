@@ -14,45 +14,7 @@ This information is used to shape Next.js' roadmap and prioritize features.
 You can learn more, including how to opt-out if you'd not like to participate in this anonymous program, by visiting the following URL:
 https://nextjs.org/telemetry
 
-✓ Ready in 1127ms
-○ Compiling /verify-changes ...
-⨯ Error: useCart debe usarse dentro de un CartProvider
-    at useCart (components/shop/cart-context.tsx:110:23)
-    at StoreHeader (components/store/store-header.tsx:41:42)
-  108 | export const useCart = () => {
-  109 |   const context = useContext(CartContext)
-> 110 |   if (!context) throw new Error("useCart debe usarse dentro de un CartProvider")
-      |                       ^
-  111 |   return context
-  112 | } {
-  digest: '2166887011'
-}
- GET /verify-changes 500 in 7.9s (compile: 7.2s, render: 629ms)
- GET /verify-changes 200 in 542ms (compile: 79ms, render: 463ms)
-TypeError: fetch failed
-    at ignore-listed frames {
-  [cause]: Error: getaddrinfo EAI_AGAIN via.placeholder.com
-      at ignore-listed frames {
-    errno: -3001,
-    code: 'EAI_AGAIN',
-    syscall: 'getaddrinfo',
-    hostname: 'via.placeholder.com'
-  }
-}
-TypeError: fetch failed
-    at ignore-listed frames {
-  [cause]: Error: getaddrinfo EAI_AGAIN via.placeholder.com
-      at ignore-listed frames {
-    errno: -3001,
-    code: 'EAI_AGAIN',
-    syscall: 'getaddrinfo',
-    hostname: 'via.placeholder.com'
-  }
-}
- GET /_next/image?url=https%3A%2F%2Fvia.placeholder.com%2F200&w=640&q=75 500 in 1378ms (compile: 1309ms, render: 69ms)
- GET /_next/image?url=https%3A%2F%2Fvia.placeholder.com%2F200&w=640&q=75 500 in 1378ms (compile: 1309ms, render: 69ms)
- GET /_next/image?url=https%3A%2F%2Fvia.placeholder.com%2F150&w=1920&q=75 500 in 1697ms (compile: 1677ms, render: 20ms)
- GET /_next/image?url=https%3A%2F%2Fvia.placeholder.com%2F150&w=1920&q=75 500 in 1697ms (compile: 1677ms, render: 20ms)
- GET /verify-changes 200 in 232ms (compile: 60ms, render: 172ms)
- GET /verify-changes 200 in 77ms (compile: 8ms, render: 69ms)
-[?25h
+✓ Ready in 1320ms
+○ Compiling /test-color-bug ...
+ GET /test-color-bug 200 in 9.2s (compile: 8.7s, render: 533ms)
+ GET /test-color-bug 200 in 255ms (compile: 77ms, render: 178ms)
