@@ -64,14 +64,18 @@ export default function StoreClient({ profile, products, config }: StoreClientPr
 
   // Avatar Shape Logic (Copied from DesignEditor)
   const avatarClasses = useMemo(() => {
-    switch(config.profile.avatarShape) {
-      case 'none': return 'rounded-none';
-      case 'square': return 'rounded-2xl';
-      case 'rounded': return 'rounded-2xl';
-      case 'circle':
-      default: return 'rounded-full';
-    }
-  }, [config.profile.avatarShape]);
+    // Prioritize frameStyle (from editor/user report), fallback to avatarShape
+    const frameStyle = (config.profile as any).frameStyle || config.profile.avatarShape || 'circle';
+
+    if (frameStyle === 'none') return 'rounded-none';
+    if (frameStyle === 'square') return 'rounded-2xl';
+
+    // Legacy support
+    if (frameStyle === 'rounded') return 'rounded-2xl';
+
+    // Default to circle
+    return 'rounded-full';
+  }, [config.profile]);
 
   const socialLinks = Array.isArray(config?.socialLinks) ? config.socialLinks.filter(l => l.active) : []
 
