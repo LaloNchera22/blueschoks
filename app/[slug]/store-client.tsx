@@ -63,24 +63,14 @@ export default function StoreClient({ profile, products, config }: StoreClientPr
   };
 
   // Avatar Shape & Border Logic
-  const { avatarClasses, shapeClass, frameStyle, borderColor } = useMemo(() => {
-    const frameStyle = (config.profile as any).frameStyle || config.profile.avatarShape || 'circle';
-    const borderColor = (config.profile as any).borderColor || config.profile.avatarBorderColor || '#ffffff';
+  const avatarShape = config.profile?.avatarShape || 'circle';
+  const avatarBorderColor = config.profile?.avatarBorderColor || '#ffffff';
 
-    const shapeClass = cn(
-      frameStyle === 'circle' && "rounded-full",
-      (frameStyle === 'square' || frameStyle === 'rounded') && "rounded-2xl",
-      frameStyle === 'none' && "rounded-none"
-    );
-
-    const avatarClasses = cn(
-      "relative h-32 w-32 overflow-hidden shadow-xl",
-      shapeClass,
-      frameStyle === 'none' ? "border-0" : "border-4"
-    );
-
-    return { avatarClasses, shapeClass, frameStyle, borderColor };
-  }, [config.profile]);
+  const shapeClass = useMemo(() => {
+    if (avatarShape === 'none') return 'rounded-none';
+    if (avatarShape === 'square' || avatarShape === 'rounded') return 'rounded-2xl';
+    return 'rounded-full';
+  }, [avatarShape]);
 
   const socialLinks = Array.isArray(config?.socialLinks) ? config.socialLinks.filter(l => l.active) : []
 
@@ -104,29 +94,31 @@ export default function StoreClient({ profile, products, config }: StoreClientPr
             <div className="flex flex-col items-center text-center pt-12 pb-6 px-6">
 
                 {/* AVATAR */}
-                <div className="relative mb-6">
-                    <div className={cn(
-                        "absolute -inset-1 bg-gradient-to-r from-gray-200 to-gray-100 blur opacity-50",
-                         shapeClass
-                    )}></div>
-                    <div
-                        className={avatarClasses}
-                        style={{ borderColor: frameStyle !== 'none' ? borderColor : 'transparent' }}
-                    >
-                        {config.profile.avatarUrl ? (
-                            <Image
-                              src={config.profile.avatarUrl}
-                              alt="Avatar"
-                              fill
-                              className="object-cover"
-                              priority
-                            />
-                        ) : (
-                            <div className="w-full h-full flex items-center justify-center bg-gray-100 text-gray-300">
-                                <Smartphone className="w-10 h-10" />
-                            </div>
-                        )}
-                    </div>
+                <div className="flex justify-center mb-6">
+                  <div
+                    className={cn(
+                      "relative w-32 h-32 overflow-hidden border-4",
+                      shapeClass
+                    )}
+                    style={{
+                      borderColor: avatarBorderColor,
+                      boxShadow: '0 4px 12px rgba(0,0,0,0.1)'
+                    }}
+                  >
+                    {config.profile.avatarUrl ? (
+                        <Image
+                          src={config.profile.avatarUrl}
+                          alt="Avatar"
+                          fill
+                          className="object-cover"
+                          priority
+                        />
+                    ) : (
+                        <div className="w-full h-full flex items-center justify-center bg-gray-100 text-gray-300">
+                            <Smartphone className="w-10 h-10" />
+                        </div>
+                    )}
+                  </div>
                 </div>
 
                 {/* SHOP NAME */}
