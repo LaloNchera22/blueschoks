@@ -55,7 +55,7 @@ import { CSS } from '@dnd-kit/utilities';
 
 import { DesignConfig, LinkItem, ProductStyle } from '@/lib/types/design-system';
 import { saveDesignConfig } from '@/app/dashboard/actions/design-actions';
-import { updateProductStyle, applyStyleToAllProducts } from '@/app/dashboard/products/actions';
+import { updateProductStyle, applyStyleToAllProducts, saveProductStylesBulk } from '@/app/dashboard/products/actions';
 import { Database } from '@/utils/supabase/types';
 import { cn } from '@/lib/utils';
 import { DEFAULT_DESIGN } from '@/utils/design-sanitizer';
@@ -241,14 +241,33 @@ export default function DesignEditor({ initialConfig, initialProducts, userId, s
     setIsSaving(true);
     try {
       console.log("Saving Config Payload:", config); // Debug log
-      const result = await saveDesignConfig(config);
-      if (result.success) {
+
+      // 1. Save Design Config
+      const designPromise = saveDesignConfig(config);
+
+      // 2. Save Product Styles (only if we have real products)
+      let productsPromise = Promise.resolve({ success: true });
+      if (initialProducts.length > 0) {
+         const productUpdates = products.map(p => ({
+            id: p.id,
+            style_config: (p.style_config as ProductStyle) || {}
+         }));
+         productsPromise = saveProductStylesBulk(productUpdates);
+      }
+
+      const [designResult, productsResult] = await Promise.all([
+        designPromise,
+        productsPromise
+      ]);
+
+      if (designResult.success && productsResult.success) {
         toast.success("Diseño guardado correctamente");
         router.refresh();
       } else {
         toast.error("Error al guardar cambios");
       }
     } catch (error) {
+      console.error(error);
       toast.error("Error de conexión");
     } finally {
       setIsSaving(false);

@@ -133,3 +133,24 @@ export async function applyStyleToAllProducts(style: ProductStyle) {
   revalidatePath("/dashboard/products")
   return { success: true }
 }
+
+export async function saveProductStylesBulk(updates: { id: string; style_config: ProductStyle }[]) {
+  const supabase = await createClient()
+  const { data: { user } } = await supabase.auth.getUser()
+  if (!user) throw new Error("No autorizado")
+
+  // Use Promise.all for concurrency
+  const promises = updates.map(update =>
+    supabase.from('products')
+      .update({ style_config: update.style_config })
+      .eq('id', update.id)
+      .eq('user_id', user.id) // Ensure user owns the product
+  )
+
+  await Promise.all(promises)
+
+  revalidatePath('/dashboard/design')
+  revalidatePath('/[slug]', 'page') // Limpiar caché pública
+  revalidatePath('/', 'layout') // Global revalidate
+  return { success: true }
+}
