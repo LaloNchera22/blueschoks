@@ -147,7 +147,13 @@ export async function saveProductStylesBulk(updates: { id: string; style_config:
       .eq('user_id', user.id) // Ensure user owns the product
   )
 
-  await Promise.all(promises)
+  const results = await Promise.all(promises)
+  const errors = results.filter(r => r.error).map(r => r.error?.message)
+
+  if (errors.length > 0) {
+    console.error("Errors saving product styles:", errors)
+    return { success: false, error: errors.join(", ") }
+  }
 
   revalidatePath('/dashboard/design')
   revalidatePath('/[slug]', 'page') // Limpiar caché pública
