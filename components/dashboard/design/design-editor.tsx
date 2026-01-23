@@ -59,6 +59,8 @@ import { updateProductStyle, applyStyleToAllProducts } from '@/app/dashboard/pro
 import { Database } from '@/utils/supabase/types';
 import { cn } from '@/lib/utils';
 import { DEFAULT_DESIGN } from '@/utils/design-sanitizer';
+import { ProductStylingToolbar } from './product-styling-toolbar';
+import { ColorCircle } from './color-circle';
 
 // --- TYPES ---
 type Product = Database['public']['Tables']['products']['Row'];
@@ -128,36 +130,6 @@ const getContrastColor = (hexcolor: string) => {
 }
 
 // --- HELPER COMPONENTS ---
-
-const ColorCircle = ({
-  color,
-  onChange,
-  size = "md"
-}: {
-  color: string;
-  onChange: (c: string) => void;
-  size?: "sm" | "md" | "lg";
-}) => {
-  const sizeClasses = {
-    sm: "w-6 h-6",
-    md: "w-8 h-8",
-    lg: "w-10 h-10"
-  };
-
-  return (
-    <div className={cn(
-      "relative group rounded-full overflow-hidden border border-gray-200 shadow-sm cursor-pointer hover:scale-105 transition-transform shrink-0",
-      sizeClasses[size]
-    )}>
-      <input
-        type="color"
-        value={color || '#000000'}
-        onChange={(e) => onChange(e.target.value)}
-        className="absolute inset-0 w-[150%] h-[150%] -top-1/4 -left-1/4 cursor-pointer p-0 border-0"
-      />
-    </div>
-  );
-};
 
 // Sortable Item for Socials Manager
 function SortableSocialItem({ id, link, onDelete }: { id: string, link: LinkItem, onDelete: (id: string) => void }) {
@@ -802,137 +774,25 @@ export default function DesignEditor({ initialConfig, initialProducts, userId, s
              </div>
           )}
 
-           {/* NEW: PRODUCT INDIVIDUAL TOOLS */}
+           {/* NEW: PRODUCT INDIVIDUAL TOOLS (Refactored) */}
            {activeTool === 'product-individual' && selectedProduct && (
-            <div className="flex items-center gap-4 animate-in fade-in slide-in-from-top-2 duration-300">
-
-                {/* Footer Background */}
-                <div className="flex flex-col items-center gap-1">
-                  <div className="flex items-center gap-1 relative">
-                    <ColorCircle
-                        color={selectedProduct.style_config?.footerBackground || 'transparent'}
-                        onChange={(c) => updateSelectedProductStyle('footerBackground', c)}
-                        size="sm"
-                    />
-                    {selectedProduct.style_config?.footerBackground && (
-                        <button
-                            onClick={(e) => { e.stopPropagation(); updateSelectedProductStyle('footerBackground', undefined); }}
-                            className="absolute -top-1 -right-1 bg-gray-100 border border-gray-300 rounded-full p-0.5 hover:bg-gray-200 transition-colors shadow-sm z-10"
-                            title="Quitar fondo"
-                        >
-                            <Minus size={10} className="text-gray-600" />
-                        </button>
-                    )}
-                  </div>
-                  <span className="text-[9px] text-gray-500 font-semibold uppercase tracking-wider">Fondo</span>
-                </div>
-
-                <div className="w-px h-6 bg-gray-200" />
-
-                {/* Title Font */}
-                <div className="flex flex-col items-center gap-1">
-                 <div className="relative">
-                    <select
-                      value={selectedProduct.style_config?.titleFont || ''}
-                      onChange={(e) => updateSelectedProductStyle('titleFont', e.target.value || undefined)}
-                      className="appearance-none bg-gray-50 border border-gray-200 rounded-full h-6 pl-2 pr-6 text-[10px] font-medium focus:outline-none focus:ring-2 focus:ring-black/5 cursor-pointer text-gray-700 hover:bg-gray-100 w-20 truncate"
-                    >
-                      <option value="">Default</option>
-                      {FONTS.map(f => <option key={f.value} value={f.value}>{f.name}</option>)}
-                    </select>
-                    <ChevronDown className="w-2 h-2 absolute right-2 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none" />
-                 </div>
-                 <span className="text-[9px] text-gray-500 font-semibold uppercase tracking-wider">Título</span>
-                </div>
-
-                {/* Title Color */}
-                <div className="flex flex-col items-center gap-1">
-                  <div className="flex items-center gap-1 relative">
-                    <ColorCircle
-                        color={selectedProduct.style_config?.titleColor || config.cardStyle?.titleColor || config.colors.text}
-                        onChange={(c) => updateSelectedProductStyle('titleColor', c)}
-                        size="sm"
-                    />
-                     {selectedProduct.style_config?.titleColor && (
-                        <button
-                            onClick={(e) => { e.stopPropagation(); updateSelectedProductStyle('titleColor', undefined); }}
-                            className="absolute -top-1 -right-1 bg-gray-100 border border-gray-300 rounded-full p-0.5 hover:bg-gray-200 transition-colors shadow-sm z-10"
-                            title="Reset color"
-                        >
-                            <Minus size={10} className="text-gray-600" />
-                        </button>
-                    )}
-                  </div>
-                  <span className="text-[9px] text-gray-500 font-semibold uppercase tracking-wider">Color T.</span>
-                </div>
-
-                {/* Price Font */}
-                <div className="flex flex-col items-center gap-1">
-                 <div className="relative">
-                    <select
-                      value={selectedProduct.style_config?.priceFont || ''}
-                      onChange={(e) => updateSelectedProductStyle('priceFont', e.target.value || undefined)}
-                      className="appearance-none bg-gray-50 border border-gray-200 rounded-full h-6 pl-2 pr-6 text-[10px] font-medium focus:outline-none focus:ring-2 focus:ring-black/5 cursor-pointer text-gray-700 hover:bg-gray-100 w-20 truncate"
-                    >
-                      <option value="">Default</option>
-                      {FONTS.map(f => <option key={f.value} value={f.value}>{f.name}</option>)}
-                    </select>
-                    <ChevronDown className="w-2 h-2 absolute right-2 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none" />
-                 </div>
-                 <span className="text-[9px] text-gray-500 font-semibold uppercase tracking-wider">Precio</span>
-                </div>
-
-                {/* Price Color */}
-                <div className="flex flex-col items-center gap-1">
-                  <div className="flex items-center gap-1 relative">
-                    <ColorCircle
-                        color={selectedProduct.style_config?.priceColor || config.cardStyle?.priceColor || config.colors.primary}
-                        onChange={(c) => updateSelectedProductStyle('priceColor', c)}
-                        size="sm"
-                    />
-                    {selectedProduct.style_config?.priceColor && (
-                        <button
-                            onClick={(e) => { e.stopPropagation(); updateSelectedProductStyle('priceColor', undefined); }}
-                            className="absolute -top-1 -right-1 bg-gray-100 border border-gray-300 rounded-full p-0.5 hover:bg-gray-200 transition-colors shadow-sm z-10"
-                            title="Reset color"
-                        >
-                            <Minus size={10} className="text-gray-600" />
-                        </button>
-                    )}
-                  </div>
-                  <span className="text-[9px] text-gray-500 font-semibold uppercase tracking-wider">Color P.</span>
-                </div>
-
-                 <div className="w-px h-6 bg-gray-200" />
-
-                 {/* Apply to All */}
-                 <button
-                   onClick={handleApplyToAll}
-                   disabled={isSavingProduct}
-                   className="flex flex-col items-center gap-1 group"
-                   title="Aplicar a todos"
-                 >
-                     <div className="w-8 h-8 rounded-full border border-gray-200 bg-white flex items-center justify-center hover:bg-gray-50 hover:scale-105 transition-all text-gray-600">
-                        <Copy className="w-4 h-4" />
-                     </div>
-                     <span className="text-[9px] text-gray-500 font-semibold uppercase tracking-wider group-hover:text-black transition-colors">Todos</span>
-                 </button>
-
-                 {/* Specific Save Button */}
-                 <button
-                   onClick={handleSaveProduct}
-                   disabled={isSavingProduct}
-                   className="flex flex-col items-center gap-1 group"
-                   title="Guardar cambios del producto"
-                 >
-                     <div className="w-8 h-8 rounded-full bg-black text-white flex items-center justify-center hover:bg-gray-800 hover:scale-105 transition-all shadow-sm">
-                        {isSavingProduct ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />}
-                     </div>
-                     <span className="text-[9px] text-gray-500 font-semibold uppercase tracking-wider group-hover:text-black transition-colors">Guardar</span>
-                 </button>
-
-            </div>
-          )}
+              <ProductStylingToolbar
+                product={selectedProduct}
+                onUpdate={updateSelectedProductStyle}
+                onSave={handleSaveProduct}
+                onApplyAll={handleApplyToAll}
+                onClose={() => {
+                  setActiveTool('global');
+                  setSelectedProductId(null);
+                }}
+                isSaving={isSavingProduct}
+                fonts={FONTS}
+                defaultColors={{
+                  title: config.cardStyle?.titleColor || config.colors.text,
+                  price: config.cardStyle?.priceColor || config.colors.primary,
+                }}
+              />
+           )}
 
           {/* SAVE BUTTON (Always visible on right) */}
           {activeTool !== 'product-individual' && (
