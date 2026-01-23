@@ -30,13 +30,11 @@ export async function saveDesignConfig(config: DesignConfig) {
 
     if (error) throw error
 
-    revalidatePath('/dashboard/design', 'layout')
+    revalidatePath('/dashboard/design', 'page')
 
     if (profile?.slug) {
       // Revalidate the shop page path
-      revalidatePath(`/${profile.slug}`, 'layout')
-      // Invalidate the shop data cache
-      // revalidateTag(`shop:${profile.slug}`, 'max')
+      revalidatePath(`/${profile.slug}`, 'page')
     }
 
     // Force global revalidation to ensure stale data is purged

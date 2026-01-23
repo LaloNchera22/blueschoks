@@ -1,4 +1,4 @@
-import { DesignConfig, LinkItem, CheckoutConfig, CardStyle } from '@/lib/types/design-system';
+import { DesignConfig, LinkItem, CheckoutConfig, CardStyle, TextStyle } from '@/lib/types/design-system';
 
 export const DEFAULT_DESIGN: DesignConfig = {
   colors: {
@@ -69,6 +69,8 @@ export function sanitizeDesign(raw: any, profileFallback?: any): DesignConfig {
       shopName: typeof raw.profile?.shopName === 'string' ? raw.profile.shopName : (profileFallback?.shop_name || DEFAULT_DESIGN.profile.shopName),
       avatarShape: ['circle', 'rounded', 'square', 'none'].includes(raw.profile?.avatarShape) ? raw.profile.avatarShape : DEFAULT_DESIGN.profile.avatarShape,
       avatarBorderColor: typeof raw.profile?.avatarBorderColor === 'string' ? raw.profile.avatarBorderColor : DEFAULT_DESIGN.profile.avatarBorderColor,
+      titleStyle: sanitizeTextStyle(raw.profile?.titleStyle),
+      bioStyle: sanitizeTextStyle(raw.profile?.bioStyle),
     },
     socialLinks: raw.socialLinks.map((link: any): LinkItem => ({
       id: typeof link.id === 'string' ? link.id : Math.random().toString(36).substr(2, 9),
@@ -108,5 +110,18 @@ function applyProfileFallbacks(config: DesignConfig, profile: any): DesignConfig
       shopName: config.profile.shopName || profile.shop_name || '',
       avatarUrl: config.profile.avatarUrl || profile.avatar_url || '',
     }
+  };
+}
+
+function sanitizeTextStyle(raw: any): TextStyle | undefined {
+  if (!raw || typeof raw !== 'object') return undefined;
+
+  return {
+    fontFamily: typeof raw.fontFamily === 'string' ? raw.fontFamily : undefined,
+    bold: typeof raw.bold === 'boolean' ? raw.bold : undefined,
+    italic: typeof raw.italic === 'boolean' ? raw.italic : undefined,
+    align: ['left', 'center', 'right'].includes(raw.align) ? raw.align : undefined,
+    color: typeof raw.color === 'string' ? raw.color : undefined,
+    size: typeof raw.size === 'number' ? raw.size : undefined,
   };
 }
