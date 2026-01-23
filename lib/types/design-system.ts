@@ -23,6 +23,12 @@ export interface CardStyle {
   titleColor: string;
 }
 
+export interface ProductStyle {
+  footerBackground?: string;
+  titleFont?: string;
+  priceFont?: string;
+}
+
 export interface TextStyle {
   fontFamily?: string;
   bold?: boolean;

@@ -31,7 +31,8 @@ import {
   Music2,
   Mail,
   ExternalLink,
-  Upload
+  Upload,
+  Copy
 } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { createClient } from '@/utils/supabase/client';
@@ -52,8 +53,9 @@ import {
 } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
 
-import { DesignConfig, LinkItem } from '@/lib/types/design-system';
+import { DesignConfig, LinkItem, ProductStyle } from '@/lib/types/design-system';
 import { saveDesignConfig } from '@/app/dashboard/actions/design-actions';
+import { updateProductStyle, applyStyleToAllProducts } from '@/app/dashboard/products/actions';
 import { Database } from '@/utils/supabase/types';
 import { cn } from '@/lib/utils';
 import { DEFAULT_DESIGN } from '@/utils/design-sanitizer';
@@ -77,6 +79,7 @@ type ToolType =
   | 'card-title'
   | 'card-price'
   | 'card-button'
+  | 'product-individual'
   | `social-icon-${string}`; // social-icon-[id]
 
 const DUMMY_PRODUCTS = [
@@ -221,8 +224,12 @@ export default function DesignEditor({ initialConfig, initialProducts, userId, s
   }, [initialConfig]);
 
   const [config, setConfig] = useState<DesignConfig>(safeInitialConfig);
+  // Initialize products with local state
+  const [products, setProducts] = useState<Product[]>(initialProducts.length > 0 ? initialProducts : (DUMMY_PRODUCTS as any));
   const [activeTool, setActiveTool] = useState<ToolType>('global');
+  const [selectedProductId, setSelectedProductId] = useState<string | null>(null);
   const [isSaving, setIsSaving] = useState(false);
+  const [isSavingProduct, setIsSavingProduct] = useState(false);
   const [showSocialsManager, setShowSocialsManager] = useState(false);
   const [isUploadingImage, setIsUploadingImage] = useState(false);
 
@@ -269,6 +276,69 @@ export default function DesignEditor({ initialConfig, initialProducts, userId, s
     } finally {
       setIsSaving(false);
     }
+  };
+
+  // --- PRODUCT STYLING LOGIC ---
+  const getSelectedProduct = () => products.find(p => p.id === selectedProductId);
+
+  const updateSelectedProductStyle = (key: keyof ProductStyle, value: string | undefined) => {
+    if (!selectedProductId) return;
+
+    setProducts(prev => prev.map(p => {
+        if (p.id === selectedProductId) {
+            return {
+                ...p,
+                style_config: {
+                    ...p.style_config,
+                    [key]: value
+                }
+            };
+        }
+        return p;
+    }));
+  };
+
+  const handleSaveProduct = async () => {
+    if (!selectedProductId) return;
+    const product = getSelectedProduct();
+    if (!product) return;
+
+    setIsSavingProduct(true);
+    try {
+        await updateProductStyle(product.id, product.style_config || {});
+        toast.success("Estilo de producto guardado");
+        router.refresh();
+    } catch (e) {
+        toast.error("Error al guardar producto");
+    } finally {
+        setIsSavingProduct(false);
+    }
+  };
+
+  const handleApplyToAll = async () => {
+      if (!selectedProductId) return;
+      const product = getSelectedProduct();
+      if (!product?.style_config) return;
+
+      if (!confirm("¿Aplicar este estilo a TODOS los productos?")) return;
+
+      setIsSavingProduct(true);
+      try {
+          await applyStyleToAllProducts(product.style_config);
+
+          // Update local state
+          setProducts(prev => prev.map(p => ({
+              ...p,
+              style_config: product.style_config
+          })));
+
+          toast.success("Estilo aplicado a todos");
+          router.refresh();
+      } catch (e) {
+          toast.error("Error al aplicar estilos");
+      } finally {
+          setIsSavingProduct(false);
+      }
   };
 
   const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -340,8 +410,6 @@ export default function DesignEditor({ initialConfig, initialProducts, userId, s
     updateConfig(['socialLinks'], updatedLinks);
   };
 
-  const displayProducts = initialProducts.length > 0 ? initialProducts : DUMMY_PRODUCTS;
-
   // Derive current selection data
   const selectedSocialLink = useMemo(() => {
     if (activeTool && activeTool.startsWith('social-icon-')) {
@@ -374,6 +442,8 @@ export default function DesignEditor({ initialConfig, initialProducts, userId, s
       fontSize: styleConfig?.size ? `${styleConfig.size}px` : undefined,
     };
   };
+
+  const selectedProduct = getSelectedProduct();
 
   return (
     <div className="w-full h-full relative overflow-hidden flex flex-col items-center justify-center font-sans bg-gray-50">
@@ -732,16 +802,108 @@ export default function DesignEditor({ initialConfig, initialProducts, userId, s
              </div>
           )}
 
+           {/* NEW: PRODUCT INDIVIDUAL TOOLS */}
+           {activeTool === 'product-individual' && selectedProduct && (
+            <div className="flex items-center gap-4 animate-in fade-in slide-in-from-top-2 duration-300">
+
+                {/* Footer Background */}
+                <div className="flex flex-col items-center gap-1">
+                  <div className="flex items-center gap-1 relative">
+                    <ColorCircle
+                        color={selectedProduct.style_config?.footerBackground || 'transparent'}
+                        onChange={(c) => updateSelectedProductStyle('footerBackground', c)}
+                        size="sm"
+                    />
+                    {selectedProduct.style_config?.footerBackground && (
+                        <button
+                            onClick={(e) => { e.stopPropagation(); updateSelectedProductStyle('footerBackground', undefined); }}
+                            className="absolute -top-1 -right-1 bg-gray-100 border border-gray-300 rounded-full p-0.5 hover:bg-gray-200 transition-colors shadow-sm z-10"
+                            title="Quitar fondo"
+                        >
+                            <Minus size={10} className="text-gray-600" />
+                        </button>
+                    )}
+                  </div>
+                  <span className="text-[9px] text-gray-500 font-semibold uppercase tracking-wider">Fondo</span>
+                </div>
+
+                <div className="w-px h-6 bg-gray-200" />
+
+                {/* Title Font */}
+                <div className="flex flex-col items-center gap-1">
+                 <div className="relative">
+                    <select
+                      value={selectedProduct.style_config?.titleFont || ''}
+                      onChange={(e) => updateSelectedProductStyle('titleFont', e.target.value || undefined)}
+                      className="appearance-none bg-gray-50 border border-gray-200 rounded-full h-6 pl-2 pr-6 text-[10px] font-medium focus:outline-none focus:ring-2 focus:ring-black/5 cursor-pointer text-gray-700 hover:bg-gray-100 w-20 truncate"
+                    >
+                      <option value="">Default</option>
+                      {FONTS.map(f => <option key={f.value} value={f.value}>{f.name}</option>)}
+                    </select>
+                    <ChevronDown className="w-2 h-2 absolute right-2 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none" />
+                 </div>
+                 <span className="text-[9px] text-gray-500 font-semibold uppercase tracking-wider">Título</span>
+                </div>
+
+                {/* Price Font */}
+                <div className="flex flex-col items-center gap-1">
+                 <div className="relative">
+                    <select
+                      value={selectedProduct.style_config?.priceFont || ''}
+                      onChange={(e) => updateSelectedProductStyle('priceFont', e.target.value || undefined)}
+                      className="appearance-none bg-gray-50 border border-gray-200 rounded-full h-6 pl-2 pr-6 text-[10px] font-medium focus:outline-none focus:ring-2 focus:ring-black/5 cursor-pointer text-gray-700 hover:bg-gray-100 w-20 truncate"
+                    >
+                      <option value="">Default</option>
+                      {FONTS.map(f => <option key={f.value} value={f.value}>{f.name}</option>)}
+                    </select>
+                    <ChevronDown className="w-2 h-2 absolute right-2 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none" />
+                 </div>
+                 <span className="text-[9px] text-gray-500 font-semibold uppercase tracking-wider">Precio</span>
+                </div>
+
+                 <div className="w-px h-6 bg-gray-200" />
+
+                 {/* Apply to All */}
+                 <button
+                   onClick={handleApplyToAll}
+                   disabled={isSavingProduct}
+                   className="flex flex-col items-center gap-1 group"
+                   title="Aplicar a todos"
+                 >
+                     <div className="w-8 h-8 rounded-full border border-gray-200 bg-white flex items-center justify-center hover:bg-gray-50 hover:scale-105 transition-all text-gray-600">
+                        <Copy className="w-4 h-4" />
+                     </div>
+                     <span className="text-[9px] text-gray-500 font-semibold uppercase tracking-wider group-hover:text-black transition-colors">Todos</span>
+                 </button>
+
+                 {/* Specific Save Button */}
+                 <button
+                   onClick={handleSaveProduct}
+                   disabled={isSavingProduct}
+                   className="flex flex-col items-center gap-1 group"
+                   title="Guardar cambios del producto"
+                 >
+                     <div className="w-8 h-8 rounded-full bg-black text-white flex items-center justify-center hover:bg-gray-800 hover:scale-105 transition-all shadow-sm">
+                        {isSavingProduct ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />}
+                     </div>
+                     <span className="text-[9px] text-gray-500 font-semibold uppercase tracking-wider group-hover:text-black transition-colors">Guardar</span>
+                 </button>
+
+            </div>
+          )}
+
           {/* SAVE BUTTON (Always visible on right) */}
-          <div className="pl-4 ml-auto border-l border-gray-200 py-1">
-            <button
-              onClick={handleSave}
-              disabled={isSaving}
-              className="bg-black hover:bg-gray-800 text-white rounded-full w-10 h-10 flex items-center justify-center transition-all disabled:opacity-50 disabled:cursor-not-allowed shadow-sm"
-            >
-              {isSaving ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />}
-            </button>
-          </div>
+          {activeTool !== 'product-individual' && (
+            <div className="pl-4 ml-auto border-l border-gray-200 py-1">
+                <button
+                onClick={handleSave}
+                disabled={isSaving}
+                className="bg-black hover:bg-gray-800 text-white rounded-full w-10 h-10 flex items-center justify-center transition-all disabled:opacity-50 disabled:cursor-not-allowed shadow-sm"
+                >
+                {isSaving ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />}
+                </button>
+            </div>
+          )}
         </div>
       </div>
 
@@ -758,6 +920,7 @@ export default function DesignEditor({ initialConfig, initialProducts, userId, s
         onClick={(e) => {
           e.stopPropagation();
           setActiveTool('global');
+          setSelectedProductId(null);
         }}
       >
         {/* --- PREVIEW AREA (NEW STORE CLIENT STRUCTURE) --- */}
@@ -856,10 +1019,25 @@ export default function DesignEditor({ initialConfig, initialProducts, userId, s
                 <div className="px-4 pb-12">
                    {/* FIX: ENSURE 2 COLUMNS AND LARGER GAP */}
                    <div className="grid grid-cols-2 gap-4">
-                      {displayProducts.map((p) => (
+                      {products.map((p) => {
+                          const styleConfig = p.style_config;
+                          const footerBg = styleConfig?.footerBackground || undefined;
+                          const titleFont = styleConfig?.titleFont || undefined;
+                          const priceFont = styleConfig?.priceFont || undefined;
+                          const isProductSelected = activeTool === 'product-individual' && selectedProductId === p.id;
+
+                          return (
                           <div
                             key={p.id}
-                            className="group relative flex flex-col gap-3"
+                            className={cn(
+                                "group relative flex flex-col gap-3 rounded-2xl transition-all p-1",
+                                isProductSelected && "ring-2 ring-blue-500 bg-blue-50/50"
+                            )}
+                            onClick={(e) => {
+                                e.stopPropagation();
+                                setActiveTool('product-individual');
+                                setSelectedProductId(p.id);
+                            }}
                           >
                              {/* IMAGE CARD */}
                              <div
@@ -899,13 +1077,19 @@ export default function DesignEditor({ initialConfig, initialProducts, userId, s
                              </div>
 
                              {/* INFO */}
-                             <div className="flex flex-col gap-1 px-1">
+                             <div
+                                className={cn("flex flex-col gap-1 px-1", footerBg && "p-3 rounded-xl transition-colors")}
+                                style={{ backgroundColor: footerBg }}
+                             >
                                  <h3
                                    className={cn(
                                        "font-medium text-base leading-snug line-clamp-2 cursor-pointer hover:underline decoration-1 underline-offset-2",
                                        activeTool === 'card-title' && "bg-blue-50 ring-2 ring-blue-500 rounded px-1 -mx-1"
                                    )}
-                                   style={{ color: config.cardStyle?.titleColor || config.colors.text }}
+                                   style={{
+                                       color: config.cardStyle?.titleColor || config.colors.text,
+                                       fontFamily: titleFont
+                                   }}
                                    onClick={(e) => { e.stopPropagation(); setActiveTool('card-title'); }}
                                  >
                                      {p.name}
@@ -915,14 +1099,17 @@ export default function DesignEditor({ initialConfig, initialProducts, userId, s
                                        "font-bold text-lg tracking-tight cursor-pointer hover:opacity-70 w-fit",
                                        activeTool === 'card-price' && "bg-blue-50 ring-2 ring-blue-500 rounded px-1 -mx-1"
                                    )}
-                                   style={{ color: config.cardStyle?.priceColor || config.colors.primary }}
+                                   style={{
+                                       color: config.cardStyle?.priceColor || config.colors.primary,
+                                       fontFamily: priceFont
+                                   }}
                                    onClick={(e) => { e.stopPropagation(); setActiveTool('card-price'); }}
                                  >
                                      ${Number(p.price).toFixed(2)}
                                  </p>
                              </div>
                           </div>
-                      ))}
+                      )})}
                    </div>
                 </div>
 
