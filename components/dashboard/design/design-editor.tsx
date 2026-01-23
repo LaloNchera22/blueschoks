@@ -84,6 +84,11 @@ type ToolType =
   | 'product-individual'
   | `social-icon-${string}`; // social-icon-[id]
 
+type SelectionState = {
+  productId: string;
+  elementType: 'container' | 'title' | 'price';
+} | null;
+
 const DUMMY_PRODUCTS = [
   { id: '1', name: 'Camiseta Básica', price: 25.00, image_url: 'https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?w=500&auto=format&fit=crop&q=60' },
   { id: '2', name: 'Gorra Urbana', price: 15.00, image_url: 'https://images.unsplash.com/photo-1588850561407-ed78c282e89b?w=500&auto=format&fit=crop&q=60' },
@@ -199,7 +204,7 @@ export default function DesignEditor({ initialConfig, initialProducts, userId, s
   // Initialize products with local state
   const [products, setProducts] = useState<Product[]>(initialProducts.length > 0 ? initialProducts : (DUMMY_PRODUCTS as any));
   const [activeTool, setActiveTool] = useState<ToolType>('global');
-  const [selectedProductId, setSelectedProductId] = useState<string | null>(null);
+  const [selection, setSelection] = useState<SelectionState>(null);
   const [isSaving, setIsSaving] = useState(false);
   const [isSavingProduct, setIsSavingProduct] = useState(false);
   const [showSocialsManager, setShowSocialsManager] = useState(false);
@@ -251,13 +256,13 @@ export default function DesignEditor({ initialConfig, initialProducts, userId, s
   };
 
   // --- PRODUCT STYLING LOGIC ---
-  const getSelectedProduct = () => products.find(p => p.id === selectedProductId);
+  const getSelectedProduct = () => products.find(p => p.id === selection?.productId);
 
   const updateSelectedProductStyle = (key: keyof ProductStyle, value: string | undefined) => {
-    if (!selectedProductId) return;
+    if (!selection?.productId) return;
 
     setProducts(prev => prev.map(p => {
-        if (p.id === selectedProductId) {
+        if (p.id === selection.productId) {
             return {
                 ...p,
                 style_config: {
@@ -271,7 +276,7 @@ export default function DesignEditor({ initialConfig, initialProducts, userId, s
   };
 
   const handleSaveProduct = async () => {
-    if (!selectedProductId) return;
+    if (!selection?.productId) return;
     const product = getSelectedProduct();
     if (!product) return;
 
@@ -288,7 +293,7 @@ export default function DesignEditor({ initialConfig, initialProducts, userId, s
   };
 
   const handleApplyToAll = async () => {
-      if (!selectedProductId) return;
+      if (!selection?.productId) return;
       const product = getSelectedProduct();
       if (!product?.style_config) return;
 
@@ -775,15 +780,16 @@ export default function DesignEditor({ initialConfig, initialProducts, userId, s
           )}
 
            {/* NEW: PRODUCT INDIVIDUAL TOOLS (Refactored) */}
-           {activeTool === 'product-individual' && selectedProduct && (
+           {activeTool === 'product-individual' && selectedProduct && selection && (
               <ProductStylingToolbar
                 product={selectedProduct}
+                activeElement={selection.elementType}
                 onUpdate={updateSelectedProductStyle}
                 onSave={handleSaveProduct}
                 onApplyAll={handleApplyToAll}
                 onClose={() => {
                   setActiveTool('global');
-                  setSelectedProductId(null);
+                  setSelection(null);
                 }}
                 isSaving={isSavingProduct}
                 fonts={FONTS}
@@ -822,7 +828,7 @@ export default function DesignEditor({ initialConfig, initialProducts, userId, s
         onClick={(e) => {
           e.stopPropagation();
           setActiveTool('global');
-          setSelectedProductId(null);
+          setSelection(null);
         }}
       >
         {/* --- PREVIEW AREA (NEW STORE CLIENT STRUCTURE) --- */}
@@ -928,7 +934,7 @@ export default function DesignEditor({ initialConfig, initialProducts, userId, s
                           const priceFont = styleConfig?.priceFont || undefined;
                           const titleColor = styleConfig?.titleColor || undefined;
                           const priceColor = styleConfig?.priceColor || undefined;
-                          const isProductSelected = activeTool === 'product-individual' && selectedProductId === p.id;
+                          const isProductSelected = activeTool === 'product-individual' && selection?.productId === p.id;
 
                           return (
                           <div
@@ -940,7 +946,7 @@ export default function DesignEditor({ initialConfig, initialProducts, userId, s
                             onClick={(e) => {
                                 e.stopPropagation();
                                 setActiveTool('product-individual');
-                                setSelectedProductId(p.id);
+                                setSelection({ productId: p.id, elementType: 'container' });
                             }}
                           >
                              {/* IMAGE CARD */}
@@ -988,26 +994,34 @@ export default function DesignEditor({ initialConfig, initialProducts, userId, s
                                  <h3
                                    className={cn(
                                        "font-medium text-base leading-snug line-clamp-2 cursor-pointer hover:underline decoration-1 underline-offset-2",
-                                       activeTool === 'card-title' && "bg-blue-50 ring-2 ring-blue-500 rounded px-1 -mx-1"
+                                       (activeTool === 'card-title' || (activeTool === 'product-individual' && selection?.productId === p.id && selection?.elementType === 'title')) && "bg-blue-50 ring-2 ring-blue-500 rounded px-1 -mx-1"
                                    )}
                                    style={{
                                        color: titleColor || config.cardStyle?.titleColor || config.colors.text,
                                        fontFamily: titleFont
                                    }}
-                                   onClick={(e) => { e.stopPropagation(); setActiveTool('card-title'); }}
+                                   onClick={(e) => {
+                                       e.stopPropagation();
+                                       setActiveTool('product-individual');
+                                       setSelection({ productId: p.id, elementType: 'title' });
+                                   }}
                                  >
                                      {p.name}
                                  </h3>
                                  <p
                                    className={cn(
                                        "font-bold text-lg tracking-tight cursor-pointer hover:opacity-70 w-fit",
-                                       activeTool === 'card-price' && "bg-blue-50 ring-2 ring-blue-500 rounded px-1 -mx-1"
+                                       (activeTool === 'card-price' || (activeTool === 'product-individual' && selection?.productId === p.id && selection?.elementType === 'price')) && "bg-blue-50 ring-2 ring-blue-500 rounded px-1 -mx-1"
                                    )}
                                    style={{
                                        color: priceColor || config.cardStyle?.priceColor || config.colors.primary,
                                        fontFamily: priceFont
                                    }}
-                                   onClick={(e) => { e.stopPropagation(); setActiveTool('card-price'); }}
+                                   onClick={(e) => {
+                                       e.stopPropagation();
+                                       setActiveTool('product-individual');
+                                       setSelection({ productId: p.id, elementType: 'price' });
+                                   }}
                                  >
                                      ${Number(p.price).toFixed(2)}
                                  </p>
