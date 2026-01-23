@@ -164,10 +164,33 @@ export default function StoreClient({ profile, products, config }: StoreClientPr
                <ProductGrid products={products} config={config} />
             </div>
 
-            {/* Footer Credits */}
-            <div className="text-center py-12 opacity-40">
-                <p className="text-[10px] font-medium">Powered by EzShop</p>
-            </div>
+            {/* FOOTER: POWER BY BLUESHOCKS */}
+            <footer className="mt-auto pt-16 pb-8 w-full flex flex-col items-center justify-center gap-2">
+
+              {/* Texto Superior */}
+              <span className="text-[10px] font-bold tracking-widest opacity-60 uppercase">
+                POWER BY
+              </span>
+
+              {/* Botón / Enlace Principal */}
+              <a
+                href="https://blueshocks.com"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex items-center gap-2 px-4 py-2 bg-neutral-900 hover:bg-neutral-800 backdrop-blur-sm rounded-full transition-all duration-300 group"
+              >
+                {/* Icono del Logo (Simulado con CSS o SVG) */}
+                <div className="w-6 h-6 bg-green-500 rounded text-white flex items-center justify-center font-black text-xs">
+                  B
+                </div>
+
+                {/* Texto de Marca */}
+                <span className="text-sm font-black tracking-wide text-white group-hover:text-white/90">
+                  BLUESHOCKS
+                </span>
+              </a>
+
+            </footer>
 
           </div>
 
