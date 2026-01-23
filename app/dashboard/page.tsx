@@ -4,18 +4,35 @@ import { Plus, PackageSearch } from "lucide-react"
 import Link from "next/link"
 import ProductCardClient from "./product-card"
 import { getUser } from "@/utils/user-data"
+import { PaginationControls } from "@/components/ui/pagination-controls"
 
-export default async function DashboardPage() {
+const ITEMS_PER_PAGE = 12
+
+export default async function DashboardPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ [key: string]: string | string[] | undefined }>
+}) {
   const user = await getUser()
   if (!user) redirect("/login")
 
+  const resolvedSearchParams = await searchParams
+  const page = typeof resolvedSearchParams.page === "string" ? parseInt(resolvedSearchParams.page) : 1
+  const currentPage = page > 0 ? page : 1
+
+  const from = (currentPage - 1) * ITEMS_PER_PAGE
+  const to = from + ITEMS_PER_PAGE - 1
+
   const supabase = await createClient()
 
-  const { data: products } = await supabase
+  const { data: products, count } = await supabase
     .from("products")
-    .select("*")
+    .select("*", { count: "exact" })
     .eq("user_id", user.id)
     .order("created_at", { ascending: false })
+    .range(from, to)
+
+  const totalPages = count ? Math.ceil(count / ITEMS_PER_PAGE) : 0
 
   return (
     <div className="p-8 md:p-12 w-full max-w-7xl mx-auto space-y-10">
@@ -31,6 +48,8 @@ export default async function DashboardPage() {
               </p>
           </div>
           
+          {/* Maintained conditional rendering from original file to preserve exact functionality,
+              although products/page.tsx has it unconditional. */}
           {products && products.length > 0 && (
               <Link 
                   href="/dashboard/new" 
@@ -44,12 +63,19 @@ export default async function DashboardPage() {
 
       {/* GRID DE PRODUCTOS */}
       {products && products.length > 0 ? (
-          // --- AQUÍ ESTÁ EL TRUCO: 'items-start' PARA QUE NO SE ESTIREN ---
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 items-start">
-              {products.map((product) => (
-                  <ProductCardClient key={product.id} product={product} />
-              ))}
-          </div>
+          <>
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 items-start">
+                {products.map((product) => (
+                    <ProductCardClient key={product.id} product={product} />
+                ))}
+            </div>
+
+            <PaginationControls
+              currentPage={currentPage}
+              totalPages={totalPages}
+              baseUrl="/dashboard"
+            />
+          </>
       ) : (
           <div className="flex flex-col items-center justify-center py-20 px-4 text-center bg-white border border-dashed border-slate-300 rounded-3xl animate-in fade-in zoom-in-95 duration-500 max-w-2xl mx-auto mt-10">
               <div className="w-24 h-24 bg-slate-50 text-slate-300 rounded-full flex items-center justify-center mb-6 shadow-inner">
