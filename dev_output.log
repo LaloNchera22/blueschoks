@@ -1,0 +1,45 @@
+
+> blueshock@0.1.0 dev
+> next dev
+
+▲ Next.js 16.1.4 (Turbopack)
+- Local:         http://localhost:3000
+- Network:       http://192.168.0.2:3000
+- Experiments (use with caution):
+  · serverActions
+
+✓ Starting...
+Attention: Next.js now collects completely anonymous telemetry regarding usage.
+This information is used to shape Next.js' roadmap and prioritize features.
+You can learn more, including how to opt-out if you'd not like to participate in this anonymous program, by visiting the following URL:
+https://nextjs.org/telemetry
+
+✓ Ready in 1131ms
+○ Compiling /test-avatar ...
+⨯ Error: useCart debe usarse dentro de un CartProvider
+    at useCart (components/shop/cart-context.tsx:110:23)
+    at StoreHeader (components/store/store-header.tsx:41:42)
+  108 | export const useCart = () => {
+  109 |   const context = useContext(CartContext)
+> 110 |   if (!context) throw new Error("useCart debe usarse dentro de un CartProvider")
+      |                       ^
+  111 |   return context
+  112 | } {
+  digest: '4175559662'
+}
+ GET /test-avatar 500 in 7.9s (compile: 7.2s, render: 669ms)
+✓ Compiled in 157ms
+ GET /test-avatar 200 in 437ms (compile: 221ms, render: 217ms)
+TypeError: fetch failed
+    at ignore-listed frames {
+  [cause]: Error: getaddrinfo EAI_AGAIN via.placeholder.com
+      at ignore-listed frames {
+    errno: -3001,
+    code: 'EAI_AGAIN',
+    syscall: 'getaddrinfo',
+    hostname: 'via.placeholder.com'
+  }
+}
+ GET /_next/image?url=https%3A%2F%2Fvia.placeholder.com%2F150&w=1920&q=75 500 in 1610ms (compile: 1561ms, render: 49ms)
+ GET /_next/image?url=https%3A%2F%2Fvia.placeholder.com%2F150&w=1920&q=75 500 in 1611ms (compile: 1561ms, render: 49ms)
+[?25h
