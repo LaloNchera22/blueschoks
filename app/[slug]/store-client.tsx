@@ -165,27 +165,27 @@ export default function StoreClient({ profile, products, config }: StoreClientPr
             </div>
 
             {/* FOOTER: POWER BY BLUESHOCKS */}
-            <footer className="mt-auto pt-16 pb-8 w-full flex flex-col items-center justify-center gap-2">
+            <footer className="mt-auto py-16 w-full flex flex-col items-center justify-center gap-3">
 
-              {/* Texto Superior */}
-              <span className="text-[10px] font-bold tracking-widest opacity-60 uppercase">
+              {/* Etiqueta Superior */}
+              <span className="text-[10px] font-bold tracking-[0.2em] text-neutral-900/60 uppercase">
                 POWER BY
               </span>
 
-              {/* Botón / Enlace Principal */}
+              {/* Botón Cápsula de Marca */}
               <a
                 href="https://blueshocks.com"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="flex items-center gap-2 px-4 py-2 bg-neutral-900 hover:bg-neutral-800 backdrop-blur-sm rounded-full transition-all duration-300 group"
+                className="group flex items-center gap-3 pl-2 pr-5 py-2 bg-neutral-900 rounded-full shadow-xl hover:shadow-2xl hover:-translate-y-1 transition-all duration-300 transform"
               >
-                {/* Icono del Logo (Simulado con CSS o SVG) */}
-                <div className="w-6 h-6 bg-green-500 rounded text-white flex items-center justify-center font-black text-xs">
+                {/* Icono Logo (Cuadrado Verde) */}
+                <div className="w-8 h-8 bg-green-500 rounded flex items-center justify-center text-white font-black text-sm shadow-inner">
                   B
                 </div>
 
                 {/* Texto de Marca */}
-                <span className="text-sm font-black tracking-wide text-white group-hover:text-white/90">
+                <span className="text-sm font-bold tracking-wide text-white group-hover:text-green-400 transition-colors">
                   BLUESHOCKS
                 </span>
               </a>
