@@ -776,14 +776,16 @@ export default function DesignEditor({ initialConfig, initialProducts, userId, s
                      className="relative mb-6 group cursor-pointer"
                      onClick={(e) => { e.stopPropagation(); setActiveTool('header-avatar'); }}
                    >
-                       <div className="absolute -inset-1 bg-gradient-to-r from-gray-200 to-gray-100 rounded-full blur opacity-50 group-hover:opacity-75 transition duration-500"></div>
                        <div
                           className={cn(
-                            "relative h-32 w-32 overflow-hidden border-4 shadow-xl transition-all",
+                            "relative h-32 w-32 overflow-hidden border-4 transition-all",
                              avatarClasses,
                              activeTool === 'header-avatar' && "ring-4 ring-blue-500 ring-offset-2"
                           )}
-                          style={{ borderColor: config.profile.avatarBorderColor || '#ffffff' }}
+                          style={{
+                            borderColor: config.profile.avatarBorderColor || '#ffffff',
+                            boxShadow: '0 4px 12px rgba(0,0,0,0.1)'
+                          }}
                        >
                            {config.profile.avatarUrl ? (
                                <Image src={config.profile.avatarUrl} alt="Avatar" fill className="object-cover transition-transform duration-700 group-hover:scale-110" />
