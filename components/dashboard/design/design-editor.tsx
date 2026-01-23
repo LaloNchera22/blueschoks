@@ -256,6 +256,7 @@ export default function DesignEditor({ initialConfig, initialProducts, userId, s
   const handleSave = async () => {
     setIsSaving(true);
     try {
+      console.log("Saving Config Payload:", config); // Debug log
       const result = await saveDesignConfig(config);
       if (result.success) {
         toast.success("Diseño guardado correctamente");
