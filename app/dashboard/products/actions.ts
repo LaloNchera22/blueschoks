@@ -2,6 +2,7 @@
 
 import { createClient } from "@/utils/supabase/server"
 import { revalidatePath } from "next/cache"
+import { ProductStyle } from "@/lib/types/design-system"
 
 export async function createProduct(formData: FormData) {
   const supabase = await createClient()
@@ -95,6 +96,39 @@ export async function createProduct(formData: FormData) {
   }
 
   if (error) throw new Error("Error al guardar: " + error.message)
+
+  revalidatePath("/dashboard/products")
+  return { success: true }
+}
+
+export async function updateProductStyle(productId: string, style: ProductStyle) {
+  const supabase = await createClient()
+  const { data: { user } } = await supabase.auth.getUser()
+  if (!user) throw new Error("No autorizado")
+
+  const { error } = await supabase
+    .from('products')
+    .update({ style_config: style })
+    .eq('id', productId)
+    .eq('user_id', user.id)
+
+  if (error) throw new Error("Error al actualizar estilo del producto: " + error.message)
+
+  revalidatePath("/dashboard/products")
+  return { success: true }
+}
+
+export async function applyStyleToAllProducts(style: ProductStyle) {
+  const supabase = await createClient()
+  const { data: { user } } = await supabase.auth.getUser()
+  if (!user) throw new Error("No autorizado")
+
+  const { error } = await supabase
+    .from('products')
+    .update({ style_config: style })
+    .eq('user_id', user.id)
+
+  if (error) throw new Error("Error al aplicar estilo a todos los productos: " + error.message)
 
   revalidatePath("/dashboard/products")
   return { success: true }

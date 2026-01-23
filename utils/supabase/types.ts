@@ -1,4 +1,4 @@
-import { DesignConfig } from '@/lib/types/design-system'
+import { DesignConfig, ProductStyle } from '@/lib/types/design-system'
 import { ThemeConfig } from '@/lib/types/theme-config'
 
 export type Json =
@@ -91,6 +91,7 @@ export interface Database {
           image_url: string | null
           images: string[] | null
           stock: number
+          style_config: ProductStyle | null
         }
         Insert: {
           id?: string
@@ -102,6 +103,7 @@ export interface Database {
           image_url?: string | null
           images?: string[] | null
           stock?: number
+          style_config?: ProductStyle | null
         }
         Update: {
           id?: string
@@ -113,6 +115,7 @@ export interface Database {
           image_url?: string | null
           images?: string[] | null
           stock?: number
+          style_config?: ProductStyle | null
         }
         Relationships: [
           {

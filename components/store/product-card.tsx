@@ -54,6 +54,12 @@ export function ProductCard({ product, config }: ProductCardProps) {
     titleColor: textColor
   }
 
+  // Product Style Override
+  const styleConfig = product.style_config
+  const titleFont = styleConfig?.titleFont || undefined
+  const priceFont = styleConfig?.priceFont || undefined
+  const footerBg = styleConfig?.footerBackground || undefined
+
   return (
     <motion.div
       layout
@@ -102,13 +108,28 @@ export function ProductCard({ product, config }: ProductCardProps) {
       </div>
 
       {/* Info */}
-      <div className="flex flex-col gap-1 px-1">
+      <div
+        className={cn("flex flex-col gap-1 px-1", footerBg && "p-3 rounded-xl transition-colors")}
+        style={{ backgroundColor: footerBg }}
+      >
         <div className="flex justify-between items-start gap-4">
-            <h3 className="font-medium text-base leading-snug line-clamp-2" style={{ color: cardStyle.titleColor }}>
+            <h3
+              className="font-medium text-base leading-snug line-clamp-2"
+              style={{
+                color: cardStyle.titleColor,
+                fontFamily: titleFont
+              }}
+            >
                 {product.name}
             </h3>
         </div>
-        <p className="font-bold text-lg tracking-tight" style={{ color: cardStyle.priceColor }}>
+        <p
+          className="font-bold text-lg tracking-tight"
+          style={{
+            color: cardStyle.priceColor,
+            fontFamily: priceFont
+          }}
+        >
           ${product.price.toFixed(2)}
         </p>
       </div>
