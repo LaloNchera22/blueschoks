@@ -27,6 +27,8 @@ export interface ProductStyle {
   footerBackground?: string;
   titleFont?: string;
   priceFont?: string;
+  titleColor?: string;
+  priceColor?: string;
 }
 
 export interface TextStyle {
