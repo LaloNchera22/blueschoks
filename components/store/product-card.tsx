@@ -45,6 +45,15 @@ export function ProductCard({ product, config }: ProductCardProps) {
   const cardBg = config?.colors?.cardBackground || '#ffffff'
   const textColor = config?.colors?.text || '#1f2937'
 
+  // Card Style Config
+  const cardStyle = config.cardStyle || {
+    borderRadius: 16,
+    buttonColor: primaryColor,
+    buttonTextColor: '#ffffff',
+    priceColor: primaryColor,
+    titleColor: textColor
+  }
+
   return (
     <motion.div
       layout
@@ -52,7 +61,8 @@ export function ProductCard({ product, config }: ProductCardProps) {
     >
       {/* Image Container */}
       <div
-        className="relative aspect-[3/4] w-full overflow-hidden rounded-2xl bg-gray-100 shadow-sm transition-all duration-500 hover:shadow-lg"
+        className="relative aspect-[3/4] w-full overflow-hidden bg-gray-100 shadow-sm transition-all duration-500 hover:shadow-lg"
+        style={{ borderRadius: `${cardStyle.borderRadius}px` }}
       >
         {product.image_url ? (
           <Image
@@ -77,7 +87,10 @@ export function ProductCard({ product, config }: ProductCardProps) {
                     "h-10 w-10 rounded-full shadow-lg transition-all duration-300 hover:scale-110 active:scale-90",
                     isAdded ? "bg-green-500 hover:bg-green-600" : ""
                 )}
-                style={{ backgroundColor: isAdded ? undefined : primaryColor, color: '#fff' }}
+                style={{
+                    backgroundColor: isAdded ? undefined : cardStyle.buttonColor,
+                    color: cardStyle.buttonTextColor
+                }}
             >
                 {isAdded ? (
                     <Check className="h-5 w-5 animate-in zoom-in spin-in-50 duration-300" />
@@ -91,11 +104,11 @@ export function ProductCard({ product, config }: ProductCardProps) {
       {/* Info */}
       <div className="flex flex-col gap-1 px-1">
         <div className="flex justify-between items-start gap-4">
-            <h3 className="font-medium text-base leading-snug line-clamp-2" style={{ color: textColor }}>
+            <h3 className="font-medium text-base leading-snug line-clamp-2" style={{ color: cardStyle.titleColor }}>
                 {product.name}
             </h3>
         </div>
-        <p className="font-bold text-lg tracking-tight" style={{ color: primaryColor }}>
+        <p className="font-bold text-lg tracking-tight" style={{ color: cardStyle.priceColor }}>
           ${product.price.toFixed(2)}
         </p>
       </div>
