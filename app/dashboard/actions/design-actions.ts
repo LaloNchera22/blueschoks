@@ -33,8 +33,9 @@ export async function saveDesignConfig(config: DesignConfig) {
     revalidatePath('/dashboard/design', 'page')
 
     if (profile?.slug) {
-      // Revalidate the shop page path
-      revalidatePath(`/${profile.slug}`, 'page')
+      // ⚡ LA CLAVE: Limpiar caché de TODAS las rutas posibles
+      revalidatePath(`/${profile.slug}`)       // Limpia la tienda específica
+      revalidatePath('/[slug]', 'page')        // Limpia la ruta dinámica
     }
 
     // Force global revalidation to ensure stale data is purged
