@@ -845,6 +845,27 @@ export default function DesignEditor({ initialConfig, initialProducts, userId, s
                  <span className="text-[9px] text-gray-500 font-semibold uppercase tracking-wider">Título</span>
                 </div>
 
+                {/* Title Color */}
+                <div className="flex flex-col items-center gap-1">
+                  <div className="flex items-center gap-1 relative">
+                    <ColorCircle
+                        color={selectedProduct.style_config?.titleColor || config.cardStyle?.titleColor || config.colors.text}
+                        onChange={(c) => updateSelectedProductStyle('titleColor', c)}
+                        size="sm"
+                    />
+                     {selectedProduct.style_config?.titleColor && (
+                        <button
+                            onClick={(e) => { e.stopPropagation(); updateSelectedProductStyle('titleColor', undefined); }}
+                            className="absolute -top-1 -right-1 bg-gray-100 border border-gray-300 rounded-full p-0.5 hover:bg-gray-200 transition-colors shadow-sm z-10"
+                            title="Reset color"
+                        >
+                            <Minus size={10} className="text-gray-600" />
+                        </button>
+                    )}
+                  </div>
+                  <span className="text-[9px] text-gray-500 font-semibold uppercase tracking-wider">Color T.</span>
+                </div>
+
                 {/* Price Font */}
                 <div className="flex flex-col items-center gap-1">
                  <div className="relative">
@@ -859,6 +880,27 @@ export default function DesignEditor({ initialConfig, initialProducts, userId, s
                     <ChevronDown className="w-2 h-2 absolute right-2 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none" />
                  </div>
                  <span className="text-[9px] text-gray-500 font-semibold uppercase tracking-wider">Precio</span>
+                </div>
+
+                {/* Price Color */}
+                <div className="flex flex-col items-center gap-1">
+                  <div className="flex items-center gap-1 relative">
+                    <ColorCircle
+                        color={selectedProduct.style_config?.priceColor || config.cardStyle?.priceColor || config.colors.primary}
+                        onChange={(c) => updateSelectedProductStyle('priceColor', c)}
+                        size="sm"
+                    />
+                    {selectedProduct.style_config?.priceColor && (
+                        <button
+                            onClick={(e) => { e.stopPropagation(); updateSelectedProductStyle('priceColor', undefined); }}
+                            className="absolute -top-1 -right-1 bg-gray-100 border border-gray-300 rounded-full p-0.5 hover:bg-gray-200 transition-colors shadow-sm z-10"
+                            title="Reset color"
+                        >
+                            <Minus size={10} className="text-gray-600" />
+                        </button>
+                    )}
+                  </div>
+                  <span className="text-[9px] text-gray-500 font-semibold uppercase tracking-wider">Color P.</span>
                 </div>
 
                  <div className="w-px h-6 bg-gray-200" />
@@ -1024,6 +1066,8 @@ export default function DesignEditor({ initialConfig, initialProducts, userId, s
                           const footerBg = styleConfig?.footerBackground || undefined;
                           const titleFont = styleConfig?.titleFont || undefined;
                           const priceFont = styleConfig?.priceFont || undefined;
+                          const titleColor = styleConfig?.titleColor || undefined;
+                          const priceColor = styleConfig?.priceColor || undefined;
                           const isProductSelected = activeTool === 'product-individual' && selectedProductId === p.id;
 
                           return (
@@ -1087,7 +1131,7 @@ export default function DesignEditor({ initialConfig, initialProducts, userId, s
                                        activeTool === 'card-title' && "bg-blue-50 ring-2 ring-blue-500 rounded px-1 -mx-1"
                                    )}
                                    style={{
-                                       color: config.cardStyle?.titleColor || config.colors.text,
+                                       color: titleColor || config.cardStyle?.titleColor || config.colors.text,
                                        fontFamily: titleFont
                                    }}
                                    onClick={(e) => { e.stopPropagation(); setActiveTool('card-title'); }}
@@ -1100,7 +1144,7 @@ export default function DesignEditor({ initialConfig, initialProducts, userId, s
                                        activeTool === 'card-price' && "bg-blue-50 ring-2 ring-blue-500 rounded px-1 -mx-1"
                                    )}
                                    style={{
-                                       color: config.cardStyle?.priceColor || config.colors.primary,
+                                       color: priceColor || config.cardStyle?.priceColor || config.colors.primary,
                                        fontFamily: priceFont
                                    }}
                                    onClick={(e) => { e.stopPropagation(); setActiveTool('card-price'); }}
