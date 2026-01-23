@@ -240,35 +240,30 @@ export default function DesignEditor({ initialConfig, initialProducts, userId, s
   const handleSave = async () => {
     setIsSaving(true);
     try {
-      console.log("Saving Config Payload:", config); // Debug log
+      // 1. Preparar datos
+      const productUpdates = products.map(p => ({
+        id: p.id,
+        style_config: (p.style_config as ProductStyle) || {}
+      }));
 
-      // 1. Save Design Config
-      const designPromise = saveDesignConfig(config);
+      console.log("🔥 INTENTANDO GUARDAR:", productUpdates); // DEBUG
 
-      // 2. Save Product Styles (only if we have real products)
-      let productsPromise = Promise.resolve({ success: true });
-      if (initialProducts.length > 0) {
-         const productUpdates = products.map(p => ({
-            id: p.id,
-            style_config: (p.style_config as ProductStyle) || {}
-         }));
-         productsPromise = saveProductStylesBulk(productUpdates);
-      }
-
+      // 2. Ejecutar Acciones en Paralelo
       const [designResult, productsResult] = await Promise.all([
-        designPromise,
-        productsPromise
+        saveDesignConfig(config),
+        // Only send updates if we have initial products to avoid sending dummy data
+        initialProducts.length > 0 ? saveProductStylesBulk(productUpdates) : Promise.resolve({ success: true })
       ]);
 
-      if (designResult.success && productsResult.success) {
-        toast.success("Diseño guardado correctamente");
-        router.refresh();
-      } else {
-        toast.error("Error al guardar cambios");
-      }
-    } catch (error) {
-      console.error(error);
-      toast.error("Error de conexión");
+      if (designResult.error) throw new Error("Error saving design: " + JSON.stringify(designResult.error));
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      if ((productsResult as any)?.error) throw new Error((productsResult as any).error);
+
+      toast.success("¡Todo guardado correctamente!");
+      router.refresh();
+    } catch (error: any) {
+      console.error("❌ ERROR AL GUARDAR:", error);
+      toast.error(`Error: ${error.message}`);
     } finally {
       setIsSaving(false);
     }
