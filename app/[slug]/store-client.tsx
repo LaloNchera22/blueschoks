@@ -62,19 +62,22 @@ export default function StoreClient({ profile, products, config }: StoreClientPr
     };
   };
 
-  // Avatar Shape Logic (Copied from DesignEditor)
-  const avatarClasses = useMemo(() => {
+  // Avatar Shape & Border Logic
+  const { shapeClass, borderClass } = useMemo(() => {
     // Prioritize frameStyle (from editor/user report), fallback to avatarShape
     const frameStyle = (config.profile as any).frameStyle || config.profile.avatarShape || 'circle';
 
-    if (frameStyle === 'none') return 'rounded-none';
-    if (frameStyle === 'square') return 'rounded-2xl';
+    let sClass = 'rounded-full';
+    let bClass = 'border-4 shadow-xl';
 
-    // Legacy support
-    if (frameStyle === 'rounded') return 'rounded-2xl';
+    if (frameStyle === 'none') {
+      sClass = 'rounded-none';
+      bClass = 'border-0';
+    } else if (frameStyle === 'square' || frameStyle === 'rounded') {
+      sClass = 'rounded-2xl';
+    }
 
-    // Default to circle
-    return 'rounded-full';
+    return { shapeClass: sClass, borderClass: bClass };
   }, [config.profile]);
 
   const socialLinks = Array.isArray(config?.socialLinks) ? config.socialLinks.filter(l => l.active) : []
@@ -102,12 +105,13 @@ export default function StoreClient({ profile, products, config }: StoreClientPr
                 <div className="relative mb-6">
                     <div className={cn(
                         "absolute -inset-1 bg-gradient-to-r from-gray-200 to-gray-100 blur opacity-50",
-                         avatarClasses
+                         shapeClass
                     )}></div>
                     <div
                         className={cn(
-                          "relative h-32 w-32 overflow-hidden border-4 shadow-xl",
-                          avatarClasses
+                          "relative h-32 w-32 overflow-hidden",
+                          shapeClass,
+                          borderClass
                         )}
                         style={{ borderColor: config.profile.avatarBorderColor || '#ffffff' }}
                     >
