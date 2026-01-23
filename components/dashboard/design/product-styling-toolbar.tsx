@@ -8,6 +8,7 @@ type Product = Database['public']['Tables']['products']['Row'];
 
 interface ProductStylingToolbarProps {
   product: Product;
+  activeElement: 'container' | 'title' | 'price';
   onUpdate: (key: keyof ProductStyle, value: string | undefined) => void;
   onSave: () => void;
   onApplyAll: () => void;
@@ -22,6 +23,7 @@ interface ProductStylingToolbarProps {
 
 export function ProductStylingToolbar({
   product,
+  activeElement,
   onUpdate,
   onSave,
   onApplyAll,
@@ -33,102 +35,112 @@ export function ProductStylingToolbar({
   return (
     <div className="flex items-center gap-4 animate-in fade-in slide-in-from-top-2 duration-300">
 
-      {/* Footer Background */}
-      <div className="flex flex-col items-center gap-1">
-        <div className="flex items-center gap-1 relative">
-          <ColorCircle
-            color={product.style_config?.footerBackground || 'transparent'}
-            onChange={(c) => onUpdate('footerBackground', c)}
-            size="sm"
-          />
-          {product.style_config?.footerBackground && (
-            <button
-              onClick={(e) => { e.stopPropagation(); onUpdate('footerBackground', undefined); }}
-              className="absolute -top-1 -right-1 bg-gray-100 border border-gray-300 rounded-full p-0.5 hover:bg-gray-200 transition-colors shadow-sm z-10"
-              title="Quitar fondo"
-            >
-              <Minus size={10} className="text-gray-600" />
-            </button>
-          )}
+      {/* Footer Background - Only for container */}
+      {activeElement === 'container' && (
+        <div className="flex flex-col items-center gap-1">
+          <div className="flex items-center gap-1 relative">
+            <ColorCircle
+              color={product.style_config?.footerBackground || 'transparent'}
+              onChange={(c) => onUpdate('footerBackground', c)}
+              size="sm"
+            />
+            {product.style_config?.footerBackground && (
+              <button
+                onClick={(e) => { e.stopPropagation(); onUpdate('footerBackground', undefined); }}
+                className="absolute -top-1 -right-1 bg-gray-100 border border-gray-300 rounded-full p-0.5 hover:bg-gray-200 transition-colors shadow-sm z-10"
+                title="Quitar fondo"
+              >
+                <Minus size={10} className="text-gray-600" />
+              </button>
+            )}
+          </div>
+          <span className="text-[9px] text-gray-500 font-semibold uppercase tracking-wider">Fondo</span>
         </div>
-        <span className="text-[9px] text-gray-500 font-semibold uppercase tracking-wider">Fondo</span>
-      </div>
+      )}
 
-      <div className="w-px h-6 bg-gray-200" />
+      {/* Title Tools */}
+      {activeElement === 'title' && (
+        <>
+          {/* Title Font */}
+          <div className="flex flex-col items-center gap-1">
+            <div className="relative">
+              <select
+                value={product.style_config?.titleFont || ''}
+                onChange={(e) => onUpdate('titleFont', e.target.value || undefined)}
+                className="appearance-none bg-gray-50 border border-gray-200 rounded-full h-6 pl-2 pr-6 text-[10px] font-medium focus:outline-none focus:ring-2 focus:ring-black/5 cursor-pointer text-gray-700 hover:bg-gray-100 w-20 truncate"
+              >
+                <option value="">Default</option>
+                {fonts.map(f => <option key={f.value} value={f.value}>{f.name}</option>)}
+              </select>
+              <ChevronDown className="w-2 h-2 absolute right-2 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none" />
+            </div>
+            <span className="text-[9px] text-gray-500 font-semibold uppercase tracking-wider">Título</span>
+          </div>
 
-      {/* Title Font */}
-      <div className="flex flex-col items-center gap-1">
-        <div className="relative">
-          <select
-            value={product.style_config?.titleFont || ''}
-            onChange={(e) => onUpdate('titleFont', e.target.value || undefined)}
-            className="appearance-none bg-gray-50 border border-gray-200 rounded-full h-6 pl-2 pr-6 text-[10px] font-medium focus:outline-none focus:ring-2 focus:ring-black/5 cursor-pointer text-gray-700 hover:bg-gray-100 w-20 truncate"
-          >
-            <option value="">Default</option>
-            {fonts.map(f => <option key={f.value} value={f.value}>{f.name}</option>)}
-          </select>
-          <ChevronDown className="w-2 h-2 absolute right-2 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none" />
-        </div>
-        <span className="text-[9px] text-gray-500 font-semibold uppercase tracking-wider">Título</span>
-      </div>
+          {/* Title Color */}
+          <div className="flex flex-col items-center gap-1">
+            <div className="flex items-center gap-1 relative">
+              <ColorCircle
+                color={product.style_config?.titleColor || defaultColors.title}
+                onChange={(c) => onUpdate('titleColor', c)}
+                size="sm"
+              />
+              {product.style_config?.titleColor && (
+                <button
+                  onClick={(e) => { e.stopPropagation(); onUpdate('titleColor', undefined); }}
+                  className="absolute -top-1 -right-1 bg-gray-100 border border-gray-300 rounded-full p-0.5 hover:bg-gray-200 transition-colors shadow-sm z-10"
+                  title="Reset color"
+                >
+                  <Minus size={10} className="text-gray-600" />
+                </button>
+              )}
+            </div>
+            <span className="text-[9px] text-gray-500 font-semibold uppercase tracking-wider">Color T.</span>
+          </div>
+        </>
+      )}
 
-      {/* Title Color */}
-      <div className="flex flex-col items-center gap-1">
-        <div className="flex items-center gap-1 relative">
-          <ColorCircle
-            color={product.style_config?.titleColor || defaultColors.title}
-            onChange={(c) => onUpdate('titleColor', c)}
-            size="sm"
-          />
-          {product.style_config?.titleColor && (
-            <button
-              onClick={(e) => { e.stopPropagation(); onUpdate('titleColor', undefined); }}
-              className="absolute -top-1 -right-1 bg-gray-100 border border-gray-300 rounded-full p-0.5 hover:bg-gray-200 transition-colors shadow-sm z-10"
-              title="Reset color"
-            >
-              <Minus size={10} className="text-gray-600" />
-            </button>
-          )}
-        </div>
-        <span className="text-[9px] text-gray-500 font-semibold uppercase tracking-wider">Color T.</span>
-      </div>
+      {/* Price Tools */}
+      {activeElement === 'price' && (
+        <>
+          {/* Price Font */}
+          <div className="flex flex-col items-center gap-1">
+            <div className="relative">
+              <select
+                value={product.style_config?.priceFont || ''}
+                onChange={(e) => onUpdate('priceFont', e.target.value || undefined)}
+                className="appearance-none bg-gray-50 border border-gray-200 rounded-full h-6 pl-2 pr-6 text-[10px] font-medium focus:outline-none focus:ring-2 focus:ring-black/5 cursor-pointer text-gray-700 hover:bg-gray-100 w-20 truncate"
+              >
+                <option value="">Default</option>
+                {fonts.map(f => <option key={f.value} value={f.value}>{f.name}</option>)}
+              </select>
+              <ChevronDown className="w-2 h-2 absolute right-2 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none" />
+            </div>
+            <span className="text-[9px] text-gray-500 font-semibold uppercase tracking-wider">Precio</span>
+          </div>
 
-      {/* Price Font */}
-      <div className="flex flex-col items-center gap-1">
-        <div className="relative">
-          <select
-            value={product.style_config?.priceFont || ''}
-            onChange={(e) => onUpdate('priceFont', e.target.value || undefined)}
-            className="appearance-none bg-gray-50 border border-gray-200 rounded-full h-6 pl-2 pr-6 text-[10px] font-medium focus:outline-none focus:ring-2 focus:ring-black/5 cursor-pointer text-gray-700 hover:bg-gray-100 w-20 truncate"
-          >
-            <option value="">Default</option>
-            {fonts.map(f => <option key={f.value} value={f.value}>{f.name}</option>)}
-          </select>
-          <ChevronDown className="w-2 h-2 absolute right-2 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none" />
-        </div>
-        <span className="text-[9px] text-gray-500 font-semibold uppercase tracking-wider">Precio</span>
-      </div>
-
-      {/* Price Color */}
-      <div className="flex flex-col items-center gap-1">
-        <div className="flex items-center gap-1 relative">
-          <ColorCircle
-            color={product.style_config?.priceColor || defaultColors.price}
-            onChange={(c) => onUpdate('priceColor', c)}
-            size="sm"
-          />
-          {product.style_config?.priceColor && (
-            <button
-              onClick={(e) => { e.stopPropagation(); onUpdate('priceColor', undefined); }}
-              className="absolute -top-1 -right-1 bg-gray-100 border border-gray-300 rounded-full p-0.5 hover:bg-gray-200 transition-colors shadow-sm z-10"
-              title="Reset color"
-            >
-              <Minus size={10} className="text-gray-600" />
-            </button>
-          )}
-        </div>
-        <span className="text-[9px] text-gray-500 font-semibold uppercase tracking-wider">Color P.</span>
-      </div>
+          {/* Price Color */}
+          <div className="flex flex-col items-center gap-1">
+            <div className="flex items-center gap-1 relative">
+              <ColorCircle
+                color={product.style_config?.priceColor || defaultColors.price}
+                onChange={(c) => onUpdate('priceColor', c)}
+                size="sm"
+              />
+              {product.style_config?.priceColor && (
+                <button
+                  onClick={(e) => { e.stopPropagation(); onUpdate('priceColor', undefined); }}
+                  className="absolute -top-1 -right-1 bg-gray-100 border border-gray-300 rounded-full p-0.5 hover:bg-gray-200 transition-colors shadow-sm z-10"
+                  title="Reset color"
+                >
+                  <Minus size={10} className="text-gray-600" />
+                </button>
+              )}
+            </div>
+            <span className="text-[9px] text-gray-500 font-semibold uppercase tracking-wider">Color P.</span>
+          </div>
+        </>
+      )}
 
       <div className="w-px h-6 bg-gray-200" />
 
