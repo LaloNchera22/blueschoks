@@ -65,13 +65,18 @@ export function ProductCard({ product, config }: ProductCardProps) {
   const titleColor = styleConfig?.titleColor || cardStyle.titleColor
   const priceColor = styleConfig?.priceColor || cardStyle.priceColor
 
+  const isTransparent = cardBg === 'transparent'
+
   return (
     <motion.div
       layout
-      className="group relative h-full flex flex-col gap-3 rounded-2xl border border-neutral-100 bg-white p-2 transition-all duration-300 hover:-translate-y-1 hover:shadow-[0_8px_30px_rgb(0,0,0,0.04)]"
+      className={cn(
+        "group relative h-full flex flex-col gap-3 p-2 transition-all duration-300 hover:-translate-y-1",
+        isTransparent ? "" : "rounded-2xl hover:shadow-[0_8px_30px_rgb(0,0,0,0.04)]"
+      )}
       style={{
         backgroundColor: cardBg,
-        borderColor: cardBg === 'transparent' ? 'transparent' : undefined
+        border: isTransparent ? 'none' : `1px solid ${(cardStyle as any).borderColor || 'rgba(0,0,0,0.05)'}`
       }}
     >
       {/* Image Container */}

@@ -849,7 +849,7 @@ export default function DesignEditor({ initialConfig, initialProducts, userId, s
         <div className="flex justify-center pb-32 px-4 pt-32"> {/* Added pt-32 to account for floating toolbar */}
           <div className="w-full max-w-[420px] origin-top scale-[0.9] 2xl:scale-100 transition-transform bg-transparent">
              <div
-               className="h-full min-h-[800px] pb-40 relative rounded-[32px] border border-white/20 shadow-2xl ring-1 ring-black/5 overflow-hidden"
+               className="h-full min-h-[800px] pb-40 relative rounded-[32px] overflow-hidden"
                style={{ backgroundColor: config.colors.background || '#ffffff' }}
              >
                 {/* FIX: REMOVED STICKY HEADER VISUAL TO REMOVE FAKE HEADER BAR */}
@@ -946,13 +946,22 @@ export default function DesignEditor({ initialConfig, initialProducts, userId, s
                           const priceColor = styleConfig?.priceColor || undefined;
                           const isProductSelected = activeTool === 'product-individual' && selection?.productId === p.id;
 
+                          const globalCardBg = (config.colors as any).cardBackground || '#ffffff';
+                          const cardBg = styleConfig?.cardBackground || globalCardBg;
+                          const isTransparent = cardBg === 'transparent';
+
                           return (
                           <div
                             key={p.id}
                             className={cn(
-                                "group relative flex flex-col gap-3 rounded-2xl border border-neutral-100 bg-white p-2 transition-all duration-300 hover:-translate-y-1 hover:shadow-[0_8px_30px_rgb(0,0,0,0.04)]",
+                                "group relative flex flex-col gap-3 p-2 transition-all duration-300 hover:-translate-y-1",
+                                isTransparent ? "" : "rounded-2xl hover:shadow-[0_8px_30px_rgb(0,0,0,0.04)]",
                                 isProductSelected && "ring-2 ring-blue-500 bg-blue-50/50"
                             )}
+                            style={{
+                                backgroundColor: isProductSelected ? undefined : cardBg,
+                                border: isTransparent ? 'none' : `1px solid ${(config.cardStyle as any)?.borderColor || 'rgba(0,0,0,0.05)'}`
+                            }}
                             onClick={(e) => {
                                 e.stopPropagation();
                                 setActiveTool('product-individual');
