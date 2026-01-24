@@ -87,7 +87,7 @@ type ToolType =
 
 type SelectionState = {
   productId: string;
-  elementType: 'container' | 'title' | 'price' | 'cartButton';
+  elementType: 'container' | 'title' | 'price' | 'cartButton' | 'description';
 } | null;
 
 const DUMMY_PRODUCTS = [
