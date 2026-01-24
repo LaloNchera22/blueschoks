@@ -1,14 +1,14 @@
 
 > blueshock@0.1.0 dev
-> next dev -H 0.0.0.0
+> next dev
 
 ▲ Next.js 16.1.4 (Turbopack)
 - Local:         http://localhost:3000
-- Network:       http://0.0.0.0:3000
+- Network:       http://192.168.0.2:3000
 - Experiments (use with caution):
   · serverActions
 
 ✓ Starting...
-✓ Ready in 1131ms
- GET /test-verification 200 in 951ms (compile: 480ms, render: 471ms)
- GET /test-verification 200 in 91ms (compile: 8ms, render: 83ms)
+✓ Ready in 1084ms
+ GET /test-toolbar 200 in 3.4s (compile: 3.2s, render: 244ms)
+✓ Compiled in 92ms

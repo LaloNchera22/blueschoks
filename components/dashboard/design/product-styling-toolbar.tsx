@@ -65,14 +65,26 @@ export function ProductStylingToolbar({
                        </button>
 
                        {/* Solid Color Option */}
-                       <div className="flex items-center gap-2 px-2 py-2 rounded-md border border-gray-200">
-                          <ColorCircle
-                             color={cardColor}
-                             onChange={(val) => onUpdate('cardBackground', val)}
-                             size="sm"
-                           />
-                           <span className="text-xs text-gray-500">Color Sólido</span>
-                       </div>
+                       {!isCardTransparent && (
+                         <div className="flex items-center gap-2 px-2 py-2 rounded-md border border-gray-200 animate-in fade-in zoom-in duration-200">
+                            <ColorCircle
+                               color={cardColor}
+                               onChange={(val) => onUpdate('cardBackground', val)}
+                               size="sm"
+                             />
+                             <span className="text-xs text-gray-500">Color Sólido</span>
+                         </div>
+                       )}
+
+                       {/* Restore button if transparent */}
+                       {isCardTransparent && (
+                           <button
+                             onClick={(e) => { e.stopPropagation(); onUpdate('cardBackground', '#ffffff'); }}
+                             className="text-xs text-blue-600 underline hover:text-blue-800 text-center w-full"
+                           >
+                               Restaurar color de fondo
+                           </button>
+                       )}
                    </div>
                 </div>
 
@@ -266,19 +278,31 @@ export function ProductStylingToolbar({
                 </div>
 
                 {/* Option 2: Solid Color */}
-                <div>
-                   <label className="text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-2 block">Opción 2: Color Sólido</label>
-                   <div className={`p-3 rounded-lg border transition-all ${!isTransparent ? 'bg-neutral-50 border-gray-300' : 'border-gray-100 opacity-50 grayscale'}`}>
-                      <div className="flex items-center gap-3">
-                         <ColorCircle
-                           color={currentColor}
-                           onChange={(val) => onUpdate('descriptionBackground', val)}
-                           size="md"
-                         />
-                         <span className="text-xs text-gray-500">Seleccionar color...</span>
-                      </div>
-                   </div>
-                </div>
+                {!isTransparent && (
+                  <div className="animate-in fade-in zoom-in duration-200">
+                     <label className="text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-2 block">Opción 2: Color Sólido</label>
+                     <div className="p-3 rounded-lg border bg-neutral-50 border-gray-300 transition-all">
+                        <div className="flex items-center gap-3">
+                           <ColorCircle
+                             color={currentColor}
+                             onChange={(val) => onUpdate('descriptionBackground', val)}
+                             size="md"
+                           />
+                           <span className="text-xs text-gray-500">Seleccionar color...</span>
+                        </div>
+                     </div>
+                  </div>
+                )}
+
+                {/* Restore button if transparent */}
+                {isTransparent && (
+                    <button
+                        onClick={(e) => { e.stopPropagation(); onUpdate('descriptionBackground', '#ffffff'); }}
+                        className="text-xs text-blue-600 underline hover:text-blue-800 text-center w-full"
+                    >
+                        Restaurar color de fondo
+                    </button>
+                )}
              </div>
           </div>
         );
