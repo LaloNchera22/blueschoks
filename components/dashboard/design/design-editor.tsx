@@ -1040,23 +1040,6 @@ export default function DesignEditor({ initialConfig, initialProducts, userId, s
                    </div>
                 </div>
 
-                {/* FOOTER: POWER BY BLUESHOCKS (Minimalist) */}
-                <footer className="mt-auto py-12 w-full flex items-center justify-center gap-1.5 opacity-60 hover:opacity-100 transition-opacity">
-                  <span className="text-[11px] font-medium text-neutral-500 uppercase tracking-wider">
-                    Powered by
-                  </span>
-                  <a
-                    href="https://blueshocks.com"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="flex items-center gap-1.5 text-neutral-800 hover:text-black font-semibold"
-                  >
-                    <div className="w-4 h-4 bg-green-500 rounded-sm text-white flex items-center justify-center font-bold text-[8px]">
-                      B
-                    </div>
-                    <span className="text-[11px] tracking-wide">BLUESHOCKS</span>
-                  </a>
-                </footer>
              </div>
           </div>
         </div>
