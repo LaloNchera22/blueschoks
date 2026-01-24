@@ -5,7 +5,6 @@ import Image from 'next/image'
 import { ChevronLeft, ChevronRight, ShoppingBag } from 'lucide-react'
 import { Database } from '@/utils/supabase/types'
 import { DesignConfig } from '@/lib/types/design-system'
-import { useCart } from '@/components/shop/cart-context'
 import { cn } from '@/lib/utils'
 
 type Product = Database['public']['Tables']['products']['Row']
@@ -14,10 +13,10 @@ interface ProductCardProps {
   product: Product
   config: DesignConfig
   onSelectElement?: (element: 'container' | 'title' | 'price' | 'cartButton') => void
+  onAddToCart?: (product: Product) => void
 }
 
-export function ProductCard({ product, config, onSelectElement }: ProductCardProps) {
-  const { addToCart } = useCart()
+export function ProductCard({ product, config, onSelectElement, onAddToCart }: ProductCardProps) {
   const [imgIndex, setImgIndex] = useState(0)
 
   // Carousel Logic
@@ -61,17 +60,6 @@ export function ProductCard({ product, config, onSelectElement }: ProductCardPro
   // Cart Button Styles
   const btnBg = style.cartBtnBackground || cardStyle.buttonColor || '#000000'
   const btnColor = style.cartBtnColor || cardStyle.buttonTextColor || '#ffffff'
-
-  // Add to Cart Handler
-  const handleAddToCart = (e: React.MouseEvent) => {
-    e.stopPropagation()
-    addToCart({
-      id: product.id,
-      price: product.price,
-      name: product.name,
-      image_url: product.image_url || undefined
-    })
-  }
 
   return (
     <div
@@ -153,8 +141,8 @@ export function ProductCard({ product, config, onSelectElement }: ProductCardPro
             e.stopPropagation();
             if (onSelectElement) {
                 onSelectElement('cartButton');
-            } else {
-                handleAddToCart(e);
+            } else if (onAddToCart) {
+                onAddToCart(product);
             }
           }}
           className="w-9 h-9 flex items-center justify-center rounded-full border transition-transform active:scale-95 shadow-sm shrink-0"
