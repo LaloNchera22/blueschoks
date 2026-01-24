@@ -24,6 +24,7 @@ export interface CardStyle {
 }
 
 export interface ProductStyle {
+  cardBackground?: string;
   footerBackground?: string;
   titleFont?: string;
   priceFont?: string;
