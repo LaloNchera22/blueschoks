@@ -8,7 +8,7 @@ type Product = Database['public']['Tables']['products']['Row'];
 
 interface ProductStylingToolbarProps {
   product: Product;
-  activeElement: 'container' | 'title' | 'price';
+  activeElement: 'container' | 'title' | 'price' | 'cartButton';
   onUpdate: (key: keyof ProductStyle, value: string | undefined) => void;
   onSave: () => void;
   onApplyAll: () => void;
@@ -18,6 +18,8 @@ interface ProductStylingToolbarProps {
   defaultColors: {
     title: string;
     price: string;
+    button?: string;
+    buttonText?: string;
   };
 }
 
@@ -169,6 +171,53 @@ export function ProductStylingToolbar({
               )}
             </div>
             <span className="text-[9px] text-gray-500 font-semibold uppercase tracking-wider">Color P.</span>
+          </div>
+        </>
+      )}
+
+      {/* Cart Button Tools */}
+      {activeElement === 'cartButton' && (
+        <>
+          {/* Button Background */}
+          <div className="flex flex-col items-center gap-1">
+            <div className="flex items-center gap-1 relative">
+              <ColorCircle
+                color={product.style_config?.cartBtnBackground || defaultColors.button || '#000000'}
+                onChange={(c) => onUpdate('cartBtnBackground', c)}
+                size="sm"
+              />
+              {product.style_config?.cartBtnBackground && (
+                <button
+                  onClick={(e) => { e.stopPropagation(); onUpdate('cartBtnBackground', undefined); }}
+                  className="absolute -top-1 -right-1 bg-gray-100 border border-gray-300 rounded-full p-0.5 hover:bg-gray-200 transition-colors shadow-sm z-10"
+                  title="Reset color"
+                >
+                  <Minus size={10} className="text-gray-600" />
+                </button>
+              )}
+            </div>
+            <span className="text-[9px] text-gray-500 font-semibold uppercase tracking-wider">Fondo Btn</span>
+          </div>
+
+          {/* Button Icon/Text Color */}
+          <div className="flex flex-col items-center gap-1">
+            <div className="flex items-center gap-1 relative">
+              <ColorCircle
+                color={product.style_config?.cartBtnColor || defaultColors.buttonText || '#ffffff'}
+                onChange={(c) => onUpdate('cartBtnColor', c)}
+                size="sm"
+              />
+              {product.style_config?.cartBtnColor && (
+                <button
+                  onClick={(e) => { e.stopPropagation(); onUpdate('cartBtnColor', undefined); }}
+                  className="absolute -top-1 -right-1 bg-gray-100 border border-gray-300 rounded-full p-0.5 hover:bg-gray-200 transition-colors shadow-sm z-10"
+                  title="Reset color"
+                >
+                  <Minus size={10} className="text-gray-600" />
+                </button>
+              )}
+            </div>
+            <span className="text-[9px] text-gray-500 font-semibold uppercase tracking-wider">Icono</span>
           </div>
         </>
       )}

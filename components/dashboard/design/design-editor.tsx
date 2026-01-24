@@ -61,6 +61,7 @@ import { cn } from '@/lib/utils';
 import { DEFAULT_DESIGN } from '@/utils/design-sanitizer';
 import { ProductStylingToolbar } from './product-styling-toolbar';
 import { ColorCircle } from './color-circle';
+import { ProductCard } from '@/components/store/product-card';
 
 // --- TYPES ---
 type Product = Database['public']['Tables']['products']['Row'];
@@ -86,7 +87,7 @@ type ToolType =
 
 type SelectionState = {
   productId: string;
-  elementType: 'container' | 'title' | 'price';
+  elementType: 'container' | 'title' | 'price' | 'cartButton';
 } | null;
 
 const DUMMY_PRODUCTS = [
@@ -810,6 +811,8 @@ export default function DesignEditor({ initialConfig, initialProducts, userId, s
                 defaultColors={{
                   title: config.cardStyle?.titleColor || config.colors.text,
                   price: config.cardStyle?.priceColor || config.colors.primary,
+                  button: config.cardStyle?.buttonColor || '#000000',
+                  buttonText: config.cardStyle?.buttonTextColor || '#ffffff'
                 }}
               />
            )}
@@ -938,112 +941,25 @@ export default function DesignEditor({ initialConfig, initialProducts, userId, s
                    {/* FIX: ENSURE 2 COLUMNS AND LARGER GAP */}
                    <div className="grid grid-cols-2 gap-4">
                       {products.map((p) => {
-                          const styleConfig = p.style_config;
-                          const footerBg = styleConfig?.footerBackground || undefined;
-                          const titleFont = styleConfig?.titleFont || undefined;
-                          const priceFont = styleConfig?.priceFont || undefined;
-                          const titleColor = styleConfig?.titleColor || undefined;
-                          const priceColor = styleConfig?.priceColor || undefined;
                           const isProductSelected = activeTool === 'product-individual' && selection?.productId === p.id;
-
-                          const globalCardBg = (config.colors as any).cardBackground || '#ffffff';
-                          const cardBg = styleConfig?.cardBackground || globalCardBg;
-                          const isTransparent = cardBg === 'transparent';
 
                           return (
                           <div
                             key={p.id}
                             className={cn(
-                                "group relative flex flex-col gap-3 p-2 transition-all duration-300 hover:-translate-y-1",
-                                isTransparent ? "" : "rounded-2xl hover:shadow-[0_8px_30px_rgb(0,0,0,0.04)]",
-                                isProductSelected && "ring-2 ring-blue-500 bg-blue-50/50"
+                                "relative transition-all duration-300",
+                                isProductSelected && "ring-2 ring-blue-500 bg-blue-50/50 rounded-2xl"
                             )}
-                            style={{
-                                backgroundColor: isProductSelected ? undefined : cardBg,
-                                border: isTransparent ? 'none' : `1px solid ${(config.cardStyle as any)?.borderColor || 'rgba(0,0,0,0.05)'}`
-                            }}
-                            onClick={(e) => {
-                                e.stopPropagation();
-                                setActiveTool('product-individual');
-                                setSelection({ productId: p.id, elementType: 'container' });
-                            }}
                           >
-                             {/* IMAGE CARD */}
-                             <div
-                               className="relative aspect-[3/4] w-full overflow-hidden rounded-xl bg-gray-100"
-                             >
-                                {p.image_url ? (
-                                    <Image
-                                       src={p.image_url}
-                                       alt={p.name}
-                                       fill
-                                       className="object-cover transition-transform duration-700 ease-in-out group-hover:scale-105"
-                                    />
-                                ) : (
-                                    <div className="flex h-full w-full items-center justify-center text-gray-300 bg-gray-50">
-                                       <span className="text-[10px] font-medium">Sin imagen</span>
-                                    </div>
-                                )}
-
-                                {/* FLOATING BUTTON (EDITABLE) */}
-                                <div className="absolute bottom-3 right-3 z-10">
-                                   <button
-                                     onClick={(e) => { e.stopPropagation(); setActiveTool('card-button'); }}
-                                     className={cn(
-                                         "h-10 w-10 flex items-center justify-center rounded-full shadow-lg transition-all duration-300 hover:scale-110 active:scale-90",
-                                         activeTool === 'card-button' && "ring-4 ring-blue-500 ring-offset-2"
-                                     )}
-                                     style={{
-                                         backgroundColor: config.cardStyle?.buttonColor || config.colors.primary,
-                                         color: config.cardStyle?.buttonTextColor || '#ffffff',
-                                         borderRadius: config.cardStyle?.borderRadius ? `${config.cardStyle.borderRadius}px` : '9999px' // default to full rounded if not set
-                                     }}
-                                   >
-                                       <Plus className="h-5 w-5" />
-                                   </button>
-                                </div>
-                             </div>
-
-                             {/* INFO */}
-                             <div
-                                className={cn("flex flex-col gap-1 px-2 pb-2", footerBg && "p-3 rounded-xl transition-colors")}
-                                style={{ backgroundColor: footerBg }}
-                             >
-                                 <h3
-                                   className={cn(
-                                       "font-medium text-neutral-800 text-sm leading-snug line-clamp-2 cursor-pointer hover:underline decoration-1 underline-offset-2",
-                                       (activeTool === 'card-title' || (activeTool === 'product-individual' && selection?.productId === p.id && selection?.elementType === 'title')) && "bg-blue-50 ring-2 ring-blue-500 rounded px-1 -mx-1"
-                                   )}
-                                   style={{
-                                       color: titleColor || config.cardStyle?.titleColor || undefined, // undefined to let class take over if no override
-                                       fontFamily: titleFont
-                                   }}
-                                   onClick={(e) => {
-                                       e.stopPropagation();
-                                       setActiveTool('product-individual');
-                                       setSelection({ productId: p.id, elementType: 'title' });
-                                   }}
-                                 >
-                                     {p.name}
-                                 </h3>
-                                 <p
-                                   className={cn(
-                                       "font-semibold text-black text-base tracking-tight cursor-pointer hover:opacity-70 w-fit",
-                                       (activeTool === 'card-price' || (activeTool === 'product-individual' && selection?.productId === p.id && selection?.elementType === 'price')) && "bg-blue-50 ring-2 ring-blue-500 rounded px-1 -mx-1"
-                                   )}
-                                   style={{
-                                       color: priceColor || config.cardStyle?.priceColor || undefined,
-                                       fontFamily: priceFont
-                                   }}
-                                   onClick={(e) => {
-                                       e.stopPropagation();
-                                       setActiveTool('product-individual');
-                                       setSelection({ productId: p.id, elementType: 'price' });
-                                   }}
-                                 >
-                                     ${Number(p.price).toFixed(2)}
-                                 </p>
-                             </div>
+                             <ProductCard
+                                product={p}
+                                config={config}
+                                onSelectElement={(elementType) => {
+                                    setActiveTool('product-individual');
+                                    setSelection({ productId: p.id, elementType });
+                                }}
+                             />
+                             {/* Overlay for selection visualization if needed, but the ring above handles container selection. */}
                           </div>
                       )})}
                    </div>
