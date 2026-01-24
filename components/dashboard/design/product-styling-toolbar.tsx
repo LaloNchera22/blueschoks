@@ -8,7 +8,7 @@ type Product = Database['public']['Tables']['products']['Row'];
 
 interface ProductStylingToolbarProps {
   product: Product;
-  activeElement: 'container' | 'title' | 'price' | 'cartButton';
+  activeElement: 'container' | 'title' | 'price' | 'cartButton' | 'description';
   onUpdate: (key: keyof ProductStyle, value: string | undefined) => void;
   onSave: () => void;
   onApplyAll: () => void;
@@ -220,6 +220,36 @@ export function ProductStylingToolbar({
             <span className="text-[9px] text-gray-500 font-semibold uppercase tracking-wider">Icono</span>
           </div>
         </>
+      )}
+
+      {/* Description Tools */}
+      {activeElement === 'description' && (
+        <div className="flex flex-col items-center gap-1">
+          <div className="flex items-center gap-1 relative">
+            <ColorCircle
+              color={product.style_config?.descriptionBackground === 'transparent' ? '#ffffff' : (product.style_config?.descriptionBackground || product.style_config?.footerBackground || '#ffffff')}
+              onChange={(c) => onUpdate('descriptionBackground', c)}
+              size="sm"
+            />
+            <button
+              onClick={(e) => { e.stopPropagation(); onUpdate('descriptionBackground', 'transparent'); }}
+              className="absolute -bottom-1 -right-2 bg-white border border-gray-200 rounded-full p-0.5 hover:bg-gray-100 transition-colors shadow-sm z-10"
+              title="Transparente"
+            >
+              <Ban size={10} className="text-gray-400" />
+            </button>
+            {product.style_config?.descriptionBackground && product.style_config.descriptionBackground !== 'transparent' && (
+              <button
+                onClick={(e) => { e.stopPropagation(); onUpdate('descriptionBackground', undefined); }}
+                className="absolute -top-1 -right-1 bg-gray-100 border border-gray-300 rounded-full p-0.5 hover:bg-gray-200 transition-colors shadow-sm z-10"
+                title="Restaurar"
+              >
+                <Minus size={10} className="text-gray-600" />
+              </button>
+            )}
+          </div>
+          <span className="text-[9px] text-gray-500 font-semibold uppercase tracking-wider">Fondo Desc.</span>
+        </div>
       )}
 
       <div className="w-px h-6 bg-gray-200" />

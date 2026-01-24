@@ -12,7 +12,7 @@ type Product = Database['public']['Tables']['products']['Row']
 interface ProductCardProps {
   product: Product
   config: DesignConfig
-  onSelectElement?: (element: 'container' | 'title' | 'price' | 'cartButton') => void
+  onSelectElement?: (element: 'container' | 'title' | 'price' | 'cartButton' | 'description') => void
   onAddToCart?: (product: Product) => void
 }
 
@@ -60,6 +60,11 @@ export function ProductCard({ product, config, onSelectElement, onAddToCart }: P
   // Cart Button Styles
   const btnBg = style.cartBtnBackground || cardStyle.buttonColor || '#000000'
   const btnColor = style.cartBtnColor || cardStyle.buttonTextColor || '#ffffff'
+
+  // Description Background (Footer)
+  const descBg = style.descriptionBackground === 'transparent'
+    ? 'transparent'
+    : (style.descriptionBackground || style.footerBackground || '#ffffff')
 
   return (
     <div
@@ -113,10 +118,14 @@ export function ProductCard({ product, config, onSelectElement, onAddToCart }: P
       {/* --- FOOTER (INFO + BOTÓN CUSTOM) --- */}
       <div
         className={cn(
-            "p-3 flex justify-between items-end gap-2 flex-grow",
-            style.footerBackground && "transition-colors"
+            "p-3 flex justify-between items-end gap-2 flex-grow transition-colors relative",
+            (style.descriptionBackground || style.footerBackground) && "transition-colors"
         )}
-        style={{ backgroundColor: style.footerBackground }}
+        style={{ backgroundColor: descBg }}
+        onClick={(e) => {
+            e.stopPropagation();
+            if (onSelectElement) onSelectElement('description');
+        }}
       >
         <div className="flex flex-col min-w-0 gap-1">
            <h3
