@@ -75,15 +75,8 @@ export default function StoreClient({ profile, products, config }: StoreClientPr
   const socialLinks = Array.isArray(config?.socialLinks) ? config.socialLinks.filter(l => l.active) : []
 
   return (
-    <main
-      className="min-h-screen w-full flex justify-center items-center py-8 bg-gray-50"
-      style={{ backgroundColor: bgColor }}
-    >
-       {/* Mobile Container - Premium Glassmorphism */}
-      <div
-        className="w-full max-w-[430px] h-[90vh] rounded-[32px] border border-white/20 bg-white/90 backdrop-blur-xl shadow-2xl ring-1 ring-black/5 overflow-hidden relative overflow-y-auto"
-        style={{ color: textColor, fontFamily: config.fonts.body }}
-      >
+    <div className="min-h-screen w-full flex justify-center" style={{ backgroundColor: bgColor }}>
+      <div className="w-full max-w-[430px] min-h-screen relative shadow-2xl overflow-x-hidden flex flex-col">
           {/*
             Header Sticky Bar
             Contains: Small Logo (optional), Cart Trigger
@@ -163,21 +156,18 @@ export default function StoreClient({ profile, products, config }: StoreClientPr
                <ProductGrid products={products} config={config} />
             </div>
 
-            {/* FOOTER: POWER BY BLUESHOCKS (Minimalist) */}
-            <footer className="mt-auto py-12 w-full flex items-center justify-center gap-1.5 opacity-60 hover:opacity-100 transition-opacity">
-              <span className="text-[11px] font-medium text-neutral-500 uppercase tracking-wider">
-                Powered by
+            {/* FOOTER: POWER BY BLUESHOCKS (Restored Pill Version) */}
+            <footer className="mt-auto py-12 w-full flex flex-col items-center justify-center gap-3">
+              <span className="text-[10px] font-bold tracking-[0.2em] opacity-60 uppercase mix-blend-difference text-white">
+                POWER BY
               </span>
               <a
                 href="https://blueshocks.com"
                 target="_blank"
-                rel="noopener noreferrer"
-                className="flex items-center gap-1.5 text-neutral-800 hover:text-black font-semibold"
+                className="group flex items-center gap-3 pl-2 pr-5 py-2 bg-neutral-900 rounded-full shadow-xl hover:scale-105 transition-transform"
               >
-                <div className="w-4 h-4 bg-green-500 rounded-sm text-white flex items-center justify-center font-bold text-[8px]">
-                  B
-                </div>
-                <span className="text-[11px] tracking-wide">BLUESHOCKS</span>
+                <div className="w-8 h-8 bg-green-500 rounded flex items-center justify-center text-white font-black text-sm">B</div>
+                <span className="text-sm font-bold text-white">BLUESHOCKS</span>
               </a>
             </footer>
 
@@ -190,6 +180,6 @@ export default function StoreClient({ profile, products, config }: StoreClientPr
           <CartSidebar shop={{ whatsapp: config.checkout.whatsappNumber || profile.whatsapp || '', shop_name: config.profile.shopName || profile.shop_name }} />
 
       </div>
-    </main>
+    </div>
   )
 }
