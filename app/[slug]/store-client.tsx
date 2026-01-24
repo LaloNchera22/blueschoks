@@ -75,14 +75,11 @@ export default function StoreClient({ profile, products, config }: StoreClientPr
   const socialLinks = Array.isArray(config?.socialLinks) ? config.socialLinks.filter(l => l.active) : []
 
   return (
-    <main
-      className="min-h-screen w-full flex justify-center items-center py-8 bg-gray-50"
-      style={{ backgroundColor: bgColor }}
-    >
-       {/* Mobile Container - Premium Glassmorphism */}
+    <main className="min-h-screen w-full flex justify-center bg-gray-50/50">
+       {/* Mobile Container */}
       <div
-        className="w-full max-w-[430px] h-[90vh] rounded-[32px] border border-white/20 bg-white/90 backdrop-blur-xl shadow-2xl ring-1 ring-black/5 overflow-hidden relative overflow-y-auto"
-        style={{ color: textColor, fontFamily: config.fonts.body }}
+        className="w-full max-w-md min-h-screen shadow-xl overflow-hidden relative overflow-y-auto"
+        style={{ backgroundColor: bgColor, color: textColor, fontFamily: config.fonts.body }}
       >
           {/*
             Header Sticky Bar
@@ -100,9 +97,13 @@ export default function StoreClient({ profile, products, config }: StoreClientPr
                 <div className="flex justify-center mb-6">
                   <div
                     className={cn(
-                      "relative w-32 h-32 overflow-hidden ring-2 ring-offset-2 ring-neutral-900/10",
+                      "relative w-32 h-32 overflow-hidden border-4",
                       shapeClass
                     )}
+                    style={{
+                      borderColor: avatarBorderColor,
+                      boxShadow: '0 4px 12px rgba(0,0,0,0.1)'
+                    }}
                   >
                     {config.profile.avatarUrl ? (
                         <Image
@@ -122,7 +123,7 @@ export default function StoreClient({ profile, products, config }: StoreClientPr
 
                 {/* SHOP NAME */}
                 <h1
-                  className="text-2xl font-bold text-neutral-900 tracking-tight mb-3"
+                  className="text-3xl font-extrabold tracking-tight mb-3"
                   style={getTextStyle('title') as React.CSSProperties}
                 >
                     {config.profile.shopName || 'Mi Tienda'}
@@ -130,7 +131,7 @@ export default function StoreClient({ profile, products, config }: StoreClientPr
 
                 {/* BIO */}
                 <p
-                  className="max-w-xl text-sm text-neutral-500 leading-relaxed mb-6"
+                  className="max-w-xl text-lg text-muted-foreground leading-relaxed mb-6 font-medium opacity-90"
                   style={getTextStyle('bio') as React.CSSProperties}
                 >
                     {config.profile.bio || 'Bienvenido a mi tienda online'}
@@ -163,22 +164,32 @@ export default function StoreClient({ profile, products, config }: StoreClientPr
                <ProductGrid products={products} config={config} />
             </div>
 
-            {/* FOOTER: POWER BY BLUESHOCKS (Minimalist) */}
-            <footer className="mt-auto py-12 w-full flex items-center justify-center gap-1.5 opacity-60 hover:opacity-100 transition-opacity">
-              <span className="text-[11px] font-medium text-neutral-500 uppercase tracking-wider">
-                Powered by
+            {/* FOOTER: POWER BY BLUESHOCKS */}
+            <footer className="mt-auto pt-16 pb-8 w-full flex flex-col items-center justify-center gap-2">
+
+              {/* Texto Superior */}
+              <span className="text-[10px] font-bold tracking-widest opacity-60 uppercase">
+                POWER BY
               </span>
+
+              {/* Botón / Enlace Principal */}
               <a
                 href="https://blueshocks.com"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="flex items-center gap-1.5 text-neutral-800 hover:text-black font-semibold"
+                className="flex items-center gap-2 px-4 py-2 bg-neutral-900 hover:bg-neutral-800 backdrop-blur-sm rounded-full transition-all duration-300 group"
               >
-                <div className="w-4 h-4 bg-green-500 rounded-sm text-white flex items-center justify-center font-bold text-[8px]">
+                {/* Icono del Logo (Simulado con CSS o SVG) */}
+                <div className="w-6 h-6 bg-green-500 rounded text-white flex items-center justify-center font-black text-xs">
                   B
                 </div>
-                <span className="text-[11px] tracking-wide">BLUESHOCKS</span>
+
+                {/* Texto de Marca */}
+                <span className="text-sm font-black tracking-wide text-white group-hover:text-white/90">
+                  BLUESHOCKS
+                </span>
               </a>
+
             </footer>
 
           </div>

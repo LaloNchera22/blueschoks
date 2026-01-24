@@ -849,7 +849,8 @@ export default function DesignEditor({ initialConfig, initialProducts, userId, s
         <div className="flex justify-center pb-32 px-4 pt-32"> {/* Added pt-32 to account for floating toolbar */}
           <div className="w-full max-w-[420px] origin-top scale-[0.9] 2xl:scale-100 transition-transform bg-transparent">
              <div
-               className="h-full min-h-[800px] pb-40 relative rounded-[32px] border border-white/20 bg-white/90 backdrop-blur-xl shadow-2xl ring-1 ring-black/5 overflow-hidden"
+               className="h-full min-h-[800px] pb-40 relative shadow-2xl rounded-[32px] overflow-hidden bg-neutral-900 ring-8 ring-black/5"
+               style={{ backgroundColor: config.colors.background }}
              >
                 {/* FIX: REMOVED STICKY HEADER VISUAL TO REMOVE FAKE HEADER BAR */}
 
@@ -862,10 +863,14 @@ export default function DesignEditor({ initialConfig, initialProducts, userId, s
                    >
                        <div
                           className={cn(
-                            "relative h-32 w-32 overflow-hidden ring-2 ring-offset-2 ring-neutral-900/10 transition-all",
+                            "relative h-32 w-32 overflow-hidden border-4 transition-all",
                              avatarClasses,
                              activeTool === 'header-avatar' && "ring-4 ring-blue-500 ring-offset-2"
                           )}
+                          style={{
+                            borderColor: config.profile.avatarBorderColor || '#ffffff',
+                            boxShadow: '0 4px 12px rgba(0,0,0,0.1)'
+                          }}
                        >
                            {config.profile.avatarUrl ? (
                                <Image src={config.profile.avatarUrl} alt="Avatar" fill className="object-cover transition-transform duration-700 group-hover:scale-110" />
@@ -884,7 +889,7 @@ export default function DesignEditor({ initialConfig, initialProducts, userId, s
                    {/* SHOP NAME */}
                    <h1
                      className={cn(
-                       "text-2xl font-bold text-neutral-900 tracking-tight mb-3 cursor-pointer hover:opacity-80 transition-opacity",
+                       "text-3xl font-extrabold tracking-tight mb-3 cursor-pointer hover:opacity-80 transition-opacity",
                         activeTool === 'header-title' && "underline decoration-blue-500 decoration-2 underline-offset-4"
                      )}
                      style={getTextStyle('title')}
@@ -896,7 +901,7 @@ export default function DesignEditor({ initialConfig, initialProducts, userId, s
                    {/* BIO */}
                    <p
                      className={cn(
-                       "max-w-xl text-sm text-neutral-500 leading-relaxed mb-6 cursor-pointer hover:bg-black/5 rounded px-2 -mx-2 transition-colors",
+                       "max-w-xl text-lg text-muted-foreground leading-relaxed mb-6 font-medium opacity-90 cursor-pointer hover:bg-black/5 rounded px-2 -mx-2 transition-colors",
                        activeTool === 'header-bio' && "ring-2 ring-blue-500 bg-blue-50/50"
                      )}
                      style={getTextStyle('bio')}
@@ -949,7 +954,7 @@ export default function DesignEditor({ initialConfig, initialProducts, userId, s
                           <div
                             key={p.id}
                             className={cn(
-                                "group relative flex flex-col gap-3 rounded-2xl border border-neutral-100 bg-white p-2 transition-all duration-300 hover:-translate-y-1 hover:shadow-[0_8px_30px_rgb(0,0,0,0.04)]",
+                                "group relative flex flex-col gap-3 rounded-2xl transition-all p-1",
                                 isProductSelected && "ring-2 ring-blue-500 bg-blue-50/50"
                             )}
                             onClick={(e) => {
@@ -960,7 +965,8 @@ export default function DesignEditor({ initialConfig, initialProducts, userId, s
                           >
                              {/* IMAGE CARD */}
                              <div
-                               className="relative aspect-[3/4] w-full overflow-hidden rounded-xl bg-gray-100"
+                               className="relative aspect-[3/4] w-full overflow-hidden rounded-2xl bg-gray-100 shadow-sm transition-all duration-500 hover:shadow-lg"
+                               style={{ backgroundColor: config.colors.cardBackground || '#ffffff' }}
                              >
                                 {p.image_url ? (
                                     <Image
@@ -996,16 +1002,16 @@ export default function DesignEditor({ initialConfig, initialProducts, userId, s
 
                              {/* INFO */}
                              <div
-                                className={cn("flex flex-col gap-1 px-2 pb-2", footerBg && "p-3 rounded-xl transition-colors")}
+                                className={cn("flex flex-col gap-1 px-1", footerBg && "p-3 rounded-xl transition-colors")}
                                 style={{ backgroundColor: footerBg }}
                              >
                                  <h3
                                    className={cn(
-                                       "font-medium text-neutral-800 text-sm leading-snug line-clamp-2 cursor-pointer hover:underline decoration-1 underline-offset-2",
+                                       "font-medium text-base leading-snug line-clamp-2 cursor-pointer hover:underline decoration-1 underline-offset-2",
                                        (activeTool === 'card-title' || (activeTool === 'product-individual' && selection?.productId === p.id && selection?.elementType === 'title')) && "bg-blue-50 ring-2 ring-blue-500 rounded px-1 -mx-1"
                                    )}
                                    style={{
-                                       color: titleColor || config.cardStyle?.titleColor || undefined, // undefined to let class take over if no override
+                                       color: titleColor || config.cardStyle?.titleColor || config.colors.text,
                                        fontFamily: titleFont
                                    }}
                                    onClick={(e) => {
@@ -1018,11 +1024,11 @@ export default function DesignEditor({ initialConfig, initialProducts, userId, s
                                  </h3>
                                  <p
                                    className={cn(
-                                       "font-semibold text-black text-base tracking-tight cursor-pointer hover:opacity-70 w-fit",
+                                       "font-bold text-lg tracking-tight cursor-pointer hover:opacity-70 w-fit",
                                        (activeTool === 'card-price' || (activeTool === 'product-individual' && selection?.productId === p.id && selection?.elementType === 'price')) && "bg-blue-50 ring-2 ring-blue-500 rounded px-1 -mx-1"
                                    )}
                                    style={{
-                                       color: priceColor || config.cardStyle?.priceColor || undefined,
+                                       color: priceColor || config.cardStyle?.priceColor || config.colors.primary,
                                        fontFamily: priceFont
                                    }}
                                    onClick={(e) => {
@@ -1039,22 +1045,32 @@ export default function DesignEditor({ initialConfig, initialProducts, userId, s
                    </div>
                 </div>
 
-                {/* FOOTER: POWER BY BLUESHOCKS (Minimalist) */}
-                <footer className="mt-auto py-12 w-full flex items-center justify-center gap-1.5 opacity-60 hover:opacity-100 transition-opacity">
-                  <span className="text-[11px] font-medium text-neutral-500 uppercase tracking-wider">
-                    Powered by
+                {/* FOOTER: POWER BY BLUESHOCKS */}
+                <footer className="mt-auto pt-16 pb-8 w-full flex flex-col items-center justify-center gap-2">
+
+                  {/* Texto Superior */}
+                  <span className="text-[10px] font-bold tracking-widest opacity-60 uppercase">
+                    POWER BY
                   </span>
+
+                  {/* Botón / Enlace Principal */}
                   <a
                     href="https://blueshocks.com"
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="flex items-center gap-1.5 text-neutral-800 hover:text-black font-semibold"
+                    className="flex items-center gap-2 px-4 py-2 bg-neutral-900 hover:bg-neutral-800 backdrop-blur-sm rounded-full transition-all duration-300 group"
                   >
-                    <div className="w-4 h-4 bg-green-500 rounded-sm text-white flex items-center justify-center font-bold text-[8px]">
+                    {/* Icono del Logo (Simulado con CSS o SVG) */}
+                    <div className="w-6 h-6 bg-green-500 rounded text-white flex items-center justify-center font-black text-xs">
                       B
                     </div>
-                    <span className="text-[11px] tracking-wide">BLUESHOCKS</span>
+
+                    {/* Texto de Marca */}
+                    <span className="text-sm font-black tracking-wide text-white group-hover:text-white/90">
+                      BLUESHOCKS
+                    </span>
                   </a>
+
                 </footer>
              </div>
           </div>

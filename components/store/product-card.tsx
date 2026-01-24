@@ -67,11 +67,12 @@ export function ProductCard({ product, config }: ProductCardProps) {
   return (
     <motion.div
       layout
-      className="group relative flex flex-col gap-3 rounded-2xl border border-neutral-100 bg-white p-2 transition-all duration-300 hover:-translate-y-1 hover:shadow-[0_8px_30px_rgb(0,0,0,0.04)]"
+      className="group relative flex flex-col gap-3"
     >
       {/* Image Container */}
       <div
-        className="relative aspect-[3/4] w-full overflow-hidden bg-gray-100 rounded-xl"
+        className="relative aspect-[3/4] w-full overflow-hidden bg-gray-100 shadow-sm transition-all duration-500 hover:shadow-lg"
+        style={{ borderRadius: `${cardStyle.borderRadius}px` }}
       >
         {product.image_url ? (
           <Image
@@ -112,14 +113,14 @@ export function ProductCard({ product, config }: ProductCardProps) {
 
       {/* Info */}
       <div
-        className={cn("flex flex-col gap-1 px-2 pb-2", footerBg && "p-3 rounded-xl transition-colors")}
+        className={cn("flex flex-col gap-1 px-1", footerBg && "p-3 rounded-xl transition-colors")}
         style={{ backgroundColor: footerBg }}
       >
         <div className="flex justify-between items-start gap-4">
             <h3
-              className="font-medium text-neutral-800 text-sm leading-snug line-clamp-2"
+              className="font-medium text-base leading-snug line-clamp-2"
               style={{
-                color: titleColor, // Keep override if needed, or default to neutral-800 via class
+                color: titleColor,
                 fontFamily: titleFont
               }}
             >
@@ -127,9 +128,9 @@ export function ProductCard({ product, config }: ProductCardProps) {
             </h3>
         </div>
         <p
-          className="font-semibold text-black text-base tracking-tight"
+          className="font-bold text-lg tracking-tight"
           style={{
-            color: priceColor, // Keep override if needed
+            color: priceColor,
             fontFamily: priceFont
           }}
         >
