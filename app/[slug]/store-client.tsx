@@ -11,7 +11,6 @@ import {
   MessageCircle,
   Mail,
   Music2,
-  ExternalLink,
   Smartphone,
   Link as LinkIcon
 } from 'lucide-react'
@@ -20,7 +19,7 @@ import { Database } from '@/utils/supabase/types'
 import { useCart } from '@/components/shop/cart-context'
 import CartSidebar from '@/components/shop/cart-sidebar'
 import { StoreHeader } from '@/components/store/store-header'
-import { ProductGrid } from '@/components/store/product-grid'
+import { ProductCard } from '@/components/store/product-card'
 import { cn } from '@/lib/utils'
 
 type Profile = Database['public']['Tables']['profiles']['Row']
@@ -44,6 +43,7 @@ const PLATFORMS = [
 ]
 
 export default function StoreClient({ profile, products, config }: StoreClientProps) {
+  const { addToCart } = useCart()
 
   // Background style from config
   const bgColor = config?.colors?.background || '#ffffff'
@@ -64,7 +64,6 @@ export default function StoreClient({ profile, products, config }: StoreClientPr
 
   // Avatar Shape & Border Logic
   const avatarShape = config.profile?.avatarShape || 'circle';
-  const avatarBorderColor = config.profile?.avatarBorderColor || '#ffffff';
 
   const shapeClass = useMemo(() => {
     if (avatarShape === 'none') return 'rounded-none';
@@ -75,8 +74,10 @@ export default function StoreClient({ profile, products, config }: StoreClientPr
   const socialLinks = Array.isArray(config?.socialLinks) ? config.socialLinks.filter(l => l.active) : []
 
   return (
-    <div className="min-h-screen w-full flex justify-center items-start sm:items-center p-0 sm:p-4" style={{ backgroundColor: bgColor, color: textColor }}>
-      <div className="w-full max-w-[430px] min-h-screen sm:min-h-[800px] sm:rounded-[32px] relative flex flex-col overflow-hidden">
+    <div className="min-h-screen w-full flex justify-center items-center" style={{ backgroundColor: bgColor, color: textColor }}>
+
+      {/* CONTENEDOR PRINCIPAL: Sin bordes blancos, sin bg-white fijo */}
+      <div className="w-full max-w-[430px] min-h-screen relative flex flex-col shadow-2xl overflow-hidden">
           {/*
             Header Sticky Bar
             Contains: Small Logo (optional), Cart Trigger
@@ -151,9 +152,24 @@ export default function StoreClient({ profile, products, config }: StoreClientPr
                 )}
             </div>
 
-            {/* --- PRODUCT GRID --- */}
+            {/* --- PRODUCT GRID (INLINED) --- */}
             <div className="px-4">
-               <ProductGrid products={products} config={config} />
+               {products.length === 0 ? (
+                  <div className="py-24 text-center opacity-60">
+                    <p className="text-lg font-medium">No hay productos disponibles por el momento.</p>
+                  </div>
+               ) : (
+                  <div className="grid grid-cols-2 gap-3 pb-32">
+                      {products.map(product => (
+                        <ProductCard
+                          key={product.id}
+                          product={product}
+                          config={config}
+                          onAddToCart={addToCart} // ✅ Pasamos la función como prop
+                        />
+                      ))}
+                  </div>
+               )}
             </div>
 
             {/* FOOTER: POWER BY BLUESHOCKS (Minimalist) */}
