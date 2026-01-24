@@ -42,7 +42,7 @@ export function ProductCard({ product, config }: ProductCardProps) {
 
   // Styles
   const primaryColor = config?.colors?.primary || '#000000'
-  const cardBg = config?.colors?.cardBackground || '#ffffff'
+  const globalCardBg = config?.colors?.cardBackground || '#ffffff'
   const textColor = config?.colors?.text || '#1f2937'
 
   // Card Style Config
@@ -61,17 +61,22 @@ export function ProductCard({ product, config }: ProductCardProps) {
   const footerBg = styleConfig?.footerBackground || undefined
 
   // Prioritize product-specific colors over global card style
+  const cardBg = styleConfig?.cardBackground || globalCardBg
   const titleColor = styleConfig?.titleColor || cardStyle.titleColor
   const priceColor = styleConfig?.priceColor || cardStyle.priceColor
 
   return (
     <motion.div
       layout
-      className="group relative flex flex-col gap-3 rounded-2xl border border-neutral-100 bg-white p-2 transition-all duration-300 hover:-translate-y-1 hover:shadow-[0_8px_30px_rgb(0,0,0,0.04)]"
+      className="group relative h-full flex flex-col gap-3 rounded-2xl border border-neutral-100 bg-white p-2 transition-all duration-300 hover:-translate-y-1 hover:shadow-[0_8px_30px_rgb(0,0,0,0.04)]"
+      style={{
+        backgroundColor: cardBg,
+        borderColor: cardBg === 'transparent' ? 'transparent' : undefined
+      }}
     >
       {/* Image Container */}
       <div
-        className="relative aspect-[3/4] w-full overflow-hidden bg-gray-100 rounded-xl"
+        className="relative aspect-square w-full overflow-hidden bg-gray-100 rounded-xl"
       >
         {product.image_url ? (
           <Image
@@ -112,7 +117,7 @@ export function ProductCard({ product, config }: ProductCardProps) {
 
       {/* Info */}
       <div
-        className={cn("flex flex-col gap-1 px-2 pb-2", footerBg && "p-3 rounded-xl transition-colors")}
+        className={cn("flex flex-col gap-1 px-2 pb-2 flex-grow", footerBg && "p-3 rounded-xl transition-colors")}
         style={{ backgroundColor: footerBg }}
       >
         <div className="flex justify-between items-start gap-4">

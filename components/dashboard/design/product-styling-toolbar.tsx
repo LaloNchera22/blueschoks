@@ -1,5 +1,5 @@
 import React from 'react';
-import { Loader2, Save, Minus, Copy, ChevronDown, X } from 'lucide-react';
+import { Loader2, Save, Minus, Copy, ChevronDown, X, Ban } from 'lucide-react';
 import { ProductStyle } from '@/lib/types/design-system';
 import { Database } from '@/utils/supabase/types';
 import { ColorCircle } from './color-circle';
@@ -37,25 +37,56 @@ export function ProductStylingToolbar({
 
       {/* Footer Background - Only for container */}
       {activeElement === 'container' && (
-        <div className="flex flex-col items-center gap-1">
-          <div className="flex items-center gap-1 relative">
-            <ColorCircle
-              color={product.style_config?.footerBackground || 'transparent'}
-              onChange={(c) => onUpdate('footerBackground', c)}
-              size="sm"
-            />
-            {product.style_config?.footerBackground && (
+        <>
+          {/* Card Background */}
+          <div className="flex flex-col items-center gap-1">
+            <div className="flex items-center gap-1 relative">
+              <ColorCircle
+                color={product.style_config?.cardBackground === 'transparent' ? '#ffffff' : (product.style_config?.cardBackground || '#ffffff')}
+                onChange={(c) => onUpdate('cardBackground', c)}
+                size="sm"
+              />
               <button
-                onClick={(e) => { e.stopPropagation(); onUpdate('footerBackground', undefined); }}
-                className="absolute -top-1 -right-1 bg-gray-100 border border-gray-300 rounded-full p-0.5 hover:bg-gray-200 transition-colors shadow-sm z-10"
-                title="Quitar fondo"
+                onClick={(e) => { e.stopPropagation(); onUpdate('cardBackground', 'transparent'); }}
+                className="absolute -bottom-1 -right-2 bg-white border border-gray-200 rounded-full p-0.5 hover:bg-gray-100 transition-colors shadow-sm z-10"
+                title="Transparente"
               >
-                <Minus size={10} className="text-gray-600" />
+                <Ban size={10} className="text-gray-400" />
               </button>
-            )}
+              {product.style_config?.cardBackground && product.style_config.cardBackground !== 'transparent' && (
+                <button
+                  onClick={(e) => { e.stopPropagation(); onUpdate('cardBackground', undefined); }}
+                  className="absolute -top-1 -right-1 bg-gray-100 border border-gray-300 rounded-full p-0.5 hover:bg-gray-200 transition-colors shadow-sm z-10"
+                  title="Restaurar"
+                >
+                  <Minus size={10} className="text-gray-600" />
+                </button>
+              )}
+            </div>
+            <span className="text-[9px] text-gray-500 font-semibold uppercase tracking-wider">Tarjeta</span>
           </div>
-          <span className="text-[9px] text-gray-500 font-semibold uppercase tracking-wider">Fondo</span>
-        </div>
+
+          {/* Footer Background */}
+          <div className="flex flex-col items-center gap-1">
+            <div className="flex items-center gap-1 relative">
+              <ColorCircle
+                color={product.style_config?.footerBackground || 'transparent'}
+                onChange={(c) => onUpdate('footerBackground', c)}
+                size="sm"
+              />
+              {product.style_config?.footerBackground && (
+                <button
+                  onClick={(e) => { e.stopPropagation(); onUpdate('footerBackground', undefined); }}
+                  className="absolute -top-1 -right-1 bg-gray-100 border border-gray-300 rounded-full p-0.5 hover:bg-gray-200 transition-colors shadow-sm z-10"
+                  title="Quitar fondo"
+                >
+                  <Minus size={10} className="text-gray-600" />
+                </button>
+              )}
+            </div>
+            <span className="text-[9px] text-gray-500 font-semibold uppercase tracking-wider">Info</span>
+          </div>
+        </>
       )}
 
       {/* Title Tools */}
