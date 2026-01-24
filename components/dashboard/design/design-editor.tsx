@@ -849,7 +849,8 @@ export default function DesignEditor({ initialConfig, initialProducts, userId, s
         <div className="flex justify-center pb-32 px-4 pt-32"> {/* Added pt-32 to account for floating toolbar */}
           <div className="w-full max-w-[420px] origin-top scale-[0.9] 2xl:scale-100 transition-transform bg-transparent">
              <div
-               className="h-full min-h-[800px] pb-40 relative rounded-[32px] border border-white/20 bg-white/90 backdrop-blur-xl shadow-2xl ring-1 ring-black/5 overflow-hidden"
+               className="h-full min-h-[800px] pb-40 relative rounded-[32px] border border-white/20 shadow-2xl ring-1 ring-black/5 overflow-hidden"
+               style={{ backgroundColor: config.colors.background || '#ffffff' }}
              >
                 {/* FIX: REMOVED STICKY HEADER VISUAL TO REMOVE FAKE HEADER BAR */}
 
