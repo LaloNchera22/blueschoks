@@ -1,13 +1,11 @@
 "use client"
 
-import React from 'react'
+import React, { useState } from 'react'
 import Image from 'next/image'
-import { motion } from 'framer-motion'
-import { Plus, Check } from 'lucide-react'
+import { ChevronLeft, ChevronRight, ShoppingBag } from 'lucide-react'
 import { Database } from '@/utils/supabase/types'
 import { DesignConfig } from '@/lib/types/design-system'
 import { useCart } from '@/components/shop/cart-context'
-import { Button } from '@/components/ui/button'
 import { cn } from '@/lib/utils'
 
 type Product = Database['public']['Tables']['products']['Row']
@@ -15,137 +13,160 @@ type Product = Database['public']['Tables']['products']['Row']
 interface ProductCardProps {
   product: Product
   config: DesignConfig
+  onSelectElement?: (element: 'container' | 'title' | 'price' | 'cartButton') => void
 }
 
-export function ProductCard({ product, config }: ProductCardProps) {
-  const { addToCart, items } = useCart()
-  const [isAdded, setIsAdded] = React.useState(false)
+export function ProductCard({ product, config, onSelectElement }: ProductCardProps) {
+  const { addToCart } = useCart()
+  const [imgIndex, setImgIndex] = useState(0)
 
-  // Determine if item is already in cart for visual feedback (optional)
-  // const inCart = items.find(i => i.id === product.id)
+  // Carousel Logic
+  // Use images array if available and not empty, otherwise fallback to image_url
+  const images = (product.images && product.images.length > 0)
+    ? product.images
+    : (product.image_url ? [product.image_url] : [])
 
-  const handleAdd = (e: React.MouseEvent) => {
+  const handlePrev = (e: React.MouseEvent) => {
     e.stopPropagation()
-    e.preventDefault()
+    setImgIndex(curr => curr === 0 ? images.length - 1 : curr - 1)
+  }
 
+  const handleNext = (e: React.MouseEvent) => {
+    e.stopPropagation()
+    setImgIndex(curr => (curr + 1) % images.length)
+  }
+
+  // Styles Resolution
+  const style = product.style_config || {}
+  const cardStyle = config?.cardStyle || {
+      borderRadius: 16,
+      buttonColor: '#000000',
+      buttonTextColor: '#ffffff',
+      priceColor: '#000000',
+      titleColor: '#1f2937'
+  }
+  const globalColors = config?.colors || { cardBackground: '#ffffff', text: '#1f2937' }
+
+  // Background
+  const isTransparent = style.cardBackground === 'transparent'
+  const bgColor = isTransparent ? 'transparent' : (style.cardBackground || globalColors.cardBackground || '#ffffff')
+  const borderColor = isTransparent ? 'none' : `1px solid ${(cardStyle as any).borderColor || 'rgba(0,0,0,0.05)'}`
+
+  // Fonts & Colors (Granular > Global Fallback)
+  const titleFont = style.titleFont
+  const priceFont = style.priceFont
+  const titleColor = style.titleColor || cardStyle.titleColor || globalColors.text
+  const priceColor = style.priceColor || cardStyle.priceColor || globalColors.text
+
+  // Cart Button Styles
+  const btnBg = style.cartBtnBackground || cardStyle.buttonColor || '#000000'
+  const btnColor = style.cartBtnColor || cardStyle.buttonTextColor || '#ffffff'
+
+  // Add to Cart Handler
+  const handleAddToCart = (e: React.MouseEvent) => {
+    e.stopPropagation()
     addToCart({
       id: product.id,
       price: product.price,
       name: product.name,
       image_url: product.image_url || undefined
     })
-
-    // Temporary success state for the button
-    setIsAdded(true)
-    setTimeout(() => setIsAdded(false), 2000)
   }
-
-  // Styles
-  const primaryColor = config?.colors?.primary || '#000000'
-  const globalCardBg = config?.colors?.cardBackground || '#ffffff'
-  const textColor = config?.colors?.text || '#1f2937'
-
-  // Card Style Config
-  const cardStyle = config.cardStyle || {
-    borderRadius: 16,
-    buttonColor: primaryColor,
-    buttonTextColor: '#ffffff',
-    priceColor: primaryColor,
-    titleColor: textColor
-  }
-
-  // Product Style Override
-  const styleConfig = product.style_config
-  const titleFont = styleConfig?.titleFont || undefined
-  const priceFont = styleConfig?.priceFont || undefined
-  const footerBg = styleConfig?.footerBackground || undefined
-
-  // Prioritize product-specific colors over global card style
-  const cardBg = styleConfig?.cardBackground || globalCardBg
-  const titleColor = styleConfig?.titleColor || cardStyle.titleColor
-  const priceColor = styleConfig?.priceColor || cardStyle.priceColor
-
-  const isTransparent = cardBg === 'transparent'
 
   return (
-    <motion.div
-      layout
+    <div
       className={cn(
-        "group relative h-full flex flex-col gap-3 p-2 transition-all duration-300 hover:-translate-y-1",
-        isTransparent ? "" : "rounded-2xl hover:shadow-[0_8px_30px_rgb(0,0,0,0.04)]"
+        "h-full flex flex-col relative overflow-hidden transition-all duration-300 group",
+        isTransparent ? "" : "rounded-2xl shadow-sm hover:shadow-md"
       )}
       style={{
-        backgroundColor: cardBg,
-        border: isTransparent ? 'none' : `1px solid ${(cardStyle as any).borderColor || 'rgba(0,0,0,0.05)'}`
+        backgroundColor: bgColor,
+        border: borderColor
       }}
+      onClick={() => onSelectElement && onSelectElement('container')}
     >
-      {/* Image Container */}
-      <div
-        className="relative aspect-square w-full overflow-hidden bg-gray-100 rounded-xl"
-      >
-        {product.image_url ? (
-          <Image
-            src={product.image_url}
-            alt={product.name}
-            fill
-            className="object-cover transition-transform duration-700 ease-in-out group-hover:scale-105"
-            sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
-          />
+      {/* --- ZONA IMAGEN (CARRUSEL) --- */}
+      <div className={cn(
+          "relative w-full aspect-square bg-gray-100 overflow-hidden",
+          isTransparent ? "rounded-xl" : ""
+      )}>
+        {images.length > 0 ? (
+           <Image
+             src={images[imgIndex]}
+             alt={product.name}
+             fill
+             className="object-cover transition-transform duration-700 group-hover:scale-105"
+             sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+           />
         ) : (
-          <div className="flex h-full w-full items-center justify-center text-gray-300 bg-gray-50">
-            <span className="text-xs font-medium">Sin imagen</span>
-          </div>
+           <div className="flex h-full w-full items-center justify-center text-gray-300 bg-gray-50">
+             <span className="text-xs font-medium">Sin imagen</span>
+           </div>
         )}
 
-        {/* Floating Action Button (Top Right or Bottom Right) - Let's do Bottom Right for reachability */}
-        <div className="absolute bottom-3 right-3 sm:bottom-4 sm:right-4 z-10">
-            <Button
-                size="icon"
-                onClick={handleAdd}
-                className={cn(
-                    "h-10 w-10 rounded-full shadow-lg transition-all duration-300 hover:scale-110 active:scale-90",
-                    isAdded ? "bg-green-500 hover:bg-green-600" : ""
-                )}
-                style={{
-                    backgroundColor: isAdded ? undefined : cardStyle.buttonColor,
-                    color: cardStyle.buttonTextColor
-                }}
+        {images.length > 1 && (
+          <>
+            <button
+                onClick={handlePrev}
+                className="absolute left-2 top-1/2 -translate-y-1/2 bg-white/90 hover:bg-white p-1.5 rounded-full opacity-0 group-hover:opacity-100 transition-opacity z-10 shadow-sm text-black"
             >
-                {isAdded ? (
-                    <Check className="h-5 w-5 animate-in zoom-in spin-in-50 duration-300" />
-                ) : (
-                    <Plus className="h-5 w-5" />
-                )}
-            </Button>
-        </div>
+                <ChevronLeft size={16}/>
+            </button>
+            <button
+                onClick={handleNext}
+                className="absolute right-2 top-1/2 -translate-y-1/2 bg-white/90 hover:bg-white p-1.5 rounded-full opacity-0 group-hover:opacity-100 transition-opacity z-10 shadow-sm text-black"
+            >
+                <ChevronRight size={16}/>
+            </button>
+          </>
+        )}
       </div>
 
-      {/* Info */}
+      {/* --- FOOTER (INFO + BOTÓN CUSTOM) --- */}
       <div
-        className={cn("flex flex-col gap-1 px-2 pb-2 flex-grow", footerBg && "p-3 rounded-xl transition-colors")}
-        style={{ backgroundColor: footerBg }}
+        className={cn(
+            "p-3 flex justify-between items-end gap-2 flex-grow",
+            style.footerBackground && "transition-colors"
+        )}
+        style={{ backgroundColor: style.footerBackground }}
       >
-        <div className="flex justify-between items-start gap-4">
-            <h3
-              className="font-medium text-neutral-800 text-sm leading-snug line-clamp-2"
-              style={{
-                color: titleColor, // Keep override if needed, or default to neutral-800 via class
-                fontFamily: titleFont
-              }}
-            >
-                {product.name}
-            </h3>
+        <div className="flex flex-col min-w-0 gap-1">
+           <h3
+             className="truncate font-medium text-sm text-neutral-800"
+             style={{ fontFamily: titleFont, color: titleColor }}
+             onClick={(e) => { e.stopPropagation(); onSelectElement && onSelectElement('title'); }}
+           >
+             {product.name}
+           </h3>
+           <p
+             className="text-sm font-semibold opacity-90 text-black"
+             style={{ fontFamily: priceFont, color: priceColor }}
+             onClick={(e) => { e.stopPropagation(); onSelectElement && onSelectElement('price'); }}
+           >
+             ${product.price.toFixed(2)}
+           </p>
         </div>
-        <p
-          className="font-semibold text-black text-base tracking-tight"
+
+        {/* BOTÓN DE CARRITO PERSONALIZABLE */}
+        <button
+          onClick={(e) => {
+            e.stopPropagation();
+            if (onSelectElement) {
+                onSelectElement('cartButton');
+            } else {
+                handleAddToCart(e);
+            }
+          }}
+          className="w-9 h-9 flex items-center justify-center rounded-full border transition-transform active:scale-95 shadow-sm shrink-0"
           style={{
-            color: priceColor, // Keep override if needed
-            fontFamily: priceFont
+            backgroundColor: btnBg,
+            color: btnColor,
+            borderColor: btnColor === '#ffffff' ? 'rgba(0,0,0,0.1)' : btnColor // Subtle border if white to separate from card
           }}
         >
-          ${product.price.toFixed(2)}
-        </p>
+          <ShoppingBag size={16} />
+        </button>
       </div>
-    </motion.div>
+    </div>
   )
 }
