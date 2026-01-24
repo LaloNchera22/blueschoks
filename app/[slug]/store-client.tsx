@@ -156,18 +156,20 @@ export default function StoreClient({ profile, products, config }: StoreClientPr
                <ProductGrid products={products} config={config} />
             </div>
 
-            {/* FOOTER: POWER BY BLUESHOCKS (Restored Pill Version) */}
-            <footer className="mt-auto py-12 w-full flex flex-col items-center justify-center gap-3">
-              <span className="text-[10px] font-bold tracking-[0.2em] opacity-60 uppercase mix-blend-difference text-white">
-                POWER BY
-              </span>
+            {/* FOOTER: POWER BY BLUESHOCKS (Minimalist) */}
+            <footer className="w-full py-8 mt-auto flex justify-center items-center opacity-70 hover:opacity-100 transition-opacity duration-300">
               <a
                 href="https://blueshocks.com"
                 target="_blank"
-                className="group flex items-center gap-3 pl-2 pr-5 py-2 bg-neutral-900 rounded-full shadow-xl hover:scale-105 transition-transform"
+                rel="noreferrer"
+                className="text-xs uppercase tracking-[0.2em] flex items-center gap-1.5"
+                style={{
+                  color: getTextStyle('title').color,
+                  fontFamily: getTextStyle('title').fontFamily
+                }}
               >
-                <div className="w-8 h-8 bg-green-500 rounded flex items-center justify-center text-white font-black text-sm">B</div>
-                <span className="text-sm font-bold text-white">BLUESHOCKS</span>
+                <span className="font-light">Powered by</span>
+                <span className="font-bold">BLUESHOCKS</span>
               </a>
             </footer>
 

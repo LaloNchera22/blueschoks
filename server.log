@@ -1,0 +1,18 @@
+
+> blueshock@0.1.0 dev
+> next dev -H 0.0.0.0
+
+▲ Next.js 16.1.4 (Turbopack)
+- Local:         http://localhost:3000
+- Network:       http://0.0.0.0:3000
+- Experiments (use with caution):
+  · serverActions
+
+✓ Starting...
+✓ Ready in 1096ms
+○ Compiling /test-verification ...
+ GET /test-verification 200 in 5.6s (compile: 5.0s, render: 547ms)
+ GET /test-verification-editor 200 in 1807ms (compile: 1595ms, render: 212ms)
+ GET /test-verification 200 in 92ms (compile: 8ms, render: 85ms)
+ GET /test-verification-editor 200 in 69ms (compile: 4ms, render: 65ms)
+✓ Compiled in 162ms
