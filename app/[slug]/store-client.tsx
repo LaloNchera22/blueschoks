@@ -75,8 +75,8 @@ export default function StoreClient({ profile, products, config }: StoreClientPr
   const socialLinks = Array.isArray(config?.socialLinks) ? config.socialLinks.filter(l => l.active) : []
 
   return (
-    <div className="min-h-screen w-full flex justify-center" style={{ backgroundColor: bgColor }}>
-      <div className="w-full max-w-[430px] min-h-screen relative shadow-2xl overflow-x-hidden flex flex-col">
+    <div className="min-h-screen w-full flex justify-center items-start sm:items-center p-0 sm:p-4" style={{ backgroundColor: bgColor, color: textColor }}>
+      <div className="w-full max-w-[430px] min-h-screen sm:min-h-[800px] sm:rounded-[32px] shadow-2xl relative flex flex-col overflow-hidden">
           {/*
             Header Sticky Bar
             Contains: Small Logo (optional), Cart Trigger
