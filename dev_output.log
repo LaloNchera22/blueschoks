@@ -14,8 +14,20 @@ This information is used to shape Next.js' roadmap and prioritize features.
 You can learn more, including how to opt-out if you'd not like to participate in this anonymous program, by visiting the following URL:
 https://nextjs.org/telemetry
 
-✓ Ready in 1119ms
-○ Compiling /test-editor ...
- GET /test-editor 200 in 6.6s (compile: 6.1s, render: 514ms)
-⨯ The requested resource "https://placehold.co/400" has type "image/svg+xml" but dangerouslyAllowSVG is disabled. Consider adding the "unoptimized" property to the <Image>.
-✓ Compiled in 232ms
+✓ Ready in 1537ms
+○ Compiling /test-toolbar ...
+ GET /test-toolbar 200 in 7.4s (compile: 6.9s, render: 534ms)
+TypeError: fetch failed
+    at ignore-listed frames {
+  [cause]: Error: getaddrinfo EAI_AGAIN via.placeholder.com
+      at ignore-listed frames {
+    errno: -3001,
+    code: 'EAI_AGAIN',
+    syscall: 'getaddrinfo',
+    hostname: 'via.placeholder.com'
+  }
+}
+○ Compiling /_error ...
+ GET /_next/image?url=https%3A%2F%2Fvia.placeholder.com%2F400&w=640&q=75 500 in 3.9s (compile: 3.9s, render: 65ms)
+ GET /_next/image?url=https%3A%2F%2Fvia.placeholder.com%2F400&w=640&q=75 500 in 3.9s (compile: 3.9s, render: 66ms)
+✓ Compiled in 133ms
