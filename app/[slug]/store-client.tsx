@@ -22,6 +22,7 @@ import CartSidebar from '@/components/shop/cart-sidebar'
 import { StoreHeader } from '@/components/store/store-header'
 import { ProductCard } from '@/components/store/product-card'
 import { cn } from '@/lib/utils'
+import { FontLoaderListener } from '@/components/ui/font-loader-listener'
 
 type Profile = Database['public']['Tables']['profiles']['Row']
 type Product = Database['public']['Tables']['products']['Row']
@@ -93,6 +94,7 @@ export default function StoreClient({ profile, products, config }: StoreClientPr
 
   return (
     <div className="min-h-screen w-full flex justify-center items-center" style={{ backgroundColor: bgColor, color: textColor }}>
+      <FontLoaderListener config={config} products={products} />
 
       {/* CONTENEDOR PRINCIPAL: Sin bordes blancos, sin bg-white fijo */}
       <div className="w-full max-w-[430px] min-h-screen relative flex flex-col shadow-2xl overflow-hidden">

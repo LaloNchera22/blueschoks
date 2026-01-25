@@ -3,6 +3,7 @@ import { Loader2, Save, Minus, Copy, ChevronDown, X } from 'lucide-react';
 import { ProductStyle } from '@/lib/types/design-system';
 import { Database } from '@/utils/supabase/types';
 import { ColorCircle } from './color-circle';
+import { FontPicker } from './font-picker';
 
 type Product = Database['public']['Tables']['products']['Row'];
 
@@ -123,17 +124,11 @@ export function ProductStylingToolbar({
         <>
           {/* Title Font */}
           <div className="flex flex-col items-center gap-1">
-            <div className="relative">
-              <select
-                value={product.style_config?.titleFont || ''}
-                onChange={(e) => onUpdate('titleFont', e.target.value || undefined)}
-                className="appearance-none bg-gray-50 border border-gray-200 rounded-full h-6 pl-2 pr-6 text-[10px] font-medium focus:outline-none focus:ring-2 focus:ring-black/5 cursor-pointer text-gray-700 hover:bg-gray-100 w-20 truncate"
-              >
-                <option value="">Default</option>
-                {fonts.map(f => <option key={f.value} value={f.value}>{f.name}</option>)}
-              </select>
-              <ChevronDown className="w-2 h-2 absolute right-2 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none" />
-            </div>
+            <FontPicker
+              value={product.style_config?.titleFont || ''}
+              onChange={(val) => onUpdate('titleFont', val || undefined)}
+              className="w-24"
+            />
             <span className="text-[9px] text-gray-500 font-semibold uppercase tracking-wider">Título</span>
           </div>
 
@@ -165,17 +160,11 @@ export function ProductStylingToolbar({
         <>
           {/* Price Font */}
           <div className="flex flex-col items-center gap-1">
-            <div className="relative">
-              <select
-                value={product.style_config?.priceFont || ''}
-                onChange={(e) => onUpdate('priceFont', e.target.value || undefined)}
-                className="appearance-none bg-gray-50 border border-gray-200 rounded-full h-6 pl-2 pr-6 text-[10px] font-medium focus:outline-none focus:ring-2 focus:ring-black/5 cursor-pointer text-gray-700 hover:bg-gray-100 w-20 truncate"
-              >
-                <option value="">Default</option>
-                {fonts.map(f => <option key={f.value} value={f.value}>{f.name}</option>)}
-              </select>
-              <ChevronDown className="w-2 h-2 absolute right-2 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none" />
-            </div>
+            <FontPicker
+              value={product.style_config?.priceFont || ''}
+              onChange={(val) => onUpdate('priceFont', val || undefined)}
+              className="w-24"
+            />
             <span className="text-[9px] text-gray-500 font-semibold uppercase tracking-wider">Precio</span>
           </div>
 
