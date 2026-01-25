@@ -13,7 +13,9 @@ import {
   Music2,
   Smartphone,
   Link as LinkIcon,
-  Send
+  Send,
+  Lock,
+  Store
 } from 'lucide-react'
 import { DesignConfig } from '@/lib/types/design-system'
 import { Database } from '@/utils/supabase/types'
@@ -33,30 +35,15 @@ interface StoreClientProps {
   config: DesignConfig
 }
 
-const OnlyFansIcon = ({ className }: { className?: string }) => (
-  <svg
-    viewBox="0 0 24 24"
-    fill="none"
-    stroke="currentColor"
-    strokeWidth="2"
-    strokeLinecap="round"
-    strokeLinejoin="round"
-    className={className}
-  >
-    <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8zm0-14c-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4-1.79-4-4-4zm0 6c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2z" />
-    <path d="M16.5 14.5c-1.05 0-2.02.34-2.82.91L12.5 14l-1.18 1.41 1.18 1.41c.8-.57 1.77-.91 2.82-.91 1.1 0 2 .9 2 2s-.9 2-2 2-2-.9-2-2" />
-  </svg>
-);
-
 const PLATFORMS = [
   { id: 'instagram', icon: Instagram, label: 'Instagram' },
   { id: 'tiktok', icon: Music2, label: 'TikTok' },
   { id: 'whatsapp', icon: MessageCircle, label: 'WhatsApp' },
   { id: 'telegram', icon: Send, label: 'Telegram' },
-  { id: 'onlyfans', icon: OnlyFansIcon, label: 'OnlyFans' },
+  { id: 'onlyfans', icon: Lock, label: 'OnlyFans' },
   { id: 'twitter', icon: Twitter, label: 'Twitter' },
   { id: 'facebook', icon: Facebook, label: 'Facebook' },
-  { id: 'website', icon: Globe, label: 'Website' },
+  { id: 'website', icon: Store, label: 'Mi Tienda Web' },
   { id: 'email', icon: Mail, label: 'Email' },
   { id: 'other', icon: LinkIcon, label: 'Otro' },
 ]
@@ -164,7 +151,7 @@ export default function StoreClient({ profile, products, config }: StoreClientPr
                                   className="p-3 rounded-full bg-gray-50 text-gray-600 hover:bg-gray-100 hover:text-gray-900 transition-all duration-300 border border-gray-100 shadow-sm"
                                   style={{ color: link.color ? link.color : undefined }}
                                >
-                                   <Icon className="w-5 h-5" />
+                                   <Icon size={28} strokeWidth={1.5} />
                                </Link>
                            )
                        })}
