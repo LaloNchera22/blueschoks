@@ -489,14 +489,15 @@ export default function DesignEditor({ initialConfig, initialProducts, userId, s
         className="absolute top-6 left-1/2 -translate-x-1/2 z-50 w-max mb-4 pointer-events-auto"
         onClick={(e) => e.stopPropagation()}
       >
-        {(activeTool === 'header-title' || activeTool === 'header-bio') ? (
-            <ProfileStylingToolbar
-              activeTool={activeTool}
-              config={config}
-              onUpdateConfig={updateConfig}
-            />
-        ) : (
         <div className="h-14 px-6 rounded-full bg-white/90 shadow-lg border border-gray-200 flex items-center gap-4 transition-all duration-300 ease-out backdrop-blur-md">
+
+          {(activeTool === 'header-title' || activeTool === 'header-bio') && (
+              <ProfileStylingToolbar
+                activeTool={activeTool}
+                config={config}
+                onUpdateConfig={updateConfig}
+              />
+          )}
 
           {/* 1. GLOBAL TOOLS (Default) */}
           {activeTool === 'global' && (
@@ -738,7 +739,6 @@ export default function DesignEditor({ initialConfig, initialProducts, userId, s
             </div>
           )}
         </div>
-        )}
       </div>
 
       {/* --- EDGE-TO-EDGE STORE CONTENT (Full Width/Height Scrollable) --- */}
