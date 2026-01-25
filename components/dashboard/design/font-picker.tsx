@@ -53,6 +53,7 @@ const FontOption = ({ font, isSelected, onClick }: { font: string, isSelected: b
 export function FontPicker({ value, onChange, className }: FontPickerProps) {
   const [isOpen, setIsOpen] = useState(false);
   const [search, setSearch] = useState('');
+  const [visibleCount, setVisibleCount] = useState(50);
   const containerRef = useRef<HTMLDivElement>(null);
 
   // Close on click outside
@@ -71,9 +72,21 @@ export function FontPicker({ value, onChange, className }: FontPickerProps) {
     };
   }, [isOpen]);
 
+  // Reset visible count on search change
+  useEffect(() => {
+    setVisibleCount(50);
+  }, [search]);
+
   const filteredFonts = GOOGLE_FONTS_LIST.filter(font =>
     font.toLowerCase().includes(search.toLowerCase())
   );
+
+  const handleScroll = (e: React.UIEvent<HTMLDivElement>) => {
+    const { scrollTop, scrollHeight, clientHeight } = e.currentTarget;
+    if (scrollHeight - scrollTop <= clientHeight + 200) {
+      setVisibleCount((prev) => Math.min(prev + 50, filteredFonts.length));
+    }
+  };
 
   return (
     <div className={cn("relative", className)} ref={containerRef}>
@@ -102,13 +115,16 @@ export function FontPicker({ value, onChange, className }: FontPickerProps) {
             </div>
           </div>
 
-          <div className="overflow-y-auto flex-1 p-1 custom-scrollbar">
+          <div
+            className="overflow-y-auto flex-1 p-1 custom-scrollbar"
+            onScroll={handleScroll}
+          >
              {filteredFonts.length === 0 ? (
                 <div className="p-4 text-center text-xs text-gray-400">
                    No se encontraron fuentes
                 </div>
              ) : (
-                filteredFonts.map((font) => (
+                filteredFonts.slice(0, visibleCount).map((font) => (
                   <FontOption
                     key={font}
                     font={font}
