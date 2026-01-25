@@ -62,6 +62,9 @@ import { DEFAULT_DESIGN } from '@/utils/design-sanitizer';
 import { ProductStylingToolbar } from './product-styling-toolbar';
 import { ColorCircle } from './color-circle';
 import { ProductCard } from '@/components/store/product-card';
+import { FontPicker } from './font-picker';
+import { FontLoaderListener } from '@/components/ui/font-loader-listener';
+import { GOOGLE_FONTS_LIST } from '@/utils/font-loader';
 
 // --- TYPES ---
 type Product = Database['public']['Tables']['products']['Row'];
@@ -95,15 +98,6 @@ const DUMMY_PRODUCTS = [
   { id: '2', name: 'Gorra Urbana', price: 15.00, image_url: 'https://images.unsplash.com/photo-1588850561407-ed78c282e89b?w=500&auto=format&fit=crop&q=60' },
   { id: '3', name: 'Sneakers Pro', price: 120.00, image_url: 'https://images.unsplash.com/photo-1552346154-21d32810aba3?w=500&auto=format&fit=crop&q=60' },
   { id: '4', name: 'Mochila Viaje', price: 45.00, image_url: 'https://images.unsplash.com/photo-1553062407-98eeb64c6a62?w=500&auto=format&fit=crop&q=60' },
-];
-
-const FONTS = [
-  { name: 'Inter', value: 'Inter' },
-  { name: 'Roboto', value: 'Roboto' },
-  { name: 'Open Sans', value: 'Open Sans' },
-  { name: 'Lato', value: 'Lato' },
-  { name: 'Montserrat', value: 'Montserrat' },
-  { name: 'Playfair', value: 'Playfair Display' },
 ];
 
 const PLATFORMS = [
@@ -439,6 +433,7 @@ export default function DesignEditor({ initialConfig, initialProducts, userId, s
 
   return (
     <div className="w-full h-full relative overflow-hidden flex flex-col items-center justify-center font-sans bg-gray-50">
+      <FontLoaderListener config={config} products={products} />
       <style>{`
         /* Hide Next.js Dev Tools and Toasts in Editor Preview */
         [data-nextjs-toast],
@@ -498,19 +493,13 @@ export default function DesignEditor({ initialConfig, initialProducts, userId, s
               </div>
 
               <div className="flex flex-col items-center gap-1 group">
-                 <div className="relative">
-                    <select
-                      value={config.fonts.body}
-                      onChange={(e) => {
-                        updateConfig(['fonts', 'body'], e.target.value);
-                        updateConfig(['fonts', 'heading'], e.target.value);
-                      }}
-                      className="appearance-none bg-gray-50 border border-gray-200 rounded-full h-8 pl-3 pr-7 text-xs font-medium focus:outline-none focus:ring-2 focus:ring-black/5 cursor-pointer text-gray-700 hover:bg-gray-100 transition-colors"
-                    >
-                      {FONTS.map(f => <option key={f.value} value={f.value}>{f.name}</option>)}
-                    </select>
-                    <ChevronDown className="w-3 h-3 absolute right-2 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none" />
-                 </div>
+                 <FontPicker
+                   value={config.fonts.body}
+                   onChange={(val) => {
+                     updateConfig(['fonts', 'body'], val);
+                     updateConfig(['fonts', 'heading'], val);
+                   }}
+                 />
                  <span className="text-[9px] text-gray-500 font-semibold uppercase tracking-wider group-hover:text-black transition-colors">Fuente</span>
               </div>
 
@@ -540,16 +529,10 @@ export default function DesignEditor({ initialConfig, initialProducts, userId, s
           {(activeTool === 'header-title' || activeTool === 'header-bio') && (
              <div className="flex items-center gap-3 animate-in fade-in slide-in-from-top-2 duration-300">
                {/* Font Family Dropdown */}
-               <div className="relative">
-                  <select
-                    value={(activeTool === 'header-title' ? config.profile.titleStyle?.fontFamily : config.profile.bioStyle?.fontFamily) || (activeTool === 'header-title' ? config.fonts.heading : config.fonts.body)}
-                    onChange={(e) => updateConfig(['profile', activeTool === 'header-title' ? 'titleStyle' : 'bioStyle', 'fontFamily'], e.target.value)}
-                    className="appearance-none bg-gray-50 border border-gray-200 rounded-full h-8 pl-3 pr-7 text-xs font-medium focus:outline-none focus:ring-2 focus:ring-black/5 cursor-pointer text-gray-700 hover:bg-gray-100 transition-colors w-24 truncate"
-                  >
-                    {FONTS.map(f => <option key={f.value} value={f.value}>{f.name}</option>)}
-                  </select>
-                  <ChevronDown className="w-3 h-3 absolute right-2 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none" />
-               </div>
+               <FontPicker
+                 value={(activeTool === 'header-title' ? config.profile.titleStyle?.fontFamily : config.profile.bioStyle?.fontFamily) || (activeTool === 'header-title' ? config.fonts.heading : config.fonts.body)}
+                 onChange={(val) => updateConfig(['profile', activeTool === 'header-title' ? 'titleStyle' : 'bioStyle', 'fontFamily'], val)}
+               />
 
                {/* Separator */}
                <div className="w-px h-6 bg-gray-300" />
@@ -807,7 +790,7 @@ export default function DesignEditor({ initialConfig, initialProducts, userId, s
                   setSelection(null);
                 }}
                 isSaving={isSavingProduct}
-                fonts={FONTS}
+                fonts={GOOGLE_FONTS_LIST.map(f => ({ name: f, value: f }))}
                 defaultColors={{
                   title: config.cardStyle?.titleColor || config.colors.text,
                   price: config.cardStyle?.priceColor || config.colors.primary,
