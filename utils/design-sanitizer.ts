@@ -74,7 +74,7 @@ export function sanitizeDesign(raw: any, profileFallback?: any): DesignConfig {
     },
     socialLinks: raw.socialLinks.map((link: any): LinkItem => ({
       id: typeof link.id === 'string' ? link.id : Math.random().toString(36).substr(2, 9),
-      platform: ['instagram', 'tiktok', 'twitter', 'facebook', 'website', 'whatsapp', 'other'].includes(link.platform) ? link.platform : 'website',
+      platform: ['instagram', 'tiktok', 'twitter', 'facebook', 'website', 'whatsapp', 'onlyfans', 'telegram', 'email', 'other'].includes(link.platform) ? link.platform : 'website',
       url: typeof link.url === 'string' ? link.url : '',
       label: typeof link.label === 'string' ? link.label : '',
       active: typeof link.active === 'boolean' ? link.active : true,

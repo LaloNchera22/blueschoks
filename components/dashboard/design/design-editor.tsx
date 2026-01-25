@@ -33,7 +33,9 @@ import {
   ExternalLink,
   Upload,
   Copy,
-  Send
+  Send,
+  Lock,
+  Store
 } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { createClient } from '@/utils/supabase/client';
@@ -110,30 +112,15 @@ const FONTS = [
   { name: 'Playfair', value: 'Playfair Display' },
 ];
 
-const OnlyFansIcon = ({ className }: { className?: string }) => (
-  <svg
-    viewBox="0 0 24 24"
-    fill="none"
-    stroke="currentColor"
-    strokeWidth="2"
-    strokeLinecap="round"
-    strokeLinejoin="round"
-    className={className}
-  >
-    <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8zm0-14c-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4-1.79-4-4-4zm0 6c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2z" />
-    <path d="M16.5 14.5c-1.05 0-2.02.34-2.82.91L12.5 14l-1.18 1.41 1.18 1.41c.8-.57 1.77-.91 2.82-.91 1.1 0 2 .9 2 2s-.9 2-2 2-2-.9-2-2" />
-  </svg>
-);
-
 const PLATFORMS = [
   { id: 'instagram', icon: Instagram, label: 'Instagram', placeholder: 'https://instagram.com/usuario' },
   { id: 'tiktok', icon: Music2, label: 'TikTok', placeholder: 'https://tiktok.com/@usuario' },
   { id: 'whatsapp', icon: MessageCircle, label: 'WhatsApp', placeholder: 'https://wa.me/...' },
   { id: 'telegram', label: 'Telegram', icon: Send, placeholder: 'https://t.me/tu_usuario', prefix: 'https://t.me/' },
-  { id: 'onlyfans', label: 'OnlyFans', icon: OnlyFansIcon, placeholder: 'https://onlyfans.com/tu_usuario', prefix: 'https://onlyfans.com/' },
+  { id: 'onlyfans', label: 'OnlyFans', icon: Lock, placeholder: 'https://onlyfans.com/tu_usuario', prefix: 'https://onlyfans.com/' },
   { id: 'twitter', icon: Twitter, label: 'Twitter', placeholder: 'https://twitter.com/usuario' },
   { id: 'facebook', icon: Facebook, label: 'Facebook', placeholder: 'https://facebook.com/usuario' },
-  { id: 'website', icon: Globe, label: 'Website', placeholder: 'https://...' },
+  { id: 'website', icon: Store, label: 'Mi Tienda Web', placeholder: 'https://...' },
   { id: 'email', icon: Mail, label: 'Email', placeholder: 'mailto:...' },
   { id: 'other', icon: LinkIcon, label: 'Otro', placeholder: 'https://...' },
 ];
@@ -934,7 +921,7 @@ export default function DesignEditor({ initialConfig, initialProducts, userId, s
                                   )}
                                   style={{ color: link.color ? link.color : undefined }}
                                >
-                                   <Icon className="w-5 h-5" />
+                                   <Icon size={28} strokeWidth={1.5} />
                                </button>
                            )
                        })}
