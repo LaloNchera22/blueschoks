@@ -61,6 +61,7 @@ import { Database } from '@/utils/supabase/types';
 import { cn } from '@/lib/utils';
 import { DEFAULT_DESIGN } from '@/utils/design-sanitizer';
 import { ProductStylingToolbar } from './product-styling-toolbar';
+import { ProfileStylingToolbar } from './profile-styling-toolbar';
 import { ColorCircle } from './color-circle';
 import { ProductCard } from '@/components/store/product-card';
 import { FontPicker } from './font-picker';
@@ -501,6 +502,13 @@ export default function DesignEditor({ initialConfig, initialProducts, userId, s
         className="absolute top-6 left-1/2 -translate-x-1/2 z-50 w-max mb-4 pointer-events-auto"
         onClick={(e) => e.stopPropagation()}
       >
+        {(activeTool === 'header-title' || activeTool === 'header-bio') ? (
+            <ProfileStylingToolbar
+              activeTool={activeTool}
+              config={config}
+              onUpdateConfig={updateConfig}
+            />
+        ) : (
         <div className="h-14 px-6 rounded-full bg-white/90 shadow-lg border border-gray-200 flex items-center gap-4 transition-all duration-300 ease-out backdrop-blur-md">
 
           {/* 1. GLOBAL TOOLS (Default) */}
@@ -552,103 +560,6 @@ export default function DesignEditor({ initialConfig, initialProducts, userId, s
             </div>
           )}
 
-          {/* 2. RICH TEXT TOOLS (Header Title & Bio) */}
-          {(activeTool === 'header-title' || activeTool === 'header-bio') && (
-             <div className="flex items-center gap-3 animate-in fade-in slide-in-from-top-2 duration-300">
-               {/* Font Family Dropdown */}
-               <FontPicker
-                 value={(activeTool === 'header-title' ? config.profile.titleStyle?.fontFamily : config.profile.bioStyle?.fontFamily) || (activeTool === 'header-title' ? config.fonts.heading : config.fonts.body)}
-                 onChange={(val) => updateConfig(['profile', activeTool === 'header-title' ? 'titleStyle' : 'bioStyle', 'fontFamily'], val)}
-               />
-
-               {/* Separator */}
-               <div className="w-px h-6 bg-gray-300" />
-
-               {/* Style Toggles (Bold/Italic) */}
-               <div className="flex items-center bg-gray-50 rounded-lg p-0.5 border border-gray-200">
-                  <button
-                    onClick={() => {
-                        const styleKey = activeTool === 'header-title' ? 'titleStyle' : 'bioStyle';
-                        const current = activeTool === 'header-title' ? config.profile.titleStyle?.bold : config.profile.bioStyle?.bold;
-                        updateConfig(['profile', styleKey, 'bold'], !current);
-                    }}
-                    className={cn(
-                      "w-7 h-7 flex items-center justify-center rounded-md transition-all",
-                      (activeTool === 'header-title' ? config.profile.titleStyle?.bold : config.profile.bioStyle?.bold) ? "bg-white shadow-sm text-black" : "text-gray-500 hover:text-black"
-                    )}
-                  >
-                    <Bold className="w-4 h-4" />
-                  </button>
-                  <button
-                    onClick={() => {
-                        const styleKey = activeTool === 'header-title' ? 'titleStyle' : 'bioStyle';
-                        const current = activeTool === 'header-title' ? config.profile.titleStyle?.italic : config.profile.bioStyle?.italic;
-                        updateConfig(['profile', styleKey, 'italic'], !current);
-                    }}
-                    className={cn(
-                      "w-7 h-7 flex items-center justify-center rounded-md transition-all",
-                      (activeTool === 'header-title' ? config.profile.titleStyle?.italic : config.profile.bioStyle?.italic) ? "bg-white shadow-sm text-black" : "text-gray-500 hover:text-black"
-                    )}
-                  >
-                    <Italic className="w-4 h-4" />
-                  </button>
-               </div>
-
-               {/* Alignment Group */}
-               <div className="flex items-center bg-gray-50 rounded-lg p-0.5 border border-gray-200">
-                  {['left', 'center', 'right'].map((align) => (
-                    <button
-                      key={align}
-                      onClick={() => updateConfig(['profile', activeTool === 'header-title' ? 'titleStyle' : 'bioStyle', 'align'], align)}
-                      className={cn(
-                        "w-7 h-7 flex items-center justify-center rounded-md transition-all",
-                        ((activeTool === 'header-title' ? config.profile.titleStyle?.align : config.profile.bioStyle?.align) || 'center') === align ? "bg-white shadow-sm text-black" : "text-gray-500 hover:text-black"
-                      )}
-                    >
-                      {align === 'left' && <AlignLeft className="w-4 h-4" />}
-                      {align === 'center' && <AlignCenter className="w-4 h-4" />}
-                      {align === 'right' && <AlignRight className="w-4 h-4" />}
-                    </button>
-                  ))}
-               </div>
-
-               {/* Separator */}
-               <div className="w-px h-6 bg-gray-300" />
-
-               {/* Color */}
-               <ColorCircle
-                  color={(activeTool === 'header-title' ? config.profile.titleStyle?.color : config.profile.bioStyle?.color) || config.colors.text}
-                  onChange={(c) => updateConfig(['profile', activeTool === 'header-title' ? 'titleStyle' : 'bioStyle', 'color'], c)}
-               />
-
-               {/* Size (Simple +/-) */}
-               <div className="flex items-center gap-1 bg-gray-50 rounded-full border border-gray-200 px-1 ml-1">
-                  <button
-                    onClick={() => {
-                        const styleKey = activeTool === 'header-title' ? 'titleStyle' : 'bioStyle';
-                        const currentSize = (activeTool === 'header-title' ? config.profile.titleStyle?.size : config.profile.bioStyle?.size) || (activeTool === 'header-title' ? 24 : 14);
-                        updateConfig(['profile', styleKey, 'size'], Math.max(10, currentSize - 1));
-                    }}
-                    className="w-6 h-6 flex items-center justify-center text-gray-500 hover:text-black"
-                  >
-                    <Minus className="w-3 h-3" />
-                  </button>
-                  <span className="text-[10px] font-medium w-4 text-center">
-                    {(activeTool === 'header-title' ? config.profile.titleStyle?.size : config.profile.bioStyle?.size) || (activeTool === 'header-title' ? 24 : 14)}
-                  </span>
-                   <button
-                    onClick={() => {
-                        const styleKey = activeTool === 'header-title' ? 'titleStyle' : 'bioStyle';
-                        const currentSize = (activeTool === 'header-title' ? config.profile.titleStyle?.size : config.profile.bioStyle?.size) || (activeTool === 'header-title' ? 24 : 14);
-                        updateConfig(['profile', styleKey, 'size'], Math.min(64, currentSize + 1));
-                    }}
-                    className="w-6 h-6 flex items-center justify-center text-gray-500 hover:text-black"
-                  >
-                     <Type className="w-3 h-3" />
-                  </button>
-               </div>
-             </div>
-          )}
 
           {/* 3. HEADER AVATAR TOOLS (Existing, but moved to top) */}
           {activeTool === 'header-avatar' && (
@@ -840,6 +751,7 @@ export default function DesignEditor({ initialConfig, initialProducts, userId, s
             </div>
           )}
         </div>
+        )}
       </div>
 
       {/* --- EDGE-TO-EDGE STORE CONTENT (Full Width/Height Scrollable) --- */}

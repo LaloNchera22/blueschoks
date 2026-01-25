@@ -14,9 +14,9 @@ This information is used to shape Next.js' roadmap and prioritize features.
 You can learn more, including how to opt-out if you'd not like to participate in this anonymous program, by visiting the following URL:
 https://nextjs.org/telemetry
 
-✓ Ready in 1167ms
-○ Compiling /test-design ...
- GET /test-design 200 in 7.7s (compile: 7.1s, render: 597ms)
+✓ Ready in 1176ms
+○ Compiling /test-editor ...
+ GET /test-editor 200 in 8.0s (compile: 7.4s, render: 556ms)
 TypeError: fetch failed
     at ignore-listed frames {
   [cause]: Error: getaddrinfo EAI_AGAIN via.placeholder.com
@@ -27,43 +27,6 @@ TypeError: fetch failed
     hostname: 'via.placeholder.com'
   }
 }
- GET /test-design 200 in 159ms (compile: 13ms, render: 146ms)
-TypeError: fetch failed
-    at ignore-listed frames {
-  [cause]: Error: getaddrinfo EAI_AGAIN via.placeholder.com
-      at ignore-listed frames {
-    errno: -3001,
-    code: 'EAI_AGAIN',
-    syscall: 'getaddrinfo',
-    hostname: 'via.placeholder.com'
-  }
-}
- GET /_next/image?url=https%3A%2F%2Fvia.placeholder.com%2F400&w=640&q=75 500 in 257ms (compile: 219ms, render: 38ms)
- GET /_next/image?url=https%3A%2F%2Fvia.placeholder.com%2F400&w=640&q=75 500 in 257ms (compile: 219ms, render: 38ms)
- GET /test-design 200 in 136ms (compile: 9ms, render: 127ms)
-TypeError: fetch failed
-    at ignore-listed frames {
-  [cause]: Error: getaddrinfo EAI_AGAIN via.placeholder.com
-      at ignore-listed frames {
-    errno: -3001,
-    code: 'EAI_AGAIN',
-    syscall: 'getaddrinfo',
-    hostname: 'via.placeholder.com'
-  }
-}
- GET /_next/image?url=https%3A%2F%2Fvia.placeholder.com%2F400&w=640&q=75 500 in 191ms (compile: 166ms, render: 25ms)
- GET /_next/image?url=https%3A%2F%2Fvia.placeholder.com%2F400&w=640&q=75 500 in 191ms (compile: 166ms, render: 25ms)
- GET /test-design 200 in 108ms (compile: 5ms, render: 103ms)
-TypeError: fetch failed
-    at ignore-listed frames {
-  [cause]: Error: getaddrinfo EAI_AGAIN via.placeholder.com
-      at ignore-listed frames {
-    errno: -3001,
-    code: 'EAI_AGAIN',
-    syscall: 'getaddrinfo',
-    hostname: 'via.placeholder.com'
-  }
-}
- GET /_next/image?url=https%3A%2F%2Fvia.placeholder.com%2F400&w=640&q=75 500 in 252ms (compile: 229ms, render: 23ms)
- GET /_next/image?url=https%3A%2F%2Fvia.placeholder.com%2F400&w=640&q=75 500 in 252ms (compile: 229ms, render: 24ms)
-✓ Compiled in 159ms
+ GET /_next/image?url=https%3A%2F%2Fvia.placeholder.com%2F400&w=640&q=75 500 in 2.5s (compile: 2.5s, render: 77ms)
+ GET /_next/image?url=https%3A%2F%2Fvia.placeholder.com%2F400&w=640&q=75 500 in 2.5s (compile: 2.5s, render: 77ms)
+✓ Compiled in 118ms
