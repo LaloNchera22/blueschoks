@@ -20,7 +20,6 @@ export function ProductCard({ product, config, onSelectElement, onAddToCart }: P
   const [imgIndex, setImgIndex] = useState(0)
 
   // Carousel Logic
-  // Use images array if available and not empty, otherwise fallback to image_url
   const images = (product.images && product.images.length > 0)
     ? product.images
     : (product.image_url ? [product.image_url] : [])
@@ -35,8 +34,18 @@ export function ProductCard({ product, config, onSelectElement, onAddToCart }: P
     setImgIndex(curr => (curr + 1) % images.length)
   }
 
-  // Styles Resolution
+  // 1. Lógica de Estilos
   const style = product.style_config || {}
+
+  // Fondos: Si es transparent, usa la keyword 'transparent'. Si es undefined, usa blanco.
+  const cardBg = (style.cardBackground === 'transparent' || style.cardBackground === 'rgba(0,0,0,0)')
+    ? 'transparent'
+    : (style.cardBackground || '#ffffff');
+
+  const descBg = (style.descriptionBackground === 'transparent' || style.descriptionBackground === 'rgba(0,0,0,0)')
+    ? 'transparent'
+    : (style.descriptionBackground || '#ffffff');
+
   const cardStyle = config?.cardStyle || {
       borderRadius: 16,
       buttonColor: '#000000',
@@ -45,11 +54,6 @@ export function ProductCard({ product, config, onSelectElement, onAddToCart }: P
       titleColor: '#1f2937'
   }
   const globalColors = config?.colors || { cardBackground: '#ffffff', text: '#1f2937' }
-
-  // Background
-  const isTransparent = style.cardBackground === 'transparent'
-  const bgColor = isTransparent ? 'transparent' : (style.cardBackground || globalColors.cardBackground || '#ffffff')
-  const borderColor = isTransparent ? 'none' : `1px solid ${(cardStyle as any).borderColor || 'rgba(0,0,0,0.05)'}`
 
   // Fonts & Colors (Granular > Global Fallback)
   const titleFont = style.titleFont
@@ -61,28 +65,17 @@ export function ProductCard({ product, config, onSelectElement, onAddToCart }: P
   const btnBg = style.cartBtnBackground || cardStyle.buttonColor || '#000000'
   const btnColor = style.cartBtnColor || cardStyle.buttonTextColor || '#ffffff'
 
-  // Description Background (Footer)
-  const descBg = style.descriptionBackground === 'transparent'
-    ? 'transparent'
-    : (style.descriptionBackground || style.footerBackground || '#ffffff')
-
   return (
     <div
-      className={cn(
-        "h-full flex flex-col relative overflow-hidden transition-all duration-300 group",
-        isTransparent ? "" : "rounded-2xl shadow-sm hover:shadow-md"
-      )}
-      style={{
-        backgroundColor: bgColor,
-        border: borderColor
-      }}
+      className={`
+        h-full flex flex-col relative overflow-hidden transition-all duration-300 group
+        ${cardBg === 'transparent' ? '' : 'rounded-2xl shadow-sm'}
+      `}
+      style={{ backgroundColor: cardBg }}
       onClick={() => onSelectElement && onSelectElement('container')}
     >
       {/* --- ZONA IMAGEN (CARRUSEL) --- */}
-      <div className={cn(
-          "relative w-full aspect-square bg-gray-100 overflow-hidden",
-          isTransparent ? "rounded-xl" : ""
-      )}>
+      <div className={`relative w-full aspect-square bg-gray-100 overflow-hidden ${cardBg === 'transparent' ? 'rounded-xl' : ''}`}>
         {images.length > 0 ? (
            <Image
              src={images[imgIndex]}
@@ -117,10 +110,7 @@ export function ProductCard({ product, config, onSelectElement, onAddToCart }: P
 
       {/* --- FOOTER (INFO + BOTÓN CUSTOM) --- */}
       <div
-        className={cn(
-            "p-3 flex justify-between items-end gap-2 flex-grow transition-colors relative",
-            (style.descriptionBackground || style.footerBackground) && "transition-colors"
-        )}
+        className="p-3 flex justify-between items-end gap-2 flex-grow transition-colors relative"
         style={{ backgroundColor: descBg }}
         onClick={(e) => {
             e.stopPropagation();
@@ -158,7 +148,7 @@ export function ProductCard({ product, config, onSelectElement, onAddToCart }: P
           style={{
             backgroundColor: btnBg,
             color: btnColor,
-            borderColor: btnColor === '#ffffff' ? 'rgba(0,0,0,0.1)' : btnColor // Subtle border if white to separate from card
+            borderColor: btnColor === '#ffffff' ? 'rgba(0,0,0,0.1)' : btnColor
           }}
         >
           <ShoppingBag size={16} />
