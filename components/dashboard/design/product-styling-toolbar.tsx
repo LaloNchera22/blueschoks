@@ -114,6 +114,27 @@ export function ProductStylingToolbar({
                    </div>
                 </div>
 
+                <div className="h-px bg-gray-100 w-full" />
+
+                {/* 3. Image Shape */}
+                <div>
+                   <label className="text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-2 block">Forma Imagen</label>
+                   <div className="flex bg-gray-100 p-1 rounded-lg">
+                     <button
+                       onClick={(e) => { e.stopPropagation(); onUpdate('imageShape', 'square'); }}
+                       className={`flex-1 py-1.5 text-xs font-medium rounded-md transition-all ${product.style_config?.imageShape === 'square' ? 'bg-white shadow text-black' : 'text-gray-500 hover:text-gray-700'}`}
+                     >
+                       Cuadrada
+                     </button>
+                     <button
+                       onClick={(e) => { e.stopPropagation(); onUpdate('imageShape', 'rounded'); }}
+                       className={`flex-1 py-1.5 text-xs font-medium rounded-md transition-all ${(!product.style_config?.imageShape || product.style_config?.imageShape === 'rounded') ? 'bg-white shadow text-black' : 'text-gray-500 hover:text-gray-700'}`}
+                     >
+                       Redondeada
+                     </button>
+                   </div>
+                </div>
+
              </div>
           </div>
         );

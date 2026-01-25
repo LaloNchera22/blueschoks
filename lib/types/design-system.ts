@@ -34,6 +34,7 @@ export interface ProductStyle {
   cartBtnBackground?: string;
   cartBtnColor?: string;
   borderColor?: string;
+  imageShape?: 'square' | 'rounded';
 }
 
 export interface TextStyle {

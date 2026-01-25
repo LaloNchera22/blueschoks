@@ -85,7 +85,9 @@ export function ProductCard({ product, config, onSelectElement, onAddToCart }: P
       onClick={() => onSelectElement && onSelectElement('container')}
     >
       {/* --- ZONA IMAGEN (CARRUSEL) --- */}
-      <div className={`relative w-full aspect-square bg-gray-100 overflow-hidden ${cardBg === 'transparent' ? 'rounded-xl' : ''}`}>
+      <div className={`relative w-full aspect-square bg-gray-100 overflow-hidden transition-all ${
+        style.imageShape === 'square' ? 'rounded-none' : 'rounded-xl'
+      }`}>
 
         {/* IMAGEN ACTUAL */}
         <Image
