@@ -1,6 +1,6 @@
 export interface LinkItem {
   id: string;
-  platform: 'instagram' | 'tiktok' | 'twitter' | 'facebook' | 'website' | 'whatsapp' | 'other';
+  platform: 'instagram' | 'tiktok' | 'twitter' | 'facebook' | 'website' | 'whatsapp' | 'telegram' | 'onlyfans' | 'other';
   url: string;
   label: string;
   active: boolean;
