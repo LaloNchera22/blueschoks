@@ -39,14 +39,18 @@ export function ProductCard({ product, config, onSelectElement, onAddToCart }: P
   // 4. Lógica de Estilos
   const style = product.style_config || {}
 
-  // Fondos: Si es transparent, usa la keyword 'transparent'. Si es undefined, usa blanco.
-  const cardBg = (style.cardBackground === 'transparent' || style.cardBackground === 'rgba(0,0,0,0)')
-    ? 'transparent'
-    : (style.cardBackground || '#ffffff');
+  // Helper para asegurar transparencia real
+  const getBgStyle = (colorValue: string | undefined) => {
+    if (!colorValue || colorValue === 'transparent' || colorValue === 'rgba(0,0,0,0)') {
+      return 'transparent';
+    }
+    return colorValue;
+  };
 
-  const descBg = (style.descriptionBackground === 'transparent' || style.descriptionBackground === 'rgba(0,0,0,0)')
-    ? 'transparent'
-    : (style.descriptionBackground || '#ffffff');
+  const cardBg = getBgStyle(style.cardBackground);
+  const descBg = getBgStyle(style.descriptionBackground);
+  // Detectamos si es transparente para quitar bordes/sombras
+  const isCardTransparent = cardBg === 'transparent';
 
   const cardStyle = config?.cardStyle || {
       borderRadius: 16,
@@ -69,11 +73,15 @@ export function ProductCard({ product, config, onSelectElement, onAddToCart }: P
 
   return (
     <div
+      // ⚠️ ASEGURARSE: AQUÍ NO DEBE HABER NINGÚN 'bg-white' o similar.
       className={`
         h-full flex flex-col relative overflow-hidden transition-all duration-300 group
-        ${cardBg === 'transparent' ? '' : 'rounded-2xl shadow-sm'}
+        ${isCardTransparent ? '' : 'rounded-2xl shadow-sm'}
       `}
-      style={{ backgroundColor: cardBg }}
+      style={{
+         backgroundColor: cardBg,
+         border: isCardTransparent ? 'none' : `1px solid ${style.borderColor || 'rgba(0,0,0,0.05)'}`
+      }}
       onClick={() => onSelectElement && onSelectElement('container')}
     >
       {/* --- ZONA IMAGEN (CARRUSEL) --- */}
@@ -120,7 +128,8 @@ export function ProductCard({ product, config, onSelectElement, onAddToCart }: P
 
       {/* --- FOOTER (INFO + BOTÓN CUSTOM) --- */}
       <div
-        className="p-3 flex justify-between items-end gap-2 flex-grow transition-colors relative"
+        // ⚠️ ASEGURARSE: AQUÍ TAMPOCO DEBE HABER 'bg-*' classes.
+        className="p-3 flex justify-between items-end gap-2 flex-grow relative transition-colors"
         style={{ backgroundColor: descBg }}
         onClick={(e) => {
             e.stopPropagation();
