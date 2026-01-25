@@ -5,13 +5,14 @@ import { useSearchParams } from "next/navigation"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
-import { ArrowLeft, Store, User, Phone, Globe, Edit3, Mail, Lock } from "lucide-react"
+import { ArrowLeft, Store, User, Phone, Globe, Edit3, Mail, Lock, AlertCircle } from "lucide-react"
 import { useState, useEffect, Suspense, useRef } from "react"
 import { signup } from "@/app/register/actions"
 import { createClient } from "@/utils/supabase/client"
 
 function RegisterForm() {
   const searchParams = useSearchParams()
+  const message = searchParams.get("message")
   const slugInputRef = useRef<HTMLInputElement>(null)
   
   const [shopName, setShopName] = useState("")
@@ -167,6 +168,13 @@ function RegisterForm() {
                 </div>
             </div>
         </div>
+
+        {message && (
+          <div className="p-3 bg-red-50 text-red-600 text-xs rounded-md flex items-center gap-2 border border-red-100 font-bold">
+            <AlertCircle className="w-4 h-4" />
+            {message}
+          </div>
+        )}
 
         <Button type="submit" className="w-full h-10 font-bold bg-[#0F172A] hover:bg-slate-800 text-sm mt-1">
           Crear Tienda Gratis
