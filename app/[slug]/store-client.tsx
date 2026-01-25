@@ -14,9 +14,9 @@ import {
   Smartphone,
   Link as LinkIcon,
   Send,
-  Lock,
   Store
 } from 'lucide-react'
+import { OnlyFansLogo } from '@/components/icons/onlyfans-logo'
 import { DesignConfig } from '@/lib/types/design-system'
 import { Database } from '@/utils/supabase/types'
 import { useCart } from '@/components/shop/cart-context'
@@ -40,7 +40,7 @@ const PLATFORMS = [
   { id: 'tiktok', icon: Music2, label: 'TikTok' },
   { id: 'whatsapp', icon: MessageCircle, label: 'WhatsApp' },
   { id: 'telegram', icon: Send, label: 'Telegram' },
-  { id: 'onlyfans', icon: Lock, label: 'OnlyFans' },
+  { id: 'onlyfans', icon: OnlyFansLogo, label: 'OnlyFans' },
   { id: 'twitter', icon: Twitter, label: 'Twitter' },
   { id: 'facebook', icon: Facebook, label: 'Facebook' },
   { id: 'website', icon: Store, label: 'Mi Tienda Web' },

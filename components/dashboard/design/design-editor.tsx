@@ -34,9 +34,9 @@ import {
   Upload,
   Copy,
   Send,
-  Lock,
   Store
 } from 'lucide-react';
+import { OnlyFansLogo } from '@/components/icons/onlyfans-logo';
 import { useRouter } from 'next/navigation';
 import { createClient } from '@/utils/supabase/client';
 import {
@@ -118,7 +118,7 @@ const PLATFORMS = [
   { id: 'tiktok', icon: Music2, label: 'TikTok', placeholder: 'https://tiktok.com/@usuario' },
   { id: 'whatsapp', icon: MessageCircle, label: 'WhatsApp', placeholder: 'https://wa.me/...' },
   { id: 'telegram', label: 'Telegram', icon: Send, placeholder: 'https://t.me/tu_usuario', prefix: 'https://t.me/' },
-  { id: 'onlyfans', label: 'OnlyFans', icon: Lock, placeholder: 'https://onlyfans.com/tu_usuario', prefix: 'https://onlyfans.com/' },
+  { id: 'onlyfans', label: 'OnlyFans', icon: OnlyFansLogo, placeholder: 'https://onlyfans.com/tu_usuario', prefix: 'https://onlyfans.com/', color: '#00AFF0' },
   { id: 'twitter', icon: Twitter, label: 'Twitter', placeholder: 'https://twitter.com/usuario' },
   { id: 'facebook', icon: Facebook, label: 'Facebook', placeholder: 'https://facebook.com/usuario' },
   { id: 'website', icon: Store, label: 'Mi Tienda Web', placeholder: 'https://...' },
@@ -379,13 +379,14 @@ export default function DesignEditor({ initialConfig, initialProducts, userId, s
 
   // Socials Management Logic
   const handleAddSocial = (platform: LinkItem['platform']) => {
+    const platformDef = PLATFORMS.find(p => p.id === platform);
     const newLink: LinkItem = {
       id: Math.random().toString(36).substr(2, 9),
       platform,
       url: '',
       label: platform,
       active: true,
-      color: '#000000'
+      color: (platformDef as any)?.color || '#000000'
     };
     updateConfig(['socialLinks'], [...config.socialLinks, newLink]);
   };
