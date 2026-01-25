@@ -5,7 +5,6 @@ import Image from 'next/image'
 import { ChevronLeft, ChevronRight, ShoppingBag } from 'lucide-react'
 import { Database } from '@/utils/supabase/types'
 import { DesignConfig } from '@/lib/types/design-system'
-import { cn } from '@/lib/utils'
 
 type Product = Database['public']['Tables']['products']['Row']
 
@@ -17,24 +16,27 @@ interface ProductCardProps {
 }
 
 export function ProductCard({ product, config, onSelectElement, onAddToCart }: ProductCardProps) {
-  const [imgIndex, setImgIndex] = useState(0)
+  // 1. ESTADO PARA EL CARRUSEL
+  const [currentImg, setCurrentImg] = useState(0)
 
-  // Carousel Logic
+  // 2. NORMALIZACIÓN DE IMÁGENES
+  // Si product.images existe y tiene items, úsalo. Si no, usa la imagen principal o fallback.
   const images = (product.images && product.images.length > 0)
     ? product.images
-    : (product.image_url ? [product.image_url] : [])
+    : [product.image_url || 'https://via.placeholder.com/400']
 
+  // 3. HANDLERS DE NAVEGACIÓN
   const handlePrev = (e: React.MouseEvent) => {
-    e.stopPropagation()
-    setImgIndex(curr => curr === 0 ? images.length - 1 : curr - 1)
+    e.stopPropagation() // Evita seleccionar la tarjeta
+    setCurrentImg((prev) => (prev === 0 ? images.length - 1 : prev - 1))
   }
 
   const handleNext = (e: React.MouseEvent) => {
-    e.stopPropagation()
-    setImgIndex(curr => (curr + 1) % images.length)
+    e.stopPropagation() // Evita seleccionar la tarjeta
+    setCurrentImg((prev) => (prev + 1) % images.length)
   }
 
-  // 1. Lógica de Estilos
+  // 4. Lógica de Estilos
   const style = product.style_config || {}
 
   // Helper para asegurar transparencia real
@@ -83,35 +85,43 @@ export function ProductCard({ product, config, onSelectElement, onAddToCart }: P
       onClick={() => onSelectElement && onSelectElement('container')}
     >
       {/* --- ZONA IMAGEN (CARRUSEL) --- */}
-      <div className={`relative w-full aspect-square bg-gray-100 overflow-hidden ${isCardTransparent ? 'rounded-xl' : ''}`}>
-        {images.length > 0 ? (
-           <Image
-             src={images[imgIndex]}
-             alt={product.name}
-             fill
-             className="object-cover transition-transform duration-700 group-hover:scale-105"
-             sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
-           />
-        ) : (
-           <div className="flex h-full w-full items-center justify-center text-gray-300 bg-gray-50">
-             <span className="text-xs font-medium">Sin imagen</span>
-           </div>
-        )}
+      <div className={`relative w-full aspect-square bg-gray-100 overflow-hidden ${cardBg === 'transparent' ? 'rounded-xl' : ''}`}>
 
+        {/* IMAGEN ACTUAL */}
+        <Image
+          src={images[currentImg]}
+          alt={product.name}
+          fill
+          className="object-cover transition-transform duration-500 group-hover:scale-105"
+          sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+        />
+
+        {/* CONTROLES DEL CARRUSEL (Solo si hay más de 1 foto) */}
         {images.length > 1 && (
           <>
             <button
-                onClick={handlePrev}
-                className="absolute left-2 top-1/2 -translate-y-1/2 bg-white/90 hover:bg-white p-1.5 rounded-full opacity-0 group-hover:opacity-100 transition-opacity z-10 shadow-sm text-black"
+              onClick={handlePrev}
+              className="absolute left-2 top-1/2 -translate-y-1/2 w-8 h-8 bg-white/80 hover:bg-white rounded-full flex items-center justify-center shadow-sm opacity-0 group-hover:opacity-100 transition-opacity z-10 backdrop-blur-sm"
             >
-                <ChevronLeft size={16}/>
+              <ChevronLeft size={18} className="text-black" />
             </button>
+
             <button
-                onClick={handleNext}
-                className="absolute right-2 top-1/2 -translate-y-1/2 bg-white/90 hover:bg-white p-1.5 rounded-full opacity-0 group-hover:opacity-100 transition-opacity z-10 shadow-sm text-black"
+              onClick={handleNext}
+              className="absolute right-2 top-1/2 -translate-y-1/2 w-8 h-8 bg-white/80 hover:bg-white rounded-full flex items-center justify-center shadow-sm opacity-0 group-hover:opacity-100 transition-opacity z-10 backdrop-blur-sm"
             >
-                <ChevronRight size={16}/>
+              <ChevronRight size={18} className="text-black" />
             </button>
+
+            {/* INDICADOR DE PUNTOS */}
+            <div className="absolute bottom-2 left-0 right-0 flex justify-center gap-1 z-10">
+              {images.map((_, idx) => (
+                <div
+                  key={idx}
+                  className={`w-1.5 h-1.5 rounded-full shadow-sm transition-colors ${idx === currentImg ? 'bg-white' : 'bg-white/50'}`}
+                />
+              ))}
+            </div>
           </>
         )}
       </div>
