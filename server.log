@@ -1,0 +1,14 @@
+
+> blueshock@0.1.0 dev
+> next dev -H 0.0.0.0
+
+▲ Next.js 16.1.4 (Turbopack)
+- Local:         http://localhost:3000
+- Network:       http://0.0.0.0:3000
+- Experiments (use with caution):
+  · serverActions
+
+✓ Starting...
+✓ Ready in 1059ms
+ GET /test-font-picker 200 in 3.4s (compile: 3.2s, render: 229ms)
+ GET /test-font-picker 200 in 258ms (compile: 137ms, render: 121ms)

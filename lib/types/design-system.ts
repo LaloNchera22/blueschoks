@@ -33,6 +33,7 @@ export interface ProductStyle {
   priceColor?: string;
   cartBtnBackground?: string;
   cartBtnColor?: string;
+  borderColor?: string;
 }
 
 export interface TextStyle {
