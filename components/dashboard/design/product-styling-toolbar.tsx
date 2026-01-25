@@ -1,5 +1,5 @@
 import React from 'react';
-import { Loader2, Save, Minus, Copy, ChevronDown, X, Ban, Check } from 'lucide-react';
+import { Loader2, Save, Minus, Copy, ChevronDown, X } from 'lucide-react';
 import { ProductStyle } from '@/lib/types/design-system';
 import { Database } from '@/utils/supabase/types';
 import { ColorCircle } from './color-circle';
@@ -39,7 +39,7 @@ export function ProductStylingToolbar({
 
       {/* Container Tools - Refactored with Floating Panel */}
       {activeElement === 'container' && (() => {
-        const isCardTransparent = product.style_config?.cardBackground === 'transparent';
+        const isCardTransparent = product.style_config?.cardBackground === 'transparent' || product.style_config?.cardBackground === 'rgba(0,0,0,0)';
         const cardColor = isCardTransparent ? '#ffffff' : (product.style_config?.cardBackground || '#ffffff');
 
         return (
@@ -53,39 +53,39 @@ export function ProductStylingToolbar({
                 {/* 1. Main Card Background */}
                 <div>
                    <label className="text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-2 block">Fondo General</label>
-                   <div className="flex flex-col gap-2">
-                      {/* Transparent Option */}
-                      <button
-                         onClick={(e) => { e.stopPropagation(); onUpdate('cardBackground', 'transparent'); }}
-                         className={`flex items-center gap-2 px-2 py-2 rounded-md border w-full transition-all ${isCardTransparent ? 'bg-neutral-50 border-black ring-1 ring-black/5' : 'hover:bg-gray-50 border-gray-200'}`}
-                       >
-                         <div className="w-4 h-4 rounded border bg-[url('https://placehold.co/4x4/transparent')] opacity-50 shrink-0"></div>
-                         <span className="text-xs font-medium">Invisible</span>
-                         {isCardTransparent && <Check className="w-3 h-3 ml-auto text-green-600" />}
-                       </button>
 
-                       {/* Solid Color Option */}
-                       {!isCardTransparent && (
-                         <div className="flex items-center gap-2 px-2 py-2 rounded-md border border-gray-200 animate-in fade-in zoom-in duration-200">
-                            <ColorCircle
-                               color={cardColor}
-                               onChange={(val) => onUpdate('cardBackground', val)}
-                               size="sm"
-                             />
-                             <span className="text-xs text-gray-500">Color Sólido</span>
-                         </div>
-                       )}
-
-                       {/* Restore button if transparent */}
-                       {isCardTransparent && (
-                           <button
-                             onClick={(e) => { e.stopPropagation(); onUpdate('cardBackground', '#ffffff'); }}
-                             className="text-xs text-blue-600 underline hover:text-blue-800 text-center w-full"
-                           >
-                               Restaurar color de fondo
-                           </button>
-                       )}
+                   {/* SELECCIÓN DE MODO: TABS VISUALES */}
+                   <div className="flex bg-gray-100 p-1 rounded-lg mb-3">
+                     <button
+                       onClick={(e) => { e.stopPropagation(); onUpdate('cardBackground', 'transparent'); }}
+                       className={`flex-1 py-1.5 text-xs font-medium rounded-md transition-all ${isCardTransparent ? 'bg-white shadow text-black' : 'text-gray-500 hover:text-gray-700'}`}
+                     >
+                       Invisible
+                     </button>
+                     <button
+                       onClick={(e) => { e.stopPropagation(); onUpdate('cardBackground', '#ffffff'); }}
+                       className={`flex-1 py-1.5 text-xs font-medium rounded-md transition-all ${!isCardTransparent ? 'bg-white shadow text-black' : 'text-gray-500 hover:text-gray-700'}`}
+                     >
+                       Color
+                     </button>
                    </div>
+
+                   {/* CONTENIDO CONDICIONAL */}
+                   {isCardTransparent ? (
+                      <div className="text-center py-4 px-2 bg-gray-50 rounded border border-dashed border-gray-300">
+                         <span className="text-xs text-gray-400 block mb-1">El fondo es invisible</span>
+                         <div className="w-full h-4 bg-[url('https://placehold.co/100x4/transparent')] opacity-30 rounded"></div>
+                      </div>
+                   ) : (
+                      <div className="flex items-center gap-2 px-2 py-2 rounded-md border border-gray-200 animate-in fade-in zoom-in duration-200">
+                         <ColorCircle
+                            color={cardColor}
+                            onChange={(val) => onUpdate('cardBackground', val)}
+                            size="md"
+                          />
+                          <span className="text-xs text-gray-500">Seleccionar color</span>
+                      </div>
+                   )}
                 </div>
 
                 <div className="h-px bg-gray-100 w-full" />
@@ -251,8 +251,8 @@ export function ProductStylingToolbar({
 
       {/* Description Tools - Refactored with Floating Panel */}
       {activeElement === 'description' && (() => {
-        const isTransparent = product.style_config?.descriptionBackground === 'transparent';
-        const currentColor = isTransparent ? '#ffffff' : (product.style_config?.descriptionBackground || product.style_config?.footerBackground || '#ffffff');
+        const isDescTransparent = product.style_config?.descriptionBackground === 'transparent' || product.style_config?.descriptionBackground === 'rgba(0,0,0,0)';
+        const currentColor = isDescTransparent ? '#ffffff' : (product.style_config?.descriptionBackground || product.style_config?.footerBackground || '#ffffff');
 
         return (
           <div className="relative flex flex-col items-center gap-1">
@@ -262,47 +262,49 @@ export function ProductStylingToolbar({
              <div className="absolute top-full mt-6 left-1/2 -translate-x-1/2 w-64 bg-white rounded-xl shadow-2xl border border-gray-100 p-4 z-50 flex flex-col gap-4 animate-in fade-in zoom-in-95 duration-200 cursor-default" onClick={(e) => e.stopPropagation()}>
                 <div className="absolute -top-2 left-1/2 -translate-x-1/2 w-4 h-4 bg-white border-t border-l border-gray-100 rotate-45"></div>
 
-                {/* Option 1: Transparent */}
-                <div>
-                   <label className="text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-2 block">Opción 1: Invisible</label>
-                   <button
-                     onClick={(e) => { e.stopPropagation(); onUpdate('descriptionBackground', 'transparent'); }}
-                     className={`flex items-center gap-3 px-3 py-2.5 rounded-lg border w-full transition-all ${isTransparent ? 'bg-neutral-50 border-black ring-1 ring-black/5' : 'hover:bg-gray-50 border-gray-200 bg-white'}`}
-                   >
-                     <div className="w-5 h-5 rounded border bg-[url('https://placehold.co/4x4/transparent')] opacity-50 shrink-0"></div>
-                     <div className="flex flex-col items-start">
-                        <span className={`text-xs font-medium ${isTransparent ? 'text-black' : 'text-gray-600'}`}>Transparente</span>
-                        {isTransparent && <span className="text-[9px] text-green-600 font-bold">Activo</span>}
-                     </div>
-                   </button>
+                <div className="flex justify-between items-center border-b pb-2 mb-2">
+                   <span className="text-xs font-bold text-gray-500 uppercase">Fondo Descripción</span>
+                   <button onClick={onClose} className="text-gray-400 hover:text-black">✕</button>
                 </div>
 
-                {/* Option 2: Solid Color */}
-                {!isTransparent && (
-                  <div className="animate-in fade-in zoom-in duration-200">
-                     <label className="text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-2 block">Opción 2: Color Sólido</label>
-                     <div className="p-3 rounded-lg border bg-neutral-50 border-gray-300 transition-all">
-                        <div className="flex items-center gap-3">
-                           <ColorCircle
-                             color={currentColor}
-                             onChange={(val) => onUpdate('descriptionBackground', val)}
-                             size="md"
-                           />
-                           <span className="text-xs text-gray-500">Seleccionar color...</span>
-                        </div>
-                     </div>
-                  </div>
+                {/* SELECCIÓN DE MODO: TABS VISUALES */}
+                <div className="flex bg-gray-100 p-1 rounded-lg">
+                  <button
+                    onClick={(e) => { e.stopPropagation(); onUpdate('descriptionBackground', 'transparent'); }}
+                    className={`flex-1 py-1.5 text-xs font-medium rounded-md transition-all ${isDescTransparent ? 'bg-white shadow text-black' : 'text-gray-500 hover:text-gray-700'}`}
+                  >
+                    Invisible
+                  </button>
+                  <button
+                    onClick={(e) => { e.stopPropagation(); onUpdate('descriptionBackground', '#ffffff'); }}
+                    className={`flex-1 py-1.5 text-xs font-medium rounded-md transition-all ${!isDescTransparent ? 'bg-white shadow text-black' : 'text-gray-500 hover:text-gray-700'}`}
+                  >
+                    Color
+                  </button>
+                </div>
+
+                {/* CONTENIDO CONDICIONAL */}
+                {isDescTransparent ? (
+                   <div className="text-center py-4 px-2 bg-gray-50 rounded border border-dashed border-gray-300">
+                      <span className="text-xs text-gray-400 block mb-1">El fondo es invisible</span>
+                      <div className="w-full h-4 bg-[url('https://placehold.co/100x4/transparent')] opacity-30 rounded"></div>
+                   </div>
+                ) : (
+                   <div>
+                      <label className="text-xs font-semibold mb-2 block">Elige un color:</label>
+                      <div className="flex items-center gap-2">
+                        <ColorCircle
+                          color={currentColor}
+                          onChange={(val) => onUpdate('descriptionBackground', val)}
+                          size="md"
+                        />
+                      </div>
+                   </div>
                 )}
 
-                {/* Restore button if transparent */}
-                {isTransparent && (
-                    <button
-                        onClick={(e) => { e.stopPropagation(); onUpdate('descriptionBackground', '#ffffff'); }}
-                        className="text-xs text-blue-600 underline hover:text-blue-800 text-center w-full"
-                    >
-                        Restaurar color de fondo
-                    </button>
-                )}
+                <button onClick={onApplyAll} className="mt-2 w-full py-2 bg-black text-white text-xs rounded hover:bg-neutral-800">
+                  Aplicar a todos
+                </button>
              </div>
           </div>
         );
