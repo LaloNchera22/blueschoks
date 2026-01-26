@@ -24,6 +24,17 @@ interface StoreHeaderProps {
   config: DesignConfig
 }
 
+const OnlyFansIcon = ({ className }: { className?: string }) => (
+  <svg
+    viewBox="0 0 24 24"
+    fill="currentColor"
+    className={className}
+    xmlns="http://www.w3.org/2000/svg"
+  >
+    <path d="M17.426 3.018a9.423 9.423 0 0 0-3.344.606 8.32 8.32 0 0 0-4.707-1.42 8.356 8.356 0 0 0-8.375 8.337 8.356 8.356 0 0 0 8.375 8.338 8.32 8.32 0 0 0 4.67-1.405 9.42 9.42 0 1 0 3.38-14.456zm-7.98 12.875a5.454 5.454 0 1 1 5.474-5.454 5.467 5.467 0 0 1-5.474 5.454zm7.98-1.57a6.6 6.6 0 1 1 6.598-6.6 6.612 6.612 0 0 1-6.598 6.6zM15.5 8.5l-2.5 4h5l-2.5-4z"/>
+  </svg>
+);
+
 const getSocialIcon = (platform: string) => {
   switch (platform.toLowerCase()) {
     case 'instagram': return <Instagram className="w-5 h-5" />
@@ -31,6 +42,7 @@ const getSocialIcon = (platform: string) => {
     case 'twitter': return <Twitter className="w-5 h-5" />
     case 'facebook': return <Facebook className="w-5 h-5" />
     case 'whatsapp': return <MessageCircle className="w-5 h-5" />
+    case 'onlyfans': return <OnlyFansIcon className="w-5 h-5" />
     case 'website': return <Globe className="w-5 h-5" />
     case 'email': return <Mail className="w-5 h-5" />
     default: return <ExternalLink className="w-5 h-5" />
