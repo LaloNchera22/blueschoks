@@ -6,15 +6,48 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
-import { Loader2, Image as ImageIcon, Trash2, UploadCloud, Video, ArrowLeft } from "lucide-react"
+import { Loader2, Image as ImageIcon, Trash2, UploadCloud, Video, ArrowLeft, Lock, Star } from "lucide-react"
 import { createProduct } from "@/app/dashboard/products/actions"
 import Image from "next/image"
+import Link from "next/link"
 
-export default function CreateProductForm({ isPro = false }: { isPro?: boolean }) {
+export default function CreateProductForm({ isPro = false, productCount = 0 }: { isPro?: boolean, productCount?: number }) {
   const router = useRouter()
   const [isLoading, setIsLoading] = useState(false)
   const [previews, setPreviews] = useState<{url: string, type: string}[]>([])
   const fileInputRef = useRef<HTMLInputElement>(null)
+
+  const isProductLimitReached = !isPro && productCount >= 3;
+
+  if (isProductLimitReached) {
+    return (
+      <div className="max-w-xl mx-auto mt-20 text-center p-8 bg-white rounded-3xl border border-slate-200 shadow-xl">
+        <div className="w-16 h-16 bg-slate-100 rounded-full flex items-center justify-center mx-auto mb-6">
+          <Lock className="w-8 h-8 text-slate-400" />
+        </div>
+        <h2 className="text-2xl font-black text-slate-900 mb-2">Has alcanzado tu límite</h2>
+        <p className="text-slate-500 mb-8 leading-relaxed">
+          El plan gratuito permite hasta 3 productos activos. Has usado {productCount} de 3.
+          <br />Actualiza a PRO para publicar productos ilimitados.
+        </p>
+        <div className="flex flex-col gap-3">
+            <Link href="/dashboard/settings" className="w-full">
+                <Button className="w-full h-12 bg-black hover:bg-slate-800 text-white font-bold rounded-xl text-lg shadow-lg shadow-slate-900/10 transition-all active:scale-95">
+                    <Star className="w-5 h-5 mr-2 text-yellow-400 fill-yellow-400" />
+                    Obtener Plan PRO
+                </Button>
+            </Link>
+            <Button
+                variant="ghost"
+                onClick={() => router.back()}
+                className="w-full font-bold text-slate-500"
+            >
+                Volver
+            </Button>
+        </div>
+      </div>
+    )
+  }
 
   const handleFiles = (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = Array.from(e.target.files || [])

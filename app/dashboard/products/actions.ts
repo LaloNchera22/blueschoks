@@ -30,6 +30,19 @@ export async function createProduct(formData: FormData) {
 
   const isPro = profile?.is_pro || false
 
+  // --- REGLAS DE NEGOCIO (PRODUCTOS) ---
+  // Si NO es PRO y está creando un producto nuevo (no tiene productId), verificamos el límite
+  if (!isPro && !productId) {
+    const { count } = await supabase
+      .from('products')
+      .select('*', { count: 'exact', head: true })
+      .eq('user_id', user.id)
+
+    if ((count || 0) >= 3) {
+      throw new Error("Has alcanzado el límite de 3 productos del plan gratuito. Actualiza a PRO para productos ilimitados.")
+    }
+  }
+
   // 4. Recolectar Archivos NUEVOS
   const newFiles = formData.getAll('files') as File[]
   
@@ -37,7 +50,7 @@ export async function createProduct(formData: FormData) {
   const validNewFiles = newFiles.filter(f => f.size > 0)
   const totalFilesCount = existingMedia.length + validNewFiles.length
 
-  // --- REGLAS DE NEGOCIO ---
+  // --- REGLAS DE NEGOCIO (MEDIA) ---
   if (!isPro) {
     if (totalFilesCount > 3) {
       throw new Error(`El plan gratuito permite 3 fotos. Tienes ${totalFilesCount}.`)

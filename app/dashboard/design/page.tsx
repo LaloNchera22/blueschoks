@@ -59,6 +59,7 @@ export default async function DesignPage() {
         initialProducts={products}
         userId={user.id}
         slug={validSlug}
+        isPro={profile.is_pro || false}
       />
     </div>
   );

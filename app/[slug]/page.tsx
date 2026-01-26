@@ -60,9 +60,14 @@ export default async function StorePage({ params }: { params: Promise<{ slug: st
     .eq('stock', 1) // Solo productos en stock
     .order('created_at', { ascending: false })
 
+  const isPro = profile.is_pro || false;
+
   // 3. Adapt Design Config (Merge)
   // Prioritize design_config (new source), fall back to theme_config (legacy)
-  const rawConfig = (profile.design_config || profile.theme_config) as unknown as Partial<DesignConfig> | null
+  // If NOT PRO, we force null to trigger default design (Basic)
+  const rawConfig = isPro
+    ? (profile.design_config || profile.theme_config) as unknown as Partial<DesignConfig> | null
+    : null;
 
   // Use the robust sanitizer to ensure all fields (avatarShape, styles, etc.) are preserved correctly
   const config = sanitizeDesign(rawConfig, profile);
