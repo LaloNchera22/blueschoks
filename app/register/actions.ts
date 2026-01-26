@@ -71,11 +71,11 @@ export async function signup(formData: FormData) {
       // Intentamos insertar/actualizar el perfil manualmente usando la llave de servicio
       await adminSupabase.from('profiles').upsert({
         id: data.user.id,
-        full_name: fullName,
         username: username,
         slug: username,
         shop_name: shopName,
         whatsapp: phone,
+        email: email,
         updated_at: new Date().toISOString(),
         // Forzamos defaults si es necesario, aunque la base de datos debería manejarlos
         is_pro: false
