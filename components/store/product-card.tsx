@@ -21,10 +21,18 @@ export function ProductCard({ product, config, onSelectElement, onAddToCart }: P
 
   // 2. Lógica de Galería
   const gallery = useMemo(() => {
-    const imgs = (product.images && product.images.length > 0)
+    let imgs = (product.images && product.images.length > 0)
       ? product.images
       : [product.image_url || 'https://via.placeholder.com/400'];
-    return imgs.filter(Boolean);
+    imgs = imgs.filter(Boolean);
+
+    // MOCK FOR TESTING: Force duplication if single image to enable carousel
+    if (imgs.length <= 1) {
+      const img = imgs[0];
+      return [img, img, img, img];
+    }
+
+    return imgs;
   }, [product.images, product.image_url]);
 
   // 3. HANDLERS DE NAVEGACIÓN
@@ -101,16 +109,16 @@ export function ProductCard({ product, config, onSelectElement, onAddToCart }: P
           <>
             <button
               onClick={handlePrev}
-              className="absolute left-2 top-1/2 -translate-y-1/2 w-8 h-8 bg-black/50 hover:bg-black/70 rounded-full flex items-center justify-center shadow-sm opacity-100 sm:opacity-0 sm:group-hover:opacity-100 transition-opacity z-10 backdrop-blur-sm"
+              className="absolute left-2 top-1/2 -translate-y-1/2 w-8 h-8 bg-white hover:bg-gray-100 rounded-full flex items-center justify-center shadow-sm opacity-100 transition-opacity z-10"
             >
-              <ChevronLeft size={18} className="text-white" />
+              <ChevronLeft size={18} className="text-black" />
             </button>
 
             <button
               onClick={handleNext}
-              className="absolute right-2 top-1/2 -translate-y-1/2 w-8 h-8 bg-black/50 hover:bg-black/70 rounded-full flex items-center justify-center shadow-sm opacity-100 sm:opacity-0 sm:group-hover:opacity-100 transition-opacity z-10 backdrop-blur-sm"
+              className="absolute right-2 top-1/2 -translate-y-1/2 w-8 h-8 bg-white hover:bg-gray-100 rounded-full flex items-center justify-center shadow-sm opacity-100 transition-opacity z-10"
             >
-              <ChevronRight size={18} className="text-white" />
+              <ChevronRight size={18} className="text-black" />
             </button>
 
             {/* INDICADOR DE PUNTOS */}
