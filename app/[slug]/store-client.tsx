@@ -112,28 +112,30 @@ export default function StoreClient({ profile, products, config }: StoreClientPr
             <div className="flex flex-col items-center text-center pt-12 pb-6 px-6">
 
                 {/* AVATAR */}
-                <div className="flex justify-center mb-6">
-                  <div
-                    className={cn(
-                      "relative w-32 h-32 overflow-hidden ring-2 ring-offset-2 ring-neutral-900/10",
-                      shapeClass
-                    )}
-                  >
-                    {config.profile.avatarUrl ? (
-                        <Image
-                          src={config.profile.avatarUrl}
-                          alt="Avatar"
-                          fill
-                          className="object-cover"
-                          priority
-                        />
-                    ) : (
-                        <div className="w-full h-full flex items-center justify-center bg-gray-100 text-gray-300">
-                            <Smartphone className="w-10 h-10" />
-                        </div>
-                    )}
+                {profile.is_pro && (
+                  <div className="flex justify-center mb-6">
+                    <div
+                      className={cn(
+                        "relative w-32 h-32 overflow-hidden ring-2 ring-offset-2 ring-neutral-900/10",
+                        shapeClass
+                      )}
+                    >
+                      {config.profile.avatarUrl ? (
+                          <Image
+                            src={config.profile.avatarUrl}
+                            alt="Avatar"
+                            fill
+                            className="object-cover"
+                            priority
+                          />
+                      ) : (
+                          <div className="w-full h-full flex items-center justify-center bg-gray-100 text-gray-300">
+                              <Smartphone className="w-10 h-10" />
+                          </div>
+                      )}
+                    </div>
                   </div>
-                </div>
+                )}
 
                 {/* SHOP NAME */}
                 <h1
