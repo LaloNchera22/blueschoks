@@ -3,7 +3,7 @@
 import { useState, useEffect, useTransition, useMemo } from "react"
 import Image from "next/image"
 import Link from "next/link"
-import { Trash2, Edit, Play, Grid, Square, AlertCircle, Video, ChevronLeft, ChevronRight, RefreshCw } from "lucide-react"
+import { Trash2, Edit, Play, Grid, Square, Video, ChevronLeft, ChevronRight, RefreshCw, Image as ImageIcon } from "lucide-react"
 import { deleteProduct, toggleStock } from "./actions"
 import { formatCurrency } from "@/lib/utils"
 import { Switch } from "@/components/ui/switch"
@@ -37,13 +37,48 @@ export default function ProductCardClient({ product }: ProductCardProps) {
   const [isDeleting, setIsDeleting] = useState(false)
   const [isTogglingStock, setIsTogglingStock] = useState(false)
 
+  // Lógica de "Imagen Inteligente" robusta
+  const mainImage = useMemo(() => {
+    // 1. Prioridad: image_url
+    if (product.image_url && typeof product.image_url === 'string' && product.image_url.length > 5) {
+        return product.image_url;
+    }
+    // 2. Prioridad: images[0]
+    if (product.images && Array.isArray(product.images) && product.images.length > 0) {
+        return product.images[0];
+    }
+    // 3. Fallback a media (legacy) si existe
+    if (product.media && Array.isArray(product.media) && product.media.length > 0) {
+        return product.media[0];
+    }
+    return null;
+  }, [product.image_url, product.images, product.media]);
+
   const mediaList = useMemo(() => {
-    const rawMedia = Array.isArray(product.media) && product.media.length > 0
-      ? product.media
-      : (product.image_url ? [product.image_url] : [])
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    return rawMedia.filter((url: any) => typeof url === 'string' && url.length > 5)
-  }, [product.media, product.image_url])
+    const list: string[] = [];
+
+    // Start with mainImage if it exists
+    if (mainImage) {
+        list.push(mainImage);
+    }
+
+    // Collect all other potential images
+    const candidates = [
+        ...(Array.isArray(product.images) ? product.images : []),
+        ...(Array.isArray(product.media) ? product.media : []),
+        ...(product.image_url ? [product.image_url] : [])
+    ];
+
+    // Add unique ones
+    candidates.forEach((url) => {
+        if (typeof url === 'string' && url.length > 5 && !list.includes(url)) {
+            list.push(url);
+        }
+    });
+
+    return list;
+  }, [mainImage, product.images, product.media, product.image_url]);
+
   const hasMedia = mediaList.length > 0
 
   useEffect(() => {
@@ -81,11 +116,7 @@ export default function ProductCardClient({ product }: ProductCardProps) {
   }
 
   const handleToggleStock = async () => {
-    // Optimistic update handled by server action usually, but we want immediate feedback
-    // Ideally we would use useOptimistic but for now we rely on the server action revalidation
     setIsTogglingStock(true)
-
-    // We can show a loading toast if needed, but the prompt asks for toast "Estado actualizado"
     startTransition(async () => {
         try {
            await toggleStock(product.id)
@@ -131,7 +162,13 @@ export default function ProductCardClient({ product }: ProductCardProps) {
                                         <Video size={16} className="relative z-10" />
                                     </div>
                                 ) : (
-                                    <Image src={url} alt="Collage" fill className="object-cover" />
+                                    <Image
+                                      src={url}
+                                      alt="Collage"
+                                      fill
+                                      className="object-cover"
+                                      sizes="(max-width: 768px) 50vw, 33vw"
+                                    />
                                 )}
                             </div>
                         ))}
@@ -145,7 +182,16 @@ export default function ProductCardClient({ product }: ProductCardProps) {
                                 if (isVideo(url)) {
                                     return <video key={url} src={url} className="w-full h-full object-cover" autoPlay={viewMode === 'carousel'} muted loop />
                                 }
-                                return <Image key={url} src={url} alt={product.name} fill className="object-cover transition-transform duration-500 group-hover:scale-105" />
+                                return (
+                                  <Image
+                                    key={url}
+                                    src={url}
+                                    alt={product.name}
+                                    fill
+                                    className="object-cover transition-transform duration-500 group-hover:scale-105"
+                                    sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+                                  />
+                                )
                             })()}
 
                             {/* Carousel Controls */}
@@ -170,11 +216,12 @@ export default function ProductCardClient({ product }: ProductCardProps) {
                     )}
                 </>
             ) : (
-                <div className="w-full h-full flex flex-col items-center justify-center text-muted-foreground bg-muted/20 gap-2">
-                    <div className="p-3 bg-background rounded-full shadow-sm">
-                        <AlertCircle size={24} className="text-muted-foreground/50" />
+                // Fallback: Contenedor gris neutro con icono
+                <div className="w-full h-full flex flex-col items-center justify-center text-slate-400 bg-slate-100 gap-2">
+                    <div className="p-4 bg-white rounded-full shadow-sm border border-slate-200">
+                        <ImageIcon size={28} className="text-slate-300" />
                     </div>
-                    <span className="text-xs font-medium">Sin imagen</span>
+                    <span className="text-xs font-semibold text-slate-500">Sin imagen</span>
                 </div>
             )}
         </Link>
