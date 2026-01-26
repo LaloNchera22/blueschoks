@@ -500,10 +500,10 @@ export default function DesignEditor({ initialConfig, initialProducts, userId, s
              <p className="text-slate-500 mb-8 leading-relaxed">
                Desbloquea el editor de diseño completo. Personaliza colores, fuentes, botones y más para que tu tienda sea única.
              </p>
-             <Link href="/dashboard/settings" className="block w-full">
+             <Link href="/dashboard/pricing" className="block w-full">
                 <button className="w-full py-4 bg-slate-900 hover:bg-black text-white font-bold rounded-xl text-lg shadow-xl shadow-slate-900/10 transition-all active:scale-95 flex items-center justify-center gap-2">
                    <Star className="w-5 h-5 text-yellow-400 fill-yellow-400" />
-                   Desbloquear Diseño
+                   Desbloquear PRO
                 </button>
              </Link>
           </div>
