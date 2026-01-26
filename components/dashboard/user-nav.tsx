@@ -78,7 +78,7 @@ export function UserNav({ userEmail, avatarUrl, isCollapsed }: UserNavProps) {
             <Settings className="mr-2 h-4 w-4" />
             <span>Configuración</span>
           </DropdownMenuItem>
-          <DropdownMenuItem onClick={() => window.open('mailto:soporte@blueshocks.com', '_blank')} className="cursor-pointer">
+          <DropdownMenuItem onClick={() => router.push("/dashboard/help")} className="cursor-pointer">
             <HelpCircle className="mr-2 h-4 w-4" />
             <span>Ayuda / Soporte</span>
           </DropdownMenuItem>
