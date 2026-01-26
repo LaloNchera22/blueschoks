@@ -8,7 +8,7 @@ const settingsSchema = z.object({
   shopName: z.string().optional(),
   slug: z.string().optional(),
   countryCode: z.string().optional(),
-  localPhone: z.string().optional(),
+  localPhone: z.string().regex(/^\d+$/, "Solo números").min(10, "Mínimo 10 dígitos").optional().or(z.literal('')),
   email: z.string().email().optional().or(z.literal('')),
 })
 
@@ -24,12 +24,18 @@ export async function updateSettings(prevState: SettingsState, formData: FormDat
   const { data: { user }, error: authError } = await supabase.auth.getUser()
   if (authError || !user) return { error: "No autorizado" }
 
+  // Helper para extraer string o undefined (evitando null que rompe Zod .optional())
+  const getString = (key: string) => {
+    const val = formData.get(key)
+    return typeof val === 'string' ? val : undefined
+  }
+
   const rawData = {
-    shopName: formData.get("shopName") as string,
-    slug: formData.get("slug") as string,
-    countryCode: formData.get("countryCode") as string,
-    localPhone: formData.get("localPhone") as string,
-    email: formData.get("email") as string,
+    shopName: getString("shopName"),
+    slug: getString("slug"),
+    countryCode: getString("countryCode"),
+    localPhone: getString("localPhone"),
+    email: getString("email"),
   }
 
   const validated = settingsSchema.safeParse(rawData)
