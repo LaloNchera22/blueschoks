@@ -50,26 +50,54 @@ export async function updateSettings(prevState: SettingsState, formData: FormDat
     updated_at: new Date().toISOString(),
   }
 
-  // Solo actualizamos si el valor no está vacío.
-  // Esto permite actualizaciones parciales:
-  // Si el usuario edita solo el nombre, el slug puede venir vacío (si no se ha configurado antes)
-  // y lo ignoramos en lugar de intentar guardar "".
+  // Obtenemos el perfil actual para comparar cambios
+  // Esto es vital para evitar errores de unicidad si el slug no ha cambiado,
+  // y para evitar bloqueos de RLS si intentamos escribir lo mismo.
+  const { data: currentProfile } = await supabase
+    .from('profiles')
+    .select('*')
+    .eq('id', user.id)
+    .single()
 
+  // 1. SHOP NAME
   if (shopName && shopName.trim() !== "") {
-    updates.shop_name = shopName.trim()
+    const cleanShopName = shopName.trim()
+    if (!currentProfile || cleanShopName !== currentProfile.shop_name) {
+      updates.shop_name = cleanShopName
+    }
   }
 
+  // 2. SLUG
+  // Relajamos validación: permitimos letras, números y guiones.
+  // Solo actualizamos si es diferente al actual.
   if (rawSlug && rawSlug.trim() !== "") {
-    updates.slug = rawSlug.toLowerCase().trim().replace(/\s+/g, '-').replace(/[^\w-]/g, '')
+    const cleanSlug = rawSlug.toLowerCase().trim().replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, '')
+
+    if (cleanSlug.length > 0) {
+       if (!currentProfile || cleanSlug !== currentProfile.slug) {
+         updates.slug = cleanSlug
+       }
+    }
   }
 
+  // 3. WHATSAPP
   if (countryCode && localPhone && localPhone.trim() !== "") {
-    updates.whatsapp = (countryCode.replace('+', '') + localPhone).trim()
+    const cleanPhone = (countryCode.replace('+', '') + localPhone).trim()
+    if (!currentProfile || cleanPhone !== currentProfile.whatsapp) {
+      updates.whatsapp = cleanPhone
+    }
   }
 
   try {
     // Solo hacemos update si hay algo más que updated_at
-    if (Object.keys(updates).length > 1) {
+    // OJO: Si solo cambió updated_at, igual podríamos querer guardarlo,
+    // pero para eficiencia, si no hay cambios reales de datos, podemos saltar o solo updatear fecha.
+    // En este caso, si el objeto updates tiene mas de 1 llave, significa que hubo cambio de datos.
+
+    // Si NO hay currentProfile (caso raro), forzamos update.
+    const hasDataChanges = Object.keys(updates).length > 1;
+
+    if (hasDataChanges || !currentProfile) {
       const { error: updateError } = await supabase
         .from("profiles")
         .update(updates)
@@ -92,24 +120,11 @@ export async function updateSettings(prevState: SettingsState, formData: FormDat
     revalidatePath("/dashboard")
     revalidatePath("/dashboard/settings")
 
-    // Si cambio el slug, invalidamos la cache del nuevo y el viejo...
-    // pero como no tenemos el viejo facilmente a mano (sin otra query),
-    // y el usuario va a ser redirigido al nuevo slug, lo importante es invalidar
-    // las tags de los datos.
-
-    // Necesitamos invalidar la tag del slug ACTUAL (que puede ser el nuevo o el viejo).
-    // Si el slug cambió, 'updates.slug' tiene el nuevo.
-    // Pero si NO cambió, 'updates.slug' no existe.
-    // Necesitamos saber el slug final vigente para invalidar su caché de datos.
-
-    // Estrategia: Obtener el slug final.
+    // Lógica de revalidación de caché (Slug)
     let finalSlug = updates.slug;
 
     if (!finalSlug) {
-        // Si no se actualizó el slug, necesitamos el actual de la base de datos.
-        // Podríamos hacer una query, o asumir que si no cambió,
-        // cualquier cambio en shop_name debe reflejarse en el slug actual.
-        const { data: currentProfile } = await supabase.from('profiles').select('slug').eq('id', user.id).single();
+        // Si no se actualizó el slug, usamos el actual.
         finalSlug = currentProfile?.slug;
     }
 
