@@ -58,6 +58,8 @@ export interface ProfileConfig {
 }
 
 export interface DesignConfig {
+  backgroundImage?: string;
+  backgroundOpacity?: number;
   colors: {
     background: string;
     text: string;
