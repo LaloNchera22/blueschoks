@@ -160,19 +160,18 @@ export function ProductCard({ product, config, onSelectElement, onAddToCart }: P
           onClick={(e) => {
             e.stopPropagation();
             if (onSelectElement) {
-                onSelectElement('cartButton');
+               onSelectElement('cartButton');
             } else if (onAddToCart) {
-                onAddToCart(product);
+               onAddToCart(product);
             }
           }}
-          className="w-9 h-9 flex items-center justify-center rounded-full border transition-transform active:scale-95 shadow-sm shrink-0"
+          className="w-10 h-10 rounded-full flex items-center justify-center shadow-lg transition-transform active:scale-90 shrink-0"
           style={{
             backgroundColor: btnBg,
-            color: btnColor,
-            borderColor: btnColor === '#ffffff' ? 'rgba(0,0,0,0.1)' : btnColor
+            color: btnColor
           }}
         >
-          <ShoppingBag size={16} />
+          <ShoppingBag size={18} strokeWidth={2.5} />
         </button>
       </div>
     </div>
