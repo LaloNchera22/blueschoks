@@ -21,27 +21,29 @@ export function ProductCard({ product, config, onSelectElement, onAddToCart }: P
 
   // 2. Lógica de Galería
   const gallery = useMemo(() => {
-    let imgs: string[] = []
+    // 1. Array base (imagen principal si existe)
+    const mainImg = product.image_url ? [product.image_url] : []
 
-    // 1. Prioridad: Array de imágenes
-    if (product.images && product.images.length > 0) {
-      imgs = product.images
-    }
-    // 2. Fallback: Imagen principal
-    else if (product.image_url) {
-      imgs = [product.image_url]
-    }
+    // 2. Array adicional
+    const extraImgs = product.images && product.images.length > 0 ? product.images : []
 
-    // Filtra cualquier valor nulo o inválido
-    imgs = imgs.filter(img => img && img.length > 5)
+    // 3. Combinar y filtrar
+    const rawGallery = [...mainImg, ...extraImgs].filter(url => url && url.length > 5)
 
-    // Fallback final si todo falla
-    if (imgs.length === 0) {
+    // 4. Deduplicar
+    const uniqueGallery = Array.from(new Set(rawGallery))
+
+    // Fallback final
+    if (uniqueGallery.length === 0) {
       return ['/placeholder.png']
     }
 
-    return imgs
+    return uniqueGallery
   }, [product.images, product.image_url])
+
+  const isVideo = (url: string) => {
+    return /\.(mp4|webm|ogg|mov)$/i.test(url)
+  }
 
   // 3. HANDLERS DE NAVEGACIÓN
   const handlePrev = (e: React.MouseEvent) => {
@@ -87,6 +89,8 @@ export function ProductCard({ product, config, onSelectElement, onAddToCart }: P
   const btnBg = style.cartBtnBackground || cardStyle.buttonColor || '#000000'
   const btnColor = style.cartBtnColor || cardStyle.buttonTextColor || '#ffffff'
 
+  const currentMediaUrl = gallery[currentImg];
+
   return (
     <div
       className={`
@@ -104,13 +108,24 @@ export function ProductCard({ product, config, onSelectElement, onAddToCart }: P
         style.imageShape === 'square' ? 'rounded-none' : 'rounded-xl'
       }`}>
 
-        <Image
-          src={gallery[currentImg]}
-          alt={product.name}
-          fill
-          className="object-cover transition-transform duration-500 group-hover:scale-105"
-          sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
-        />
+        {isVideo(currentMediaUrl) ? (
+          <video
+            src={currentMediaUrl}
+            className="w-full h-full object-cover"
+            autoPlay
+            muted
+            loop
+            playsInline
+          />
+        ) : (
+          <Image
+            src={currentMediaUrl}
+            alt={product.name}
+            fill
+            className="object-cover transition-transform duration-500 group-hover:scale-105"
+            sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+          />
+        )}
 
         {/* CONTROLES DEL CARRUSEL (Solo si hay más de 1 foto) */}
         {gallery.length > 1 && (
@@ -155,14 +170,20 @@ export function ProductCard({ product, config, onSelectElement, onAddToCart }: P
            <h3
              className="truncate font-medium text-sm text-neutral-800"
              style={{ fontFamily: titleFont, color: titleColor }}
-             onClick={(e) => { e.stopPropagation(); onSelectElement && onSelectElement('title'); }}
+             onClick={(e) => {
+               e.stopPropagation();
+               if (onSelectElement) onSelectElement('title');
+             }}
            >
              {product.name}
            </h3>
            <p
              className="text-sm font-semibold opacity-90 text-black"
              style={{ fontFamily: priceFont, color: priceColor }}
-             onClick={(e) => { e.stopPropagation(); onSelectElement && onSelectElement('price'); }}
+             onClick={(e) => {
+               e.stopPropagation();
+               if (onSelectElement) onSelectElement('price');
+             }}
            >
              ${product.price.toFixed(2)}
            </p>
