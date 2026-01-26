@@ -114,23 +114,37 @@ export function ProductStylingToolbar({
                    </div>
                 </div>
 
-                <div className="h-px bg-gray-100 w-full" />
+                {/* --- SECCIÓN NUEVA: FORMA DE IMAGEN --- */}
+                <div className="border-t border-gray-100 pt-3 mt-3">
+                   <label className="text-[10px] font-bold text-gray-400 uppercase mb-2 block tracking-wider">
+                     Forma de Foto
+                   </label>
 
-                {/* 3. Image Shape */}
-                <div>
-                   <label className="text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-2 block">Forma Imagen</label>
-                   <div className="flex bg-gray-100 p-1 rounded-lg">
+                   <div className="flex bg-gray-100 p-1 rounded-lg gap-1">
+                     {/* Opción 1: CUADRADA */}
                      <button
                        onClick={(e) => { e.stopPropagation(); onUpdate('imageShape', 'square'); }}
-                       className={`flex-1 py-1.5 text-xs font-medium rounded-md transition-all ${product.style_config?.imageShape === 'square' ? 'bg-white shadow text-black' : 'text-gray-500 hover:text-gray-700'}`}
+                       className={`flex-1 flex items-center justify-center gap-2 py-1.5 text-xs font-bold rounded-md transition-all ${
+                         product.style_config?.imageShape === 'square'
+                           ? 'bg-white shadow-sm text-black ring-1 ring-black/5'
+                           : 'text-gray-500 hover:text-gray-700 hover:bg-gray-200/50'
+                       }`}
                      >
+                       <div className="w-3 h-3 border border-current bg-current opacity-20 rounded-none"></div>
                        Cuadrada
                      </button>
+
+                     {/* Opción 2: REDONDA (Default) */}
                      <button
                        onClick={(e) => { e.stopPropagation(); onUpdate('imageShape', 'rounded'); }}
-                       className={`flex-1 py-1.5 text-xs font-medium rounded-md transition-all ${(!product.style_config?.imageShape || product.style_config?.imageShape === 'rounded') ? 'bg-white shadow text-black' : 'text-gray-500 hover:text-gray-700'}`}
+                       className={`flex-1 flex items-center justify-center gap-2 py-1.5 text-xs font-bold rounded-md transition-all ${
+                         (!product.style_config?.imageShape || product.style_config?.imageShape === 'rounded')
+                           ? 'bg-white shadow-sm text-black ring-1 ring-black/5'
+                           : 'text-gray-500 hover:text-gray-700 hover:bg-gray-200/50'
+                       }`}
                      >
-                       Redondeada
+                       <div className="w-3 h-3 border border-current bg-current opacity-20 rounded-full"></div>
+                       Redonda
                      </button>
                    </div>
                 </div>
