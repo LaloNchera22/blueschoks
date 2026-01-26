@@ -8,12 +8,14 @@ interface DashboardLayoutClientProps {
   children: React.ReactNode
   shopUrl: string
   userEmail: string
+  isPro: boolean
 }
 
 export default function DashboardLayoutClient({
   children,
   shopUrl,
   userEmail,
+  isPro,
 }: DashboardLayoutClientProps) {
   const [isSidebarOpen, setIsSidebarOpen] = useState(true)
 
@@ -23,6 +25,7 @@ export default function DashboardLayoutClient({
         shopUrl={shopUrl}
         userEmail={userEmail}
         isOpen={isSidebarOpen}
+        isPro={isPro}
         onClose={() => setIsSidebarOpen(false)}
       />
 
