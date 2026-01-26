@@ -27,11 +27,13 @@ export function ProductCard({ product, config, onSelectElement, onAddToCart }: P
 
   // 3. HANDLERS DE NAVEGACIÓN
   const handlePrev = (e: React.MouseEvent) => {
+    e.preventDefault()
     e.stopPropagation() // Evita seleccionar la tarjeta
     setCurrentImg((prev) => (prev === 0 ? images.length - 1 : prev - 1))
   }
 
   const handleNext = (e: React.MouseEvent) => {
+    e.preventDefault()
     e.stopPropagation() // Evita seleccionar la tarjeta
     setCurrentImg((prev) => (prev + 1) % images.length)
   }
@@ -103,16 +105,16 @@ export function ProductCard({ product, config, onSelectElement, onAddToCart }: P
           <>
             <button
               onClick={handlePrev}
-              className="absolute left-2 top-1/2 -translate-y-1/2 w-8 h-8 bg-white/80 hover:bg-white rounded-full flex items-center justify-center shadow-sm opacity-0 group-hover:opacity-100 transition-opacity z-10 backdrop-blur-sm"
+              className="absolute left-2 top-1/2 -translate-y-1/2 w-8 h-8 bg-black/50 hover:bg-black/70 rounded-full flex items-center justify-center shadow-sm opacity-100 sm:opacity-0 sm:group-hover:opacity-100 transition-opacity z-10 backdrop-blur-sm"
             >
-              <ChevronLeft size={18} className="text-black" />
+              <ChevronLeft size={18} className="text-white" />
             </button>
 
             <button
               onClick={handleNext}
-              className="absolute right-2 top-1/2 -translate-y-1/2 w-8 h-8 bg-white/80 hover:bg-white rounded-full flex items-center justify-center shadow-sm opacity-0 group-hover:opacity-100 transition-opacity z-10 backdrop-blur-sm"
+              className="absolute right-2 top-1/2 -translate-y-1/2 w-8 h-8 bg-black/50 hover:bg-black/70 rounded-full flex items-center justify-center shadow-sm opacity-100 sm:opacity-0 sm:group-hover:opacity-100 transition-opacity z-10 backdrop-blur-sm"
             >
-              <ChevronRight size={18} className="text-black" />
+              <ChevronRight size={18} className="text-white" />
             </button>
 
             {/* INDICADOR DE PUNTOS */}
