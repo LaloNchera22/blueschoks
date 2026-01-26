@@ -31,7 +31,7 @@ export default function PricingPage() {
           </CardHeader>
           <CardContent className="flex-1">
             <div className="mb-6">
-              <span className="text-4xl font-bold">$9</span>
+              <span className="text-4xl font-bold">$99</span>
               <span className="text-muted-foreground">/mes</span>
             </div>
             <ul className="space-y-3">
@@ -66,7 +66,7 @@ export default function PricingPage() {
           </CardHeader>
           <CardContent className="flex-1">
             <div className="mb-6">
-              <span className="text-4xl font-bold">$90</span>
+              <span className="text-4xl font-bold">$599</span>
               <span className="text-muted-foreground">/año</span>
             </div>
             <ul className="space-y-3">
@@ -102,7 +102,7 @@ export default function PricingPage() {
           </CardHeader>
           <CardContent className="flex-1">
             <div className="mb-6">
-              <span className="text-4xl font-bold">$299</span>
+              <span className="text-4xl font-bold">$1999</span>
               <span className="text-muted-foreground">/único</span>
             </div>
             <ul className="space-y-3">
