@@ -1,0 +1,30 @@
+
+> blueshock@0.1.0 dev
+> next dev -H 0.0.0.0
+
+▲ Next.js 16.1.4 (Turbopack)
+- Local:         http://localhost:3000
+- Network:       http://0.0.0.0:3000
+- Experiments (use with caution):
+  · serverActions
+
+✓ Starting...
+✓ Ready in 1053ms
+○ Compiling /test-background ...
+⨯ Error: useCart debe usarse dentro de un CartProvider
+    at useCart (components/shop/cart-context.tsx:110:23)
+    at StoreClient (app/[slug]/store-client.tsx:52:32)
+  108 | export const useCart = () => {
+  109 |   const context = useContext(CartContext)
+> 110 |   if (!context) throw new Error("useCart debe usarse dentro de un CartProvider")
+      |                       ^
+  111 |   return context
+  112 | } {
+  digest: '3758838801'
+}
+ GET /test-background 500 in 9.2s (compile: 8.5s, render: 693ms)
+ GET /test-background 200 in 555ms (compile: 82ms, render: 473ms)
+⨯ The requested resource "https://placehold.co/400" has type "image/svg+xml" but dangerouslyAllowSVG is disabled. Consider adding the "unoptimized" property to the <Image>.
+ GET /test-background 200 in 77ms (compile: 5ms, render: 72ms)
+⨯ The requested resource "https://placehold.co/400" has type "image/svg+xml" but dangerouslyAllowSVG is disabled. Consider adding the "unoptimized" property to the <Image>.
+✓ Compiled in 115ms

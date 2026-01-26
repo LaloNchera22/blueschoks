@@ -67,6 +67,7 @@ import { cn } from '@/lib/utils';
 import { DEFAULT_DESIGN } from '@/utils/design-sanitizer';
 import { ProductStylingToolbar } from './product-styling-toolbar';
 import { ProfileStylingToolbar } from './profile-styling-toolbar';
+import { BackgroundStylingToolbar } from './background-styling-toolbar';
 import { ColorCircle } from './color-circle';
 import { ProductCard } from '@/components/store/product-card';
 import { FontPicker } from './font-picker';
@@ -87,6 +88,7 @@ interface DesignEditorProps {
 // "Atom" selection key
 type ToolType =
   | 'global'
+  | 'background'
   | 'header-avatar'
   | 'header-title'
   | 'header-bio'
@@ -381,6 +383,41 @@ export default function DesignEditor({ initialConfig, initialProducts, userId, s
     toast.success("Avatar actualizado");
   };
 
+  const handleBackgroundUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    if (file.size > 5 * 1024 * 1024) {
+      toast.error("La imagen debe ser menor a 5MB");
+      return;
+    }
+
+    setIsUploadingImage(true);
+    const supabase = createClient();
+    const fileExt = file.name.split('.').pop();
+    const fileName = `bg-${userId}-${Date.now()}.${fileExt}`;
+    const filePath = `${fileName}`;
+
+    const { error: uploadError } = await supabase.storage
+      .from('avatars')
+      .upload(filePath, file);
+
+    if (uploadError) {
+      console.error(uploadError);
+      toast.error("Error al subir imagen");
+      setIsUploadingImage(false);
+      return;
+    }
+
+    const { data: { publicUrl } } = supabase.storage
+      .from('avatars')
+      .getPublicUrl(filePath);
+
+    updateConfig(['backgroundImage'], publicUrl);
+    setIsUploadingImage(false);
+    toast.success("Fondo actualizado");
+  };
+
   // Socials Management Logic
   const handleAddSocial = (platform: LinkItem['platform']) => {
     const platformDef = PLATFORMS.find(p => p.id === platform);
@@ -525,21 +562,31 @@ export default function DesignEditor({ initialConfig, initialProducts, userId, s
               />
           )}
 
+          {activeTool === 'background' && (
+             <BackgroundStylingToolbar
+                config={config}
+                onUpdate={updateConfig}
+                onUploadImage={handleBackgroundUpload}
+                onClose={() => setActiveTool('global')}
+                isUploading={isUploadingImage}
+             />
+          )}
+
           {/* 1. GLOBAL TOOLS (Default) */}
           {activeTool === 'global' && (
             <div className="flex items-center gap-5 animate-in fade-in slide-in-from-top-2 duration-300">
-               <div className="flex flex-col items-center gap-1 group">
-                <ColorCircle
-                  color={config.colors.background}
-                  onChange={(c) => {
-                    updateConfig(['colors', 'background'], c);
-                    // FIX: Auto-adapt text color for contrast
-                    const contrastColor = getContrastColor(c);
-                    updateConfig(['colors', 'text'], contrastColor);
-                  }}
-                />
+               <button
+                  onClick={() => setActiveTool('background')}
+                  className="flex flex-col items-center gap-1 group cursor-pointer"
+               >
+                <div className="relative pointer-events-none">
+                   <ColorCircle
+                     color={config.colors.background}
+                     onChange={() => {}}
+                   />
+                </div>
                 <span className="text-[9px] text-gray-500 font-semibold uppercase tracking-wider group-hover:text-black transition-colors">Fondo</span>
-              </div>
+              </button>
 
               <div className="flex flex-col items-center gap-1 group">
                  <FontPicker
@@ -790,6 +837,19 @@ export default function DesignEditor({ initialConfig, initialProducts, userId, s
                className="h-full min-h-[800px] pb-40 relative rounded-[32px] overflow-hidden"
                style={{ backgroundColor: config.colors.background || '#ffffff' }}
              >
+                {/* Background Image Layer */}
+                {config.backgroundImage && (
+                    <div className="absolute inset-0 z-0 pointer-events-none">
+                       <img
+                          src={config.backgroundImage}
+                          alt="Background"
+                          className="w-full h-full object-cover"
+                          style={{ opacity: config.backgroundOpacity ?? 0.5 }}
+                       />
+                    </div>
+                )}
+
+                <div className="relative z-10">
                 {/* FIX: REMOVED STICKY HEADER VISUAL TO REMOVE FAKE HEADER BAR */}
 
                 {/* --- 2. HERO SECTION --- */}
@@ -898,6 +958,7 @@ export default function DesignEditor({ initialConfig, initialProducts, userId, s
                           </div>
                       )})}
                    </div>
+                </div>
                 </div>
 
              </div>
