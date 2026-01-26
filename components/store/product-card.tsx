@@ -29,7 +29,7 @@ export function ProductCard({ product, config, onSelectElement, onAddToCart }: P
     const mainImg = product.image_url ? [product.image_url] : []
 
     // 2. Array adicional
-    const extraImgs = product.images && product.images.length > 0 ? product.images : []
+    const extraImgs = (product.images && Array.isArray(product.images)) ? product.images : []
 
     // 3. Combinar y filtrar
     const rawGallery = [...mainImg, ...extraImgs].filter(url => url && url.length > 5)
@@ -187,14 +187,14 @@ export function ProductCard({ product, config, onSelectElement, onAddToCart }: P
             <>
               <button
                 onClick={handlePrev}
-                className="absolute left-2 top-1/2 -translate-y-1/2 w-8 h-8 bg-white/90 hover:bg-white rounded-full flex items-center justify-center shadow-sm z-50 transition-transform active:scale-95 opacity-0 group-hover:opacity-100"
+                className="absolute left-2 top-1/2 -translate-y-1/2 w-8 h-8 bg-white/90 hover:bg-white rounded-full flex items-center justify-center shadow-sm z-50 transition-transform active:scale-95"
               >
                 <ChevronLeft size={18} className="text-black" />
               </button>
 
               <button
                 onClick={handleNext}
-                className="absolute right-2 top-1/2 -translate-y-1/2 w-8 h-8 bg-white/90 hover:bg-white rounded-full flex items-center justify-center shadow-sm z-50 transition-transform active:scale-95 opacity-0 group-hover:opacity-100"
+                className="absolute right-2 top-1/2 -translate-y-1/2 w-8 h-8 bg-white/90 hover:bg-white rounded-full flex items-center justify-center shadow-sm z-50 transition-transform active:scale-95"
               >
                 <ChevronRight size={18} className="text-black" />
               </button>
