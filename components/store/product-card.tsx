@@ -33,8 +33,16 @@ export function ProductCard({ product, config, onSelectElement, onAddToCart }: P
     }
 
     // 2. Agregar imágenes adicionales
-    if (product.images && Array.isArray(product.images)) {
-      images.push(...product.images);
+    // Combinamos images (legacy) y media (nuevo)
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const extraMedia = (product as any).media;
+    const extraImages = [
+      ...(Array.isArray(product.images) ? product.images : []),
+      ...(Array.isArray(extraMedia) ? extraMedia : [])
+    ];
+
+    if (extraImages.length > 0) {
+      images.push(...extraImages as string[]);
     }
 
     // 3. Filtrar y deduplicar
@@ -48,7 +56,7 @@ export function ProductCard({ product, config, onSelectElement, onAddToCart }: P
     }
 
     return uniqueGallery;
-  }, [product.images, product.image_url]);
+  }, [product.images, product.image_url, (product as any).media]);
 
   const isVideo = (url: string) => {
     return /\.(mp4|webm|ogg|mov)$/i.test(url)
