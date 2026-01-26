@@ -2,10 +2,13 @@
 
 import React, { useState, useMemo } from 'react';
 import Image from 'next/image';
+import Link from 'next/link';
 import { toast } from 'sonner';
 import {
   Save,
   Loader2,
+  Lock,
+  Star,
   ChevronDown,
   Smartphone,
   Instagram,
@@ -78,6 +81,7 @@ interface DesignEditorProps {
   initialProducts: Product[];
   userId: string;
   slug: string;
+  isPro?: boolean;
 }
 
 // "Atom" selection key
@@ -191,7 +195,7 @@ function SortableSocialItem({ id, link, onDelete }: { id: string, link: LinkItem
 
 // --- MAIN COMPONENT ---
 
-export default function DesignEditor({ initialConfig, initialProducts, userId, slug }: DesignEditorProps) {
+export default function DesignEditor({ initialConfig, initialProducts, userId, slug, isPro = false }: DesignEditorProps) {
   const router = useRouter();
   // Ensure we have valid defaults for new fields if they don't exist yet
   const safeInitialConfig = useMemo(() => {
@@ -484,6 +488,27 @@ export default function DesignEditor({ initialConfig, initialProducts, userId, s
         }}
       />
       <div className="absolute inset-0 bg-white/20 backdrop-blur-3xl pointer-events-none" />
+
+      {/* --- PRO LOCK OVERLAY --- */}
+      {!isPro && (
+        <div className="absolute inset-0 z-[100] backdrop-blur-md bg-white/30 flex items-center justify-center p-4">
+          <div className="bg-white rounded-3xl shadow-2xl p-8 max-w-md text-center border border-white/50 animate-in fade-in zoom-in duration-300">
+             <div className="w-16 h-16 bg-slate-900 text-white rounded-full flex items-center justify-center mx-auto mb-6 shadow-lg shadow-slate-900/20">
+                <Lock className="w-7 h-7" />
+             </div>
+             <h2 className="text-2xl font-black text-slate-900 mb-2">Personalización PRO</h2>
+             <p className="text-slate-500 mb-8 leading-relaxed">
+               Desbloquea el editor de diseño completo. Personaliza colores, fuentes, botones y más para que tu tienda sea única.
+             </p>
+             <Link href="/dashboard/settings" className="block w-full">
+                <button className="w-full py-4 bg-slate-900 hover:bg-black text-white font-bold rounded-xl text-lg shadow-xl shadow-slate-900/10 transition-all active:scale-95 flex items-center justify-center gap-2">
+                   <Star className="w-5 h-5 text-yellow-400 fill-yellow-400" />
+                   Desbloquear Diseño
+                </button>
+             </Link>
+          </div>
+        </div>
+      )}
 
       {/* --- SMART TOOLBAR (FIX: MOVED OUTSIDE SCROLL FLOW & ABSOLUTE POSITIONED) --- */}
       <div
