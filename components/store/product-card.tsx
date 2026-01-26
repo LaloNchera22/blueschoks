@@ -25,25 +25,30 @@ export function ProductCard({ product, config, onSelectElement, onAddToCart }: P
 
   // 2. Lógica de Galería
   const gallery = useMemo(() => {
-    // 1. Array base (imagen principal si existe)
-    const mainImg = product.image_url ? [product.image_url] : []
+    const images: string[] = [];
 
-    // 2. Array adicional
-    const extraImgs = (product.images && Array.isArray(product.images)) ? product.images : []
-
-    // 3. Combinar y filtrar
-    const rawGallery = [...mainImg, ...extraImgs].filter(url => url && url.length > 5)
-
-    // 4. Deduplicar
-    const uniqueGallery = Array.from(new Set(rawGallery))
-
-    // Fallback final
-    if (uniqueGallery.length === 0) {
-      return ['/placeholder.png']
+    // 1. Agregar imagen principal si existe
+    if (product.image_url && typeof product.image_url === 'string') {
+      images.push(product.image_url);
     }
 
-    return uniqueGallery
-  }, [product.images, product.image_url])
+    // 2. Agregar imágenes adicionales
+    if (product.images && Array.isArray(product.images)) {
+      images.push(...product.images);
+    }
+
+    // 3. Filtrar y deduplicar
+    // Filtramos strings vacíos o muy cortos y null/undefined
+    const validImages = images.filter(url => url && typeof url === 'string' && url.length > 5);
+    const uniqueGallery = Array.from(new Set(validImages));
+
+    // Fallback
+    if (uniqueGallery.length === 0) {
+      return ['/placeholder.png'];
+    }
+
+    return uniqueGallery;
+  }, [product.images, product.image_url]);
 
   const isVideo = (url: string) => {
     return /\.(mp4|webm|ogg|mov)$/i.test(url)
@@ -187,14 +192,14 @@ export function ProductCard({ product, config, onSelectElement, onAddToCart }: P
             <>
               <button
                 onClick={handlePrev}
-                className="absolute left-2 top-1/2 -translate-y-1/2 w-8 h-8 bg-white/90 hover:bg-white rounded-full flex items-center justify-center shadow-sm z-50 transition-transform active:scale-95"
+                className="absolute left-2 top-1/2 -translate-y-1/2 w-8 h-8 bg-white hover:bg-gray-100 rounded-full flex items-center justify-center shadow-md z-50 transition-transform active:scale-95 opacity-90 hover:opacity-100"
               >
                 <ChevronLeft size={18} className="text-black" />
               </button>
 
               <button
                 onClick={handleNext}
-                className="absolute right-2 top-1/2 -translate-y-1/2 w-8 h-8 bg-white/90 hover:bg-white rounded-full flex items-center justify-center shadow-sm z-50 transition-transform active:scale-95"
+                className="absolute right-2 top-1/2 -translate-y-1/2 w-8 h-8 bg-white hover:bg-gray-100 rounded-full flex items-center justify-center shadow-md z-50 transition-transform active:scale-95 opacity-90 hover:opacity-100"
               >
                 <ChevronRight size={18} className="text-black" />
               </button>

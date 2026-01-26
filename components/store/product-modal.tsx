@@ -137,15 +137,15 @@ export function ProductModal({
             <>
               <button
                 onClick={(e) => { e.stopPropagation(); handlePrev(); }}
-                className="absolute left-4 top-1/2 -translate-y-1/2 w-10 h-10 bg-white/80 hover:bg-white rounded-full flex items-center justify-center shadow-sm backdrop-blur-sm transition-all active:scale-95 z-50"
+                className="absolute left-4 top-1/2 -translate-y-1/2 w-10 h-10 bg-white hover:bg-gray-100 rounded-full flex items-center justify-center shadow-md z-50 transition-transform active:scale-95 opacity-90 hover:opacity-100"
               >
-                <ChevronLeft size={20} />
+                <ChevronLeft size={20} className="text-black" />
               </button>
               <button
                 onClick={(e) => { e.stopPropagation(); handleNext(); }}
-                className="absolute right-4 top-1/2 -translate-y-1/2 w-10 h-10 bg-white/80 hover:bg-white rounded-full flex items-center justify-center shadow-sm backdrop-blur-sm transition-all active:scale-95 z-50"
+                className="absolute right-4 top-1/2 -translate-y-1/2 w-10 h-10 bg-white hover:bg-gray-100 rounded-full flex items-center justify-center shadow-md z-50 transition-transform active:scale-95 opacity-90 hover:opacity-100"
               >
-                <ChevronRight size={20} />
+                <ChevronRight size={20} className="text-black" />
               </button>
 
               {/* Dots */}
