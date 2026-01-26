@@ -1,37 +1,15 @@
 
 > blueshock@0.1.0 dev
-> next dev -p 3000
+> next dev -H 0.0.0.0
 
 ▲ Next.js 16.1.4 (Turbopack)
 - Local:         http://localhost:3000
-- Network:       http://192.168.0.2:3000
+- Network:       http://0.0.0.0:3000
 - Experiments (use with caution):
   · serverActions
 
 ✓ Starting...
-✓ Ready in 1082ms
-○ Compiling /test-design-feature ...
- GET /test-design-feature 200 in 3.9s (compile: 3.6s, render: 285ms)
-TypeError: fetch failed
-    at ignore-listed frames {
-  [cause]: Error: getaddrinfo EAI_AGAIN via.placeholder.com
-      at ignore-listed frames {
-    errno: -3001,
-    code: 'EAI_AGAIN',
-    syscall: 'getaddrinfo',
-    hostname: 'via.placeholder.com'
-  }
-}
- GET /test-design-feature 200 in 93ms (compile: 6ms, render: 87ms)
-TypeError: fetch failed
-    at ignore-listed frames {
-  [cause]: Error: getaddrinfo EAI_AGAIN via.placeholder.com
-      at ignore-listed frames {
-    errno: -3001,
-    code: 'EAI_AGAIN',
-    syscall: 'getaddrinfo',
-    hostname: 'via.placeholder.com'
-  }
-}
- GET /_next/image?url=https%3A%2F%2Fvia.placeholder.com%2F400&w=640&q=75 500 in 267ms (compile: 242ms, render: 24ms)
- GET /_next/image?url=https%3A%2F%2Fvia.placeholder.com%2F400&w=640&q=75 500 in 267ms (compile: 242ms, render: 25ms)
+✓ Ready in 1178ms
+ GET /test-sidebar 200 in 1692ms (compile: 1205ms, render: 487ms)
+✓ Compiled in 652ms
+[?25h

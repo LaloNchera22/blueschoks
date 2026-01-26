@@ -3,7 +3,7 @@
 import { useState } from "react"
 import Link from "next/link"
 import { usePathname } from "next/navigation"
-import { Package, Settings, Palette, Home, Copy, ExternalLink, Globe, Check, X } from "lucide-react"
+import { Package, Settings, Palette, Home, Copy, ExternalLink, Globe, Check, X, Crown } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { UserNav } from "@/components/dashboard/user-nav"
 
@@ -12,11 +12,13 @@ export function AppSidebar({
   shopUrl = "",
   userEmail = "usuario@email.com",
   isOpen = true,
+  isPro = false,
   onClose
 }: {
   shopUrl?: string,
   userEmail?: string,
   isOpen?: boolean,
+  isPro?: boolean,
   onClose?: () => void
 }) {
   const pathname = usePathname()
@@ -66,14 +68,29 @@ export function AppSidebar({
            <span className="font-black text-lg tracking-tight text-slate-900">BLUESHOCKS</span>
         </div>
 
-        <div className="bg-amber-50 border border-amber-100 rounded-xl p-3 flex items-center gap-3 mb-6">
-           <div className="bg-amber-100 text-amber-600 p-1.5 rounded-lg">
-             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><path d="m2 4 3 12h14l3-12-6 7-4-7-4 7-6-7zm3 16h14"/></svg>
-           </div>
-           <div>
-             <h3 className="font-bold text-[10px] uppercase tracking-wider text-amber-800">Plan Pro</h3>
-             <p className="text-[10px] text-amber-600/80 font-medium">Cuenta activa</p>
-           </div>
+        {/* ZONA DE ESTADO DEL PLAN */}
+        <div className="mb-6">
+          {isPro ? (
+            <div className="bg-amber-50 border border-amber-100 rounded-xl p-3 flex items-center gap-3">
+               <div className="bg-amber-100 text-amber-600 p-1.5 rounded-lg">
+                 <Crown size={14} strokeWidth={3} />
+               </div>
+               <div>
+                 <h3 className="font-bold text-[10px] uppercase tracking-wider text-amber-800">Plan Pro</h3>
+                 <p className="text-[10px] text-amber-600/80 font-medium">Cuenta activa</p>
+               </div>
+            </div>
+          ) : (
+            <div className="bg-slate-50 border border-slate-100 rounded-xl p-4 text-center">
+              <p className="text-xs text-slate-500 mb-3">Estás en el plan gratuito</p>
+              <Link
+                href="/dashboard/pricing"
+                className="block w-full py-2 bg-black text-white text-xs font-bold rounded-lg hover:bg-neutral-800 transition-all shadow-md hover:shadow-lg transform hover:-translate-y-0.5"
+              >
+                OBTENER PRO 💎
+              </Link>
+            </div>
+          )}
         </div>
       </div>
 
