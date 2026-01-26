@@ -26,15 +26,15 @@ interface PricingClientProps {
 export default function PricingClient({ isPro, subscriptionEnd, plans }: PricingClientProps) {
   const [loading, setLoading] = useState<string | null>(null)
 
-  const handleSubscribe = async (planKey: keyof PlansConfig) => {
+  const handleCheckout = async (planKey: keyof PlansConfig) => {
     const plan = plans[planKey]
     if (!plan) return
 
     setLoading(planKey)
-    console.log(`Subscribing to plan: ${planKey}`, plan)
+    console.log(`Checkout for plan: ${planKey}`, plan)
 
     try {
-      const response = await fetch('/api/checkout', {
+      const response = await fetch('/api/stripe/checkout', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -64,21 +64,14 @@ export default function PricingClient({ isPro, subscriptionEnd, plans }: Pricing
   let currentPlan = "Free"
   if (isPro) {
     if (subscriptionEnd) {
-      // This is a simplification. Ideally we'd know if it's monthly or yearly from the backend.
-      // But for now, let's assume if it's not lifetime, it matches one of the subscription plans.
-      // However, the UI logic previously used "Mensual" as a catch-all for subscription.
-      currentPlan = "Mensual"
+      currentPlan = "Mensual" // or Annual, simplified logic
     } else {
       currentPlan = "Lifetime"
     }
   }
 
   const renderAction = (displayPlanName: string, planKey: keyof PlansConfig, buttonVariant: "default" | "outline" | "secondary" | "ghost" | "link" | "destructive" | null | undefined = "default", customClass?: string) => {
-    // Logic to disable button if it's the current plan
-    // Note: This logic is imperfect because "Mensual" in currentPlan might not match "Anual" here even if both are subscriptions.
-    // But we'll stick to the existing logic of disabling the specific plan if it matches the display name.
 
-    // Check if this plan matches the current plan logic
     const isCurrent = currentPlan === displayPlanName;
 
     if (isCurrent) {
@@ -90,16 +83,17 @@ export default function PricingClient({ isPro, subscriptionEnd, plans }: Pricing
     }
 
     const isLoading = loading === planKey;
+    const buttonText = isLoading ? 'Cargando...' : (customClass ? 'Comprar ahora' : 'Suscribirse');
 
     // Special styling for Lifetime button if passed
     if (customClass) {
         return (
             <Button
               className={customClass}
-              onClick={() => handleSubscribe(planKey)}
+              onClick={() => handleCheckout(planKey)}
               disabled={isLoading || !!loading}
             >
-              {isLoading ? 'Procesando...' : 'Comprar ahora'}
+              {buttonText}
             </Button>
         )
     }
@@ -107,11 +101,11 @@ export default function PricingClient({ isPro, subscriptionEnd, plans }: Pricing
     return (
       <Button
         className="w-full"
-        onClick={() => handleSubscribe(planKey)}
+        onClick={() => handleCheckout(planKey)}
         variant={buttonVariant}
         disabled={isLoading || !!loading}
       >
-         {isLoading ? 'Procesando...' : 'Suscribirse'}
+         {buttonText}
       </Button>
     )
   }
