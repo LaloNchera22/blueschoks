@@ -24,10 +24,16 @@ export function PlansModal({ isOpen, onClose, isPro, expirationDate }: PlansModa
   return (
     <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
       <DialogContent className="sm:max-w-4xl p-0 overflow-hidden gap-0 bg-transparent border-none shadow-none">
-        <div className="bg-white rounded-2xl shadow-2xl overflow-hidden grid md:grid-cols-2">
+        <div className="bg-white rounded-2xl shadow-2xl overflow-hidden flex flex-col">
+          <DialogHeader className="p-6 pb-2">
+            <DialogTitle className="text-2xl font-bold text-center text-slate-900">
+              Elige el plan ideal para tu negocio
+            </DialogTitle>
+          </DialogHeader>
 
-          {/* FREE PLAN COLUMN */}
-          <div className="p-8 border-r border-slate-100 flex flex-col relative bg-slate-50/50">
+          <div className="grid md:grid-cols-2 w-full">
+            {/* FREE PLAN COLUMN */}
+            <div className="p-8 border-r border-slate-100 flex flex-col relative bg-slate-50/50">
             {!isPro && (
               <div className="absolute top-4 right-4">
                 <span className="bg-slate-200 text-slate-600 text-[10px] font-bold px-3 py-1 rounded-full uppercase tracking-wider">
@@ -67,8 +73,8 @@ export function PlansModal({ isOpen, onClose, isPro, expirationDate }: PlansModa
             </div>
           </div>
 
-          {/* PRO PLAN COLUMN */}
-          <div className="p-8 bg-slate-900 text-white relative flex flex-col overflow-hidden">
+            {/* PRO PLAN COLUMN */}
+            <div className="p-8 bg-slate-900 text-white relative flex flex-col overflow-hidden">
             {/* Background Gradient/Effects */}
             <div className="absolute top-0 right-0 w-64 h-64 bg-amber-500/10 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2 pointer-events-none"></div>
 
@@ -124,6 +130,7 @@ export function PlansModal({ isOpen, onClose, isPro, expirationDate }: PlansModa
                    Plan Activo
                  </div>
                )}
+            </div>
             </div>
           </div>
         </div>
