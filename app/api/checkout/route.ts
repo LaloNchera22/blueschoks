@@ -13,7 +13,7 @@ const stripe = new Stripe(stripeSecretKey, {
   // apiVersion: '2024-12-18.acacia', <--- PUEDES COMENTAR ESTO SI MOLESTA
 })
 
-export async function POST() {
+export async function POST(req: Request) {
   const supabase = await createClient()
 
   // 1. Verificamos quién es el usuario
@@ -32,7 +32,10 @@ export async function POST() {
     .single()
 
   try {
-    const priceId = process.env.STRIPE_PRICE_ID || 'price_dummy_for_build';
+    const body = await req.json().catch(() => ({})); // Handle empty body safely
+    const priceId = body.priceId || process.env.STRIPE_PRICE_ID || 'price_dummy_for_build';
+    const mode = body.mode || 'subscription';
+
     const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000';
 
     // 3. Creamos la sesión de pago
@@ -44,7 +47,7 @@ export async function POST() {
           quantity: 1,
         },
       ],
-      mode: 'subscription', 
+      mode: mode,
       success_url: `${baseUrl}/dashboard?payment=success`,
       cancel_url: `${baseUrl}/dashboard?payment=cancelled`,
       customer_email: user.email, 
