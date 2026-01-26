@@ -1,5 +1,5 @@
 import { redirect } from "next/navigation"
-import SettingsForm from "./settings-form" // Importamos el formulario nuevo
+import SettingsForm from "./settings-form"
 import { getProfile, getUser } from "@/utils/user-data"
 
 export default async function SettingsPage() {
@@ -12,10 +12,12 @@ export default async function SettingsPage() {
   // 2. Obtener Datos del Perfil
   const profile = await getProfile()
 
-  // 3. Empaquetar datos para el formulario
+  // 3. Empaquetar datos (AQUÍ ESTABA EL ERROR)
+  // Agregamos 'username' para que el formulario reciba el link correcto de la base de datos
   const initialData = {
     shop_name: profile?.shop_name || "",
-    slug: profile?.slug || "",
+    slug: profile?.slug || "",         // Mantenemos por si acaso
+    username: profile?.username || "", // <--- CRUCIAL: Este es tu link real ahora
     whatsapp: profile?.whatsapp || "",
     email: user.email || ""
   }

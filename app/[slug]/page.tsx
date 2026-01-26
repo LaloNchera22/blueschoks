@@ -1,25 +1,24 @@
 import { notFound } from 'next/navigation'
 import { Metadata } from 'next'
-import { createAdminClient } from '@/utils/supabase/server'
+import { createClient } from '@/utils/supabase/server' // Usa el cliente normal para lectura pública
 import { DesignConfig } from '@/lib/types/design-system'
 import { CartProvider } from '@/components/shop/cart-context'
 import StoreClient from './store-client'
-import { DEFAULT_DESIGN, sanitizeDesign } from '@/utils/design-sanitizer'
+import { sanitizeDesign } from '@/utils/design-sanitizer'
 
 // --- 2. GENERATE METADATA ---
 export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }): Promise<Metadata> {
   const { slug } = await params
-  const supabase = await createAdminClient()
+  const supabase = await createClient()
 
   const { data: profile } = await supabase
     .from('profiles')
     .select('shop_name, design_title_text, design_subtitle_text, avatar_url, theme_config, design_config')
-    .eq('slug', slug)
+    .eq('username', slug) // <--- CORRECCIÓN 1: Buscamos por username
     .single()
 
   if (!profile) return { title: 'Tienda no encontrada' }
 
-  // Prioritize design_config (new source), fall back to theme_config (legacy)
   const config = (profile.design_config || profile.theme_config) as unknown as DesignConfig
   const title = config?.profile?.shopName || profile.shop_name || 'Mi Tienda'
   const desc = config?.profile?.bio || profile.design_subtitle_text || 'Bienvenido a mi tienda'
@@ -39,13 +38,13 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
 // --- 3. PAGE COMPONENT ---
 export default async function StorePage({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params
-  const supabase = await createAdminClient()
+  const supabase = await createClient()
 
   // 1. Fetch Profile
   const { data: profile } = await supabase
     .from('profiles')
-    .select('*, design_config') // Explicitly select design_config to ensure it's available even if * misses it due to types
-    .eq('slug', slug)
+    .select('*, design_config')
+    .eq('username', slug) // <--- CORRECCIÓN 2: Buscamos por username (donde guardaste el link)
     .single()
 
   if (!profile) {
@@ -57,19 +56,16 @@ export default async function StorePage({ params }: { params: Promise<{ slug: st
     .from('products')
     .select('*')
     .eq('user_id', profile.id)
-    .eq('stock', 1) // Solo productos en stock
+    .eq('is_active', true) // Solo activos
     .order('created_at', { ascending: false })
 
   const isPro = profile.is_pro || false;
 
-  // 3. Adapt Design Config (Merge)
-  // Prioritize design_config (new source), fall back to theme_config (legacy)
-  // If NOT PRO, we force null to trigger default design (Basic)
+  // 3. Adapt Design Config
   const rawConfig = isPro
     ? (profile.design_config || profile.theme_config) as unknown as Partial<DesignConfig> | null
     : null;
 
-  // Use the robust sanitizer to ensure all fields (avatarShape, styles, etc.) are preserved correctly
   const config = sanitizeDesign(rawConfig, profile);
 
   return (

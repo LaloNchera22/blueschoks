@@ -14,12 +14,10 @@ export default async function DashboardLayout({
 
   const profile = await getProfile()
 
-  // ❌ HE BORRADO EL BLOQUE QUE DECÍA: if (!profile?.is_pro) redirect("/pricing")
-  // Ahora los usuarios gratuitos PUEDEN entrar.
-
   return (
     <DashboardLayoutClient
-       shopUrl={profile?.slug || ""}
+       // CORRECCIÓN CRÍTICA: Usamos username, que es donde guardamos el link real
+       shopUrl={profile?.username || ""} 
        userEmail={user.email || ""}
        isPro={profile?.is_pro ?? false}
     >

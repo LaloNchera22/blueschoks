@@ -22,6 +22,7 @@ const COUNTRY_CODES = [
 interface InitialData {
   shop_name?: string;
   slug?: string;
+  username?: string; // <--- AGREGADO: Para leer el link real de la DB
   whatsapp?: string;
   email?: string;
   [key: string]: unknown;
@@ -43,11 +44,8 @@ export default function SettingsForm({ initialData }: { initialData: InitialData
   // Cuando se guarda con éxito, cerramos todo
   useEffect(() => {
     if (state.success) {
-      // eslint-disable-next-line react-hooks/set-state-in-effect
       setEditShop(false)
-      // eslint-disable-next-line react-hooks/set-state-in-effect
       setEditSlug(false)
-      // eslint-disable-next-line react-hooks/set-state-in-effect
       setEditContact(false)
     }
   }, [state.success])
@@ -57,12 +55,9 @@ export default function SettingsForm({ initialData }: { initialData: InitialData
       const fullNumber = initialData.whatsapp.toString()
       const foundPrefix = COUNTRY_CODES.find(c => fullNumber.startsWith(c.code.replace('+', '')))
       if (foundPrefix) {
-        // eslint-disable-next-line react-hooks/set-state-in-effect
         setPhonePrefix(foundPrefix.code)
-        // eslint-disable-next-line react-hooks/set-state-in-effect
         setPhoneNumber(fullNumber.replace(foundPrefix.code.replace('+', ''), ''))
       } else {
-        // eslint-disable-next-line react-hooks/set-state-in-effect
         setPhoneNumber(fullNumber)
       }
     }
@@ -99,7 +94,7 @@ export default function SettingsForm({ initialData }: { initialData: InitialData
                   id="shopName" 
                   name="shopName" 
                   defaultValue={initialData.shop_name} 
-                  readOnly={!editShop} // Usamos readOnly para que se envíe el dato aunque esté bloqueado
+                  readOnly={!editShop} 
                   className={`h-11 transition-all font-medium ${!editShop && "bg-slate-100 text-slate-500 border-slate-200 focus:ring-0 cursor-not-allowed"}`}
               />
           </div>
@@ -139,7 +134,8 @@ export default function SettingsForm({ initialData }: { initialData: InitialData
                   <input 
                       id="slug"
                       name="slug"
-                      defaultValue={initialData.slug}
+                      // --- CORRECCIÓN IMPORTANTE: Lee username primero ---
+                      defaultValue={initialData.username || initialData.slug || ''}
                       readOnly={!editSlug}
                       placeholder="tu-marca"
                       className={`flex-1 bg-transparent border-none focus:ring-0 text-slate-900 font-bold text-sm outline-none ${!editSlug && "text-slate-500 cursor-not-allowed"}`}
@@ -179,7 +175,7 @@ export default function SettingsForm({ initialData }: { initialData: InitialData
                       <div className="w-[140px] relative">
                           <select 
                             name="countryCode"
-                            disabled={!editContact} // Select sí usa disabled visualmente
+                            disabled={!editContact} 
                             value={phonePrefix}
                             onChange={(e) => setPhonePrefix(e.target.value)}
                             className="w-full h-11 appearance-none bg-white border border-slate-300 rounded-lg pl-3 pr-8 text-sm font-bold text-slate-900 focus:outline-none focus:ring-2 focus:ring-green-500 disabled:bg-slate-100 disabled:text-slate-500 disabled:border-slate-200 cursor-pointer disabled:cursor-not-allowed"
@@ -207,7 +203,6 @@ export default function SettingsForm({ initialData }: { initialData: InitialData
                   </div>
               </div>
 
-              {/* Input Oculto para que el CountryCode se envíe aunque el select esté disabled */}
               {!editContact && <input type="hidden" name="countryCode" value={phonePrefix} />}
 
               <div className="">
