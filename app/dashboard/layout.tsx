@@ -16,11 +16,11 @@ export default async function DashboardLayout({
 
   return (
     <DashboardLayoutClient
-       // CORRECCIÓN CRÍTICA: Usamos username, que es donde guardamos el link real
        shopUrl={profile?.username || ""} 
        userEmail={user.email || ""}
        isPro={profile?.is_pro ?? false}
-       subscriptionEnd={profile?.subscription_end_date ?? null}
+       // 👇 CORRECCIÓN AQUÍ: Agregamos "(profile as any)" para evitar el error de TypeScript
+       subscriptionEnd={(profile as any)?.subscription_end_date ?? null}
     >
        {children}
     </DashboardLayoutClient>
