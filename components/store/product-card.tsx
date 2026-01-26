@@ -21,18 +21,19 @@ export function ProductCard({ product, config, onSelectElement, onAddToCart }: P
 
   // 2. Lógica de Galería
   const gallery = useMemo(() => {
-    let imgs = (product.images && product.images.length > 0)
-      ? product.images
-      : [product.image_url || 'https://via.placeholder.com/400'];
-    imgs = imgs.filter(Boolean);
-
-    // MOCK FOR TESTING: Force duplication if single image to enable carousel
-    if (imgs.length <= 1) {
-      const img = imgs[0];
-      return [img, img, img, img];
+    // 1. Prioridad: Array de imágenes
+    if (product.images && product.images.length > 0) {
+      const validImages = product.images.filter(Boolean);
+      if (validImages.length > 0) return validImages;
     }
 
-    return imgs;
+    // 2. Prioridad: Imagen principal (image_url)
+    if (product.image_url) {
+      return [product.image_url];
+    }
+
+    // 3. Fallback: Placeholder
+    return ['/placeholder.png'];
   }, [product.images, product.image_url]);
 
   // 3. HANDLERS DE NAVEGACIÓN

@@ -6,6 +6,7 @@ import { usePathname } from "next/navigation"
 import { Package, Settings, Palette, Home, Copy, ExternalLink, Globe, Check, X, Crown } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { UserNav } from "@/components/dashboard/user-nav"
+import { PlansModal } from "@/components/dashboard/plans-modal"
 
 // Agregamos la prop 'userEmail' para mostrarlo abajo
 export function AppSidebar({
@@ -13,16 +14,19 @@ export function AppSidebar({
   userEmail = "usuario@email.com",
   isOpen = true,
   isPro = false,
+  subscriptionEnd = null,
   onClose
 }: {
   shopUrl?: string,
   userEmail?: string,
   isOpen?: boolean,
   isPro?: boolean,
+  subscriptionEnd?: string | null,
   onClose?: () => void
 }) {
   const pathname = usePathname()
   const [copied, setCopied] = useState(false)
+  const [showPlans, setShowPlans] = useState(false)
 
   const hasShopUrl = shopUrl && shopUrl.length > 0;
   // Ensure the link is clean and dynamic based on the slug
@@ -71,24 +75,34 @@ export function AppSidebar({
         {/* ZONA DE ESTADO DEL PLAN */}
         <div className="mb-6">
           {isPro ? (
-            <div className="bg-amber-50 border border-amber-100 rounded-xl p-3 flex items-center gap-3">
-               <div className="bg-amber-100 text-amber-600 p-1.5 rounded-lg">
+            <div
+              onClick={() => setShowPlans(true)}
+              className="bg-amber-50 border border-amber-100 rounded-xl p-3 flex items-center gap-3 cursor-pointer hover:bg-amber-100/50 transition-colors group/plan"
+            >
+               <div className="bg-amber-100 text-amber-600 p-1.5 rounded-lg group-hover/plan:bg-amber-200 transition-colors">
                  <Crown size={14} strokeWidth={3} />
                </div>
                <div>
                  <h3 className="font-bold text-[10px] uppercase tracking-wider text-amber-800">Plan Pro</h3>
-                 <p className="text-[10px] text-amber-600/80 font-medium">Cuenta activa</p>
+                 {subscriptionEnd ? (
+                   <p className="text-[10px] text-amber-600/80 font-medium">
+                     Vence: {new Date(subscriptionEnd).toLocaleDateString()}
+                   </p>
+                 ) : (
+                   <p className="text-[10px] text-amber-600/80 font-medium">Cuenta activa</p>
+                 )}
                </div>
             </div>
           ) : (
             <div className="bg-slate-50 border border-slate-100 rounded-xl p-4 text-center">
               <p className="text-xs text-slate-500 mb-3">Estás en el plan gratuito</p>
-              <Link
-                href="/dashboard/pricing"
-                className="block w-full py-2 bg-black text-white text-xs font-bold rounded-lg hover:bg-neutral-800 transition-all shadow-md hover:shadow-lg transform hover:-translate-y-0.5"
+              <Button
+                variant="default"
+                onClick={() => setShowPlans(true)}
+                className="w-full py-2 bg-black text-white text-xs font-bold rounded-lg hover:bg-neutral-800 transition-all shadow-md hover:shadow-lg transform hover:-translate-y-0.5"
               >
-                OBTENER PRO 💎
-              </Link>
+                VER PLANES 💎
+              </Button>
             </div>
           )}
         </div>
@@ -160,6 +174,13 @@ export function AppSidebar({
       <div className="p-3 mt-auto border-t border-slate-100">
          <UserNav userEmail={userEmail} isCollapsed={false} />
       </div>
+
+      <PlansModal
+        isOpen={showPlans}
+        onClose={() => setShowPlans(false)}
+        isPro={isPro}
+        expirationDate={subscriptionEnd}
+      />
 
     </aside>
   )

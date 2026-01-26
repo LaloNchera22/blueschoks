@@ -20,6 +20,7 @@ export default async function DashboardLayout({
        shopUrl={profile?.username || ""} 
        userEmail={user.email || ""}
        isPro={profile?.is_pro ?? false}
+       subscriptionEnd={profile?.subscription_end_date ?? null}
     >
        {children}
     </DashboardLayoutClient>

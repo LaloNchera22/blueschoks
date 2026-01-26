@@ -9,6 +9,7 @@ interface DashboardLayoutClientProps {
   shopUrl: string
   userEmail: string
   isPro: boolean
+  subscriptionEnd: string | null
 }
 
 export default function DashboardLayoutClient({
@@ -16,6 +17,7 @@ export default function DashboardLayoutClient({
   shopUrl,
   userEmail,
   isPro,
+  subscriptionEnd,
 }: DashboardLayoutClientProps) {
   const [isSidebarOpen, setIsSidebarOpen] = useState(true)
 
@@ -26,6 +28,7 @@ export default function DashboardLayoutClient({
         userEmail={userEmail}
         isOpen={isSidebarOpen}
         isPro={isPro}
+        subscriptionEnd={subscriptionEnd}
         onClose={() => setIsSidebarOpen(false)}
       />
 
