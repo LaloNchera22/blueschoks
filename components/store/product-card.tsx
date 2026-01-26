@@ -21,20 +21,27 @@ export function ProductCard({ product, config, onSelectElement, onAddToCart }: P
 
   // 2. Lógica de Galería
   const gallery = useMemo(() => {
+    let imgs: string[] = []
+
     // 1. Prioridad: Array de imágenes
     if (product.images && product.images.length > 0) {
-      const validImages = product.images.filter(Boolean);
-      if (validImages.length > 0) return validImages;
+      imgs = product.images
+    }
+    // 2. Fallback: Imagen principal
+    else if (product.image_url) {
+      imgs = [product.image_url]
     }
 
-    // 2. Prioridad: Imagen principal (image_url)
-    if (product.image_url) {
-      return [product.image_url];
+    // Filtra cualquier valor nulo o inválido
+    imgs = imgs.filter(img => img && img.length > 5)
+
+    // Fallback final si todo falla
+    if (imgs.length === 0) {
+      return ['/placeholder.png']
     }
 
-    // 3. Fallback: Placeholder
-    return ['/placeholder.png'];
-  }, [product.images, product.image_url]);
+    return imgs
+  }, [product.images, product.image_url])
 
   // 3. HANDLERS DE NAVEGACIÓN
   const handlePrev = (e: React.MouseEvent) => {
@@ -110,20 +117,20 @@ export function ProductCard({ product, config, onSelectElement, onAddToCart }: P
           <>
             <button
               onClick={handlePrev}
-              className="absolute left-2 top-1/2 -translate-y-1/2 w-8 h-8 bg-white hover:bg-gray-100 rounded-full flex items-center justify-center shadow-sm opacity-100 transition-opacity z-10"
+              className="absolute left-2 top-1/2 -translate-y-1/2 w-8 h-8 bg-white hover:bg-gray-100 rounded-full flex items-center justify-center shadow-sm z-50 transition-transform active:scale-95"
             >
               <ChevronLeft size={18} className="text-black" />
             </button>
 
             <button
               onClick={handleNext}
-              className="absolute right-2 top-1/2 -translate-y-1/2 w-8 h-8 bg-white hover:bg-gray-100 rounded-full flex items-center justify-center shadow-sm opacity-100 transition-opacity z-10"
+              className="absolute right-2 top-1/2 -translate-y-1/2 w-8 h-8 bg-white hover:bg-gray-100 rounded-full flex items-center justify-center shadow-sm z-50 transition-transform active:scale-95"
             >
               <ChevronRight size={18} className="text-black" />
             </button>
 
             {/* INDICADOR DE PUNTOS */}
-            <div className="absolute bottom-2 left-0 right-0 flex justify-center gap-1 z-10">
+            <div className="absolute bottom-2 left-0 right-0 flex justify-center gap-1 z-50 pointer-events-none">
               {gallery.map((_, idx) => (
                 <div
                   key={idx}
