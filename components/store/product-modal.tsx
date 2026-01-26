@@ -137,19 +137,19 @@ export function ProductModal({
             <>
               <button
                 onClick={(e) => { e.stopPropagation(); handlePrev(); }}
-                className="absolute left-4 top-1/2 -translate-y-1/2 w-10 h-10 bg-white/80 hover:bg-white rounded-full flex items-center justify-center shadow-sm backdrop-blur-sm transition-all active:scale-95 z-10"
+                className="absolute left-4 top-1/2 -translate-y-1/2 w-10 h-10 bg-white/80 hover:bg-white rounded-full flex items-center justify-center shadow-sm backdrop-blur-sm transition-all active:scale-95 z-50"
               >
                 <ChevronLeft size={20} />
               </button>
               <button
                 onClick={(e) => { e.stopPropagation(); handleNext(); }}
-                className="absolute right-4 top-1/2 -translate-y-1/2 w-10 h-10 bg-white/80 hover:bg-white rounded-full flex items-center justify-center shadow-sm backdrop-blur-sm transition-all active:scale-95 z-10"
+                className="absolute right-4 top-1/2 -translate-y-1/2 w-10 h-10 bg-white/80 hover:bg-white rounded-full flex items-center justify-center shadow-sm backdrop-blur-sm transition-all active:scale-95 z-50"
               >
                 <ChevronRight size={20} />
               </button>
 
               {/* Dots */}
-              <div className="absolute bottom-4 left-0 right-0 flex justify-center gap-2 z-10">
+              <div className="absolute bottom-4 left-0 right-0 flex justify-center gap-2 z-50">
                 {gallery.map((_, idx) => (
                   <div
                     key={idx}
