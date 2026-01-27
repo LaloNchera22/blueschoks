@@ -68,6 +68,7 @@ export const DUMMY_PROFILE: Profile = {
   username: "tienda_demo",
   whatsapp: null,
   is_pro: false,
+  subscription_end_date: null,
   slug: "tienda-demo",
   email: "demo@example.com",
   avatar_url: null,
