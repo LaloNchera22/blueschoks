@@ -2,6 +2,9 @@
   "name": "blueshock",
   "version": "0.1.0",
   "private": true,
+  "engines": {
+    "node": ">=20.0.0"
+  },
   "scripts": {
     "dev": "next dev",
     "build": "next build",
@@ -30,7 +33,7 @@
     "framer-motion": "^12.26.2",
     "immer": "^11.1.3",
     "lucide-react": "^0.562.0",
-    "next": "^16.1.4",
+    "next": "^16.1.5",
     "next-themes": "^0.4.6",
     "playwright": "^1.57.0",
     "react": "19.2.3",
