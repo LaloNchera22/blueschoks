@@ -1,5 +1,8 @@
 import { createClient } from "@/utils/supabase/server"
+import { Database } from "@/utils/supabase/types"
 import { cache } from "react"
+
+export type Profile = Database['public']['Tables']['profiles']['Row']
 
 export const getUser = cache(async () => {
   const supabase = await createClient()
@@ -10,7 +13,7 @@ export const getUser = cache(async () => {
   return user
 })
 
-export const getProfile = cache(async () => {
+export const getProfile = cache(async (): Promise<Profile | null> => {
   const user = await getUser()
   if (!user) return null
 
