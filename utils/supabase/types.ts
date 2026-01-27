@@ -20,6 +20,7 @@ export interface Database {
           username: string | null
           whatsapp: string | null
           is_pro: boolean | null
+          subscription_end_date: string | null
           slug: string | null
           email: string | null
           avatar_url: string | null
@@ -39,6 +40,7 @@ export interface Database {
           username?: string | null
           whatsapp?: string | null
           is_pro?: boolean | null
+          subscription_end_date?: string | null
           slug?: string | null
           email?: string | null
           avatar_url?: string | null
@@ -58,6 +60,7 @@ export interface Database {
           username?: string | null
           whatsapp?: string | null
           is_pro?: boolean | null
+          subscription_end_date?: string | null
           slug?: string | null
           email?: string | null
           avatar_url?: string | null
