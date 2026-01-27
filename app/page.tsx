@@ -6,11 +6,13 @@ import { Footer } from "@/components/landing/footer"
 export default function LandingPage() {
   return (
     // Se eliminó 'h-screen' y 'overflow-hidden' para permitir scroll natural.
-    <div className="min-h-screen flex flex-col bg-white font-sans text-slate-900 selection:bg-blue-100 overflow-x-hidden">
+    <div className="min-h-screen flex flex-col bg-white font-sans text-slate-900 selection:bg-blue-100 overflow-x-hidden lg:h-screen lg:max-h-screen lg:overflow-hidden lg:justify-between">
       <Navbar />
-      <main className="flex-1 flex flex-col items-center w-full">
+      <main className="flex-1 flex flex-col items-center w-full lg:justify-center">
         <Hero />
-        <Features />
+        <div className="block lg:hidden w-full">
+          <Features />
+        </div>
       </main>
       <Footer />
     </div>
