@@ -142,6 +142,7 @@ export function normalizeProfile(raw: any): Profile {
     username: safeString(raw?.username, 'usuario'),
     whatsapp: raw?.whatsapp || null,
     is_pro: !!raw?.is_pro,
+    subscription_end_date: raw?.subscription_end_date || null,
     slug: raw?.slug || null, // Will attempt to fix below
     email: raw?.email || null,
     avatar_url: raw?.avatar_url || null,
