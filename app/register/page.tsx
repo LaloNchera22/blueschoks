@@ -64,23 +64,23 @@ function RegisterForm() {
   }
 
   return (
-    <div className="flex-1 flex flex-col justify-center max-w-xl mx-auto w-full space-y-4">
+    <div className="flex-1 flex flex-col justify-center max-w-xl mx-auto w-full space-y-2">
           
       {/* HEADER COMPACTO */}
-      <div className="flex flex-col space-y-1 text-center mb-2">
-        <div className="w-9 h-9 bg-[#0F172A] text-white rounded-lg flex items-center justify-center font-black text-lg mx-auto mb-1">
+      <div className="flex flex-col space-y-0.5 text-center mb-1">
+        <div className="w-8 h-8 bg-[#0F172A] text-white rounded-md flex items-center justify-center font-black text-sm mx-auto mb-1">
           B
         </div>
-        <h1 className="text-xl font-bold tracking-tight">Crea tu cuenta</h1>
-        <p className="text-xs text-muted-foreground">
+        <h1 className="text-lg font-bold tracking-tight">Crea tu cuenta</h1>
+        <p className="text-[10px] text-muted-foreground">
           Estás a un paso de vender online.
         </p>
       </div>
 
-      <form action={signup} className="space-y-3">
+      <form action={signup} className="space-y-2">
         
         {/* FILA 1: Nombre y Apellido */}
-        <div className="grid grid-cols-2 gap-3">
+        <div className="grid grid-cols-2 gap-2">
           <div className="grid gap-1.5">
             <Label htmlFor="firstName" className="text-xs font-bold text-slate-700">Nombre</Label>
             <div className="relative">
@@ -95,15 +95,15 @@ function RegisterForm() {
         </div>
 
         {/* FILA 2: WhatsApp y Nombre Tienda (Fusionados en una fila para ahorrar espacio) */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-            <div className="grid gap-1.5">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+            <div className="grid gap-1">
                 <Label htmlFor="phone" className="text-xs font-bold text-slate-700">WhatsApp</Label>
                 <div className="relative">
                     <Phone className="absolute left-2.5 top-2.5 h-4 w-4 text-slate-400" />
                     <Input id="phone" name="phone" type="tel" placeholder="55 1234 5678" className="pl-8 h-9 text-sm" required />
                 </div>
             </div>
-            <div className="grid gap-1.5">
+            <div className="grid gap-1">
                 <Label htmlFor="shopName" className="text-xs font-bold text-slate-700">Nombre de tu Tienda</Label>
                 <div className="relative">
                     <Store className="absolute left-2.5 top-2.5 h-4 w-4 text-slate-400" />
@@ -121,7 +121,7 @@ function RegisterForm() {
         </div>
 
         {/* FILA 3: Link (Ancho completo pero compacto) */}
-        <div className="grid gap-1.5">
+        <div className="grid gap-1">
           <Label className="flex items-center justify-between text-xs font-bold text-slate-700">
             <div className="flex items-center gap-1.5">
                 <Globe className="w-3 h-3" /> Link de tu tienda
@@ -152,15 +152,15 @@ function RegisterForm() {
         </div>
 
         {/* FILA 4: Correo y Contraseña (Fusionados para ahorrar espacio) */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-            <div className="grid gap-1.5">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+            <div className="grid gap-1">
                 <Label htmlFor="email" className="text-xs font-bold text-slate-700">Correo</Label>
                 <div className="relative">
                     <Mail className="absolute left-2.5 top-2.5 h-4 w-4 text-slate-400" />
                     <Input id="email" name="email" type="email" placeholder="hola@mail.com" className="pl-8 h-9 text-sm" required />
                 </div>
             </div>
-            <div className="grid gap-1.5">
+            <div className="grid gap-1">
                 <Label htmlFor="password" className="text-xs font-bold text-slate-700">Contraseña</Label>
                 <div className="relative">
                     <Lock className="absolute left-2.5 top-2.5 h-4 w-4 text-slate-400" />
@@ -176,7 +176,7 @@ function RegisterForm() {
           </div>
         )}
 
-        <Button type="submit" className="w-full h-10 font-bold bg-[#0F172A] hover:bg-slate-800 text-sm mt-1">
+        <Button type="submit" className="w-full h-9 font-bold bg-[#0F172A] hover:bg-slate-800 text-sm mt-1">
           Crear Tienda Gratis
         </Button>
       </form>
@@ -225,8 +225,8 @@ export default function RegisterPage() {
     <div className="w-full h-screen grid lg:grid-cols-2 overflow-hidden">
       
       {/* Columna Izquierda: Formulario (Ahora más compacto) */}
-      <div className="flex flex-col h-full bg-white p-4 lg:p-8 relative overflow-y-auto items-center justify-center">
-        <Link href="/" className="absolute top-4 left-4 lg:top-8 lg:left-8 text-muted-foreground hover:text-primary transition-colors flex items-center gap-2 text-xs font-bold">
+      <div className="flex flex-col h-full bg-white p-4 lg:p-6 relative overflow-y-auto items-center justify-center">
+        <Link href="/" className="absolute top-4 left-4 text-muted-foreground hover:text-primary transition-colors flex items-center gap-2 text-xs font-bold">
           <ArrowLeft className="w-4 h-4" />
           Volver
         </Link>
@@ -236,22 +236,22 @@ export default function RegisterPage() {
       </div>
 
       {/* Columna Derecha: Branding (Visualmente igual) */}
-      <div className="hidden lg:flex flex-col bg-[#0F172A] text-white p-12 justify-center relative overflow-hidden">
+      <div className="hidden lg:flex flex-col bg-[#0F172A] text-white p-6 justify-center relative overflow-hidden">
         <div className="absolute top-0 right-0 -mt-20 -mr-20 w-96 h-96 bg-blue-500/20 rounded-full blur-3xl opacity-50 animate-pulse"></div>
         <div className="absolute bottom-0 left-0 -mb-20 -ml-20 w-96 h-96 bg-purple-600/20 rounded-full blur-3xl opacity-50"></div>
 
-        <div className="relative z-10 max-w-md mx-auto text-center space-y-6">
-            <div className="w-16 h-16 bg-white/10 rounded-2xl flex items-center justify-center mx-auto backdrop-blur-sm border border-white/10">
-               <Store className="w-8 h-8 text-white" />
+        <div className="relative z-10 max-w-md mx-auto text-center space-y-3">
+            <div className="w-12 h-12 bg-white/10 rounded-xl flex items-center justify-center mx-auto backdrop-blur-sm border border-white/10">
+               <Store className="w-6 h-6 text-white" />
             </div>
-            <h2 className="text-3xl font-bold">Tu negocio en WhatsApp, <br/>al siguiente nivel.</h2>
-            <div className="space-y-4 text-slate-300 text-sm leading-relaxed">
+            <h2 className="text-xl font-bold">Tu negocio en WhatsApp, <br/>al siguiente nivel.</h2>
+            <div className="space-y-2 text-slate-300 text-xs leading-relaxed">
                 <p>✓ Catálogo digital instantáneo</p>
                 <p>✓ Sin comisiones por venta</p>
                 <p>✓ Gestión de inventario simple</p>
             </div>
         </div>
-        <div className="absolute bottom-8 w-full text-center text-xs text-slate-500 left-0">
+        <div className="absolute bottom-4 w-full text-center text-[10px] text-slate-500 left-0">
             © 2026 BlueShock Inc.
         </div>
       </div>
