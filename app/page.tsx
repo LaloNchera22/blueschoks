@@ -7,9 +7,9 @@ export default function LandingPage() {
   return (
     <div className="min-h-screen flex flex-col bg-white font-sans text-slate-900 selection:bg-blue-100 overflow-x-hidden lg:h-screen lg:overflow-hidden">
       <Navbar />
-      <main className="flex-1 w-full flex flex-col items-center lg:grid lg:grid-cols-2 lg:items-center lg:gap-8 lg:px-6">
+      <main className="flex-1 w-full flex flex-col items-center lg:justify-evenly">
         <Hero />
-        <div className="w-full lg:h-full lg:flex lg:flex-col lg:justify-center">
+        <div className="w-full">
           <Features />
         </div>
       </main>
