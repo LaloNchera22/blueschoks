@@ -22,7 +22,8 @@ export default async function DashboardLayout({
        shopUrl={profile?.slug || ""}
        userEmail={user.email || ""}
        isPro={profile?.is_pro ?? false}
-       subscriptionEnd={profile?.subscription_end_date ?? null}
+       // 👇 AQUÍ ESTÁ EL ARREGLO: (profile as any)
+       subscriptionEnd={(profile as any)?.subscription_end_date ?? null}
     >
        {children}
     </DashboardLayoutClient>
