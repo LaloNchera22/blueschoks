@@ -262,8 +262,6 @@ export default function DesignEditor({ initialConfig, initialProducts, userId, s
         style_config: (p.style_config as ProductStyle) || {}
       }));
 
-      console.log("🔥 INTENTANDO GUARDAR:", productUpdates); // DEBUG
-
       // 2. Ejecutar Acciones en Paralelo
       const [designResult, productsResult] = await Promise.all([
         saveDesignConfig(config),
