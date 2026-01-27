@@ -17,11 +17,11 @@ export default function LoginPage() {
   const [state, dispatch] = useActionState(login, initialState)
 
   return (
-    // Layout Grid igual que registro: Izquierda Formulario / Derecha Visual (oculta en móvil)
-    <div className="w-full min-h-screen grid lg:grid-cols-2 font-sans bg-white">
+    // Layout Grid: Full height, no scroll, split screen on MD+
+    <div className="w-full h-screen overflow-hidden grid md:grid-cols-2 font-sans bg-white">
       
       {/* --- COLUMNA IZQUIERDA: FORMULARIO --- */}
-      <div className="flex flex-col justify-center px-8 py-12 sm:px-12 lg:px-20 relative bg-white">
+      <div className="flex flex-col justify-center items-center px-8 sm:px-12 relative bg-white h-full">
         
         {/* Botón Volver */}
         <div className="absolute top-8 left-8">
@@ -33,7 +33,7 @@ export default function LoginPage() {
 
         <div className="w-full max-w-[380px] mx-auto space-y-8 mt-12">
           
-          {/* Header con Branding idéntico a Home */}
+          {/* Header con Branding */}
           <div className="space-y-4">
             <div className="flex items-center gap-2 font-black text-xl tracking-tighter text-slate-900 mb-6">
                 <div className="w-8 h-8 bg-[#0F172A] text-white rounded-lg flex items-center justify-center text-sm">B</div>
@@ -97,7 +97,7 @@ export default function LoginPage() {
             </div>
           </div>
 
-          {/* Botón Google - Estilo Outline pero Redondo */}
+          {/* Botón Google */}
           <Button variant="outline" className="w-full h-12 border-slate-200 hover:bg-slate-50 text-slate-700 font-bold rounded-full flex items-center justify-center gap-3 transition-all hover:scale-[1.02]">
             <svg className="h-5 w-5" viewBox="0 0 24 24">
               <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4" />
@@ -117,20 +117,20 @@ export default function LoginPage() {
         </div>
       </div>
 
-      {/* --- COLUMNA DERECHA: VISUAL (Estilo Landing Page) --- */}
-      <div className="hidden lg:flex flex-col justify-center items-center bg-slate-50 p-12 lg:p-24 relative overflow-hidden border-l border-slate-100">
+      {/* --- COLUMNA DERECHA: VISUAL --- */}
+      <div className="hidden md:flex flex-col justify-center items-center bg-slate-50 p-6 md:p-12 relative overflow-hidden border-l border-slate-100 h-full">
          
          {/* Fondo decorativo sutil */}
          <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-blue-100 rounded-full blur-[100px] opacity-60 pointer-events-none -translate-y-1/2 translate-x-1/2"></div>
          
-         <div className="relative z-10 w-full max-w-md space-y-6">
-            <h2 className="text-3xl font-black tracking-tight text-slate-900 mb-8">
+         <div className="relative z-10 w-full max-w-md space-y-5">
+            <h2 className="text-2xl md:text-3xl font-black tracking-tight text-slate-900 mb-6">
                Tu tienda online, <br/>
                <span className="text-blue-600">más rápida que nunca.</span>
             </h2>
 
-            {/* Tarjeta 1 - Estilo Landing */}
-            <div className="bg-white p-5 rounded-2xl shadow-sm border border-slate-100 flex items-start gap-4 hover:shadow-md transition-shadow">
+            {/* Tarjeta 1 */}
+            <div className="bg-white p-4 rounded-2xl shadow-sm border border-slate-100 flex items-start gap-4 hover:shadow-md transition-shadow">
                <div className="w-10 h-10 bg-blue-50 text-blue-600 rounded-lg flex items-center justify-center shrink-0">
                   <Zap size={20} className="fill-blue-600" />
                </div>
@@ -142,8 +142,8 @@ export default function LoginPage() {
                </div>
             </div>
 
-            {/* Tarjeta 2 - Estilo Landing */}
-            <div className="bg-white p-5 rounded-2xl shadow-sm border border-slate-100 flex items-start gap-4 hover:shadow-md transition-shadow">
+            {/* Tarjeta 2 */}
+            <div className="bg-white p-4 rounded-2xl shadow-sm border border-slate-100 flex items-start gap-4 hover:shadow-md transition-shadow">
                <div className="w-10 h-10 bg-green-50 text-green-600 rounded-lg flex items-center justify-center shrink-0">
                   <Shield size={20} />
                </div>
@@ -155,8 +155,8 @@ export default function LoginPage() {
                </div>
             </div>
 
-            {/* Tarjeta 3 - Estilo Landing */}
-            <div className="bg-white p-5 rounded-2xl shadow-sm border border-slate-100 flex items-start gap-4 hover:shadow-md transition-shadow">
+            {/* Tarjeta 3 */}
+            <div className="bg-white p-4 rounded-2xl shadow-sm border border-slate-100 flex items-start gap-4 hover:shadow-md transition-shadow">
                <div className="w-10 h-10 bg-purple-50 text-purple-600 rounded-lg flex items-center justify-center shrink-0">
                   <CheckCircle2 size={20} />
                </div>
