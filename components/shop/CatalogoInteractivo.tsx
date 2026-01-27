@@ -52,7 +52,6 @@ const CatalogoInteractivo = memo(function CatalogoInteractivo({ products, shop, 
   const { setSelectedComponent, selectedComponent, theme: editorTheme } = useEditorStore()
   
   const [isClient, setIsClient] = useState(false)
-  const [scrolled, setScrolled] = useState(false)
   const [isCartOpen, setIsCartOpen] = useState(false) 
 
   // Use editor theme if in editor mode, otherwise use shop.theme_config or legacy fallback
@@ -60,12 +59,6 @@ const CatalogoInteractivo = memo(function CatalogoInteractivo({ products, shop, 
 
   useEffect(() => {
       setIsClient(true)
-  }, [])
-
-  useEffect(() => {
-      const handleScroll = () => setScrolled(window.scrollY > 20)
-      window.addEventListener('scroll', handleScroll)
-      return () => window.removeEventListener('scroll', handleScroll)
   }, [])
 
   // 2. Fórmulas de Totales (Optimizadas)
