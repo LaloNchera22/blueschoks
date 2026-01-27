@@ -1,5 +1,6 @@
 {
   "name": "blueshock",
+  "description": "Blueshock Next.js Project",
   "version": "0.1.0",
   "private": true,
   "engines": {
