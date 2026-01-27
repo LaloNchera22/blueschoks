@@ -21,51 +21,51 @@ export default function LoginPage() {
     <div className="w-full h-screen overflow-hidden grid md:grid-cols-2 font-sans bg-white">
       
       {/* --- COLUMNA IZQUIERDA: FORMULARIO --- */}
-      <div className="flex flex-col justify-center items-center px-8 sm:px-12 relative bg-white h-full">
+      <div className="flex flex-col justify-center items-center px-6 relative bg-white h-full">
         
         {/* Botón Volver */}
-        <div className="absolute top-8 left-8">
-          <Link href="/" className="group flex items-center gap-2 text-sm font-bold text-slate-400 hover:text-slate-900 transition-colors">
-            <ArrowLeft size={18} className="group-hover:-translate-x-1 transition-transform" />
+        <div className="absolute top-4 left-4">
+          <Link href="/" className="group flex items-center gap-2 text-xs font-bold text-slate-400 hover:text-slate-900 transition-colors">
+            <ArrowLeft size={16} className="group-hover:-translate-x-1 transition-transform" />
             Volver
           </Link>
         </div>
 
-        <div className="w-full max-w-[380px] mx-auto space-y-8 mt-12">
+        <div className="w-full max-w-[380px] mx-auto space-y-4">
           
           {/* Header con Branding */}
-          <div className="space-y-4">
-            <div className="flex items-center gap-2 font-black text-xl tracking-tighter text-slate-900 mb-6">
-                <div className="w-8 h-8 bg-[#0F172A] text-white rounded-lg flex items-center justify-center text-sm">B</div>
+          <div className="space-y-2">
+            <div className="flex items-center gap-2 font-black text-lg tracking-tighter text-slate-900 mb-2">
+                <div className="w-6 h-6 bg-[#0F172A] text-white rounded-md flex items-center justify-center text-xs">B</div>
                 BLUESHOCKS
             </div>
             
-            <h1 className="text-4xl font-black tracking-tight text-slate-900">
+            <h1 className="text-2xl font-black tracking-tight text-slate-900">
               Bienvenido
             </h1>
-            <p className="text-slate-500 font-medium">
+            <p className="text-slate-500 font-medium text-sm">
               Ingresa a tu panel de control.
             </p>
           </div>
 
-          <form action={dispatch} className="space-y-5">
+          <form action={dispatch} className="space-y-3">
             
-            <div className="space-y-2">
-              <Label htmlFor="email" className="text-slate-900 font-bold text-sm">Correo Electrónico</Label>
+            <div className="space-y-1">
+              <Label htmlFor="email" className="text-slate-900 font-bold text-xs">Correo Electrónico</Label>
               <Input
                 id="email"
                 name="email"
                 type="email"
                 placeholder="nombre@tuempresa.com"
                 required
-                className="h-12 bg-white border-slate-200 focus:border-slate-900 focus:ring-slate-900 rounded-xl transition-all font-medium"
+                className="h-9 bg-white border-slate-200 focus:border-slate-900 focus:ring-slate-900 rounded-lg transition-all font-medium text-sm"
               />
             </div>
             
-            <div className="space-y-2">
+            <div className="space-y-1">
               <div className="flex items-center justify-between">
-                <Label htmlFor="password" className="text-slate-900 font-bold text-sm">Contraseña</Label>
-                <Link href="#" className="text-xs font-bold text-blue-600 hover:text-blue-800 hover:underline">
+                <Label htmlFor="password" className="text-slate-900 font-bold text-xs">Contraseña</Label>
+                <Link href="#" className="text-[10px] font-bold text-blue-600 hover:text-blue-800 hover:underline">
                   ¿Olvidaste tu contraseña?
                 </Link>
               </div>
@@ -75,7 +75,7 @@ export default function LoginPage() {
                 type="password"
                 placeholder="••••••••"
                 required
-                className="h-12 bg-white border-slate-200 focus:border-slate-900 focus:ring-slate-900 rounded-xl transition-all font-medium"
+                className="h-9 bg-white border-slate-200 focus:border-slate-900 focus:ring-slate-900 rounded-lg transition-all font-medium text-sm"
               />
             </div>
 
@@ -98,8 +98,8 @@ export default function LoginPage() {
           </div>
 
           {/* Botón Google */}
-          <Button variant="outline" className="w-full h-12 border-slate-200 hover:bg-slate-50 text-slate-700 font-bold rounded-full flex items-center justify-center gap-3 transition-all hover:scale-[1.02]">
-            <svg className="h-5 w-5" viewBox="0 0 24 24">
+          <Button variant="outline" className="w-full h-9 border-slate-200 hover:bg-slate-50 text-slate-700 font-bold rounded-full flex items-center justify-center gap-2 transition-all hover:scale-[1.02] text-sm">
+            <svg className="h-4 w-4" viewBox="0 0 24 24">
               <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4" />
               <path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853" />
               <path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.84z" fill="#FBBC05" />
@@ -118,51 +118,51 @@ export default function LoginPage() {
       </div>
 
       {/* --- COLUMNA DERECHA: VISUAL --- */}
-      <div className="hidden md:flex flex-col justify-center items-center bg-slate-50 p-6 md:p-12 relative overflow-hidden border-l border-slate-100 h-full">
+      <div className="hidden md:flex flex-col justify-center items-center bg-slate-50 p-6 relative overflow-hidden border-l border-slate-100 h-full">
          
          {/* Fondo decorativo sutil */}
          <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-blue-100 rounded-full blur-[100px] opacity-60 pointer-events-none -translate-y-1/2 translate-x-1/2"></div>
          
-         <div className="relative z-10 w-full max-w-md space-y-5">
-            <h2 className="text-2xl md:text-3xl font-black tracking-tight text-slate-900 mb-6">
+         <div className="relative z-10 w-full max-w-md space-y-3">
+            <h2 className="text-xl md:text-2xl font-black tracking-tight text-slate-900 mb-4">
                Tu tienda online, <br/>
                <span className="text-blue-600">más rápida que nunca.</span>
             </h2>
 
             {/* Tarjeta 1 */}
-            <div className="bg-white p-4 rounded-2xl shadow-sm border border-slate-100 flex items-start gap-4 hover:shadow-md transition-shadow">
-               <div className="w-10 h-10 bg-blue-50 text-blue-600 rounded-lg flex items-center justify-center shrink-0">
-                  <Zap size={20} className="fill-blue-600" />
+            <div className="bg-white p-3 rounded-xl shadow-sm border border-slate-100 flex items-start gap-3 hover:shadow-md transition-shadow">
+               <div className="w-8 h-8 bg-blue-50 text-blue-600 rounded-lg flex items-center justify-center shrink-0">
+                  <Zap size={16} className="fill-blue-600" />
                </div>
                <div>
-                  <h3 className="font-bold text-slate-900">Velocidad Extrema</h3>
-                  <p className="text-sm text-slate-500 leading-snug mt-1">
+                  <h3 className="font-bold text-slate-900 text-sm">Velocidad Extrema</h3>
+                  <p className="text-xs text-slate-500 leading-snug mt-0.5">
                      Administra tu catálogo sin esperas. Todo carga al instante.
                   </p>
                </div>
             </div>
 
             {/* Tarjeta 2 */}
-            <div className="bg-white p-4 rounded-2xl shadow-sm border border-slate-100 flex items-start gap-4 hover:shadow-md transition-shadow">
-               <div className="w-10 h-10 bg-green-50 text-green-600 rounded-lg flex items-center justify-center shrink-0">
-                  <Shield size={20} />
+            <div className="bg-white p-3 rounded-xl shadow-sm border border-slate-100 flex items-start gap-3 hover:shadow-md transition-shadow">
+               <div className="w-8 h-8 bg-green-50 text-green-600 rounded-lg flex items-center justify-center shrink-0">
+                  <Shield size={16} />
                </div>
                <div>
-                  <h3 className="font-bold text-slate-900">Seguridad Total</h3>
-                  <p className="text-sm text-slate-500 leading-snug mt-1">
+                  <h3 className="font-bold text-slate-900 text-sm">Seguridad Total</h3>
+                  <p className="text-xs text-slate-500 leading-snug mt-0.5">
                      Tus datos y los de tus clientes están protegidos con estándares bancarios.
                   </p>
                </div>
             </div>
 
             {/* Tarjeta 3 */}
-            <div className="bg-white p-4 rounded-2xl shadow-sm border border-slate-100 flex items-start gap-4 hover:shadow-md transition-shadow">
-               <div className="w-10 h-10 bg-purple-50 text-purple-600 rounded-lg flex items-center justify-center shrink-0">
-                  <CheckCircle2 size={20} />
+            <div className="bg-white p-3 rounded-xl shadow-sm border border-slate-100 flex items-start gap-3 hover:shadow-md transition-shadow">
+               <div className="w-8 h-8 bg-purple-50 text-purple-600 rounded-lg flex items-center justify-center shrink-0">
+                  <CheckCircle2 size={16} />
                </div>
                <div>
-                  <h3 className="font-bold text-slate-900">Fácil de Usar</h3>
-                  <p className="text-sm text-slate-500 leading-snug mt-1">
+                  <h3 className="font-bold text-slate-900 text-sm">Fácil de Usar</h3>
+                  <p className="text-xs text-slate-500 leading-snug mt-0.5">
                      Diseñado para que te enfoques en vender, no en programar.
                   </p>
                </div>
@@ -181,9 +181,9 @@ function SubmitButton() {
     <Button 
       type="submit" 
       disabled={pending} 
-      className="w-full bg-slate-900 hover:bg-slate-800 text-white font-bold h-12 rounded-full text-base shadow-xl shadow-slate-200 hover:shadow-2xl hover:scale-[1.02] transition-all active:scale-[0.98]"
+      className="w-full bg-slate-900 hover:bg-slate-800 text-white font-bold h-10 rounded-full text-sm shadow-xl shadow-slate-200 hover:shadow-2xl hover:scale-[1.02] transition-all active:scale-[0.98]"
     >
-      {pending ? <><Loader2 className="mr-2 h-5 w-5 animate-spin" /> Verificando...</> : "Iniciar Sesión"}
+      {pending ? <><Loader2 className="mr-2 h-4 w-4 animate-spin" /> Verificando...</> : "Iniciar Sesión"}
     </Button>
   )
 }
