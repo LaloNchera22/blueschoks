@@ -41,9 +41,9 @@ export default function AddProductModal({ isPro = false }: Props) {
     const combinedFiles = [...selectedFiles, ...newFiles]
     setSelectedFiles(combinedFiles)
 
-    // GENERAMOS PREVIEWS PARA TODO EL CONJUNTO
-    const newPreviews = combinedFiles.map(file => URL.createObjectURL(file))
-    setPreviews(newPreviews)
+    // GENERAMOS PREVIEWS SOLO PARA LAS NUEVAS
+    const additionalPreviews = newFiles.map(file => URL.createObjectURL(file))
+    setPreviews(prev => [...prev, ...additionalPreviews])
 
     // LIMPIAMOS EL INPUT (Para que el usuario pueda seleccionar la misma foto si se equivocó)
     if (fileInputRef.current) fileInputRef.current.value = ''
@@ -55,7 +55,7 @@ export default function AddProductModal({ isPro = false }: Props) {
     setSelectedFiles(updatedFiles)
     
     // Actualizamos previews
-    const updatedPreviews = updatedFiles.map(file => URL.createObjectURL(file))
+    const updatedPreviews = previews.filter((_, idx) => idx !== indexToRemove)
     setPreviews(updatedPreviews)
   }
 
