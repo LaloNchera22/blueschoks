@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useRef } from 'react'
+import { useState, useRef, useEffect } from 'react'
 import { addProduct } from '@/app/actions' 
 import { useRouter } from 'next/navigation'
 import Image from 'next/image'
@@ -16,6 +16,19 @@ export default function AddProductModal({ isPro = false }: Props) {
   // ESTADO PARA ACUMULAR LAS FOTOS (Array de Archivos)
   const [selectedFiles, setSelectedFiles] = useState<File[]>([]) 
   const [previews, setPreviews] = useState<string[]>([]) 
+  const previewsRef = useRef<string[]>([])
+
+  // Sincronizar ref con state para limpieza al desmontar
+  useEffect(() => {
+    previewsRef.current = previews
+  }, [previews])
+
+  // Limpieza al desmontar el componente
+  useEffect(() => {
+    return () => {
+      previewsRef.current.forEach(url => URL.revokeObjectURL(url))
+    }
+  }, [])
 
   const router = useRouter()
   const formRef = useRef<HTMLFormElement>(null)
@@ -41,9 +54,9 @@ export default function AddProductModal({ isPro = false }: Props) {
     const combinedFiles = [...selectedFiles, ...newFiles]
     setSelectedFiles(combinedFiles)
 
-    // GENERAMOS PREVIEWS PARA TODO EL CONJUNTO
-    const newPreviews = combinedFiles.map(file => URL.createObjectURL(file))
-    setPreviews(newPreviews)
+    // GENERAMOS PREVIEWS SOLO PARA LAS NUEVAS
+    const newPreviews = newFiles.map(file => URL.createObjectURL(file))
+    setPreviews(prev => [...prev, ...newPreviews])
 
     // LIMPIAMOS EL INPUT (Para que el usuario pueda seleccionar la misma foto si se equivocó)
     if (fileInputRef.current) fileInputRef.current.value = ''
@@ -51,12 +64,14 @@ export default function AddProductModal({ isPro = false }: Props) {
 
   // --- 2. FUNCIÓN PARA QUITAR UNA FOTO INDIVIDUAL ---
   const removeImage = (indexToRemove: number) => {
+    // Revocar la URL específica
+    URL.revokeObjectURL(previews[indexToRemove])
+
     const updatedFiles = selectedFiles.filter((_, idx) => idx !== indexToRemove)
     setSelectedFiles(updatedFiles)
     
-    // Actualizamos previews
-    const updatedPreviews = updatedFiles.map(file => URL.createObjectURL(file))
-    setPreviews(updatedPreviews)
+    // Actualizamos previews filtrando
+    setPreviews(prev => prev.filter((_, idx) => idx !== indexToRemove))
   }
 
   // --- 3. ENVÍO DEL FORMULARIO ---
@@ -86,6 +101,8 @@ export default function AddProductModal({ isPro = false }: Props) {
     
     if (result?.success) {
       setIsOpen(false)
+      // Revocar todas las URLs antes de limpiar el estado
+      previews.forEach(url => URL.revokeObjectURL(url))
       setSelectedFiles([]) // Limpiar memoria
       setPreviews([])
       router.refresh() 
