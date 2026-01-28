@@ -45,17 +45,24 @@ export default function PricingClient({ isPro, subscriptionEnd, plans }: Pricing
         }),
       })
 
+      if (!response.ok) {
+         // Si la respuesta no es ok, lanzamos error para caer en el catch
+         const errData = await response.json().catch(() => ({}));
+         throw new Error(errData.error || 'Error en la petición');
+      }
+
       const data = await response.json()
 
       if (data.url) {
-        window.location.href = data.url
+        window.location.href = data.url; // Esto es lo que nos lleva a Stripe
       } else {
+        console.error("No se recibió URL de Stripe");
         alert(data.error || 'Error al iniciar el pago')
         setLoading(null)
       }
     } catch (error) {
       console.error(error)
-      alert('Ocurrió un error inesperado')
+      alert(error instanceof Error ? error.message : 'Ocurrió un error inesperado')
       setLoading(null)
     }
   }
