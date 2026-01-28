@@ -22,6 +22,7 @@ export default function LoginPage() {
     await supabase.auth.signInWithOAuth({
       provider: 'google',
       options: {
+        // Usamos window.location.origin para que funcione en Localhost y Producción automáticamente
         redirectTo: `${window.location.origin}/auth/callback`,
         queryParams: {
           access_type: 'offline',
@@ -114,9 +115,9 @@ export default function LoginPage() {
 
           {/* Botón Google */}
           <Button
-            variant="outline"
             type="button"
             onClick={handleGoogleLogin}
+            variant="outline"
             className="w-full h-9 border-slate-200 hover:bg-slate-50 text-slate-700 font-bold rounded-full flex items-center justify-center gap-2 transition-all hover:scale-[1.02] text-sm"
           >
             <svg className="h-4 w-4" viewBox="0 0 24 24">
