@@ -58,7 +58,8 @@ export async function POST(req: Request) {
       mode: mode,
       success_url: `${baseUrl}/dashboard?payment=success`,
       cancel_url: `${baseUrl}/dashboard?payment=cancelled`,
-      customer_email: user.email, 
+      customer_email: user.email,
+      allow_promotion_codes: true,
       metadata: {
         userId: user.id, 
       },
