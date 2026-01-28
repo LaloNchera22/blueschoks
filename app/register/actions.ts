@@ -2,7 +2,7 @@
 
 import { revalidatePath } from "next/cache"
 import { redirect } from "next/navigation"
-import { createClient, createAdminClient } from "@/utils/supabase/server"
+import { createClient } from "@/utils/supabase/server"
 
 export async function signup(formData: FormData) {
   const supabase = await createClient()
@@ -37,7 +37,7 @@ export async function signup(formData: FormData) {
 
   // 3. Creación del usuario con metadatos
   // Pasamos los datos extra en options.data para que el Trigger de Supabase capture first_name, last_name, etc.
-  const { data, error } = await supabase.auth.signUp({
+  const { error } = await supabase.auth.signUp({
     email,
     password,
     options: {
@@ -47,7 +47,7 @@ export async function signup(formData: FormData) {
         last_name: lastName,
         shop_name: shopName,
         username: username,
-        whatsapp: phone
+        whatsapp: phone // ¡Importante no perder este dato!
       }
     },
   })
@@ -59,31 +59,6 @@ export async function signup(formData: FormData) {
       return redirect("/register?message=Este nombre de tienda ya está ocupado. Por favor intenta con otro.")
     }
     return redirect("/register?message=No se pudo registrar el usuario")
-  }
-
-  // 5. RESPALDO CRÍTICO: Inserción Manual del Perfil
-  // Si el usuario se creó pero el Trigger falló, nos aseguramos de que el perfil exista.
-  if (data?.user) {
-    try {
-      const adminSupabase = await createAdminClient()
-
-      // Intentamos insertar/actualizar el perfil manualmente usando la llave de servicio
-      await adminSupabase.from('profiles').upsert({
-        id: data.user.id,
-        username: username,
-        slug: username,
-        shop_name: shopName,
-        whatsapp: phone,
-        email: email,
-        updated_at: new Date().toISOString(),
-        // Forzamos defaults si es necesario, aunque la base de datos debería manejarlos
-        is_pro: false
-      }, { onConflict: 'id' })
-
-    } catch (manualInsertError) {
-      console.error("Error manual insert profile:", manualInsertError)
-      // No bloqueamos el flujo si esto falla, pero queda registrado.
-    }
   }
 
   revalidatePath("/", "layout")
