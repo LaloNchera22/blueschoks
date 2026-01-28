@@ -34,7 +34,13 @@ export async function POST(req: Request) {
   try {
     const body = await req.json().catch(() => ({})); // Handle empty body safely
     const priceId = body.priceId || process.env.STRIPE_PRICE_ID || 'price_dummy_for_build';
-    const mode = body.mode || 'subscription';
+
+    const lifetimePriceId = process.env.STRIPE_PRICE_ID_PRO_LIFETIME;
+    let mode: Stripe.Checkout.SessionCreateParams.Mode = 'subscription';
+
+    if (lifetimePriceId && priceId === lifetimePriceId) {
+      mode = 'payment';
+    }
 
     const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000';
 
