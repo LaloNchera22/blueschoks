@@ -8,11 +8,23 @@ export default function SubscribeButton() {
   const handleSubscribe = async () => {
     setLoading(true)
     try {
-      // Llamamos a nuestra API Route
+      // Llamamos a nuestra API Route con headers correctos y body
       const response = await fetch('/api/checkout', {
         method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          // Usamos el ID del plan mensual por defecto para este botón rápido
+          priceId: 'price_1StqsN4Z7AzNdq844cERPeZ8',
+          mode: 'subscription',
+        }),
       })
       
+      if (!response.ok) {
+        throw new Error('Error en la petición de checkout');
+      }
+
       const data = await response.json()
 
       // Si todo sale bien, Stripe nos manda una URL. Redirigimos ahí.

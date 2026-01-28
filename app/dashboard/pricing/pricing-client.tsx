@@ -31,9 +31,9 @@ export default function PricingClient({ isPro, subscriptionEnd, plans }: Pricing
     if (!plan) return
 
     setLoading(planKey)
-    console.log(`Subscribing to plan: ${planKey}`, plan)
 
     try {
+      // Usamos una ruta relativa estricta para evitar problemas con localhost o variables de entorno
       const response = await fetch('/api/checkout', {
         method: 'POST',
         headers: {
