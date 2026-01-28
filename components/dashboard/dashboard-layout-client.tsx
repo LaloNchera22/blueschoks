@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import AppSidebar from "@/components/dashboard-sidebar"
 import { StickyHeader } from "@/components/dashboard/sticky-header"
 
@@ -21,6 +21,13 @@ export default function DashboardLayoutClient({
 }: DashboardLayoutClientProps) {
   const [isSidebarOpen, setIsSidebarOpen] = useState(true)
 
+  useEffect(() => {
+    // Check screen size on mount to close sidebar on mobile
+    if (window.innerWidth < 768) {
+      setIsSidebarOpen(false)
+    }
+  }, [])
+
   return (
     <div className="flex h-screen w-full bg-slate-50 overflow-hidden">
       <AppSidebar
@@ -32,7 +39,7 @@ export default function DashboardLayoutClient({
         onClose={() => setIsSidebarOpen(false)}
       />
 
-      <main className="flex-1 overflow-y-auto h-full relative flex flex-col transition-all duration-300">
+      <main className="flex-1 overflow-y-auto h-full relative flex flex-col transition-all duration-300 pt-16 md:pt-0">
         <StickyHeader isSidebarOpen={isSidebarOpen} onOpen={() => setIsSidebarOpen(true)} />
 
         {children}
