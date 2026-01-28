@@ -46,9 +46,10 @@ export default function PricingClient({ isPro, subscriptionEnd, plans }: Pricing
       })
 
       if (!response.ok) {
-         // Si la respuesta no es ok, lanzamos error para caer en el catch
-         const errData = await response.json().catch(() => ({}));
-         throw new Error(errData.error || 'Error en la petición');
+        const errorData = await response.json();
+        alert(`Error de Stripe: ${errorData.error}`);
+        setLoading(null);
+        return;
       }
 
       const data = await response.json()
