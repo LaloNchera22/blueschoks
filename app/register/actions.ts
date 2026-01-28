@@ -16,8 +16,10 @@ export async function signup(formData: FormData) {
   const phone = formData.get("phone") as string
   const slugRaw = formData.get("slug")?.toString() || ""
 
-  // 1. Limpieza del input
-  const username = slugRaw.trim().toLowerCase()
+  // 1. Generación y Limpieza del Slug
+  // Si no hay slug explícito, lo generamos desde el nombre de la tienda
+  const rawSlug = slugRaw || shopName
+  const username = rawSlug.toLowerCase().replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, '')
 
   // 2. Check preventivo
   // Verificamos si el slug ya existe en la tabla profiles antes de intentar crear el usuario
@@ -33,21 +35,18 @@ export async function signup(formData: FormData) {
     }
   }
 
-  const fullName = `${firstName} ${lastName}`.trim()
-
   // 3. Creación del usuario con metadatos
-  // Pasamos los datos extra en options.data para que el Trigger de Supabase cree el perfil
-  // Agregamos 'slug' explícitamente por si el trigger lo espera.
+  // Pasamos los datos extra en options.data para que el Trigger de Supabase capture first_name, last_name, etc.
   const { data, error } = await supabase.auth.signUp({
     email,
     password,
     options: {
       emailRedirectTo: `${process.env.NEXT_PUBLIC_SITE_URL}/auth/callback`,
       data: {
-        full_name: fullName,
-        username: username,
-        slug: username,
+        first_name: firstName,
+        last_name: lastName,
         shop_name: shopName,
+        username: username,
         whatsapp: phone
       }
     },
