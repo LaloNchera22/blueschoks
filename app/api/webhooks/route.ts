@@ -3,11 +3,11 @@ import { NextResponse } from 'next/server'
 import Stripe from 'stripe'
 import { createClient } from '@supabase/supabase-js'
 
-const stripeSecretKey = process.env.STRIPE_SECRET_KEY!;
-const stripe = new Stripe(stripeSecretKey)
 const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET || 'whsec_dummy_secret_for_build';
 
 export async function POST(request: Request) {
+  const stripeSecretKey = process.env.STRIPE_SECRET_KEY!;
+  const stripe = new Stripe(stripeSecretKey)
   const body = await request.text()
 
   // --- CORRECCIÓN AQUÍ ---

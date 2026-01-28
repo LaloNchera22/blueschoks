@@ -7,13 +7,14 @@ import Stripe from 'stripe'
 // CORRECCIÓN AQUÍ:
 // Si te marca error de versión, simplemente quita la línea de apiVersion 
 // o pon la fecha exacta que te sugiere el error (ej: '2024-12-18.acacia')
-const stripeSecretKey = process.env.STRIPE_SECRET_KEY!;
-const stripe = new Stripe(stripeSecretKey, {
-  typescript: true, // Esto ayuda a que no se queje tanto
-  // apiVersion: '2024-12-18.acacia', <--- PUEDES COMENTAR ESTO SI MOLESTA
-})
 
 export async function POST(req: Request) {
+  const stripeSecretKey = process.env.STRIPE_SECRET_KEY!;
+  const stripe = new Stripe(stripeSecretKey, {
+    typescript: true, // Esto ayuda a que no se queje tanto
+    // apiVersion: '2024-12-18.acacia', <--- PUEDES COMENTAR ESTO SI MOLESTA
+  })
+
   const supabase = await createClient()
 
   // 1. Verificamos quién es el usuario
