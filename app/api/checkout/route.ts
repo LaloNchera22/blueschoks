@@ -56,12 +56,12 @@ export async function POST(req: Request) {
         },
       ],
       mode: mode,
+      allow_promotion_codes: true, // Habilitar códigos de promoción (cupones)
       success_url: `${baseUrl}/dashboard?payment=success`,
       cancel_url: `${baseUrl}/dashboard?payment=cancelled`,
       customer_email: user.email,
-      allow_promotion_codes: true,
       metadata: {
-        userId: user.id, 
+        userId: user.id,
       },
     })
 
