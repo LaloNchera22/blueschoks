@@ -1003,23 +1003,6 @@ export default function DesignEditor({ initialConfig, initialProducts, userId, s
                   />
                   <span className="text-[9px] text-gray-500 font-semibold uppercase tracking-wider">Icono</span>
                 </div>
-
-                <div className="w-px h-6 bg-gray-200" />
-
-                <input
-                  type="text"
-                  value={selectedSocialLink.url}
-                  onChange={(e) => updateSocialLink(selectedSocialLink.id, 'url', e.target.value)}
-                  placeholder={PLATFORMS.find(p => p.id === selectedSocialLink.platform)?.placeholder || "https://..."}
-                  className="h-7 rounded-full border border-gray-200 bg-gray-50 px-3 text-xs w-48 focus:outline-none focus:ring-2 focus:ring-black/5"
-                />
-
-                <button
-                  onClick={() => handleRemoveSocial(selectedSocialLink.id)}
-                  className="w-7 h-7 flex items-center justify-center rounded-full bg-red-50 text-red-500 hover:bg-red-100 hover:text-red-600 transition-colors"
-                >
-                  <Trash2 className="w-3.5 h-3.5" />
-                </button>
              </div>
           )}
 

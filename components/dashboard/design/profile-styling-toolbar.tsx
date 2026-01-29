@@ -17,7 +17,8 @@ export function ProfileStylingToolbar({
 
   if (activeTool === 'header-title') {
     return (
-      <div className="flex items-center gap-2 h-full animate-in fade-in slide-in-from-top-2 duration-300 w-full justify-around">
+      <div className="flex items-center gap-2 h-full animate-in fade-in slide-in-from-top-2 duration-300 w-full justify-between">
+
         {/* Selector de Fuente */}
         <div className="flex flex-col gap-0.5">
            <label className="text-[9px] font-bold text-gray-400 uppercase">Fuente</label>
@@ -45,7 +46,8 @@ export function ProfileStylingToolbar({
 
   if (activeTool === 'header-bio') {
     return (
-      <div className="flex items-center gap-2 h-full animate-in fade-in slide-in-from-top-2 duration-300 w-full justify-around">
+      <div className="flex items-center gap-2 h-full animate-in fade-in slide-in-from-top-2 duration-300 w-full justify-between">
+
         {/* Selector de Fuente */}
         <div className="flex flex-col gap-0.5">
            <label className="text-[9px] font-bold text-gray-400 uppercase">Fuente</label>
