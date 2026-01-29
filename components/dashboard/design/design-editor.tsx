@@ -477,6 +477,269 @@ export default function DesignEditor({ initialConfig, initialProducts, userId, s
 
   const selectedProduct = getSelectedProduct();
 
+  // --- RENDER TOOLBAR CONTENT EXCLUSIVELY ---
+  const renderToolbarContent = () => {
+    switch (activeTool) {
+      case 'header-title':
+      case 'header-bio':
+        return (
+          <ProfileStylingToolbar
+            activeTool={activeTool}
+            config={config}
+            onUpdateConfig={updateConfig}
+          />
+        );
+      case 'background':
+        return (
+          <BackgroundStylingToolbar
+            config={config}
+            onUpdate={updateConfig}
+            onUploadImage={handleBackgroundUpload}
+            onClose={() => setActiveTool('global')}
+            isUploading={isUploadingImage}
+          />
+        );
+      case 'typography':
+        return (
+          <TypographyStylingToolbar
+            config={config}
+            onUpdate={updateConfig}
+            onClose={() => setActiveTool('global')}
+          />
+        );
+      case 'global':
+        return (
+          <div className="flex items-center gap-3 animate-in fade-in slide-in-from-top-2 duration-300">
+             <button
+                onClick={() => setActiveTool('background')}
+                className="flex flex-col items-center gap-1 group cursor-pointer"
+             >
+              <div className="relative pointer-events-none">
+                 <ColorCircle
+                   color={config.colors.background}
+                   onChange={() => {}}
+                   size="sm"
+                 />
+              </div>
+              <span className="text-[9px] text-gray-500 font-semibold uppercase tracking-wider group-hover:text-black transition-colors">Fondo</span>
+            </button>
+
+             <button
+                onClick={() => setActiveTool('typography')}
+                className="flex flex-col items-center gap-1 group cursor-pointer"
+             >
+              <div className="w-8 h-8 rounded-full border border-gray-200 bg-white flex items-center justify-center transition-all group-hover:bg-gray-50">
+                 <Type className="w-4 h-4 text-gray-600" />
+              </div>
+              <span className="text-[9px] text-gray-500 font-semibold uppercase tracking-wider group-hover:text-black transition-colors">Fuente</span>
+            </button>
+
+            {/* Separator */}
+            <div className="w-px h-6 bg-gray-300" />
+
+            {/* Socials Manager Button */}
+            <button
+              onClick={() => setShowSocialsManager(!showSocialsManager)}
+              className={cn(
+                "flex flex-col items-center gap-1 group",
+                showSocialsManager && "opacity-100"
+              )}
+            >
+              <div className={cn(
+                "w-7 h-7 rounded-full border border-gray-200 flex items-center justify-center transition-all",
+                showSocialsManager ? "bg-black text-white border-black" : "bg-white text-gray-600 hover:bg-gray-50 hover:scale-105"
+              )}>
+                <MoreHorizontal className="w-3.5 h-3.5" />
+              </div>
+              <span className="text-[9px] text-gray-500 font-semibold uppercase tracking-wider group-hover:text-black transition-colors">Redes</span>
+            </button>
+          </div>
+        );
+      case 'header-avatar':
+        return (
+          <div className="flex items-center gap-4 animate-in fade-in slide-in-from-top-2 duration-300">
+            {/* Image Input (Replaced) */}
+            <label className="relative cursor-pointer group">
+                <input
+                  type="file"
+                  accept="image/*"
+                  onChange={handleImageUpload}
+                  className="hidden"
+                  disabled={isUploadingImage}
+                />
+                <div className="flex items-center gap-2 h-7 rounded-full border border-gray-200 bg-gray-50 px-3 hover:bg-gray-100 transition-colors cursor-pointer">
+                   {isUploadingImage ? (
+                      <Loader2 className="w-3 h-3 animate-spin text-gray-500" />
+                   ) : (
+                      <Upload className="w-3 h-3 text-gray-500" />
+                   )}
+                   <span className="text-xs font-medium text-gray-600">
+                      {isUploadingImage ? 'Subiendo...' : 'Subir Foto'}
+                   </span>
+                </div>
+            </label>
+
+            {/* Shape Selector */}
+            <div className="flex items-center bg-gray-50 rounded-full p-1 border border-gray-100">
+              <button
+                onClick={() => updateConfig(['profile', 'avatarShape'], 'circle')}
+                className={cn(
+                  "w-5 h-5 rounded-full flex items-center justify-center transition-all",
+                  config.profile.avatarShape === 'circle' ? "bg-white shadow-sm text-black" : "text-gray-400 hover:text-gray-600"
+                )}
+                title="Círculo"
+              >
+                <Circle className="w-2.5 h-2.5" />
+              </button>
+              <button
+                onClick={() => updateConfig(['profile', 'avatarShape'], 'square')}
+                className={cn(
+                  "w-5 h-5 rounded-full flex items-center justify-center transition-all",
+                  (config.profile.avatarShape === 'square' || config.profile.avatarShape === 'rounded') ? "bg-white shadow-sm text-black" : "text-gray-400 hover:text-gray-600"
+                )}
+                title="Cuadrado Redondeado"
+              >
+                <div className="w-2.5 h-2.5 border-2 border-current rounded-sm" />
+              </button>
+              <button
+                onClick={() => updateConfig(['profile', 'avatarShape'], 'none')}
+                className={cn(
+                  "w-5 h-5 rounded-full flex items-center justify-center transition-all",
+                  config.profile.avatarShape === 'none' ? "bg-white shadow-sm text-black" : "text-gray-400 hover:text-gray-600"
+                )}
+                title="Cuadrado Recto (Sin Borde)"
+              >
+                <Square className="w-2.5 h-2.5" />
+              </button>
+            </div>
+
+            {/* Border Toggle/Color */}
+            <div className="flex flex-col items-center gap-1">
+               <div className="flex items-center gap-1 relative">
+                  <ColorCircle
+                      color={config.profile.avatarBorderColor || 'transparent'}
+                      onChange={(c) => updateConfig(['profile', 'avatarBorderColor'], c)}
+                      size="sm"
+                  />
+                  {config.profile.avatarBorderColor && (
+                      <button
+                          onClick={(e) => {
+                              e.stopPropagation();
+                              updateConfig(['profile', 'avatarBorderColor'], undefined);
+                          }}
+                          className="absolute -top-1 -right-1 bg-gray-100 border border-gray-300 rounded-full p-0.5 hover:bg-gray-200 transition-colors shadow-sm z-10"
+                          title="Quitar borde"
+                      >
+                          <Minus size={10} className="text-gray-600" />
+                      </button>
+                  )}
+               </div>
+               <span className="text-[9px] text-gray-500 font-semibold uppercase tracking-wider">Borde</span>
+            </div>
+          </div>
+        );
+      case 'card-button':
+        return (
+          <div className="flex items-center gap-4 animate-in fade-in slide-in-from-top-2 duration-300">
+             <div className="flex flex-col items-center gap-1">
+                <ColorCircle color={config.cardStyle?.buttonColor || '#000000'} onChange={(c) => updateConfig(['cardStyle', 'buttonColor'], c)} size="sm" />
+                <span className="text-[9px] text-gray-500 font-semibold uppercase tracking-wider">Fondo</span>
+             </div>
+             <div className="flex flex-col items-center gap-1">
+                <ColorCircle color={config.cardStyle?.buttonTextColor || '#ffffff'} onChange={(c) => updateConfig(['cardStyle', 'buttonTextColor'], c)} size="sm" />
+                <span className="text-[9px] text-gray-500 font-semibold uppercase tracking-wider">Texto</span>
+             </div>
+
+             <div className="flex flex-col items-center gap-1 w-24">
+                <input
+                  type="range"
+                  min="0"
+                  max="24"
+                  step="2"
+                  value={config.cardStyle?.borderRadius || 8}
+                  onChange={(e) => updateConfig(['cardStyle', 'borderRadius'], Number(e.target.value))}
+                  className="w-full h-1 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-black"
+                />
+                <span className="text-[9px] text-gray-500 font-semibold uppercase tracking-wider">Redondez</span>
+             </div>
+          </div>
+        );
+      case 'card-title':
+      case 'card-price':
+        return (
+           <div className="flex items-center gap-4 animate-in fade-in slide-in-from-top-2 duration-300">
+              <div className="flex flex-col items-center gap-1">
+                <ColorCircle
+                  color={activeTool === 'card-title' ? (config.cardStyle?.titleColor || config.colors.text) : (config.cardStyle?.priceColor || config.colors.text)}
+                  onChange={(c) => updateConfig(['cardStyle', activeTool === 'card-title' ? 'titleColor' : 'priceColor'], c)}
+                  size="sm"
+                />
+                <span className="text-[9px] text-gray-500 font-semibold uppercase tracking-wider">Color</span>
+              </div>
+           </div>
+        );
+      case 'product-individual':
+        if (selectedProduct && selection) {
+           return (
+              <ProductStylingToolbar
+                product={selectedProduct}
+                activeElement={selection.elementType}
+                onUpdate={updateSelectedProductStyle}
+                onSave={handleSaveProduct}
+                onApplyAll={handleApplyToAll}
+                onClose={() => {
+                  setActiveTool('global');
+                  setSelection(null);
+                }}
+                isSaving={isSavingProduct}
+                fonts={GOOGLE_FONTS_LIST.map(f => ({ name: f, value: f }))}
+                defaultColors={{
+                  title: config.cardStyle?.titleColor || config.colors.text,
+                  price: config.cardStyle?.priceColor || config.colors.primary,
+                  button: config.cardStyle?.buttonColor || '#000000',
+                  buttonText: config.cardStyle?.buttonTextColor || '#ffffff'
+                }}
+              />
+           );
+        }
+        return null;
+      default:
+        // Handle dynamic social-icon-* cases
+        if (activeTool && activeTool.startsWith('social-icon-') && selectedSocialLink) {
+           return (
+              <div className="flex items-center gap-4 animate-in fade-in slide-in-from-top-2 duration-300">
+                 <div className="flex flex-col items-center gap-1">
+                   <ColorCircle
+                     color={selectedSocialLink.color || config.colors.primary}
+                     onChange={(c) => updateSocialLink(selectedSocialLink.id, 'color', c)}
+                     size="sm"
+                   />
+                   <span className="text-[9px] text-gray-500 font-semibold uppercase tracking-wider">Icono</span>
+                 </div>
+
+                 <div className="w-px h-6 bg-gray-200" />
+
+                 <input
+                   type="text"
+                   value={selectedSocialLink.url}
+                   onChange={(e) => updateSocialLink(selectedSocialLink.id, 'url', e.target.value)}
+                   placeholder={PLATFORMS.find(p => p.id === selectedSocialLink.platform)?.placeholder || "https://..."}
+                   className="h-7 rounded-full border border-gray-200 bg-gray-50 px-3 text-xs w-48 focus:outline-none focus:ring-2 focus:ring-black/5"
+                 />
+
+                 <button
+                   onClick={() => handleRemoveSocial(selectedSocialLink.id)}
+                   className="w-7 h-7 flex items-center justify-center rounded-full bg-red-50 text-red-500 hover:bg-red-100 hover:text-red-600 transition-colors"
+                 >
+                   <Trash2 className="w-3.5 h-3.5" />
+                 </button>
+              </div>
+           );
+        }
+        return null;
+    }
+  };
+
   return (
     <div className="w-full h-full relative overflow-hidden flex flex-col items-center justify-center font-sans bg-gray-50">
       <FontLoaderListener config={config} products={products} />
@@ -543,260 +806,7 @@ export default function DesignEditor({ initialConfig, initialProducts, userId, s
       >
         <div className="h-11 px-4 rounded-full bg-white/90 shadow-lg border border-gray-200 flex items-center gap-2 transition-all duration-300 ease-out backdrop-blur-md">
 
-          {(activeTool === 'header-title' || activeTool === 'header-bio') && (
-              <ProfileStylingToolbar
-                activeTool={activeTool}
-                config={config}
-                onUpdateConfig={updateConfig}
-              />
-          )}
-
-          {activeTool === 'background' && (
-             <BackgroundStylingToolbar
-                config={config}
-                onUpdate={updateConfig}
-                onUploadImage={handleBackgroundUpload}
-                onClose={() => setActiveTool('global')}
-                isUploading={isUploadingImage}
-             />
-          )}
-
-          {activeTool === 'typography' && (
-             <TypographyStylingToolbar
-                config={config}
-                onUpdate={updateConfig}
-                onClose={() => setActiveTool('global')}
-             />
-          )}
-
-          {/* 1. GLOBAL TOOLS (Default) */}
-          {activeTool === 'global' && (
-            <div className="flex items-center gap-3 animate-in fade-in slide-in-from-top-2 duration-300">
-               <button
-                  onClick={() => setActiveTool('background')}
-                  className="flex flex-col items-center gap-1 group cursor-pointer"
-               >
-                <div className="relative pointer-events-none">
-                   <ColorCircle
-                     color={config.colors.background}
-                     onChange={() => {}}
-                     size="sm"
-                   />
-                </div>
-                <span className="text-[9px] text-gray-500 font-semibold uppercase tracking-wider group-hover:text-black transition-colors">Fondo</span>
-              </button>
-
-               <button
-                  onClick={() => setActiveTool('typography')}
-                  className="flex flex-col items-center gap-1 group cursor-pointer"
-               >
-                <div className="w-8 h-8 rounded-full border border-gray-200 bg-white flex items-center justify-center transition-all group-hover:bg-gray-50">
-                   <Type className="w-4 h-4 text-gray-600" />
-                </div>
-                <span className="text-[9px] text-gray-500 font-semibold uppercase tracking-wider group-hover:text-black transition-colors">Fuente</span>
-              </button>
-
-              {/* Separator */}
-              <div className="w-px h-6 bg-gray-300" />
-
-              {/* Socials Manager Button */}
-              <button
-                onClick={() => setShowSocialsManager(!showSocialsManager)}
-                className={cn(
-                  "flex flex-col items-center gap-1 group",
-                  showSocialsManager && "opacity-100"
-                )}
-              >
-                <div className={cn(
-                  "w-7 h-7 rounded-full border border-gray-200 flex items-center justify-center transition-all",
-                  showSocialsManager ? "bg-black text-white border-black" : "bg-white text-gray-600 hover:bg-gray-50 hover:scale-105"
-                )}>
-                  <MoreHorizontal className="w-3.5 h-3.5" />
-                </div>
-                <span className="text-[9px] text-gray-500 font-semibold uppercase tracking-wider group-hover:text-black transition-colors">Redes</span>
-              </button>
-            </div>
-          )}
-
-
-          {/* 3. HEADER AVATAR TOOLS (Existing, but moved to top) */}
-          {activeTool === 'header-avatar' && (
-            <div className="flex items-center gap-4 animate-in fade-in slide-in-from-top-2 duration-300">
-              {/* Image Input (Replaced) */}
-              <label className="relative cursor-pointer group">
-                  <input
-                    type="file"
-                    accept="image/*"
-                    onChange={handleImageUpload}
-                    className="hidden"
-                    disabled={isUploadingImage}
-                  />
-                  <div className="flex items-center gap-2 h-7 rounded-full border border-gray-200 bg-gray-50 px-3 hover:bg-gray-100 transition-colors cursor-pointer">
-                     {isUploadingImage ? (
-                        <Loader2 className="w-3 h-3 animate-spin text-gray-500" />
-                     ) : (
-                        <Upload className="w-3 h-3 text-gray-500" />
-                     )}
-                     <span className="text-xs font-medium text-gray-600">
-                        {isUploadingImage ? 'Subiendo...' : 'Subir Foto'}
-                     </span>
-                  </div>
-              </label>
-
-              {/* Shape Selector */}
-              <div className="flex items-center bg-gray-50 rounded-full p-1 border border-gray-100">
-                <button
-                  onClick={() => updateConfig(['profile', 'avatarShape'], 'circle')}
-                  className={cn(
-                    "w-5 h-5 rounded-full flex items-center justify-center transition-all",
-                    config.profile.avatarShape === 'circle' ? "bg-white shadow-sm text-black" : "text-gray-400 hover:text-gray-600"
-                  )}
-                  title="Círculo"
-                >
-                  <Circle className="w-2.5 h-2.5" />
-                </button>
-                <button
-                  onClick={() => updateConfig(['profile', 'avatarShape'], 'square')}
-                  className={cn(
-                    "w-5 h-5 rounded-full flex items-center justify-center transition-all",
-                    (config.profile.avatarShape === 'square' || config.profile.avatarShape === 'rounded') ? "bg-white shadow-sm text-black" : "text-gray-400 hover:text-gray-600"
-                  )}
-                  title="Cuadrado Redondeado"
-                >
-                  <div className="w-2.5 h-2.5 border-2 border-current rounded-sm" />
-                </button>
-                <button
-                  onClick={() => updateConfig(['profile', 'avatarShape'], 'none')}
-                  className={cn(
-                    "w-5 h-5 rounded-full flex items-center justify-center transition-all",
-                    config.profile.avatarShape === 'none' ? "bg-white shadow-sm text-black" : "text-gray-400 hover:text-gray-600"
-                  )}
-                  title="Cuadrado Recto (Sin Borde)"
-                >
-                  <Square className="w-2.5 h-2.5" />
-                </button>
-              </div>
-
-              {/* Border Toggle/Color */}
-              <div className="flex flex-col items-center gap-1">
-                 <div className="flex items-center gap-1 relative">
-                    <ColorCircle
-                        color={config.profile.avatarBorderColor || 'transparent'}
-                        onChange={(c) => updateConfig(['profile', 'avatarBorderColor'], c)}
-                        size="sm"
-                    />
-                    {config.profile.avatarBorderColor && (
-                        <button
-                            onClick={(e) => {
-                                e.stopPropagation();
-                                updateConfig(['profile', 'avatarBorderColor'], undefined);
-                            }}
-                            className="absolute -top-1 -right-1 bg-gray-100 border border-gray-300 rounded-full p-0.5 hover:bg-gray-200 transition-colors shadow-sm z-10"
-                            title="Quitar borde"
-                        >
-                            <Minus size={10} className="text-gray-600" />
-                        </button>
-                    )}
-                 </div>
-                 <span className="text-[9px] text-gray-500 font-semibold uppercase tracking-wider">Borde</span>
-              </div>
-            </div>
-          )}
-
-          {/* 5. ATOMIC SOCIAL ICON (Existing) */}
-          {activeTool?.startsWith('social-icon-') && selectedSocialLink && (
-             <div className="flex items-center gap-4 animate-in fade-in slide-in-from-top-2 duration-300">
-                <div className="flex flex-col items-center gap-1">
-                  <ColorCircle
-                    color={selectedSocialLink.color || config.colors.primary}
-                    onChange={(c) => updateSocialLink(selectedSocialLink.id, 'color', c)}
-                    size="sm"
-                  />
-                  <span className="text-[9px] text-gray-500 font-semibold uppercase tracking-wider">Icono</span>
-                </div>
-
-                <div className="w-px h-6 bg-gray-200" />
-
-                <input
-                  type="text"
-                  value={selectedSocialLink.url}
-                  onChange={(e) => updateSocialLink(selectedSocialLink.id, 'url', e.target.value)}
-                  placeholder={PLATFORMS.find(p => p.id === selectedSocialLink.platform)?.placeholder || "https://..."}
-                  className="h-7 rounded-full border border-gray-200 bg-gray-50 px-3 text-xs w-48 focus:outline-none focus:ring-2 focus:ring-black/5"
-                />
-
-                <button
-                  onClick={() => handleRemoveSocial(selectedSocialLink.id)}
-                  className="w-7 h-7 flex items-center justify-center rounded-full bg-red-50 text-red-500 hover:bg-red-100 hover:text-red-600 transition-colors"
-                >
-                  <Trash2 className="w-3.5 h-3.5" />
-                </button>
-             </div>
-          )}
-
-          {/* 6. CARD BUTTON TOOLS (Existing) */}
-          {activeTool === 'card-button' && (
-            <div className="flex items-center gap-4 animate-in fade-in slide-in-from-top-2 duration-300">
-               <div className="flex flex-col items-center gap-1">
-                  <ColorCircle color={config.cardStyle?.buttonColor || '#000000'} onChange={(c) => updateConfig(['cardStyle', 'buttonColor'], c)} size="sm" />
-                  <span className="text-[9px] text-gray-500 font-semibold uppercase tracking-wider">Fondo</span>
-               </div>
-               <div className="flex flex-col items-center gap-1">
-                  <ColorCircle color={config.cardStyle?.buttonTextColor || '#ffffff'} onChange={(c) => updateConfig(['cardStyle', 'buttonTextColor'], c)} size="sm" />
-                  <span className="text-[9px] text-gray-500 font-semibold uppercase tracking-wider">Texto</span>
-               </div>
-
-               <div className="flex flex-col items-center gap-1 w-24">
-                  <input
-                    type="range"
-                    min="0"
-                    max="24"
-                    step="2"
-                    value={config.cardStyle?.borderRadius || 8}
-                    onChange={(e) => updateConfig(['cardStyle', 'borderRadius'], Number(e.target.value))}
-                    className="w-full h-1 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-black"
-                  />
-                  <span className="text-[9px] text-gray-500 font-semibold uppercase tracking-wider">Redondez</span>
-               </div>
-            </div>
-          )}
-
-          {/* 7. CARD TITLE/PRICE TOOLS (Existing) */}
-          {(activeTool === 'card-title' || activeTool === 'card-price') && (
-             <div className="flex items-center gap-4 animate-in fade-in slide-in-from-top-2 duration-300">
-                <div className="flex flex-col items-center gap-1">
-                  <ColorCircle
-                    color={activeTool === 'card-title' ? (config.cardStyle?.titleColor || config.colors.text) : (config.cardStyle?.priceColor || config.colors.text)}
-                    onChange={(c) => updateConfig(['cardStyle', activeTool === 'card-title' ? 'titleColor' : 'priceColor'], c)}
-                    size="sm"
-                  />
-                  <span className="text-[9px] text-gray-500 font-semibold uppercase tracking-wider">Color</span>
-                </div>
-             </div>
-          )}
-
-           {/* NEW: PRODUCT INDIVIDUAL TOOLS (Refactored) */}
-           {activeTool === 'product-individual' && selectedProduct && selection && (
-              <ProductStylingToolbar
-                product={selectedProduct}
-                activeElement={selection.elementType}
-                onUpdate={updateSelectedProductStyle}
-                onSave={handleSaveProduct}
-                onApplyAll={handleApplyToAll}
-                onClose={() => {
-                  setActiveTool('global');
-                  setSelection(null);
-                }}
-                isSaving={isSavingProduct}
-                fonts={GOOGLE_FONTS_LIST.map(f => ({ name: f, value: f }))}
-                defaultColors={{
-                  title: config.cardStyle?.titleColor || config.colors.text,
-                  price: config.cardStyle?.priceColor || config.colors.primary,
-                  button: config.cardStyle?.buttonColor || '#000000',
-                  buttonText: config.cardStyle?.buttonTextColor || '#ffffff'
-                }}
-              />
-           )}
+          {renderToolbarContent()}
 
           {/* SAVE BUTTON (Always visible on right) */}
           {activeTool !== 'product-individual' && (
