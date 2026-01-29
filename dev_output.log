@@ -9,12 +9,7 @@
   · serverActions
 
 ✓ Starting...
-Attention: Next.js now collects completely anonymous telemetry regarding usage.
-This information is used to shape Next.js' roadmap and prioritize features.
-You can learn more, including how to opt-out if you'd not like to participate in this anonymous program, by visiting the following URL:
-https://nextjs.org/telemetry
-
-✓ Ready in 1180ms
-○ Compiling /test-new-product ...
- GET /test-new-product 200 in 11.6s (compile: 11.1s, render: 579ms)
-✓ Compiled in 89ms
+✓ Ready in 1143ms
+○ Compiling /test-preview ...
+ GET /test-preview 200 in 6.1s (compile: 5.6s, render: 422ms)
+✓ Compiled in 107ms
