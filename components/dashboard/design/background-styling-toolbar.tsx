@@ -34,7 +34,6 @@ export function BackgroundStylingToolbar({
              <div className="w-7 h-7 rounded-full bg-black text-white flex items-center justify-center shadow-sm">
                  <ImageIcon className="w-3.5 h-3.5" />
              </div>
-             <span className="text-[9px] text-gray-500 font-semibold uppercase tracking-wider">Fondo</span>
            </button>
         </PopoverTrigger>
 
@@ -45,8 +44,7 @@ export function BackgroundStylingToolbar({
           onOpenAutoFocus={(e) => e.preventDefault()}
         >
           {/* Header */}
-          <div className="flex justify-between items-center border-b border-gray-100 pb-2">
-              <span className="text-xs font-bold text-gray-500 uppercase">Personalizar Fondo</span>
+          <div className="flex justify-end items-center border-b border-gray-100 pb-2">
               <button onClick={onClose} className="text-gray-400 hover:text-black transition-colors">
                   <X className="w-4 h-4" />
               </button>
@@ -54,7 +52,6 @@ export function BackgroundStylingToolbar({
 
           {/* 1. Solid Color */}
           <div>
-             <label className="text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-2 block">Color Base</label>
              <div className="flex items-center gap-2 px-2 py-2 rounded-md border border-gray-200 bg-gray-50/50">
                 <ColorCircle
                    color={config.colors.background}
@@ -63,13 +60,11 @@ export function BackgroundStylingToolbar({
                    }}
                    size="md"
                  />
-                 <span className="text-xs text-gray-500">Seleccionar color sólido</span>
              </div>
           </div>
 
           {/* 2. Image Upload */}
           <div>
-             <label className="text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-2 block">Imagen de Fondo (Textura)</label>
 
              {!hasImage ? (
                  <label className="flex flex-col items-center justify-center w-full h-24 border-2 border-dashed border-gray-300 rounded-lg cursor-pointer hover:bg-gray-50 hover:border-gray-400 transition-all group">

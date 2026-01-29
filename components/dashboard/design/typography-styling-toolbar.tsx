@@ -23,7 +23,6 @@ export function TypographyStylingToolbar({
              <div className="w-7 h-7 rounded-full bg-black text-white flex items-center justify-center shadow-sm">
                  <Type className="w-3.5 h-3.5" />
              </div>
-             <span className="text-[9px] text-gray-500 font-semibold uppercase tracking-wider">Fuente</span>
            </button>
         </PopoverTrigger>
 
@@ -34,8 +33,7 @@ export function TypographyStylingToolbar({
           onOpenAutoFocus={(e) => e.preventDefault()}
         >
           {/* Header */}
-          <div className="flex justify-between items-center border-b border-gray-100 pb-2">
-              <span className="text-xs font-bold text-gray-500 uppercase">Personalizar Tipografía</span>
+          <div className="flex justify-end items-center border-b border-gray-100 pb-2">
               <button onClick={onClose} className="text-gray-400 hover:text-black transition-colors">
                   <X className="w-4 h-4" />
               </button>
@@ -43,7 +41,6 @@ export function TypographyStylingToolbar({
 
           {/* Font Selector */}
           <div>
-             <label className="text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-2 block">Fuente Global</label>
              <FontPicker
                 value={config.fonts.body}
                 onChange={(val) => {
@@ -52,9 +49,6 @@ export function TypographyStylingToolbar({
                 }}
                 className="w-full"
              />
-             <p className="text-[10px] text-gray-400 mt-2">
-               Se aplicará a todos los textos de la tienda.
-             </p>
           </div>
         </PopoverContent>
       </Popover>
