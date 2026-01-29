@@ -978,7 +978,7 @@ export default function DesignEditor({ initialConfig, initialProducts, userId, s
 
       {/* --- SOCIALS MANAGER POPOVER --- */}
       {showSocialsManager && (
-         <div className="fixed bottom-28 left-1/2 -translate-x-1/2 z-50 bg-white rounded-2xl shadow-2xl p-4 w-[320px] border border-gray-100 animate-in fade-in zoom-in-95 duration-200">
+         <div className="fixed bottom-28 left-1/2 -translate-x-1/2 z-50 bg-white rounded-2xl shadow-2xl p-4 w-[320px] max-w-[90vw] border border-gray-100 animate-in fade-in zoom-in-95 duration-200">
             <div className="flex items-center justify-between mb-3 px-1">
               <h3 className="text-xs font-bold uppercase tracking-wide text-gray-500">Mis Redes</h3>
               <button onClick={() => setShowSocialsManager(false)} className="text-gray-400 hover:text-black">&times;</button>
