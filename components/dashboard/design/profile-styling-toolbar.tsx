@@ -19,20 +19,6 @@ export function ProfileStylingToolbar({
     return (
       <div className="flex items-center gap-2 h-full animate-in fade-in slide-in-from-top-2 duration-300 w-full justify-between">
 
-        {/* Input de Texto */}
-        <div className="flex flex-col gap-0.5">
-          <label className="text-[9px] font-bold text-gray-400 uppercase">Texto</label>
-          <input
-            type="text"
-            value={config.profile.shopName || ''}
-            onChange={(e) => onUpdateConfig(['profile', 'shopName'], e.target.value)}
-            className="border-none bg-gray-100 rounded px-2 py-1 text-[10px] w-28 focus:ring-1 focus:ring-black focus:outline-none h-6"
-            placeholder="Nombre..."
-          />
-        </div>
-
-        <div className="w-px h-6 bg-gray-200 mx-1"></div>
-
         {/* Selector de Fuente */}
         <div className="flex flex-col gap-0.5">
            <label className="text-[9px] font-bold text-gray-400 uppercase">Fuente</label>
@@ -61,20 +47,6 @@ export function ProfileStylingToolbar({
   if (activeTool === 'header-bio') {
     return (
       <div className="flex items-center gap-2 h-full animate-in fade-in slide-in-from-top-2 duration-300 w-full justify-between">
-
-        {/* Input de Texto */}
-        <div className="flex flex-col gap-0.5">
-          <label className="text-[9px] font-bold text-gray-400 uppercase">Biografía</label>
-          <input
-            type="text"
-            value={config.profile.bio || ''}
-            onChange={(e) => onUpdateConfig(['profile', 'bio'], e.target.value)}
-            className="border-none bg-gray-100 rounded px-2 py-1 text-[10px] w-32 focus:ring-1 focus:ring-black truncate focus:outline-none h-6"
-            placeholder="Bienvenida..."
-          />
-        </div>
-
-        <div className="w-px h-6 bg-gray-200 mx-1"></div>
 
         {/* Selector de Fuente */}
         <div className="flex flex-col gap-0.5">
