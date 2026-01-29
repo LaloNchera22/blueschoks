@@ -143,6 +143,32 @@ const getContrastColor = (hexcolor: string) => {
 
 // --- HELPER COMPONENTS ---
 
+// Auto-resize Textarea Helper
+function AutoResizeTextarea({ value, onChange, placeholder, style, onFocus, className }: { value: string, onChange: (e: React.ChangeEvent<HTMLTextAreaElement>) => void, placeholder: string, style: React.CSSProperties, onFocus: () => void, className: string }) {
+  const textareaRef = React.useRef<HTMLTextAreaElement>(null);
+
+  React.useEffect(() => {
+    if (textareaRef.current) {
+      textareaRef.current.style.height = 'auto';
+      textareaRef.current.style.height = textareaRef.current.scrollHeight + 'px';
+    }
+  }, [value, style]);
+
+  return (
+    <textarea
+      ref={textareaRef}
+      value={value}
+      onChange={onChange}
+      placeholder={placeholder}
+      style={style}
+      onFocus={onFocus}
+      className={className}
+      rows={1}
+      onClick={(e) => e.stopPropagation()}
+    />
+  );
+}
+
 // Sortable Item for Socials Manager
 function SortableSocialItem({ id, link, onDelete }: { id: string, link: LinkItem, onDelete: (id: string) => void }) {
   const {
@@ -1143,16 +1169,18 @@ export default function DesignEditor({ initialConfig, initialProducts, userId, s
                    </div>
 
                    {/* SHOP NAME */}
-                   <h1
+                   <input
+                     type="text"
+                     value={config.profile.shopName || ''}
+                     onChange={(e) => updateConfig(['profile', 'shopName'], e.target.value)}
                      className={cn(
-                       "text-2xl font-bold text-neutral-900 tracking-tight mb-3 cursor-pointer hover:opacity-80 transition-opacity",
-                        activeTool === 'header-title' && "underline decoration-blue-500 decoration-2 underline-offset-4"
+                       "text-2xl font-bold text-neutral-900 tracking-tight mb-3 bg-transparent border-none outline-none w-full",
                      )}
                      style={getTextStyle('title')}
-                     onClick={(e) => { e.stopPropagation(); setActiveTool('header-title'); }}
-                   >
-                       {config.profile.shopName || 'Mi Tienda'}
-                   </h1>
+                     onFocus={() => setActiveTool('header-title')}
+                     onClick={(e) => e.stopPropagation()}
+                     placeholder="Escribe el nombre de tu tienda"
+                   />
 
                    {/* SOCIALS */}
                    <div className="flex flex-wrap justify-center gap-3 mb-4">
@@ -1190,16 +1218,16 @@ export default function DesignEditor({ initialConfig, initialProducts, userId, s
                    </div>
 
                    {/* BIO */}
-                   <p
-                     className={cn(
-                       "max-w-xl text-sm text-neutral-500 leading-relaxed mb-6 cursor-pointer hover:bg-black/5 rounded px-2 -mx-2 transition-colors",
-                       activeTool === 'header-bio' && "ring-2 ring-blue-500 bg-blue-50/50"
-                     )}
+                   <AutoResizeTextarea
+                     value={config.profile.bio || ''}
+                     onChange={(e) => updateConfig(['profile', 'bio'], e.target.value)}
+                     placeholder="Escribe un mensaje de bienvenida"
                      style={getTextStyle('bio')}
-                     onClick={(e) => { e.stopPropagation(); setActiveTool('header-bio'); }}
-                   >
-                       {config.profile.bio || 'Bienvenido a mi tienda online'}
-                   </p>
+                     onFocus={() => setActiveTool('header-bio')}
+                     className={cn(
+                       "max-w-xl text-sm text-neutral-500 leading-relaxed mb-6 bg-transparent border-none outline-none resize-none overflow-hidden w-full",
+                     )}
+                   />
                 </div>
 
                 {/* --- 3. PRODUCT GRID --- */}
