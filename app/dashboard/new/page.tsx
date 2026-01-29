@@ -70,36 +70,38 @@ export default function NewProductPage() {
   }
 
   return (
-    <div className="p-6 md:p-10 max-w-5xl mx-auto pb-24">
+    <div className="fixed inset-0 z-50 flex flex-col h-[100dvh] bg-white md:relative md:h-auto md:block md:p-10 md:max-w-5xl md:mx-auto md:pb-24 md:bg-transparent md:z-auto">
       
-      <div className="flex items-center gap-4 mb-8">
+      {/* HEADER FIXED MOBILE */}
+      <div className="flex-none flex items-center gap-4 p-4 border-b border-slate-100 md:border-none md:p-0 md:mb-8 bg-white z-10">
         <Link href="/dashboard" className="w-10 h-10 flex items-center justify-center bg-white border border-slate-200 rounded-full text-slate-500 hover:text-slate-900 shadow-sm transition-all">
             <ArrowLeft size={18} />
         </Link>
         <div>
-            <h1 className="text-3xl font-black text-slate-900 tracking-tight">Nuevo Producto</h1>
-            <p className="text-slate-500">Agrega fotos, videos y detalles.</p>
+            <h1 className="text-xl md:text-3xl font-black text-slate-900 tracking-tight">Nuevo Producto</h1>
+            <p className="text-xs md:text-base text-slate-500">Agrega fotos, videos y detalles.</p>
         </div>
       </div>
 
-      <div className="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
-        <div className="bg-slate-50/50 px-8 py-4 border-b border-slate-100 flex items-center gap-2 text-sm font-semibold text-slate-600">
+      {/* CONTENT SCROLLABLE MOBILE */}
+      <div className="flex-1 overflow-y-auto md:overflow-visible md:bg-white md:rounded-2xl md:border md:border-slate-200 md:shadow-sm">
+        <div className="hidden md:flex bg-slate-50/50 px-8 py-4 border-b border-slate-100 items-center gap-2 text-sm font-semibold text-slate-600">
             <PackagePlus size={16} /> Información del Producto
         </div>
 
-        <div className="p-8">
-            <form action={dispatch} className="space-y-8 max-w-3xl">
+        <div className="p-4 md:p-8">
+            <form action={dispatch} className="flex flex-col min-h-full md:block space-y-4 md:space-y-8 max-w-3xl">
                 
                 {/* SECCIÓN MULTIMEDIA */}
-                <div className="space-y-4">
+                <div className="space-y-2 md:space-y-4">
                     <div className="flex justify-between items-end">
-                        <Label className="text-base font-bold text-slate-900">Multimedia</Label>
-                        <span className={`text-xs font-bold px-2 py-1 rounded-md border ${isPro ? 'bg-amber-50 text-amber-600 border-amber-100' : 'bg-slate-100 text-slate-500 border-slate-200'}`}>
+                        <Label className="text-sm md:text-base font-bold text-slate-900">Multimedia</Label>
+                        <span className={`text-[10px] md:text-xs font-bold px-2 py-1 rounded-md border ${isPro ? 'bg-amber-50 text-amber-600 border-amber-100' : 'bg-slate-100 text-slate-500 border-slate-200'}`}>
                            {isPro ? <span className="flex items-center gap-1"><Crown size={10} /> Ilimitado (PRO)</span> : `Plan Free: ${files.length}/3 archivos`}
                         </span>
                     </div>
 
-                    <div className="grid grid-cols-3 sm:grid-cols-4 gap-4">
+                    <div className="grid grid-cols-3 sm:grid-cols-4 gap-2 md:gap-4">
                         {previews.map((media, index) => (
                             <div key={index} className="aspect-square relative rounded-xl overflow-hidden border border-slate-200 group bg-slate-50">
                                 {media.type === 'video' ? (
@@ -119,7 +121,7 @@ export default function NewProductPage() {
                                 <button 
                                     type="button" 
                                     onClick={() => removeFile(index)}
-                                    className="absolute top-2 right-2 bg-red-500 text-white p-1 rounded-full opacity-0 group-hover:opacity-100 transition-opacity hover:bg-red-600 shadow-lg"
+                                    className="absolute top-2 right-2 bg-red-500 text-white p-1 rounded-full opacity-100 md:opacity-0 md:group-hover:opacity-100 transition-opacity hover:bg-red-600 shadow-lg"
                                 >
                                     <X size={12} />
                                 </button>
@@ -127,9 +129,9 @@ export default function NewProductPage() {
                         ))}
 
                         {(!isPro && files.length >= 3) ? null : (
-                            <label className="aspect-square border-2 border-dashed border-slate-300 rounded-xl flex flex-col items-center justify-center cursor-pointer hover:border-slate-900 hover:bg-slate-50 transition-all group text-slate-400 hover:text-slate-900">
-                                <UploadCloud size={24} className="mb-2 group-hover:scale-110 transition-transform" />
-                                <span className="text-xs font-bold">Agregar</span>
+                            <label className="aspect-square border-2 border-dashed border-slate-300 rounded-xl flex flex-col items-center justify-center cursor-pointer hover:border-slate-900 hover:bg-slate-50 transition-all group text-slate-400 hover:text-slate-900 h-24 w-24 md:h-auto md:w-auto">
+                                <UploadCloud size={20} className="mb-1 md:mb-2 md:w-6 md:h-6 group-hover:scale-110 transition-transform" />
+                                <span className="text-[10px] md:text-xs font-bold">Agregar</span>
                                 <input 
                                     type="file" 
                                     accept="image/*,video/*" 
@@ -157,24 +159,24 @@ export default function NewProductPage() {
                     }} 
                 />
 
-                <div className="space-y-3">
-                    <Label htmlFor="name" className="text-base font-bold text-slate-900">Nombre del Producto</Label>
-                    <Input id="name" name="name" placeholder="Ej. Tenis Deportivos" required className="h-12 bg-white border-slate-200" />
+                <div className="space-y-2 md:space-y-3">
+                    <Label htmlFor="name" className="text-sm md:text-base font-bold text-slate-900">Nombre del Producto</Label>
+                    <Input id="name" name="name" placeholder="Ej. Tenis Deportivos" required className="h-10 md:h-12 bg-white border-slate-200" />
                 </div>
 
-                <div className="grid md:grid-cols-2 gap-6">
-                    <div className="space-y-3">
-                        <Label htmlFor="price" className="text-base font-bold text-slate-900">Precio</Label>
+                <div className="grid md:grid-cols-2 gap-4 md:gap-6">
+                    <div className="space-y-2 md:space-y-3">
+                        <Label htmlFor="price" className="text-sm md:text-base font-bold text-slate-900">Precio</Label>
                         <div className="relative">
                             <span className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 font-bold">$</span>
-                            <Input id="price" name="price" type="number" step="0.01" placeholder="0.00" required className="pl-8 h-12" />
+                            <Input id="price" name="price" type="number" step="0.01" placeholder="0.00" required className="pl-8 h-10 md:h-12" />
                         </div>
                     </div>
                 </div>
 
-                <div className="space-y-3">
-                    <Label htmlFor="description" className="text-base font-bold text-slate-900">Descripción</Label>
-                    <textarea id="description" name="description" rows={4} className="flex w-full rounded-xl border border-slate-200 bg-white px-4 py-3 text-base outline-none focus:ring-2 focus:ring-slate-900" placeholder="Detalles..." />
+                <div className="space-y-2 md:space-y-3">
+                    <Label htmlFor="description" className="text-sm md:text-base font-bold text-slate-900">Descripción</Label>
+                    <textarea id="description" name="description" rows={4} className="flex w-full rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm md:text-base outline-none focus:ring-2 focus:ring-slate-900" placeholder="Detalles..." />
                 </div>
 
                 {state.status === 'error' && (
@@ -184,10 +186,10 @@ export default function NewProductPage() {
                 )}
 
                 {/* --- BOTONES SEPARADOS --- */}
-                <div className="pt-6 border-t border-slate-100 flex items-center justify-between mt-8">
+                <div className="flex-none sticky bottom-0 bg-white p-4 border-t border-slate-100 flex items-center justify-between z-20 md:static md:p-0 md:border-t md:bg-transparent md:mt-8 md:pt-6">
                     <Link 
                         href="/dashboard" 
-                        className="text-slate-500 font-bold text-sm hover:text-slate-900 px-6 py-3 rounded-xl hover:bg-slate-50 transition-all"
+                        className="text-slate-500 font-bold text-sm hover:text-slate-900 px-4 md:px-6 py-2 md:py-3 rounded-xl hover:bg-slate-50 transition-all"
                     >
                         Cancelar
                     </Link>
@@ -208,8 +210,8 @@ function SubmitButton() {
         disabled={pending} 
         className="
           bg-slate-900 hover:bg-slate-800 text-white 
-          font-black text-base tracking-wide
-          h-12 px-10 rounded-xl 
+          font-black text-sm md:text-base tracking-wide
+          h-10 md:h-12 px-6 md:px-10 rounded-xl
           shadow-xl shadow-slate-900/20 
           transition-all duration-200
           hover:scale-[1.02] hover:shadow-slate-900/30
@@ -219,12 +221,12 @@ function SubmitButton() {
     >
         {pending ? (
             <>
-              <Loader2 className="mr-2 h-5 w-5 animate-spin" /> 
+              <Loader2 className="mr-2 h-4 w-4 md:h-5 md:w-5 animate-spin" />
               Guardando...
             </>
         ) : (
             <>
-              Guardar Producto
+              Guardar
             </>
         )}
     </Button>
