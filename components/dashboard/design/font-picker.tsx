@@ -4,6 +4,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { Search, Check, ChevronDown } from 'lucide-react';
 import { GOOGLE_FONTS_LIST, loadGoogleFont } from '@/utils/font-loader';
 import { cn } from '@/lib/utils';
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 
 interface FontPickerProps {
   value: string;
@@ -39,38 +40,21 @@ const FontOption = ({ font, isSelected, onClick }: { font: string, isSelected: b
       ref={ref}
       onClick={onClick}
       className={cn(
-        "w-full text-left px-4 py-3 hover:bg-gray-50 flex items-center justify-between transition-colors rounded-lg",
+        "w-full text-left px-4 py-2 hover:bg-gray-50 flex items-center justify-between transition-colors rounded-lg text-xs",
         isSelected && "bg-blue-50 text-blue-600"
       )}
       style={{ fontFamily: font }}
     >
-      <span className="text-base truncate">{font}</span>
-      {isSelected && <Check className="w-4 h-4 flex-shrink-0" />}
+      <span className="truncate">{font}</span>
+      {isSelected && <Check className="w-3.5 h-3.5 flex-shrink-0" />}
     </button>
   );
 };
 
 export function FontPicker({ value, onChange, className }: FontPickerProps) {
-  const [isOpen, setIsOpen] = useState(false);
+  const [open, setOpen] = useState(false);
   const [search, setSearch] = useState('');
   const [visibleCount, setVisibleCount] = useState(50);
-  const containerRef = useRef<HTMLDivElement>(null);
-
-  // Close on click outside
-  useEffect(() => {
-    const handleClickOutside = (event: MouseEvent) => {
-      if (containerRef.current && !containerRef.current.contains(event.target as Node)) {
-        setIsOpen(false);
-      }
-    };
-
-    if (isOpen) {
-      document.addEventListener('mousedown', handleClickOutside);
-    }
-    return () => {
-      document.removeEventListener('mousedown', handleClickOutside);
-    };
-  }, [isOpen]);
 
   // Reset visible count on search change
   useEffect(() => {
@@ -89,19 +73,22 @@ export function FontPicker({ value, onChange, className }: FontPickerProps) {
   };
 
   return (
-    <div className={cn("relative", className)} ref={containerRef}>
-      <button
-        onClick={() => setIsOpen(!isOpen)}
-        className="flex items-center justify-between w-28 px-3 py-1 bg-white border border-gray-200 rounded-full text-[10px] font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-black/5 transition-all shadow-sm"
-        title={value}
-      >
-        <span className="truncate flex-1 text-left">{value || 'Fuente'}</span>
-        <ChevronDown className="w-3 h-3 text-gray-400 ml-2 flex-shrink-0" />
-      </button>
+    <Popover open={open} onOpenChange={setOpen}>
+      <PopoverTrigger asChild>
+        <button
+          className={cn(
+            "flex items-center justify-between w-24 px-2 py-1 bg-white border border-gray-200 rounded-full text-[10px] font-medium text-gray-700 hover:bg-gray-50 focus:outline-none transition-all shadow-sm",
+            className
+          )}
+          title={value}
+        >
+          <span className="truncate flex-1 text-left">{value || 'Fuente'}</span>
+          <ChevronDown className="w-3 h-3 text-gray-400 ml-1 flex-shrink-0" />
+        </button>
+      </PopoverTrigger>
 
-      {isOpen && (
-        <div className="absolute top-full left-1/2 -translate-x-1/2 mt-2 w-64 max-w-[90vw] bg-white rounded-xl shadow-xl border border-gray-100 z-[100] overflow-hidden animate-in fade-in zoom-in-95 duration-200 flex flex-col max-h-[400px]">
-          <div className="p-3 border-b border-gray-100 sticky top-0 bg-white z-10">
+      <PopoverContent className="w-64 p-0 overflow-hidden bg-white" sideOffset={8}>
+          <div className="p-3 border-b border-gray-100 bg-white z-10">
             <div className="relative">
               <Search className="w-3 h-3 absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
               <input
@@ -109,14 +96,14 @@ export function FontPicker({ value, onChange, className }: FontPickerProps) {
                 placeholder="Buscar fuente..."
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
-                className="w-full pl-8 pr-3 py-1.5 bg-gray-50 border border-gray-200 rounded-lg text-xs focus:outline-none focus:ring-2 focus:ring-black/5"
+                className="w-full pl-8 pr-3 py-1.5 bg-gray-50 border border-gray-200 rounded-lg text-xs focus:outline-none focus:ring-1 focus:ring-black/10"
                 autoFocus
               />
             </div>
           </div>
 
           <div
-            className="overflow-y-auto flex-1 p-1 custom-scrollbar"
+            className="overflow-y-auto max-h-[300px] p-1 custom-scrollbar"
             onScroll={handleScroll}
           >
              {filteredFonts.length === 0 ? (
@@ -131,14 +118,13 @@ export function FontPicker({ value, onChange, className }: FontPickerProps) {
                     isSelected={value === font}
                     onClick={() => {
                       onChange(font);
-                      setIsOpen(false);
+                      setOpen(false);
                     }}
                   />
                 ))
              )}
           </div>
-        </div>
-      )}
-    </div>
+      </PopoverContent>
+    </Popover>
   );
 }

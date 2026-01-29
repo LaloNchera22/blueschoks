@@ -4,6 +4,7 @@ import { ProductStyle } from '@/lib/types/design-system';
 import { Database } from '@/utils/supabase/types';
 import { ColorCircle } from './color-circle';
 import { FontPicker } from './font-picker';
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 
 type Product = Database['public']['Tables']['products']['Row'];
 
@@ -36,20 +37,37 @@ export function ProductStylingToolbar({
   defaultColors
 }: ProductStylingToolbarProps) {
   return (
-    <div className="flex items-center gap-4 animate-in fade-in slide-in-from-top-2 duration-300">
+    <div className="flex items-center gap-2 animate-in fade-in slide-in-from-top-2 duration-300 w-full justify-between">
 
-      {/* Container Tools - Refactored with Floating Panel */}
+      {/* Container Tools - Refactored with Popover */}
       {activeElement === 'container' && (() => {
         const isCardTransparent = product.style_config?.cardBackground === 'transparent' || product.style_config?.cardBackground === 'rgba(0,0,0,0)';
         const cardColor = isCardTransparent ? '#ffffff' : (product.style_config?.cardBackground || '#ffffff');
 
         return (
-          <div className="relative flex flex-col items-center gap-1">
-             <span className="text-xs font-semibold text-gray-700">Fondo Tarjeta</span>
+          <Popover open={true} onOpenChange={(open) => !open && onClose()}>
+            <PopoverTrigger asChild>
+              <div className="flex flex-col items-center gap-0.5 cursor-pointer">
+                 <div className="w-7 h-7 rounded-full bg-black text-white flex items-center justify-center shadow-sm">
+                    <div className="w-3.5 h-3.5 border border-white rounded-sm" />
+                 </div>
+                 <span className="text-[9px] text-gray-500 font-semibold uppercase tracking-wider">Tarjeta</span>
+              </div>
+            </PopoverTrigger>
 
              {/* Floating Panel */}
-             <div className="absolute top-full mt-6 left-1/2 -translate-x-1/2 w-64 max-w-[90vw] bg-white rounded-xl shadow-2xl border border-gray-100 p-4 z-50 flex flex-col gap-5 animate-in fade-in zoom-in-95 duration-200 cursor-default" onClick={(e) => e.stopPropagation()}>
-                <div className="absolute -top-2 left-1/2 -translate-x-1/2 w-4 h-4 bg-white border-t border-l border-gray-100 rotate-45"></div>
+             <PopoverContent
+                className="w-64 max-w-[90vw] p-4 flex flex-col gap-4 bg-white"
+                side="bottom"
+                sideOffset={16}
+                onOpenAutoFocus={(e) => e.preventDefault()}
+             >
+                <div className="flex justify-between items-center border-b border-gray-100 pb-2 mb-1">
+                    <span className="text-xs font-bold text-gray-500 uppercase">Fondo Tarjeta</span>
+                    <button onClick={onClose} className="text-gray-400 hover:text-black">
+                        <X className="w-4 h-4" />
+                    </button>
+                </div>
 
                 {/* 1. Main Card Background */}
                 <div>
@@ -148,17 +166,16 @@ export function ProductStylingToolbar({
                      </button>
                    </div>
                 </div>
-
-             </div>
-          </div>
+             </PopoverContent>
+          </Popover>
         );
       })()}
 
       {/* Title Tools */}
       {activeElement === 'title' && (
-        <>
+        <div className="flex gap-2 items-center flex-1">
           {/* Title Font */}
-          <div className="flex flex-col items-center gap-1">
+          <div className="flex flex-col items-center gap-0.5">
             <FontPicker
               value={product.style_config?.titleFont || ''}
               onChange={(val) => onUpdate('titleFont', val || undefined)}
@@ -168,8 +185,8 @@ export function ProductStylingToolbar({
           </div>
 
           {/* Title Color */}
-          <div className="flex flex-col items-center gap-1">
-            <div className="flex items-center gap-1 relative">
+          <div className="flex flex-col items-center gap-0.5">
+            <div className="flex items-center gap-1 relative scale-90">
               <ColorCircle
                 color={product.style_config?.titleColor || defaultColors.title}
                 onChange={(c) => onUpdate('titleColor', c)}
@@ -185,16 +202,16 @@ export function ProductStylingToolbar({
                 </button>
               )}
             </div>
-            <span className="text-[9px] text-gray-500 font-semibold uppercase tracking-wider">Color T.</span>
+            <span className="text-[9px] text-gray-500 font-semibold uppercase tracking-wider">Color</span>
           </div>
-        </>
+        </div>
       )}
 
       {/* Price Tools */}
       {activeElement === 'price' && (
-        <>
+        <div className="flex gap-2 items-center flex-1">
           {/* Price Font */}
-          <div className="flex flex-col items-center gap-1">
+          <div className="flex flex-col items-center gap-0.5">
             <FontPicker
               value={product.style_config?.priceFont || ''}
               onChange={(val) => onUpdate('priceFont', val || undefined)}
@@ -204,8 +221,8 @@ export function ProductStylingToolbar({
           </div>
 
           {/* Price Color */}
-          <div className="flex flex-col items-center gap-1">
-            <div className="flex items-center gap-1 relative">
+          <div className="flex flex-col items-center gap-0.5">
+            <div className="flex items-center gap-1 relative scale-90">
               <ColorCircle
                 color={product.style_config?.priceColor || defaultColors.price}
                 onChange={(c) => onUpdate('priceColor', c)}
@@ -221,17 +238,17 @@ export function ProductStylingToolbar({
                 </button>
               )}
             </div>
-            <span className="text-[9px] text-gray-500 font-semibold uppercase tracking-wider">Color P.</span>
+            <span className="text-[9px] text-gray-500 font-semibold uppercase tracking-wider">Color</span>
           </div>
-        </>
+        </div>
       )}
 
       {/* Cart Button Tools */}
       {activeElement === 'cartButton' && (
-        <>
+        <div className="flex gap-2 items-center flex-1">
           {/* Button Background */}
-          <div className="flex flex-col items-center gap-1">
-            <div className="flex items-center gap-1 relative">
+          <div className="flex flex-col items-center gap-0.5">
+            <div className="flex items-center gap-1 relative scale-90">
               <ColorCircle
                 color={product.style_config?.cartBtnBackground || defaultColors.button || '#000000'}
                 onChange={(c) => onUpdate('cartBtnBackground', c)}
@@ -247,12 +264,12 @@ export function ProductStylingToolbar({
                 </button>
               )}
             </div>
-            <span className="text-[9px] text-gray-500 font-semibold uppercase tracking-wider">Fondo Btn</span>
+            <span className="text-[9px] text-gray-500 font-semibold uppercase tracking-wider">Fondo</span>
           </div>
 
           {/* Button Icon/Text Color */}
-          <div className="flex flex-col items-center gap-1">
-            <div className="flex items-center gap-1 relative">
+          <div className="flex flex-col items-center gap-0.5">
+            <div className="flex items-center gap-1 relative scale-90">
               <ColorCircle
                 color={product.style_config?.cartBtnColor || defaultColors.buttonText || '#ffffff'}
                 onChange={(c) => onUpdate('cartBtnColor', c)}
@@ -270,25 +287,41 @@ export function ProductStylingToolbar({
             </div>
             <span className="text-[9px] text-gray-500 font-semibold uppercase tracking-wider">Icono</span>
           </div>
-        </>
+        </div>
       )}
 
-      {/* Description Tools - Refactored with Floating Panel */}
+      {/* Description Tools - Refactored with Popover */}
       {activeElement === 'description' && (() => {
         const isDescTransparent = product.style_config?.descriptionBackground === 'transparent' || product.style_config?.descriptionBackground === 'rgba(0,0,0,0)';
         const currentColor = isDescTransparent ? '#ffffff' : (product.style_config?.descriptionBackground || product.style_config?.footerBackground || '#ffffff');
 
         return (
-          <div className="relative flex flex-col items-center gap-1">
-             <span className="text-xs font-semibold text-gray-700">Fondo Descripción</span>
+          <Popover open={true} onOpenChange={(open) => !open && onClose()}>
+             <PopoverTrigger asChild>
+                <div className="flex flex-col items-center gap-0.5 cursor-pointer">
+                   <div className="w-7 h-7 rounded-full bg-black text-white flex items-center justify-center shadow-sm">
+                      <div className="w-3.5 h-3.5 flex flex-col gap-0.5">
+                         <div className="w-full h-px bg-current opacity-80" />
+                         <div className="w-full h-px bg-current opacity-80" />
+                         <div className="w-2/3 h-px bg-current opacity-80" />
+                      </div>
+                   </div>
+                   <span className="text-[9px] text-gray-500 font-semibold uppercase tracking-wider">Desc.</span>
+                </div>
+             </PopoverTrigger>
 
              {/* Floating Panel */}
-             <div className="absolute top-full mt-6 left-1/2 -translate-x-1/2 w-64 max-w-[90vw] bg-white rounded-xl shadow-2xl border border-gray-100 p-4 z-50 flex flex-col gap-4 animate-in fade-in zoom-in-95 duration-200 cursor-default" onClick={(e) => e.stopPropagation()}>
-                <div className="absolute -top-2 left-1/2 -translate-x-1/2 w-4 h-4 bg-white border-t border-l border-gray-100 rotate-45"></div>
-
-                <div className="flex justify-between items-center border-b pb-2 mb-2">
+             <PopoverContent
+                className="w-64 max-w-[90vw] p-4 flex flex-col gap-4 bg-white"
+                side="bottom"
+                sideOffset={16}
+                onOpenAutoFocus={(e) => e.preventDefault()}
+             >
+                <div className="flex justify-between items-center border-b border-gray-100 pb-2 mb-2">
                    <span className="text-xs font-bold text-gray-500 uppercase">Fondo Descripción</span>
-                   <button onClick={onClose} className="text-gray-400 hover:text-black">✕</button>
+                   <button onClick={onClose} className="text-gray-400 hover:text-black">
+                     <X className="w-4 h-4" />
+                   </button>
                 </div>
 
                 {/* SELECCIÓN DE MODO: TABS VISUALES */}
@@ -329,8 +362,8 @@ export function ProductStylingToolbar({
                 <button onClick={onApplyAll} className="mt-2 w-full py-2 bg-black text-white text-xs rounded hover:bg-neutral-800">
                   Aplicar a todos
                 </button>
-             </div>
-          </div>
+             </PopoverContent>
+          </Popover>
         );
       })()}
 
@@ -340,7 +373,7 @@ export function ProductStylingToolbar({
       <button
         onClick={onApplyAll}
         disabled={isSaving}
-        className="flex flex-col items-center gap-1 group"
+        className="flex flex-col items-center gap-0.5 group"
         title="Aplicar a todos"
       >
         <div className="w-7 h-7 rounded-full border border-gray-200 bg-white flex items-center justify-center hover:bg-gray-50 hover:scale-105 transition-all text-gray-600">
@@ -350,10 +383,23 @@ export function ProductStylingToolbar({
       </button>
 
       {/* Specific Save Button */}
+      {/*
+        NOTE: Removed the Save button from here if it is duplicate or if space is tight.
+        But standard implementation had it.
+        Let's keep it but compact.
+      */}
+      {/*
+        Actually DesignEditor has a global SAVE button on the right.
+        ProductStylingToolbar hides it with `activeTool !== 'product-individual'` condition in parent?
+        No, logic in parent:
+        `{activeTool !== 'product-individual' && ( ... Save Button ... )}`
+        So when `product-individual` is active, parent hides global save button, relying on this one.
+      */}
+
       <button
         onClick={onSave}
         disabled={isSaving}
-        className="flex flex-col items-center gap-1 group"
+        className="flex flex-col items-center gap-0.5 group"
         title="Guardar cambios del producto"
       >
         <div className="w-7 h-7 rounded-full bg-black text-white flex items-center justify-center hover:bg-gray-800 hover:scale-105 transition-all shadow-sm">
@@ -367,7 +413,7 @@ export function ProductStylingToolbar({
       {/* Close Button */}
       <button
         onClick={onClose}
-        className="flex flex-col items-center gap-1 group"
+        className="flex flex-col items-center gap-0.5 group"
         title="Cerrar selección"
       >
          <div className="w-7 h-7 rounded-full border border-gray-200 bg-gray-50 flex items-center justify-center hover:bg-red-50 hover:text-red-500 hover:border-red-100 transition-all text-gray-500">

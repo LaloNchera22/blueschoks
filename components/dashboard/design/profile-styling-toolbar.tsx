@@ -17,39 +17,42 @@ export function ProfileStylingToolbar({
 
   if (activeTool === 'header-title') {
     return (
-      <div className="flex items-center gap-4 h-full animate-in fade-in slide-in-from-top-2 duration-300">
+      <div className="flex items-center gap-2 h-full animate-in fade-in slide-in-from-top-2 duration-300 w-full justify-between">
 
         {/* Input de Texto */}
-        <div className="flex flex-col">
-          <label className="text-[10px] font-bold text-gray-400 uppercase mb-1">Texto</label>
+        <div className="flex flex-col gap-0.5">
+          <label className="text-[9px] font-bold text-gray-400 uppercase">Texto</label>
           <input
             type="text"
             value={config.profile.shopName || ''}
             onChange={(e) => onUpdateConfig(['profile', 'shopName'], e.target.value)}
-            className="border-none bg-gray-100 rounded px-2 py-0.5 text-xs w-40 focus:ring-1 focus:ring-black focus:outline-none"
+            className="border-none bg-gray-100 rounded px-2 py-1 text-[10px] w-28 focus:ring-1 focus:ring-black focus:outline-none h-6"
             placeholder="Nombre..."
           />
         </div>
 
-        <div className="w-px h-8 bg-gray-200 mx-2"></div>
+        <div className="w-px h-6 bg-gray-200 mx-1"></div>
 
         {/* Selector de Fuente */}
-        <div className="flex flex-col">
-           <label className="text-[10px] font-bold text-gray-400 uppercase mb-1">Fuente</label>
+        <div className="flex flex-col gap-0.5">
+           <label className="text-[9px] font-bold text-gray-400 uppercase">Fuente</label>
            <FontPicker
              value={config.profile.titleStyle?.fontFamily || config.fonts.heading}
              onChange={(v) => onUpdateConfig(['profile', 'titleStyle', 'fontFamily'], v)}
+             className="h-6 w-24"
            />
         </div>
 
         {/* Selector de Color */}
-        <div className="flex flex-col">
-           <label className="text-[10px] font-bold text-gray-400 uppercase mb-1">Color</label>
-           <ColorCircle
-             color={config.profile.titleStyle?.color || config.colors.text}
-             onChange={(v) => onUpdateConfig(['profile', 'titleStyle', 'color'], v)}
-             size="sm"
-           />
+        <div className="flex flex-col gap-0.5 items-center">
+           <label className="text-[9px] font-bold text-gray-400 uppercase">Color</label>
+           <div className="scale-90">
+             <ColorCircle
+               color={config.profile.titleStyle?.color || config.colors.text}
+               onChange={(v) => onUpdateConfig(['profile', 'titleStyle', 'color'], v)}
+               size="sm"
+             />
+           </div>
         </div>
       </div>
     );
@@ -57,39 +60,42 @@ export function ProfileStylingToolbar({
 
   if (activeTool === 'header-bio') {
     return (
-      <div className="flex items-center gap-4 h-full animate-in fade-in slide-in-from-top-2 duration-300">
+      <div className="flex items-center gap-2 h-full animate-in fade-in slide-in-from-top-2 duration-300 w-full justify-between">
 
         {/* Input de Texto */}
-        <div className="flex flex-col">
-          <label className="text-[10px] font-bold text-gray-400 uppercase mb-1">Biografía</label>
+        <div className="flex flex-col gap-0.5">
+          <label className="text-[9px] font-bold text-gray-400 uppercase">Biografía</label>
           <input
             type="text"
             value={config.profile.bio || ''}
             onChange={(e) => onUpdateConfig(['profile', 'bio'], e.target.value)}
-            className="border-none bg-gray-100 rounded px-2 py-0.5 text-xs w-64 focus:ring-1 focus:ring-black truncate focus:outline-none"
+            className="border-none bg-gray-100 rounded px-2 py-1 text-[10px] w-32 focus:ring-1 focus:ring-black truncate focus:outline-none h-6"
             placeholder="Bienvenida..."
           />
         </div>
 
-        <div className="w-px h-8 bg-gray-200 mx-2"></div>
+        <div className="w-px h-6 bg-gray-200 mx-1"></div>
 
         {/* Selector de Fuente */}
-        <div className="flex flex-col">
-           <label className="text-[10px] font-bold text-gray-400 uppercase mb-1">Fuente</label>
+        <div className="flex flex-col gap-0.5">
+           <label className="text-[9px] font-bold text-gray-400 uppercase">Fuente</label>
            <FontPicker
              value={config.profile.bioStyle?.fontFamily || config.fonts.body}
              onChange={(v) => onUpdateConfig(['profile', 'bioStyle', 'fontFamily'], v)}
+             className="h-6 w-24"
            />
         </div>
 
         {/* Selector de Color */}
-        <div className="flex flex-col">
-           <label className="text-[10px] font-bold text-gray-400 uppercase mb-1">Color</label>
-           <ColorCircle
-             color={config.profile.bioStyle?.color || config.colors.text}
-             onChange={(v) => onUpdateConfig(['profile', 'bioStyle', 'color'], v)}
-             size="sm"
-           />
+        <div className="flex flex-col gap-0.5 items-center">
+           <label className="text-[9px] font-bold text-gray-400 uppercase">Color</label>
+           <div className="scale-90">
+             <ColorCircle
+               color={config.profile.bioStyle?.color || config.colors.text}
+               onChange={(v) => onUpdateConfig(['profile', 'bioStyle', 'color'], v)}
+               size="sm"
+             />
+           </div>
         </div>
       </div>
     );
