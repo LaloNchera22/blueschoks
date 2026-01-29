@@ -538,10 +538,10 @@ export default function DesignEditor({ initialConfig, initialProducts, userId, s
 
       {/* --- SMART TOOLBAR (FIX: MOVED OUTSIDE SCROLL FLOW & ABSOLUTE POSITIONED) --- */}
       <div
-        className="absolute top-20 left-1/2 -translate-x-1/2 z-30 w-max mb-4 pointer-events-auto"
+        className="absolute top-20 left-1/2 -translate-x-1/2 z-30 w-full max-w-[350px] px-4 mb-4 pointer-events-auto"
         onClick={(e) => e.stopPropagation()}
       >
-        <div className="h-11 px-4 rounded-full bg-white/90 shadow-lg border border-gray-200 flex items-center gap-2 transition-all duration-300 ease-out backdrop-blur-md">
+        <div className="w-full h-11 px-2 rounded-full bg-white/90 shadow-lg border border-gray-200 flex items-center justify-between gap-1 transition-all duration-300 ease-out backdrop-blur-md overflow-hidden">
 
           {(activeTool === 'header-title' || activeTool === 'header-bio') && (
               <ProfileStylingToolbar
@@ -571,12 +571,12 @@ export default function DesignEditor({ initialConfig, initialProducts, userId, s
 
           {/* 1. GLOBAL TOOLS (Default) */}
           {activeTool === 'global' && (
-            <div className="flex items-center gap-3 animate-in fade-in slide-in-from-top-2 duration-300">
+            <div className="flex items-center gap-2 animate-in fade-in slide-in-from-top-2 duration-300 flex-1 justify-around">
                <button
                   onClick={() => setActiveTool('background')}
-                  className="flex flex-col items-center gap-1 group cursor-pointer"
+                  className="flex flex-col items-center gap-0.5 group cursor-pointer"
                >
-                <div className="relative pointer-events-none">
+                <div className="relative pointer-events-none scale-90">
                    <ColorCircle
                      color={config.colors.background}
                      onChange={() => {}}
@@ -588,22 +588,22 @@ export default function DesignEditor({ initialConfig, initialProducts, userId, s
 
                <button
                   onClick={() => setActiveTool('typography')}
-                  className="flex flex-col items-center gap-1 group cursor-pointer"
+                  className="flex flex-col items-center gap-0.5 group cursor-pointer"
                >
-                <div className="w-8 h-8 rounded-full border border-gray-200 bg-white flex items-center justify-center transition-all group-hover:bg-gray-50">
-                   <Type className="w-4 h-4 text-gray-600" />
+                <div className="w-7 h-7 rounded-full border border-gray-200 bg-white flex items-center justify-center transition-all group-hover:bg-gray-50">
+                   <Type className="w-3.5 h-3.5 text-gray-600" />
                 </div>
                 <span className="text-[9px] text-gray-500 font-semibold uppercase tracking-wider group-hover:text-black transition-colors">Fuente</span>
               </button>
 
               {/* Separator */}
-              <div className="w-px h-6 bg-gray-300" />
+              <div className="w-px h-6 bg-gray-200" />
 
               {/* Socials Manager Button */}
               <button
                 onClick={() => setShowSocialsManager(!showSocialsManager)}
                 className={cn(
-                  "flex flex-col items-center gap-1 group",
+                  "flex flex-col items-center gap-0.5 group",
                   showSocialsManager && "opacity-100"
                 )}
               >
@@ -800,7 +800,7 @@ export default function DesignEditor({ initialConfig, initialProducts, userId, s
 
           {/* SAVE BUTTON (Always visible on right) */}
           {activeTool !== 'product-individual' && (
-            <div className="pl-4 ml-auto border-l border-gray-200 py-1">
+            <div className="pl-2 ml-auto border-l border-gray-200 py-1">
                 <button
                 onClick={handleSave}
                 disabled={isSaving}
