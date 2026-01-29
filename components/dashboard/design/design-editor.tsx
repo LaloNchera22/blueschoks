@@ -110,15 +110,6 @@ const DUMMY_PRODUCTS = [
   { id: '4', name: 'Mochila Viaje', price: 45.00, image_url: 'https://images.unsplash.com/photo-1553062407-98eeb64c6a62?w=500&auto=format&fit=crop&q=60' },
 ];
 
-const FONTS = [
-  { name: 'Inter', value: 'Inter' },
-  { name: 'Roboto', value: 'Roboto' },
-  { name: 'Open Sans', value: 'Open Sans' },
-  { name: 'Lato', value: 'Lato' },
-  { name: 'Montserrat', value: 'Montserrat' },
-  { name: 'Playfair', value: 'Playfair Display' },
-];
-
 const PLATFORMS = [
   { id: 'instagram', icon: Instagram, label: 'Instagram', placeholder: 'https://instagram.com/usuario' },
   { id: 'tiktok', icon: Music2, label: 'TikTok', placeholder: 'https://tiktok.com/@usuario' },
@@ -587,13 +578,15 @@ export default function DesignEditor({ initialConfig, initialProducts, userId, s
               </button>
 
               <div className="flex flex-col items-center gap-1 group">
-                 <FontPicker
-                   value={config.fonts.body}
-                   onChange={(val) => {
-                     updateConfig(['fonts', 'body'], val);
-                     updateConfig(['fonts', 'heading'], val);
-                   }}
-                 />
+                 {activeTool === 'global' && (
+                    <FontPicker
+                      value={config.fonts.body}
+                      onChange={(val) => {
+                        updateConfig(['fonts', 'body'], val);
+                        updateConfig(['fonts', 'heading'], val);
+                      }}
+                    />
+                 )}
                  <span className="text-[9px] text-gray-500 font-semibold uppercase tracking-wider group-hover:text-black transition-colors">Fuente</span>
               </div>
 
