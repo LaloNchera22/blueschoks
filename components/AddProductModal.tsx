@@ -121,113 +121,118 @@ export default function AddProductModal({ isPro = false }: Props) {
       </button>
 
       {isOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm p-4">
-          <div className="bg-white rounded-3xl w-full max-w-md max-h-[90vh] overflow-y-auto p-8 shadow-2xl relative animate-in fade-in zoom-in duration-200">
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm md:p-4">
+          <div className="bg-white w-full h-[100dvh] md:h-auto md:max-h-[90vh] md:max-w-md md:rounded-3xl shadow-2xl relative animate-in fade-in zoom-in duration-200 flex flex-col overflow-hidden">
             
-            <button 
-              onClick={() => setIsOpen(false)}
-              className="absolute top-4 right-4 text-gray-400 hover:text-red-500 font-bold p-2"
-            >
-              ✕
-            </button>
+            {/* Header */}
+            <div className="flex-none flex items-center justify-between p-4 border-b bg-white">
+                <h2 className="text-xl font-black text-[#1a1a8e] uppercase tracking-tight">
+                  Subir Producto
+                </h2>
+                <button
+                  onClick={() => setIsOpen(false)}
+                  className="text-gray-400 hover:text-red-500 font-bold p-2"
+                >
+                  ✕
+                </button>
+            </div>
 
-            <h2 className="text-2xl font-black text-[#1a1a8e] mb-2 uppercase tracking-tight">
-              Subir Producto
-            </h2>
-            
-            <p className="text-xs font-bold text-gray-400 mb-6 uppercase">
-              {isPro 
-                ? '📸 Fotos Ilimitadas habilitadas' 
-                : `📸 Plan Gratuito: ${selectedFiles.length}/3 fotos`
-              }
-            </p>
+            <form ref={formRef} onSubmit={handleSubmit} className="flex flex-col flex-1 min-h-0">
 
-            <form ref={formRef} onSubmit={handleSubmit} className="space-y-4">
-              
-              {/* ÁREA DE IMÁGENES */}
-              <div className="space-y-3">
-                
-                {/* PREVISUALIZACIÓN (GRID CON BOTÓN DE BORRAR) */}
-                {previews.length > 0 && (
-                  <div className="grid grid-cols-3 gap-2 mb-2">
-                    {previews.map((src, idx) => (
-                      <div key={idx} className="aspect-square relative rounded-lg overflow-hidden border border-gray-200 group">
-                        <Image
-                            src={src}
-                            alt="Preview"
-                            fill
-                            className="object-cover w-full h-full"
-                            sizes="(max-width: 768px) 33vw, 20vw"
-                        />
-                        {/* Botón X para borrar foto individual */}
-                        <button
-                          type="button"
-                          onClick={() => removeImage(idx)}
-                          className="absolute top-1 right-1 bg-red-500 text-white rounded-full w-5 h-5 flex items-center justify-center text-xs font-bold opacity-0 group-hover:opacity-100 transition shadow-md z-10"
-                        >
-                          ✕
-                        </button>
+               {/* Body - Scrollable */}
+               <div className="flex-1 overflow-y-auto p-4 space-y-2">
+                 <p className="text-xs font-bold text-gray-400 mb-2 uppercase">
+                   {isPro
+                     ? '📸 Fotos Ilimitadas habilitadas'
+                     : `📸 Plan Gratuito: ${selectedFiles.length}/3 fotos`
+                   }
+                 </p>
+
+                 {/* ÁREA DE IMÁGENES */}
+                 <div className="space-y-2">
+                    {/* PREVISUALIZACIÓN (GRID CON BOTÓN DE BORRAR) */}
+                    {previews.length > 0 && (
+                      <div className="grid grid-cols-3 gap-2 mb-2">
+                        {previews.map((src, idx) => (
+                          <div key={idx} className="aspect-square relative rounded-lg overflow-hidden border border-gray-200 group">
+                            <Image
+                                src={src}
+                                alt="Preview"
+                                fill
+                                className="object-cover w-full h-full"
+                                sizes="(max-width: 768px) 33vw, 20vw"
+                            />
+                            {/* Botón X para borrar foto individual */}
+                            <button
+                              type="button"
+                              onClick={() => removeImage(idx)}
+                              className="absolute top-1 right-1 bg-red-500 text-white rounded-full w-5 h-5 flex items-center justify-center text-xs font-bold opacity-0 group-hover:opacity-100 transition shadow-md z-10"
+                            >
+                              ✕
+                            </button>
+                          </div>
+                        ))}
                       </div>
-                    ))}
-                  </div>
-                )}
+                    )}
 
-                {/* BOTÓN DE SUBIDA */}
-                <div className="bg-gray-50 border-2 border-dashed border-gray-200 rounded-xl p-4 text-center hover:border-[#1a1a8e]/50 transition cursor-pointer relative group">
-                  <input 
-                    ref={fileInputRef}
-                    type="file" 
-                    name="image_input_dummy" // Nombre dummy, no lo usamos para enviar
-                    multiple 
-                    accept="image/*" 
-                    onChange={handleImageChange}
-                    className="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10"
-                  />
-                  <div className="space-y-1 pointer-events-none">
-                    <span className="text-2xl">📸</span>
-                    <p className="text-xs font-bold text-gray-500 uppercase">
-                      {previews.length > 0 ? '+ Agregar más fotos' : 'Toca para subir fotos'}
-                    </p>
-                  </div>
-                </div>
+                    {/* BOTÓN DE SUBIDA */}
+                    <div className="bg-gray-50 border-2 border-dashed border-gray-200 rounded-xl p-4 text-center hover:border-[#1a1a8e]/50 transition cursor-pointer relative group">
+                      <input
+                        ref={fileInputRef}
+                        type="file"
+                        name="image_input_dummy" // Nombre dummy, no lo usamos para enviar
+                        multiple
+                        accept="image/*"
+                        onChange={handleImageChange}
+                        className="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10"
+                      />
+                      <div className="space-y-1 pointer-events-none">
+                        <span className="text-2xl">📸</span>
+                        <p className="text-xs font-bold text-gray-500 uppercase">
+                          {previews.length > 0 ? '+ Agregar más fotos' : 'Toca para subir fotos'}
+                        </p>
+                      </div>
+                    </div>
+                 </div>
 
-              </div>
+                 {/* INPUTS DE TEXTO */}
+                 <input
+                   name="name"
+                   placeholder="Nombre del producto"
+                   required
+                   className="w-full p-2 bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#1a1a8e] font-bold"
+                 />
 
-              {/* INPUTS DE TEXTO */}
-              <input 
-                name="name" 
-                placeholder="Nombre del producto" 
-                required 
-                className="w-full p-3 bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#1a1a8e] font-bold"
-              />
+                 <div className="relative">
+                   <span className="absolute left-4 top-2 text-gray-400 font-bold">$</span>
+                   <input
+                     name="price"
+                     type="number"
+                     placeholder="0.00"
+                     step="0.01"
+                     required
+                     className="w-full p-2 pl-8 bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#1a1a8e] font-bold"
+                   />
+                 </div>
 
-              <div className="relative">
-                <span className="absolute left-4 top-3 text-gray-400 font-bold">$</span>
-                <input 
-                  name="price" 
-                  type="number" 
-                  placeholder="0.00" 
-                  step="0.01" 
-                  required 
-                  className="w-full p-3 pl-8 bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#1a1a8e] font-bold"
-                />
-              </div>
+                 <textarea
+                   name="description"
+                   placeholder="Descripción breve..."
+                   rows={3}
+                   className="w-full p-2 bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#1a1a8e] font-medium text-sm"
+                 />
+               </div>
 
-              <textarea 
-                name="description" 
-                placeholder="Descripción breve..." 
-                rows={3}
-                className="w-full p-3 bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#1a1a8e] font-medium text-sm"
-              />
-
-              <button 
-                type="submit" 
-                disabled={loading}
-                className="w-full bg-[#1a1a8e] text-white font-black py-4 rounded-xl hover:bg-[#2a2a9e] transition uppercase tracking-widest disabled:opacity-50"
-              >
-                {loading ? 'Subiendo...' : 'Publicar Producto'}
-              </button>
-
+               {/* Footer - Fixed Bottom within Flex */}
+               <div className="flex-none p-4 border-t bg-white">
+                 <button
+                   type="submit"
+                   disabled={loading}
+                   className="w-full bg-[#1a1a8e] text-white font-black py-4 rounded-xl hover:bg-[#2a2a9e] transition uppercase tracking-widest disabled:opacity-50"
+                 >
+                   {loading ? 'Subiendo...' : 'Publicar Producto'}
+                 </button>
+               </div>
             </form>
           </div>
         </div>
