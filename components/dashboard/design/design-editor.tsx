@@ -577,13 +577,15 @@ export default function DesignEditor({ initialConfig, initialProducts, userId, s
               </button>
 
               <div className="flex flex-col items-center gap-1 group">
-                 <FontPicker
-                   value={config.fonts.body}
-                   onChange={(val) => {
-                     updateConfig(['fonts', 'body'], val);
-                     updateConfig(['fonts', 'heading'], val);
-                   }}
-                 />
+                 {activeTool === 'global' && (
+                    <FontPicker
+                      value={config.fonts.body}
+                      onChange={(val) => {
+                        updateConfig(['fonts', 'body'], val);
+                        updateConfig(['fonts', 'heading'], val);
+                      }}
+                    />
+                 )}
                  <span className="text-[9px] text-gray-500 font-semibold uppercase tracking-wider group-hover:text-black transition-colors">Fuente</span>
               </div>
 
