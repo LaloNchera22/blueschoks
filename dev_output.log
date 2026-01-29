@@ -9,35 +9,12 @@
   · serverActions
 
 ✓ Starting...
-✓ Ready in 1139ms
-○ Compiling /test-design ...
- GET /test-design 200 in 6.2s (compile: 5.5s, render: 691ms)
-○ Compiling /[slug] ...
-SUPABASE_SERVICE_ROLE_KEY is missing. Falling back to ANON_KEY. This may cause 404s if RLS is strict.
-⨯ Error: supabaseUrl is required.
-    at createAdminClient (utils/supabase/server.ts:11:32)
-    at StorePage (app/[slug]/page.tsx:42:43)
-   9 |   if (!serviceRoleKey) {
-  10 |     console.warn("SUPABASE_SERVICE_ROLE_KEY is missing. Falling back to ANON_KEY. This may cause 404s if RLS is strict.")
-> 11 |     return createSupabaseClient<Database>(
-     |                                ^
-  12 |       process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  13 |       process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
-  14 |     ) {
-  digest: '1529488668'
-}
-SUPABASE_SERVICE_ROLE_KEY is missing. Falling back to ANON_KEY. This may cause 404s if RLS is strict.
-⨯ Error: supabaseUrl is required.
-    at createAdminClient (utils/supabase/server.ts:11:32)
-    at Module.generateMetadata (app/[slug]/page.tsx:12:43)
-   9 |   if (!serviceRoleKey) {
-  10 |     console.warn("SUPABASE_SERVICE_ROLE_KEY is missing. Falling back to ANON_KEY. This may cause 404s if RLS is strict.")
-> 11 |     return createSupabaseClient<Database>(
-     |                                ^
-  12 |       process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  13 |       process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
-  14 |     ) {
-  digest: '566818946'
-}
- GET /placeholder.png 200 in 5.1s (compile: 4.8s, render: 258ms)
-⨯ The requested resource isn't a valid image for /placeholder.png received null
+Attention: Next.js now collects completely anonymous telemetry regarding usage.
+This information is used to shape Next.js' roadmap and prioritize features.
+You can learn more, including how to opt-out if you'd not like to participate in this anonymous program, by visiting the following URL:
+https://nextjs.org/telemetry
+
+✓ Ready in 1180ms
+○ Compiling /test-new-product ...
+ GET /test-new-product 200 in 11.6s (compile: 11.1s, render: 579ms)
+✓ Compiled in 89ms
