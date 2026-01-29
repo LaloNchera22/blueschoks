@@ -21,7 +21,6 @@ export function ProfileStylingToolbar({
 
         {/* Selector de Fuente */}
         <div className="flex flex-col gap-0.5">
-           <label className="text-[9px] font-bold text-gray-400 uppercase">Fuente</label>
            <FontPicker
              value={config.profile.titleStyle?.fontFamily || config.fonts.heading}
              onChange={(v) => onUpdateConfig(['profile', 'titleStyle', 'fontFamily'], v)}
@@ -31,7 +30,6 @@ export function ProfileStylingToolbar({
 
         {/* Selector de Color */}
         <div className="flex flex-col gap-0.5 items-center">
-           <label className="text-[9px] font-bold text-gray-400 uppercase">Color</label>
            <div className="scale-90">
              <ColorCircle
                color={config.profile.titleStyle?.color || config.colors.text}
@@ -50,7 +48,6 @@ export function ProfileStylingToolbar({
 
         {/* Selector de Fuente */}
         <div className="flex flex-col gap-0.5">
-           <label className="text-[9px] font-bold text-gray-400 uppercase">Fuente</label>
            <FontPicker
              value={config.profile.bioStyle?.fontFamily || config.fonts.body}
              onChange={(v) => onUpdateConfig(['profile', 'bioStyle', 'fontFamily'], v)}
@@ -60,7 +57,6 @@ export function ProfileStylingToolbar({
 
         {/* Selector de Color */}
         <div className="flex flex-col gap-0.5 items-center">
-           <label className="text-[9px] font-bold text-gray-400 uppercase">Color</label>
            <div className="scale-90">
              <ColorCircle
                color={config.profile.bioStyle?.color || config.colors.text}

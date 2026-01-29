@@ -846,7 +846,6 @@ export default function DesignEditor({ initialConfig, initialProducts, userId, s
                      size="sm"
                    />
                 </div>
-                <span className="text-[9px] text-gray-500 font-semibold uppercase tracking-wider group-hover:text-black transition-colors">Fondo</span>
               </button>
 
                <button
@@ -856,7 +855,6 @@ export default function DesignEditor({ initialConfig, initialProducts, userId, s
                 <div className="w-7 h-7 rounded-full border border-gray-200 bg-white flex items-center justify-center transition-all group-hover:bg-gray-50">
                    <Type className="w-3.5 h-3.5 text-gray-600" />
                 </div>
-                <span className="text-[9px] text-gray-500 font-semibold uppercase tracking-wider group-hover:text-black transition-colors">Fuente</span>
               </button>
 
               {/* Separator */}
@@ -876,7 +874,6 @@ export default function DesignEditor({ initialConfig, initialProducts, userId, s
                 )}>
                   <MoreHorizontal className="w-3.5 h-3.5" />
                 </div>
-                <span className="text-[9px] text-gray-500 font-semibold uppercase tracking-wider group-hover:text-black transition-colors">Redes</span>
               </button>
             </div>
           )}
@@ -894,15 +891,12 @@ export default function DesignEditor({ initialConfig, initialProducts, userId, s
                     className="hidden"
                     disabled={isUploadingImage}
                   />
-                  <div className="flex items-center gap-2 h-7 rounded-full border border-gray-200 bg-gray-50 px-3 hover:bg-gray-100 transition-colors cursor-pointer">
+                  <div className="flex items-center justify-center w-7 h-7 rounded-full border border-gray-200 bg-gray-50 hover:bg-gray-100 transition-colors cursor-pointer">
                      {isUploadingImage ? (
-                        <Loader2 className="w-3 h-3 animate-spin text-gray-500" />
+                        <Loader2 className="w-3.5 h-3.5 animate-spin text-gray-500" />
                      ) : (
-                        <Upload className="w-3 h-3 text-gray-500" />
+                        <Upload className="w-3.5 h-3.5 text-gray-500" />
                      )}
-                     <span className="text-xs font-medium text-gray-600">
-                        {isUploadingImage ? 'Subiendo...' : 'Subir Foto'}
-                     </span>
                   </div>
               </label>
 
@@ -961,7 +955,6 @@ export default function DesignEditor({ initialConfig, initialProducts, userId, s
                         </button>
                     )}
                  </div>
-                 <span className="text-[9px] text-gray-500 font-semibold uppercase tracking-wider">Borde</span>
               </div>
             </div>
           )}
@@ -975,7 +968,6 @@ export default function DesignEditor({ initialConfig, initialProducts, userId, s
                     onChange={(c) => updateSocialLink(selectedSocialLink.id, 'color', c)}
                     size="sm"
                   />
-                  <span className="text-[9px] text-gray-500 font-semibold uppercase tracking-wider">Icono</span>
                 </div>
              </div>
           )}
@@ -985,11 +977,9 @@ export default function DesignEditor({ initialConfig, initialProducts, userId, s
             <div className="flex items-center gap-4 animate-in fade-in slide-in-from-top-2 duration-300">
                <div className="flex flex-col items-center gap-1">
                   <ColorCircle color={config.cardStyle?.buttonColor || '#000000'} onChange={(c) => updateConfig(['cardStyle', 'buttonColor'], c)} size="sm" />
-                  <span className="text-[9px] text-gray-500 font-semibold uppercase tracking-wider">Fondo</span>
                </div>
                <div className="flex flex-col items-center gap-1">
                   <ColorCircle color={config.cardStyle?.buttonTextColor || '#ffffff'} onChange={(c) => updateConfig(['cardStyle', 'buttonTextColor'], c)} size="sm" />
-                  <span className="text-[9px] text-gray-500 font-semibold uppercase tracking-wider">Texto</span>
                </div>
 
                <div className="flex flex-col items-center gap-1 w-24">
@@ -1002,7 +992,6 @@ export default function DesignEditor({ initialConfig, initialProducts, userId, s
                     onChange={(e) => updateConfig(['cardStyle', 'borderRadius'], Number(e.target.value))}
                     className="w-full h-1 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-black"
                   />
-                  <span className="text-[9px] text-gray-500 font-semibold uppercase tracking-wider">Redondez</span>
                </div>
             </div>
           )}
@@ -1016,7 +1005,6 @@ export default function DesignEditor({ initialConfig, initialProducts, userId, s
                     onChange={(c) => updateConfig(['cardStyle', activeTool === 'card-title' ? 'titleColor' : 'priceColor'], c)}
                     size="sm"
                   />
-                  <span className="text-[9px] text-gray-500 font-semibold uppercase tracking-wider">Color</span>
                 </div>
              </div>
           )}

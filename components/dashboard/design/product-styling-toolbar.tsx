@@ -51,7 +51,6 @@ export function ProductStylingToolbar({
                  <div className="w-7 h-7 rounded-full bg-black text-white flex items-center justify-center shadow-sm">
                     <div className="w-3.5 h-3.5 border border-white rounded-sm" />
                  </div>
-                 <span className="text-[9px] text-gray-500 font-semibold uppercase tracking-wider">Tarjeta</span>
               </div>
             </PopoverTrigger>
 
@@ -62,8 +61,7 @@ export function ProductStylingToolbar({
                 sideOffset={16}
                 onOpenAutoFocus={(e) => e.preventDefault()}
              >
-                <div className="flex justify-between items-center border-b border-gray-100 pb-2 mb-1">
-                    <span className="text-xs font-bold text-gray-500 uppercase">Fondo Tarjeta</span>
+                <div className="flex justify-end items-center border-b border-gray-100 pb-2 mb-1">
                     <button onClick={onClose} className="text-gray-400 hover:text-black">
                         <X className="w-4 h-4" />
                     </button>
@@ -71,8 +69,6 @@ export function ProductStylingToolbar({
 
                 {/* 1. Main Card Background */}
                 <div>
-                   <label className="text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-2 block">Fondo General</label>
-
                    {/* SELECCIÓN DE MODO: TABS VISUALES */}
                    <div className="flex bg-gray-100 p-1 rounded-lg mb-3">
                      <button
@@ -92,7 +88,6 @@ export function ProductStylingToolbar({
                    {/* CONTENIDO CONDICIONAL */}
                    {isCardTransparent ? (
                       <div className="text-center py-4 px-2 bg-gray-50 rounded border border-dashed border-gray-300">
-                         <span className="text-xs text-gray-400 block mb-1">El fondo es invisible</span>
                          <div className="w-full h-4 bg-[url('https://placehold.co/100x4/transparent')] opacity-30 rounded"></div>
                       </div>
                    ) : (
@@ -102,7 +97,6 @@ export function ProductStylingToolbar({
                             onChange={(val) => onUpdate('cardBackground', val)}
                             size="md"
                           />
-                          <span className="text-xs text-gray-500">Seleccionar color</span>
                       </div>
                    )}
                 </div>
@@ -111,16 +105,12 @@ export function ProductStylingToolbar({
 
                 {/* 2. Footer Info Background */}
                 <div>
-                   <label className="text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-2 block">Fondo Información (Footer)</label>
                    <div className="flex items-center gap-3">
                       <ColorCircle
                         color={product.style_config?.footerBackground || '#ffffff'}
                         onChange={(c) => onUpdate('footerBackground', c)}
                         size="md"
                       />
-                      <span className="text-xs text-gray-400">
-                        {product.style_config?.footerBackground ? 'Color activo' : 'Sin fondo (Hereda)'}
-                      </span>
                       {product.style_config?.footerBackground && (
                         <button
                           onClick={(e) => { e.stopPropagation(); onUpdate('footerBackground', undefined); }}
@@ -134,10 +124,6 @@ export function ProductStylingToolbar({
 
                 {/* --- SECCIÓN NUEVA: FORMA DE IMAGEN --- */}
                 <div className="border-t border-gray-100 pt-3 mt-3">
-                   <label className="text-[10px] font-bold text-gray-400 uppercase mb-2 block tracking-wider">
-                     Forma de Foto
-                   </label>
-
                    <div className="flex bg-gray-100 p-1 rounded-lg gap-1">
                      {/* Opción 1: CUADRADA */}
                      <button
@@ -149,7 +135,6 @@ export function ProductStylingToolbar({
                        }`}
                      >
                        <div className="w-3 h-3 border border-current bg-current opacity-20 rounded-none"></div>
-                       Cuadrada
                      </button>
 
                      {/* Opción 2: REDONDA (Default) */}
@@ -162,7 +147,6 @@ export function ProductStylingToolbar({
                        }`}
                      >
                        <div className="w-3 h-3 border border-current bg-current opacity-20 rounded-full"></div>
-                       Redonda
                      </button>
                    </div>
                 </div>
@@ -181,7 +165,6 @@ export function ProductStylingToolbar({
               onChange={(val) => onUpdate('titleFont', val || undefined)}
               className="w-20"
             />
-            <span className="text-[9px] text-gray-500 font-semibold uppercase tracking-wider">Título</span>
           </div>
 
           {/* Title Color */}
@@ -202,7 +185,6 @@ export function ProductStylingToolbar({
                 </button>
               )}
             </div>
-            <span className="text-[9px] text-gray-500 font-semibold uppercase tracking-wider">Color</span>
           </div>
         </div>
       )}
@@ -217,7 +199,6 @@ export function ProductStylingToolbar({
               onChange={(val) => onUpdate('priceFont', val || undefined)}
               className="w-20"
             />
-            <span className="text-[9px] text-gray-500 font-semibold uppercase tracking-wider">Precio</span>
           </div>
 
           {/* Price Color */}
@@ -238,7 +219,6 @@ export function ProductStylingToolbar({
                 </button>
               )}
             </div>
-            <span className="text-[9px] text-gray-500 font-semibold uppercase tracking-wider">Color</span>
           </div>
         </div>
       )}
@@ -264,7 +244,6 @@ export function ProductStylingToolbar({
                 </button>
               )}
             </div>
-            <span className="text-[9px] text-gray-500 font-semibold uppercase tracking-wider">Fondo</span>
           </div>
 
           {/* Button Icon/Text Color */}
@@ -285,7 +264,6 @@ export function ProductStylingToolbar({
                 </button>
               )}
             </div>
-            <span className="text-[9px] text-gray-500 font-semibold uppercase tracking-wider">Icono</span>
           </div>
         </div>
       )}
@@ -306,7 +284,6 @@ export function ProductStylingToolbar({
                          <div className="w-2/3 h-px bg-current opacity-80" />
                       </div>
                    </div>
-                   <span className="text-[9px] text-gray-500 font-semibold uppercase tracking-wider">Desc.</span>
                 </div>
              </PopoverTrigger>
 
@@ -317,8 +294,7 @@ export function ProductStylingToolbar({
                 sideOffset={16}
                 onOpenAutoFocus={(e) => e.preventDefault()}
              >
-                <div className="flex justify-between items-center border-b border-gray-100 pb-2 mb-2">
-                   <span className="text-xs font-bold text-gray-500 uppercase">Fondo Descripción</span>
+                <div className="flex justify-end items-center border-b border-gray-100 pb-2 mb-2">
                    <button onClick={onClose} className="text-gray-400 hover:text-black">
                      <X className="w-4 h-4" />
                    </button>
@@ -343,12 +319,10 @@ export function ProductStylingToolbar({
                 {/* CONTENIDO CONDICIONAL */}
                 {isDescTransparent ? (
                    <div className="text-center py-4 px-2 bg-gray-50 rounded border border-dashed border-gray-300">
-                      <span className="text-xs text-gray-400 block mb-1">El fondo es invisible</span>
                       <div className="w-full h-4 bg-[url('https://placehold.co/100x4/transparent')] opacity-30 rounded"></div>
                    </div>
                 ) : (
                    <div>
-                      <label className="text-xs font-semibold mb-2 block">Elige un color:</label>
                       <div className="flex items-center gap-2">
                         <ColorCircle
                           color={currentColor}
@@ -379,7 +353,6 @@ export function ProductStylingToolbar({
         <div className="w-7 h-7 rounded-full border border-gray-200 bg-white flex items-center justify-center hover:bg-gray-50 hover:scale-105 transition-all text-gray-600">
           <Copy className="w-3.5 h-3.5" />
         </div>
-        <span className="text-[9px] text-gray-500 font-semibold uppercase tracking-wider group-hover:text-black transition-colors">Todos</span>
       </button>
 
       {/* Specific Save Button */}
@@ -405,7 +378,6 @@ export function ProductStylingToolbar({
         <div className="w-7 h-7 rounded-full bg-black text-white flex items-center justify-center hover:bg-gray-800 hover:scale-105 transition-all shadow-sm">
           {isSaving ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Save className="w-3.5 h-3.5" />}
         </div>
-        <span className="text-[9px] text-gray-500 font-semibold uppercase tracking-wider group-hover:text-black transition-colors">Guardar</span>
       </button>
 
       <div className="w-px h-6 bg-gray-200" />
@@ -419,7 +391,6 @@ export function ProductStylingToolbar({
          <div className="w-7 h-7 rounded-full border border-gray-200 bg-gray-50 flex items-center justify-center hover:bg-red-50 hover:text-red-500 hover:border-red-100 transition-all text-gray-500">
            <X className="w-3.5 h-3.5" />
          </div>
-         <span className="text-[9px] text-gray-500 font-semibold uppercase tracking-wider group-hover:text-red-500 transition-colors">Cerrar</span>
       </button>
 
     </div>
