@@ -4,6 +4,7 @@ import React, { useState, useMemo } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { toast } from 'sonner';
+import TextareaAutosize from 'react-textarea-autosize';
 import {
   Save,
   Image as ImageIcon,
@@ -1107,16 +1108,17 @@ export default function DesignEditor({ initialConfig, initialProducts, userId, s
                    </div>
 
                    {/* SHOP NAME */}
-                   <h1
+                   <input
+                     value={config.profile.shopName || ''}
+                     placeholder="Mi Tienda"
+                     onChange={(e) => updateConfig(['profile', 'shopName'], e.target.value)}
                      className={cn(
-                       "text-2xl font-bold text-neutral-900 tracking-tight mb-3 cursor-pointer hover:opacity-80 transition-opacity",
+                       "bg-transparent border-none outline-none text-center w-full mb-3 cursor-text hover:opacity-80 transition-opacity text-2xl font-bold text-neutral-900 tracking-tight",
                         activeTool === 'header-title' && "underline decoration-blue-500 decoration-2 underline-offset-4"
                      )}
                      style={getTextStyle('title')}
                      onClick={(e) => { e.stopPropagation(); setActiveTool('header-title'); }}
-                   >
-                       {config.profile.shopName || 'Mi Tienda'}
-                   </h1>
+                   />
 
                    {/* SOCIALS */}
                    <div className="flex flex-wrap justify-center gap-3 mb-4">
@@ -1154,16 +1156,17 @@ export default function DesignEditor({ initialConfig, initialProducts, userId, s
                    </div>
 
                    {/* BIO */}
-                   <p
+                   <TextareaAutosize
+                     value={config.profile.bio || ''}
+                     placeholder="Bienvenido a mi tienda online"
+                     onChange={(e) => updateConfig(['profile', 'bio'], e.target.value)}
                      className={cn(
-                       "max-w-xl text-sm text-neutral-500 leading-relaxed mb-6 cursor-pointer hover:bg-black/5 rounded px-2 -mx-2 transition-colors",
+                       "bg-transparent border-none outline-none text-center w-full resize-none max-w-xl mb-6 cursor-text hover:bg-black/5 rounded px-2 -mx-2 transition-colors text-sm text-neutral-500 leading-relaxed",
                        activeTool === 'header-bio' && "ring-2 ring-blue-500 bg-blue-50/50"
                      )}
                      style={getTextStyle('bio')}
                      onClick={(e) => { e.stopPropagation(); setActiveTool('header-bio'); }}
-                   >
-                       {config.profile.bio || 'Bienvenido a mi tienda online'}
-                   </p>
+                   />
                 </div>
 
                 {/* --- 3. PRODUCT GRID --- */}
