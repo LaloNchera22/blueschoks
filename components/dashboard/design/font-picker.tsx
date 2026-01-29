@@ -100,7 +100,7 @@ export function FontPicker({ value, onChange, className }: FontPickerProps) {
       </button>
 
       {isOpen && (
-        <div className="absolute top-full left-0 mt-2 w-64 bg-white rounded-xl shadow-xl border border-gray-100 z-[100] overflow-hidden animate-in fade-in zoom-in-95 duration-200 flex flex-col max-h-[400px]">
+        <div className="absolute top-full left-1/2 -translate-x-1/2 mt-2 w-64 max-w-[90vw] bg-white rounded-xl shadow-xl border border-gray-100 z-[100] overflow-hidden animate-in fade-in zoom-in-95 duration-200 flex flex-col max-h-[400px]">
           <div className="p-3 border-b border-gray-100 sticky top-0 bg-white z-10">
             <div className="relative">
               <Search className="w-3 h-3 absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />

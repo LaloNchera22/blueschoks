@@ -547,7 +547,7 @@ export default function DesignEditor({ initialConfig, initialProducts, userId, s
 
       {/* --- SMART TOOLBAR (FIX: MOVED OUTSIDE SCROLL FLOW & ABSOLUTE POSITIONED) --- */}
       <div
-        className="absolute top-6 left-1/2 -translate-x-1/2 z-50 w-max mb-4 pointer-events-auto"
+        className="absolute top-20 left-1/2 -translate-x-1/2 z-30 w-max mb-4 pointer-events-auto"
         onClick={(e) => e.stopPropagation()}
       >
         <div className="h-14 px-6 rounded-full bg-white/90 shadow-lg border border-gray-200 flex items-center gap-4 transition-all duration-300 ease-out backdrop-blur-md">
@@ -829,7 +829,7 @@ export default function DesignEditor({ initialConfig, initialProducts, userId, s
         }}
       >
         {/* --- PREVIEW AREA (NEW STORE CLIENT STRUCTURE) --- */}
-        <div className="flex justify-center pb-32 px-4 pt-32"> {/* Added pt-32 to account for floating toolbar */}
+        <div className="flex justify-center pb-32 px-4 pt-40"> {/* Added pt-40 to account for floating toolbar */}
           <div className="w-full max-w-[420px] origin-top scale-[0.9] 2xl:scale-100 transition-transform bg-transparent">
              <div
                className="h-full min-h-[800px] pb-40 relative rounded-[32px] overflow-hidden"
@@ -978,7 +978,7 @@ export default function DesignEditor({ initialConfig, initialProducts, userId, s
 
       {/* --- SOCIALS MANAGER POPOVER --- */}
       {showSocialsManager && (
-         <div className="fixed bottom-28 left-1/2 -translate-x-1/2 z-50 bg-white rounded-2xl shadow-2xl p-4 w-[320px] border border-gray-100 animate-in fade-in zoom-in-95 duration-200">
+         <div className="fixed bottom-28 left-1/2 -translate-x-1/2 z-50 bg-white rounded-2xl shadow-2xl p-4 w-[320px] max-w-[90vw] border border-gray-100 animate-in fade-in zoom-in-95 duration-200">
             <div className="flex items-center justify-between mb-3 px-1">
               <h3 className="text-xs font-bold uppercase tracking-wide text-gray-500">Mis Redes</h3>
               <button onClick={() => setShowSocialsManager(false)} className="text-gray-400 hover:text-black">&times;</button>
