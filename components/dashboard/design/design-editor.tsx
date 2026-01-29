@@ -103,13 +103,6 @@ type SelectionState = {
   elementType: 'container' | 'title' | 'price' | 'cartButton' | 'description';
 } | null;
 
-const DUMMY_PRODUCTS = [
-  { id: '1', name: 'Camiseta Básica', price: 25.00, image_url: 'https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?w=500&auto=format&fit=crop&q=60' },
-  { id: '2', name: 'Gorra Urbana', price: 15.00, image_url: 'https://images.unsplash.com/photo-1588850561407-ed78c282e89b?w=500&auto=format&fit=crop&q=60' },
-  { id: '3', name: 'Sneakers Pro', price: 120.00, image_url: 'https://images.unsplash.com/photo-1552346154-21d32810aba3?w=500&auto=format&fit=crop&q=60' },
-  { id: '4', name: 'Mochila Viaje', price: 45.00, image_url: 'https://images.unsplash.com/photo-1553062407-98eeb64c6a62?w=500&auto=format&fit=crop&q=60' },
-];
-
 const FONTS = [
   { name: 'Inter', value: 'Inter' },
   { name: 'Roboto', value: 'Roboto' },
@@ -218,7 +211,7 @@ export default function DesignEditor({ initialConfig, initialProducts, userId, s
 
   const [config, setConfig] = useState<DesignConfig>(safeInitialConfig);
   // Initialize products with local state
-  const [products, setProducts] = useState<Product[]>(initialProducts.length > 0 ? initialProducts : (DUMMY_PRODUCTS as any));
+  const [products, setProducts] = useState<Product[]>(initialProducts);
   const [activeTool, setActiveTool] = useState<ToolType>('global');
   const [selection, setSelection] = useState<SelectionState>(null);
   const [isSaving, setIsSaving] = useState(false);
@@ -942,31 +935,37 @@ export default function DesignEditor({ initialConfig, initialProducts, userId, s
 
                 {/* --- 3. PRODUCT GRID --- */}
                 <div className="px-4 pb-12">
-                   {/* FIX: ENSURE 2 COLUMNS AND LARGER GAP */}
-                   <div className="grid grid-cols-2 gap-4">
-                      {products.map((p) => {
-                          const isProductSelected = activeTool === 'product-individual' && selection?.productId === p.id;
+                   {products.length > 0 ? (
+                       <div className="grid grid-cols-2 gap-4">
+                          {products.map((p) => {
+                              const isProductSelected = activeTool === 'product-individual' && selection?.productId === p.id;
 
-                          return (
-                          <div
-                            key={p.id}
-                            className={cn(
-                                "relative transition-all duration-300",
-                                isProductSelected && "ring-2 ring-blue-500 bg-blue-50/50 rounded-2xl"
-                            )}
-                          >
-                             <ProductCard
-                                product={p}
-                                config={config}
-                                onSelectElement={(elementType) => {
-                                    setActiveTool('product-individual');
-                                    setSelection({ productId: p.id, elementType });
-                                }}
-                             />
-                             {/* Overlay for selection visualization if needed, but the ring above handles container selection. */}
-                          </div>
-                      )})}
-                   </div>
+                              return (
+                              <div
+                                key={p.id}
+                                className={cn(
+                                    "relative transition-all duration-300",
+                                    isProductSelected && "ring-2 ring-blue-500 bg-blue-50/50 rounded-2xl"
+                                )}
+                              >
+                                 <ProductCard
+                                    product={p}
+                                    config={config}
+                                    onSelectElement={(elementType) => {
+                                        setActiveTool('product-individual');
+                                        setSelection({ productId: p.id, elementType });
+                                    }}
+                                 />
+                                 {/* Overlay for selection visualization if needed, but the ring above handles container selection. */}
+                              </div>
+                          )})}
+                       </div>
+                   ) : (
+                       <div className="flex flex-col items-center justify-center py-10 text-center opacity-50">
+                            <ShoppingBag className="w-8 h-8 mb-2 text-gray-400" />
+                            <p className="text-sm font-medium text-gray-500">Tu tienda está vacía</p>
+                       </div>
+                   )}
                 </div>
                 </div>
 
