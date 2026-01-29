@@ -44,7 +44,7 @@ export async function POST(req: Request) {
       mode = 'payment'
     }
 
-    const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000'
+    const baseUrl = process.env.NEXT_PUBLIC_URL || process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000'
 
     // 3. Creamos la sesión de pago
     const session = await stripe.checkout.sessions.create({
