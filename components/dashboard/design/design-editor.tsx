@@ -905,19 +905,30 @@ export default function DesignEditor({ initialConfig, initialProducts, userId, s
                    {/* SOCIALS */}
                    <div className="flex flex-wrap justify-center gap-3">
                        {config.socialLinks.map((link) => {
-                           const Icon = PLATFORMS.find(p => p.id === link.platform)?.icon || LinkIcon;
+                           const platformDef = PLATFORMS.find(p => p.id === link.platform);
+                           // Generic Icon Rule: Use LinkIcon for TikTok, Telegram, OnlyFans
+                           const useGenericIcon = ['tiktok', 'telegram', 'onlyfans'].includes(link.platform.toLowerCase());
+                           const Icon = useGenericIcon ? LinkIcon : (platformDef?.icon || LinkIcon);
+
                            const isSelected = activeTool === `social-icon-${link.id}`;
                            return (
                                <button
                                   key={link.id}
                                   onClick={(e) => { e.stopPropagation(); setActiveTool(`social-icon-${link.id}` as ToolType); }}
-                                  className={cn(
-                                      "p-3 rounded-full bg-gray-50 text-gray-600 hover:bg-gray-100 hover:text-gray-900 transition-all duration-300 border border-gray-100 shadow-sm",
-                                      isSelected && "ring-2 ring-blue-500 ring-offset-2 scale-110"
-                                  )}
-                                  style={{ color: link.color ? link.color : undefined }}
+                                  className="group flex flex-col items-center gap-1 min-w-[60px]"
                                >
-                                   <Icon size={28} strokeWidth={1.5} />
+                                   <div
+                                      className={cn(
+                                          "p-3 rounded-full bg-gray-50 text-gray-600 hover:bg-gray-100 hover:text-gray-900 transition-all duration-300 border border-gray-100 shadow-sm",
+                                          isSelected && "ring-2 ring-blue-500 ring-offset-2 scale-110"
+                                      )}
+                                      style={{ color: link.color ? link.color : undefined }}
+                                   >
+                                       <Icon size={20} strokeWidth={1.5} />
+                                   </div>
+                                   <span className="text-[10px] font-medium text-gray-500 group-hover:text-gray-900 transition-colors">
+                                      {platformDef?.label || link.platform}
+                                   </span>
                                </button>
                            )
                        })}

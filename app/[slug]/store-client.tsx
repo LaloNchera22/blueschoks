@@ -157,17 +157,28 @@ export default function StoreClient({ profile, products, config }: StoreClientPr
                 {socialLinks.length > 0 && (
                    <div className="flex flex-wrap justify-center gap-3">
                        {socialLinks.map((link) => {
-                           const Icon = PLATFORMS.find(p => p.id === link.platform)?.icon || LinkIcon;
+                           const platformDef = PLATFORMS.find(p => p.id === link.platform);
+                           // Generic Icon Rule: Use LinkIcon for TikTok, Telegram, OnlyFans
+                           const useGenericIcon = ['tiktok', 'telegram', 'onlyfans'].includes(link.platform.toLowerCase());
+                           const Icon = useGenericIcon ? LinkIcon : (platformDef?.icon || LinkIcon);
+
                            return (
                                <Link
                                   key={link.id}
                                   href={link.url}
                                   target="_blank"
                                   rel="noopener noreferrer"
-                                  className="p-3 rounded-full bg-gray-50 text-gray-600 hover:bg-gray-100 hover:text-gray-900 transition-all duration-300 border border-gray-100 shadow-sm"
-                                  style={{ color: link.color ? link.color : undefined }}
+                                  className="group flex flex-col items-center gap-1 min-w-[60px]"
                                >
-                                   <Icon size={28} strokeWidth={1.5} />
+                                   <div
+                                      className="p-3 rounded-full bg-gray-50 text-gray-600 group-hover:bg-gray-100 group-hover:text-gray-900 transition-all duration-300 border border-gray-100 shadow-sm"
+                                      style={{ color: link.color ? link.color : undefined }}
+                                   >
+                                       <Icon size={20} strokeWidth={1.5} />
+                                   </div>
+                                   <span className="text-[10px] font-medium text-gray-500 group-hover:text-gray-900 transition-colors">
+                                      {platformDef?.label || link.platform}
+                                   </span>
                                </Link>
                            )
                        })}
