@@ -6,6 +6,7 @@ import Link from 'next/link';
 import { toast } from 'sonner';
 import {
   Save,
+  Image as ImageIcon,
   Loader2,
   Lock,
   Star,
@@ -834,46 +835,38 @@ export default function DesignEditor({ initialConfig, initialProducts, userId, s
 
           {/* 1. GLOBAL TOOLS (Default) */}
           {activeTool === 'global' && (
-            <div className="flex items-center gap-2 animate-in fade-in slide-in-from-top-2 duration-300 flex-1 justify-around">
+            <div className="flex items-center gap-6 animate-in fade-in slide-in-from-top-2 duration-300 flex-1 justify-center w-full px-4">
+               {/* Background */}
                <button
                   onClick={() => setActiveTool('background')}
-                  className="flex flex-col items-center gap-0.5 group cursor-pointer"
+                  className="flex flex-col items-center justify-center group cursor-pointer p-2 rounded-xl hover:bg-gray-100 transition-all"
+                  title="Fondo"
                >
-                <div className="relative pointer-events-none scale-90">
-                   <ColorCircle
-                     color={config.colors.background}
-                     onChange={() => {}}
-                     size="sm"
-                   />
-                </div>
+                  <ImageIcon className="w-6 h-6 text-gray-600 group-hover:text-black transition-colors" strokeWidth={1.5} />
               </button>
 
+               {/* Typography */}
                <button
                   onClick={() => setActiveTool('typography')}
-                  className="flex flex-col items-center gap-0.5 group cursor-pointer"
+                  className="flex flex-col items-center justify-center group cursor-pointer p-2 rounded-xl hover:bg-gray-100 transition-all"
+                  title="Fuente"
                >
-                <div className="w-7 h-7 rounded-full border border-gray-200 bg-white flex items-center justify-center transition-all group-hover:bg-gray-50">
-                   <Type className="w-3.5 h-3.5 text-gray-600" />
-                </div>
+                  <Type className="w-6 h-6 text-gray-600 group-hover:text-black transition-colors" strokeWidth={1.5} />
               </button>
 
-              {/* Separator */}
-              <div className="w-px h-6 bg-gray-200" />
-
-              {/* Socials Manager Button */}
+              {/* Socials */}
               <button
                 onClick={() => setShowSocialsManager(!showSocialsManager)}
                 className={cn(
-                  "flex flex-col items-center gap-0.5 group",
-                  showSocialsManager && "opacity-100"
+                  "flex flex-col items-center justify-center group cursor-pointer p-2 rounded-xl hover:bg-gray-100 transition-all",
+                  showSocialsManager && "bg-gray-100 text-black"
                 )}
+                title="Redes"
               >
-                <div className={cn(
-                  "w-7 h-7 rounded-full border border-gray-200 flex items-center justify-center transition-all",
-                  showSocialsManager ? "bg-black text-white border-black" : "bg-white text-gray-600 hover:bg-gray-50 hover:scale-105"
-                )}>
-                  <MoreHorizontal className="w-3.5 h-3.5" />
-                </div>
+                  <LinkIcon className={cn(
+                    "w-6 h-6 transition-colors",
+                    showSocialsManager ? "text-black" : "text-gray-600 group-hover:text-black"
+                  )} strokeWidth={1.5} />
               </button>
             </div>
           )}
