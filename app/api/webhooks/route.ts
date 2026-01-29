@@ -40,13 +40,16 @@ export async function POST(request: Request) {
     if (userId && customerId) {
       console.log(`✅ Pago recibido! User: ${userId} | Customer: ${customerId}`)
 
-      const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || 'https://dummy.supabase.co'
-      const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY || 'dummy_key'
-
       // Conexión "ADMIN" a Supabase
       const supabaseAdmin = createClient(
-        supabaseUrl,
-        supabaseKey
+        process.env.NEXT_PUBLIC_SUPABASE_URL!,
+        process.env.SUPABASE_SERVICE_ROLE_KEY!,
+        {
+          auth: {
+            autoRefreshToken: false,
+            persistSession: false
+          }
+        }
       )
 
       // Actualizamos el perfil
