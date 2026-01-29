@@ -14,9 +14,6 @@ This information is used to shape Next.js' roadmap and prioritize features.
 You can learn more, including how to opt-out if you'd not like to participate in this anonymous program, by visiting the following URL:
 https://nextjs.org/telemetry
 
-✓ Ready in 1279ms
-○ Compiling /test-toolbar ...
- GET /test-toolbar 200 in 9.1s (compile: 8.4s, render: 719ms)
- GET /test-toolbar 200 in 331ms (compile: 110ms, render: 220ms)
- GET /test-toolbar 200 in 74ms (compile: 5ms, render: 69ms)
-✓ Compiled in 112ms
+✓ Ready in 1312ms
+○ Compiling /test-design-editor ...
+ GET /test-design-editor 200 in 10.8s (compile: 9.9s, render: 829ms)
