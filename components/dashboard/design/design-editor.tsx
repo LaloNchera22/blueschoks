@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useRef } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { toast } from 'sonner';
@@ -217,6 +217,7 @@ export default function DesignEditor({ initialConfig, initialProducts, userId, s
   const [isSavingProduct, setIsSavingProduct] = useState(false);
   const [showSocialsManager, setShowSocialsManager] = useState(false);
   const [isUploadingImage, setIsUploadingImage] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   // Degen state for drag and drop
   const sensors = useSensors(
@@ -744,6 +745,13 @@ export default function DesignEditor({ initialConfig, initialProducts, userId, s
   return (
     <div className="w-full h-full relative overflow-hidden flex flex-col items-center justify-center font-sans bg-gray-50">
       <FontLoaderListener config={config} products={products} />
+      <input
+        type="file"
+        ref={fileInputRef}
+        onChange={handleImageUpload}
+        accept="image/*"
+        className="hidden"
+      />
       <style>{`
         /* Hide Next.js Dev Tools and Toasts in Editor Preview */
         [data-nextjs-toast],
@@ -1083,7 +1091,11 @@ export default function DesignEditor({ initialConfig, initialProducts, userId, s
                    {/* AVATAR */}
                    <div
                      className="relative mb-6 group cursor-pointer"
-                     onClick={(e) => { e.stopPropagation(); setActiveTool('background'); }}
+                     onClick={(e) => {
+                       e.stopPropagation();
+                       setActiveTool('header-avatar');
+                       fileInputRef.current?.click();
+                     }}
                    >
                        <div
                           className={cn(
