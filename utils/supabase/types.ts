@@ -130,6 +130,41 @@ export interface Database {
           }
         ]
       }
+      stores: {
+        Row: {
+          id: string
+          owner_id: string
+          shop_name: string | null
+          slug: string | null
+          whatsapp: string | null
+          updated_at: string | null
+        }
+        Insert: {
+          id?: string
+          owner_id: string
+          shop_name?: string | null
+          slug?: string | null
+          whatsapp?: string | null
+          updated_at?: string | null
+        }
+        Update: {
+          id?: string
+          owner_id?: string
+          shop_name?: string | null
+          slug?: string | null
+          whatsapp?: string | null
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "stores_owner_id_fkey"
+            columns: ["owner_id"]
+            isOneToOne: true
+            referencedRelation: "users"
+            referencedColumns: ["id"]
+          }
+        ]
+      }
     }
     Views: {
       [_ in never]: never
