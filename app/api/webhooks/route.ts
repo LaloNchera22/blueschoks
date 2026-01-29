@@ -10,16 +10,12 @@ export async function POST(request: Request) {
   const stripe = new Stripe(stripeSecretKey)
   const body = await request.text()
 
-  // --- CORRECCIÓN AQUÍ ---
-  // 1. Primero esperamos a obtener los headers
   const headersList = await headers()
-  // 2. Luego leemos la firma
   const signature = headersList.get('stripe-signature') as string
 
   let event: Stripe.Event
 
   try {
-    // Verificar firma de seguridad
     if (!signature || !webhookSecret) {
        throw new Error("Faltan credenciales del Webhook")
     }
@@ -30,7 +26,6 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: message }, { status: 400 })
   }
 
-  // Manejar el evento "Pago Exitoso"
   if (event.type === 'checkout.session.completed') {
     const session = event.data.object as Stripe.Checkout.Session
 
@@ -38,9 +33,6 @@ export async function POST(request: Request) {
     const customerId = session.customer as string 
 
     if (userId && customerId) {
-      console.log(`✅ Pago recibido! User: ${userId} | Customer: ${customerId}`)
-
-      // Conexión "ADMIN" a Supabase
       const supabaseAdmin = createClient(
         process.env.NEXT_PUBLIC_SUPABASE_URL!,
         process.env.SUPABASE_SERVICE_ROLE_KEY!,
@@ -52,7 +44,6 @@ export async function POST(request: Request) {
         }
       )
 
-      // Actualizamos el perfil
       const { error } = await supabaseAdmin
         .from('profiles')
         .update({ 
