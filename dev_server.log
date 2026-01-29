@@ -9,11 +9,14 @@
   · serverActions
 
 ✓ Starting...
-✓ Ready in 1106ms
-○ Compiling /test-design ...
- GET /test-design 200 in 5.9s (compile: 5.3s, render: 568ms)
-⨯ The requested resource "https://placehold.co/400" has type "image/svg+xml" but dangerouslyAllowSVG is disabled. Consider adding the "unoptimized" property to the <Image>.
- GET /test-design 200 in 189ms (compile: 6ms, render: 183ms)
-⨯ The requested resource "https://placehold.co/400" has type "image/svg+xml" but dangerouslyAllowSVG is disabled. Consider adding the "unoptimized" property to the <Image>.
-✓ Compiled in 124ms
-[?25h
+Attention: Next.js now collects completely anonymous telemetry regarding usage.
+This information is used to shape Next.js' roadmap and prioritize features.
+You can learn more, including how to opt-out if you'd not like to participate in this anonymous program, by visiting the following URL:
+https://nextjs.org/telemetry
+
+✓ Ready in 1279ms
+○ Compiling /test-toolbar ...
+ GET /test-toolbar 200 in 9.1s (compile: 8.4s, render: 719ms)
+ GET /test-toolbar 200 in 331ms (compile: 110ms, render: 220ms)
+ GET /test-toolbar 200 in 74ms (compile: 5ms, render: 69ms)
+✓ Compiled in 112ms
