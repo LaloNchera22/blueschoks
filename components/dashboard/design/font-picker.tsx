@@ -92,7 +92,7 @@ export function FontPicker({ value, onChange, className }: FontPickerProps) {
     <div className={cn("relative", className)} ref={containerRef}>
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className="flex items-center justify-between w-32 px-3 py-1.5 bg-white border border-gray-200 rounded-full text-xs font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-black/5 transition-all shadow-sm"
+        className="flex items-center justify-between w-28 px-3 py-1 bg-white border border-gray-200 rounded-full text-[10px] font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-black/5 transition-all shadow-sm"
         title={value}
       >
         <span className="truncate flex-1 text-left">{value || 'Fuente'}</span>

@@ -540,7 +540,7 @@ export default function DesignEditor({ initialConfig, initialProducts, userId, s
         className="absolute top-20 left-1/2 -translate-x-1/2 z-30 w-max mb-4 pointer-events-auto"
         onClick={(e) => e.stopPropagation()}
       >
-        <div className="h-14 px-6 rounded-full bg-white/90 shadow-lg border border-gray-200 flex items-center gap-4 transition-all duration-300 ease-out backdrop-blur-md">
+        <div className="h-11 px-4 rounded-full bg-white/90 shadow-lg border border-gray-200 flex items-center gap-2 transition-all duration-300 ease-out backdrop-blur-md">
 
           {(activeTool === 'header-title' || activeTool === 'header-bio') && (
               <ProfileStylingToolbar
@@ -562,7 +562,7 @@ export default function DesignEditor({ initialConfig, initialProducts, userId, s
 
           {/* 1. GLOBAL TOOLS (Default) */}
           {activeTool === 'global' && (
-            <div className="flex items-center gap-5 animate-in fade-in slide-in-from-top-2 duration-300">
+            <div className="flex items-center gap-3 animate-in fade-in slide-in-from-top-2 duration-300">
                <button
                   onClick={() => setActiveTool('background')}
                   className="flex flex-col items-center gap-1 group cursor-pointer"
@@ -571,6 +571,7 @@ export default function DesignEditor({ initialConfig, initialProducts, userId, s
                    <ColorCircle
                      color={config.colors.background}
                      onChange={() => {}}
+                     size="sm"
                    />
                 </div>
                 <span className="text-[9px] text-gray-500 font-semibold uppercase tracking-wider group-hover:text-black transition-colors">Fondo</span>
@@ -601,10 +602,10 @@ export default function DesignEditor({ initialConfig, initialProducts, userId, s
                 )}
               >
                 <div className={cn(
-                  "w-8 h-8 rounded-full border border-gray-200 flex items-center justify-center transition-all",
+                  "w-7 h-7 rounded-full border border-gray-200 flex items-center justify-center transition-all",
                   showSocialsManager ? "bg-black text-white border-black" : "bg-white text-gray-600 hover:bg-gray-50 hover:scale-105"
                 )}>
-                  <MoreHorizontal className="w-4 h-4" />
+                  <MoreHorizontal className="w-3.5 h-3.5" />
                 </div>
                 <span className="text-[9px] text-gray-500 font-semibold uppercase tracking-wider group-hover:text-black transition-colors">Redes</span>
               </button>
@@ -624,7 +625,7 @@ export default function DesignEditor({ initialConfig, initialProducts, userId, s
                     className="hidden"
                     disabled={isUploadingImage}
                   />
-                  <div className="flex items-center gap-2 h-8 rounded-full border border-gray-200 bg-gray-50 px-3 hover:bg-gray-100 transition-colors cursor-pointer">
+                  <div className="flex items-center gap-2 h-7 rounded-full border border-gray-200 bg-gray-50 px-3 hover:bg-gray-100 transition-colors cursor-pointer">
                      {isUploadingImage ? (
                         <Loader2 className="w-3 h-3 animate-spin text-gray-500" />
                      ) : (
@@ -641,32 +642,32 @@ export default function DesignEditor({ initialConfig, initialProducts, userId, s
                 <button
                   onClick={() => updateConfig(['profile', 'avatarShape'], 'circle')}
                   className={cn(
-                    "w-6 h-6 rounded-full flex items-center justify-center transition-all",
+                    "w-5 h-5 rounded-full flex items-center justify-center transition-all",
                     config.profile.avatarShape === 'circle' ? "bg-white shadow-sm text-black" : "text-gray-400 hover:text-gray-600"
                   )}
                   title="Círculo"
                 >
-                  <Circle className="w-3 h-3" />
+                  <Circle className="w-2.5 h-2.5" />
                 </button>
                 <button
                   onClick={() => updateConfig(['profile', 'avatarShape'], 'square')}
                   className={cn(
-                    "w-6 h-6 rounded-full flex items-center justify-center transition-all",
+                    "w-5 h-5 rounded-full flex items-center justify-center transition-all",
                     (config.profile.avatarShape === 'square' || config.profile.avatarShape === 'rounded') ? "bg-white shadow-sm text-black" : "text-gray-400 hover:text-gray-600"
                   )}
                   title="Cuadrado Redondeado"
                 >
-                  <div className="w-3 h-3 border-2 border-current rounded-sm" />
+                  <div className="w-2.5 h-2.5 border-2 border-current rounded-sm" />
                 </button>
                 <button
                   onClick={() => updateConfig(['profile', 'avatarShape'], 'none')}
                   className={cn(
-                    "w-6 h-6 rounded-full flex items-center justify-center transition-all",
+                    "w-5 h-5 rounded-full flex items-center justify-center transition-all",
                     config.profile.avatarShape === 'none' ? "bg-white shadow-sm text-black" : "text-gray-400 hover:text-gray-600"
                   )}
                   title="Cuadrado Recto (Sin Borde)"
                 >
-                  <Square className="w-3 h-3" />
+                  <Square className="w-2.5 h-2.5" />
                 </button>
               </div>
 
@@ -703,6 +704,7 @@ export default function DesignEditor({ initialConfig, initialProducts, userId, s
                   <ColorCircle
                     color={selectedSocialLink.color || config.colors.primary}
                     onChange={(c) => updateSocialLink(selectedSocialLink.id, 'color', c)}
+                    size="sm"
                   />
                   <span className="text-[9px] text-gray-500 font-semibold uppercase tracking-wider">Icono</span>
                 </div>
@@ -714,14 +716,14 @@ export default function DesignEditor({ initialConfig, initialProducts, userId, s
                   value={selectedSocialLink.url}
                   onChange={(e) => updateSocialLink(selectedSocialLink.id, 'url', e.target.value)}
                   placeholder={PLATFORMS.find(p => p.id === selectedSocialLink.platform)?.placeholder || "https://..."}
-                  className="h-8 rounded-full border border-gray-200 bg-gray-50 px-3 text-xs w-48 focus:outline-none focus:ring-2 focus:ring-black/5"
+                  className="h-7 rounded-full border border-gray-200 bg-gray-50 px-3 text-xs w-48 focus:outline-none focus:ring-2 focus:ring-black/5"
                 />
 
                 <button
                   onClick={() => handleRemoveSocial(selectedSocialLink.id)}
-                  className="w-8 h-8 flex items-center justify-center rounded-full bg-red-50 text-red-500 hover:bg-red-100 hover:text-red-600 transition-colors"
+                  className="w-7 h-7 flex items-center justify-center rounded-full bg-red-50 text-red-500 hover:bg-red-100 hover:text-red-600 transition-colors"
                 >
-                  <Trash2 className="w-4 h-4" />
+                  <Trash2 className="w-3.5 h-3.5" />
                 </button>
              </div>
           )}
@@ -730,11 +732,11 @@ export default function DesignEditor({ initialConfig, initialProducts, userId, s
           {activeTool === 'card-button' && (
             <div className="flex items-center gap-4 animate-in fade-in slide-in-from-top-2 duration-300">
                <div className="flex flex-col items-center gap-1">
-                  <ColorCircle color={config.cardStyle?.buttonColor || '#000000'} onChange={(c) => updateConfig(['cardStyle', 'buttonColor'], c)} />
+                  <ColorCircle color={config.cardStyle?.buttonColor || '#000000'} onChange={(c) => updateConfig(['cardStyle', 'buttonColor'], c)} size="sm" />
                   <span className="text-[9px] text-gray-500 font-semibold uppercase tracking-wider">Fondo</span>
                </div>
                <div className="flex flex-col items-center gap-1">
-                  <ColorCircle color={config.cardStyle?.buttonTextColor || '#ffffff'} onChange={(c) => updateConfig(['cardStyle', 'buttonTextColor'], c)} />
+                  <ColorCircle color={config.cardStyle?.buttonTextColor || '#ffffff'} onChange={(c) => updateConfig(['cardStyle', 'buttonTextColor'], c)} size="sm" />
                   <span className="text-[9px] text-gray-500 font-semibold uppercase tracking-wider">Texto</span>
                </div>
 
@@ -760,6 +762,7 @@ export default function DesignEditor({ initialConfig, initialProducts, userId, s
                   <ColorCircle
                     color={activeTool === 'card-title' ? (config.cardStyle?.titleColor || config.colors.text) : (config.cardStyle?.priceColor || config.colors.text)}
                     onChange={(c) => updateConfig(['cardStyle', activeTool === 'card-title' ? 'titleColor' : 'priceColor'], c)}
+                    size="sm"
                   />
                   <span className="text-[9px] text-gray-500 font-semibold uppercase tracking-wider">Color</span>
                 </div>
@@ -795,9 +798,9 @@ export default function DesignEditor({ initialConfig, initialProducts, userId, s
                 <button
                 onClick={handleSave}
                 disabled={isSaving}
-                className="bg-black hover:bg-gray-800 text-white rounded-full w-10 h-10 flex items-center justify-center transition-all disabled:opacity-50 disabled:cursor-not-allowed shadow-sm"
+                className="bg-black hover:bg-gray-800 text-white rounded-full w-7 h-7 flex items-center justify-center transition-all disabled:opacity-50 disabled:cursor-not-allowed shadow-sm"
                 >
-                {isSaving ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />}
+                {isSaving ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Save className="w-3.5 h-3.5" />}
                 </button>
             </div>
           )}

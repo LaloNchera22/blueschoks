@@ -1,0 +1,19 @@
+
+> blueshock@0.1.0 dev
+> next dev
+
+▲ Next.js 16.1.5 (Turbopack)
+- Local:         http://localhost:3000
+- Network:       http://192.168.0.2:3000
+- Experiments (use with caution):
+  · serverActions
+
+✓ Starting...
+✓ Ready in 1106ms
+○ Compiling /test-design ...
+ GET /test-design 200 in 5.9s (compile: 5.3s, render: 568ms)
+⨯ The requested resource "https://placehold.co/400" has type "image/svg+xml" but dangerouslyAllowSVG is disabled. Consider adding the "unoptimized" property to the <Image>.
+ GET /test-design 200 in 189ms (compile: 6ms, render: 183ms)
+⨯ The requested resource "https://placehold.co/400" has type "image/svg+xml" but dangerouslyAllowSVG is disabled. Consider adding the "unoptimized" property to the <Image>.
+✓ Compiled in 124ms
+[?25h

@@ -12,7 +12,7 @@ export const ColorCircle = ({
   size = "md"
 }: ColorCircleProps) => {
   const sizeClasses = {
-    sm: "w-6 h-6",
+    sm: "w-7 h-7",
     md: "w-8 h-8",
     lg: "w-10 h-10"
   };

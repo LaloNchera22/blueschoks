@@ -26,7 +26,7 @@ export function ProfileStylingToolbar({
             type="text"
             value={config.profile.shopName || ''}
             onChange={(e) => onUpdateConfig(['profile', 'shopName'], e.target.value)}
-            className="border-none bg-gray-100 rounded px-2 py-1 text-sm w-40 focus:ring-1 focus:ring-black focus:outline-none"
+            className="border-none bg-gray-100 rounded px-2 py-0.5 text-xs w-40 focus:ring-1 focus:ring-black focus:outline-none"
             placeholder="Nombre..."
           />
         </div>
@@ -48,6 +48,7 @@ export function ProfileStylingToolbar({
            <ColorCircle
              color={config.profile.titleStyle?.color || config.colors.text}
              onChange={(v) => onUpdateConfig(['profile', 'titleStyle', 'color'], v)}
+             size="sm"
            />
         </div>
       </div>
@@ -65,7 +66,7 @@ export function ProfileStylingToolbar({
             type="text"
             value={config.profile.bio || ''}
             onChange={(e) => onUpdateConfig(['profile', 'bio'], e.target.value)}
-            className="border-none bg-gray-100 rounded px-2 py-1 text-sm w-64 focus:ring-1 focus:ring-black truncate focus:outline-none"
+            className="border-none bg-gray-100 rounded px-2 py-0.5 text-xs w-64 focus:ring-1 focus:ring-black truncate focus:outline-none"
             placeholder="Bienvenida..."
           />
         </div>
@@ -87,6 +88,7 @@ export function ProfileStylingToolbar({
            <ColorCircle
              color={config.profile.bioStyle?.color || config.colors.text}
              onChange={(v) => onUpdateConfig(['profile', 'bioStyle', 'color'], v)}
+             size="sm"
            />
         </div>
       </div>
