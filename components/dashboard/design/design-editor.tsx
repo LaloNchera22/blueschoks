@@ -31,15 +31,12 @@ import {
   ShoppingBag,
   Plus,
   Check,
-  Music2,
   Mail,
   ExternalLink,
   Upload,
   Copy,
-  Send,
   Store
 } from 'lucide-react';
-import { OnlyFansLogo } from '@/components/icons/onlyfans-logo';
 import { useRouter } from 'next/navigation';
 import { createClient } from '@/utils/supabase/client';
 import {
@@ -114,10 +111,10 @@ const FONTS = [
 
 const PLATFORMS = [
   { id: 'instagram', icon: Instagram, label: 'Instagram', placeholder: 'https://instagram.com/usuario' },
-  { id: 'tiktok', icon: Music2, label: 'TikTok', placeholder: 'https://tiktok.com/@usuario' },
+  { id: 'tiktok', icon: LinkIcon, label: 'TikTok', placeholder: 'https://tiktok.com/@usuario' },
   { id: 'whatsapp', icon: MessageCircle, label: 'WhatsApp', placeholder: 'https://wa.me/...' },
-  { id: 'telegram', label: 'Telegram', icon: Send, placeholder: 'https://t.me/tu_usuario', prefix: 'https://t.me/' },
-  { id: 'onlyfans', label: 'OnlyFans', icon: OnlyFansLogo, placeholder: 'https://onlyfans.com/tu_usuario', prefix: 'https://onlyfans.com/', color: '#00AFF0' },
+  { id: 'telegram', label: 'Telegram', icon: LinkIcon, placeholder: 'https://t.me/tu_usuario', prefix: 'https://t.me/' },
+  { id: 'onlyfans', label: 'OnlyFans', icon: LinkIcon, placeholder: 'https://onlyfans.com/tu_usuario', prefix: 'https://onlyfans.com/', color: '#00AFF0' },
   { id: 'twitter', icon: Twitter, label: 'Twitter', placeholder: 'https://twitter.com/usuario' },
   { id: 'facebook', icon: Facebook, label: 'Facebook', placeholder: 'https://facebook.com/usuario' },
   { id: 'website', icon: Store, label: 'Mi Tienda Web', placeholder: 'https://...' },
@@ -901,9 +898,7 @@ export default function DesignEditor({ initialConfig, initialProducts, userId, s
                    <div className="flex flex-wrap justify-center gap-3">
                        {config.socialLinks.map((link) => {
                            const platformDef = PLATFORMS.find(p => p.id === link.platform);
-                           // Generic Icon Rule: Use LinkIcon for TikTok, Telegram, OnlyFans
-                           const useGenericIcon = ['tiktok', 'telegram', 'onlyfans'].includes(link.platform.toLowerCase());
-                           const Icon = useGenericIcon ? LinkIcon : (platformDef?.icon || LinkIcon);
+                           const Icon = platformDef?.icon || LinkIcon;
 
                            const isSelected = activeTool === `social-icon-${link.id}`;
                            return (
