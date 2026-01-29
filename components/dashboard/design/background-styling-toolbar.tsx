@@ -29,8 +29,8 @@ export function BackgroundStylingToolbar({
 
       {/* Label/Title */}
       <div className="flex flex-col items-center gap-1">
-         <div className="w-8 h-8 rounded-full bg-black text-white flex items-center justify-center">
-             <ImageIcon className="w-4 h-4" />
+         <div className="w-7 h-7 rounded-full bg-black text-white flex items-center justify-center">
+             <ImageIcon className="w-3.5 h-3.5" />
          </div>
          <span className="text-[9px] text-gray-500 font-semibold uppercase tracking-wider">Fondo</span>
       </div>

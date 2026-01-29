@@ -162,7 +162,7 @@ export function ProductStylingToolbar({
             <FontPicker
               value={product.style_config?.titleFont || ''}
               onChange={(val) => onUpdate('titleFont', val || undefined)}
-              className="w-24"
+              className="w-20"
             />
             <span className="text-[9px] text-gray-500 font-semibold uppercase tracking-wider">Título</span>
           </div>
@@ -198,7 +198,7 @@ export function ProductStylingToolbar({
             <FontPicker
               value={product.style_config?.priceFont || ''}
               onChange={(val) => onUpdate('priceFont', val || undefined)}
-              className="w-24"
+              className="w-20"
             />
             <span className="text-[9px] text-gray-500 font-semibold uppercase tracking-wider">Precio</span>
           </div>
@@ -343,8 +343,8 @@ export function ProductStylingToolbar({
         className="flex flex-col items-center gap-1 group"
         title="Aplicar a todos"
       >
-        <div className="w-8 h-8 rounded-full border border-gray-200 bg-white flex items-center justify-center hover:bg-gray-50 hover:scale-105 transition-all text-gray-600">
-          <Copy className="w-4 h-4" />
+        <div className="w-7 h-7 rounded-full border border-gray-200 bg-white flex items-center justify-center hover:bg-gray-50 hover:scale-105 transition-all text-gray-600">
+          <Copy className="w-3.5 h-3.5" />
         </div>
         <span className="text-[9px] text-gray-500 font-semibold uppercase tracking-wider group-hover:text-black transition-colors">Todos</span>
       </button>
@@ -356,8 +356,8 @@ export function ProductStylingToolbar({
         className="flex flex-col items-center gap-1 group"
         title="Guardar cambios del producto"
       >
-        <div className="w-8 h-8 rounded-full bg-black text-white flex items-center justify-center hover:bg-gray-800 hover:scale-105 transition-all shadow-sm">
-          {isSaving ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />}
+        <div className="w-7 h-7 rounded-full bg-black text-white flex items-center justify-center hover:bg-gray-800 hover:scale-105 transition-all shadow-sm">
+          {isSaving ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Save className="w-3.5 h-3.5" />}
         </div>
         <span className="text-[9px] text-gray-500 font-semibold uppercase tracking-wider group-hover:text-black transition-colors">Guardar</span>
       </button>
@@ -370,8 +370,8 @@ export function ProductStylingToolbar({
         className="flex flex-col items-center gap-1 group"
         title="Cerrar selección"
       >
-         <div className="w-8 h-8 rounded-full border border-gray-200 bg-gray-50 flex items-center justify-center hover:bg-red-50 hover:text-red-500 hover:border-red-100 transition-all text-gray-500">
-           <X className="w-4 h-4" />
+         <div className="w-7 h-7 rounded-full border border-gray-200 bg-gray-50 flex items-center justify-center hover:bg-red-50 hover:text-red-500 hover:border-red-100 transition-all text-gray-500">
+           <X className="w-3.5 h-3.5" />
          </div>
          <span className="text-[9px] text-gray-500 font-semibold uppercase tracking-wider group-hover:text-red-500 transition-colors">Cerrar</span>
       </button>
