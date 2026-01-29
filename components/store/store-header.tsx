@@ -12,7 +12,8 @@ import {
   Mail,
   Music2,
   ExternalLink,
-  ShoppingBag
+  ShoppingBag,
+  Link as LinkIcon
 } from 'lucide-react'
 import { DesignConfig, LinkItem } from '@/lib/types/design-system'
 import { useCart } from '@/components/shop/cart-context'
@@ -38,14 +39,32 @@ const OnlyFansIcon = ({ className }: { className?: string }) => (
 const getSocialIcon = (platform: string) => {
   switch (platform.toLowerCase()) {
     case 'instagram': return <Instagram className="w-5 h-5" />
-    case 'tiktok': return <Music2 className="w-5 h-5" />
     case 'twitter': return <Twitter className="w-5 h-5" />
     case 'facebook': return <Facebook className="w-5 h-5" />
     case 'whatsapp': return <MessageCircle className="w-5 h-5" />
-    case 'onlyfans': return <OnlyFansIcon className="w-5 h-5" />
     case 'website': return <Globe className="w-5 h-5" />
     case 'email': return <Mail className="w-5 h-5" />
+    // Generic Icon Rule for Specific Networks
+    case 'tiktok':
+    case 'onlyfans':
+    case 'telegram':
+      return <LinkIcon className="w-5 h-5" />
     default: return <ExternalLink className="w-5 h-5" />
+  }
+}
+
+const getSocialLabel = (platform: string) => {
+  switch (platform.toLowerCase()) {
+    case 'instagram': return 'Instagram'
+    case 'tiktok': return 'TikTok'
+    case 'twitter': return 'Twitter'
+    case 'facebook': return 'Facebook'
+    case 'whatsapp': return 'WhatsApp'
+    case 'onlyfans': return 'OnlyFans'
+    case 'website': return 'Web'
+    case 'email': return 'Email'
+    case 'telegram': return 'Telegram'
+    default: return platform.charAt(0).toUpperCase() + platform.slice(1)
   }
 }
 
@@ -171,9 +190,14 @@ export function StoreHero({ config }: StoreHeaderProps) {
                       href={link.url}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="p-3 rounded-full bg-gray-50 text-gray-600 hover:bg-gray-100 hover:text-gray-900 hover:scale-110 transition-all duration-300 border border-gray-100 shadow-sm"
+                      className="group flex flex-col items-center gap-1 min-w-[60px]"
                     >
-                      {getSocialIcon(link.platform)}
+                      <div className="p-3 rounded-full bg-gray-50 text-gray-600 group-hover:bg-gray-100 group-hover:text-gray-900 group-hover:scale-110 transition-all duration-300 border border-gray-100 shadow-sm">
+                        {getSocialIcon(link.platform)}
+                      </div>
+                      <span className="text-[10px] font-medium text-gray-500 group-hover:text-gray-900 transition-colors">
+                        {getSocialLabel(link.platform)}
+                      </span>
                     </Link>
                   ))}
                 </div>
