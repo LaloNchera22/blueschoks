@@ -10,13 +10,10 @@ import {
   Globe,
   MessageCircle,
   Mail,
-  Music2,
   Smartphone,
   Link as LinkIcon,
-  Send,
   Store
 } from 'lucide-react'
-import { OnlyFansLogo } from '@/components/icons/onlyfans-logo'
 import { DesignConfig } from '@/lib/types/design-system'
 import { Database } from '@/utils/supabase/types'
 import { useCart } from '@/components/shop/cart-context'
@@ -37,10 +34,10 @@ interface StoreClientProps {
 
 const PLATFORMS = [
   { id: 'instagram', icon: Instagram, label: 'Instagram' },
-  { id: 'tiktok', icon: Music2, label: 'TikTok' },
+  { id: 'tiktok', icon: LinkIcon, label: 'TikTok' },
   { id: 'whatsapp', icon: MessageCircle, label: 'WhatsApp' },
-  { id: 'telegram', icon: Send, label: 'Telegram' },
-  { id: 'onlyfans', icon: OnlyFansLogo, label: 'OnlyFans' },
+  { id: 'telegram', icon: LinkIcon, label: 'Telegram' },
+  { id: 'onlyfans', icon: LinkIcon, label: 'OnlyFans' },
   { id: 'twitter', icon: Twitter, label: 'Twitter' },
   { id: 'facebook', icon: Facebook, label: 'Facebook' },
   { id: 'website', icon: Store, label: 'Mi Tienda Web' },
@@ -142,9 +139,7 @@ export default function StoreClient({ profile, products, config }: StoreClientPr
                    <div className="flex flex-wrap justify-center gap-3 mb-6">
                        {socialLinks.map((link) => {
                            const platformDef = PLATFORMS.find(p => p.id === link.platform);
-                           // Generic Icon Rule: Use LinkIcon for TikTok, Telegram, OnlyFans
-                           const useGenericIcon = ['tiktok', 'telegram', 'onlyfans'].includes(link.platform.toLowerCase());
-                           const Icon = useGenericIcon ? LinkIcon : (platformDef?.icon || LinkIcon);
+                           const Icon = platformDef?.icon || LinkIcon;
 
                            return (
                                <Link
