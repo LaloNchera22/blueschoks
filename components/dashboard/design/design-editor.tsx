@@ -65,9 +65,9 @@ import { DEFAULT_DESIGN } from '@/utils/design-sanitizer';
 import { ProductStylingToolbar } from './product-styling-toolbar';
 import { ProfileStylingToolbar } from './profile-styling-toolbar';
 import { BackgroundStylingToolbar } from './background-styling-toolbar';
+import { TypographyStylingToolbar } from './typography-styling-toolbar';
 import { ColorCircle } from './color-circle';
 import { ProductCard } from '@/components/store/product-card';
-import { FontPicker } from './font-picker';
 import { FontLoaderListener } from '@/components/ui/font-loader-listener';
 import { GOOGLE_FONTS_LIST } from '@/utils/font-loader';
 
@@ -86,6 +86,7 @@ interface DesignEditorProps {
 type ToolType =
   | 'global'
   | 'background'
+  | 'typography'
   | 'header-avatar'
   | 'header-title'
   | 'header-bio'
@@ -560,6 +561,14 @@ export default function DesignEditor({ initialConfig, initialProducts, userId, s
              />
           )}
 
+          {activeTool === 'typography' && (
+             <TypographyStylingToolbar
+                config={config}
+                onUpdate={updateConfig}
+                onClose={() => setActiveTool('global')}
+             />
+          )}
+
           {/* 1. GLOBAL TOOLS (Default) */}
           {activeTool === 'global' && (
             <div className="flex items-center gap-5 animate-in fade-in slide-in-from-top-2 duration-300">
@@ -576,18 +585,15 @@ export default function DesignEditor({ initialConfig, initialProducts, userId, s
                 <span className="text-[9px] text-gray-500 font-semibold uppercase tracking-wider group-hover:text-black transition-colors">Fondo</span>
               </button>
 
-              <div className="flex flex-col items-center gap-1 group">
-                 {activeTool === 'global' && (
-                    <FontPicker
-                      value={config.fonts.body}
-                      onChange={(val) => {
-                        updateConfig(['fonts', 'body'], val);
-                        updateConfig(['fonts', 'heading'], val);
-                      }}
-                    />
-                 )}
-                 <span className="text-[9px] text-gray-500 font-semibold uppercase tracking-wider group-hover:text-black transition-colors">Fuente</span>
-              </div>
+               <button
+                  onClick={() => setActiveTool('typography')}
+                  className="flex flex-col items-center gap-1 group cursor-pointer"
+               >
+                <div className="w-8 h-8 rounded-full border border-gray-200 bg-white flex items-center justify-center transition-all group-hover:bg-gray-50">
+                   <Type className="w-4 h-4 text-gray-600" />
+                </div>
+                <span className="text-[9px] text-gray-500 font-semibold uppercase tracking-wider group-hover:text-black transition-colors">Fuente</span>
+              </button>
 
               {/* Separator */}
               <div className="w-px h-6 bg-gray-300" />
