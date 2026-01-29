@@ -37,10 +37,10 @@ export function BackgroundStylingToolbar({
 
       {/* Floating Panel (Using exact style from ProductStylingToolbar) */}
       <div
-        className="absolute top-full mt-6 left-0 w-[280px] bg-white rounded-xl shadow-2xl border border-gray-100 p-4 z-50 flex flex-col gap-5 animate-in fade-in zoom-in-95 duration-200 cursor-default"
+        className="absolute top-full mt-6 left-1/2 -translate-x-1/2 w-[280px] max-w-[90vw] bg-white rounded-xl shadow-2xl border border-gray-100 p-4 z-50 flex flex-col gap-5 animate-in fade-in zoom-in-95 duration-200 cursor-default"
         onClick={(e) => e.stopPropagation()}
       >
-        <div className="absolute -top-2 left-6 w-4 h-4 bg-white border-t border-l border-gray-100 rotate-45"></div>
+        <div className="absolute -top-2 left-1/2 -translate-x-1/2 w-4 h-4 bg-white border-t border-l border-gray-100 rotate-45"></div>
 
         {/* Header */}
         <div className="flex justify-between items-center border-b pb-2">
