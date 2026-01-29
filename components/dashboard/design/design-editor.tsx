@@ -855,7 +855,7 @@ export default function DesignEditor({ initialConfig, initialProducts, userId, s
                    {/* AVATAR */}
                    <div
                      className="relative mb-6 group cursor-pointer"
-                     onClick={(e) => { e.stopPropagation(); setActiveTool('header-avatar'); }}
+                     onClick={(e) => { e.stopPropagation(); setActiveTool('background'); }}
                    >
                        <div
                           className={cn(
