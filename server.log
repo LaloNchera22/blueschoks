@@ -14,19 +14,7 @@ This information is used to shape Next.js' roadmap and prioritize features.
 You can learn more, including how to opt-out if you'd not like to participate in this anonymous program, by visiting the following URL:
 https://nextjs.org/telemetry
 
-✓ Ready in 1491ms
-○ Compiling / ...
-⨯ Error: Event handlers cannot be passed to Client Component props.
-  <... isSidebarOpen={false} onOpen={function onOpen}>
-                                    ^^^^^^^^^^^^^^^^^
-If you need interactivity, consider converting part of this to a Client Component.
-    at stringify (<anonymous>)
-    at stringify (<anonymous>) {
-  digest: '297669155'
-}
- GET / 500 in 10.4s (compile: 8.4s, render: 2.0s)
-✓ Compiled in 126ms
- GET / 200 in 462ms (compile: 189ms, render: 273ms)
-✓ Compiled in 123ms
- GET / 200 in 238ms (compile: 139ms, render: 99ms)
-✓ Compiled in 151ms
+✓ Ready in 1148ms
+○ Compiling /test-verification ...
+ GET /test-verification 200 in 8.4s (compile: 7.8s, render: 630ms)
+✓ Compiled in 90ms
