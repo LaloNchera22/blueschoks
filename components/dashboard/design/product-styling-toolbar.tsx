@@ -48,7 +48,7 @@ export function ProductStylingToolbar({
              <span className="text-xs font-semibold text-gray-700">Fondo Tarjeta</span>
 
              {/* Floating Panel */}
-             <div className="absolute top-full mt-6 left-1/2 -translate-x-1/2 w-64 bg-white rounded-xl shadow-2xl border border-gray-100 p-4 z-50 flex flex-col gap-5 animate-in fade-in zoom-in-95 duration-200 cursor-default" onClick={(e) => e.stopPropagation()}>
+             <div className="absolute top-full mt-6 left-1/2 -translate-x-1/2 w-64 max-w-[90vw] bg-white rounded-xl shadow-2xl border border-gray-100 p-4 z-50 flex flex-col gap-5 animate-in fade-in zoom-in-95 duration-200 cursor-default" onClick={(e) => e.stopPropagation()}>
                 <div className="absolute -top-2 left-1/2 -translate-x-1/2 w-4 h-4 bg-white border-t border-l border-gray-100 rotate-45"></div>
 
                 {/* 1. Main Card Background */}
@@ -283,7 +283,7 @@ export function ProductStylingToolbar({
              <span className="text-xs font-semibold text-gray-700">Fondo Descripción</span>
 
              {/* Floating Panel */}
-             <div className="absolute top-full mt-6 left-1/2 -translate-x-1/2 w-64 bg-white rounded-xl shadow-2xl border border-gray-100 p-4 z-50 flex flex-col gap-4 animate-in fade-in zoom-in-95 duration-200 cursor-default" onClick={(e) => e.stopPropagation()}>
+             <div className="absolute top-full mt-6 left-1/2 -translate-x-1/2 w-64 max-w-[90vw] bg-white rounded-xl shadow-2xl border border-gray-100 p-4 z-50 flex flex-col gap-4 animate-in fade-in zoom-in-95 duration-200 cursor-default" onClick={(e) => e.stopPropagation()}>
                 <div className="absolute -top-2 left-1/2 -translate-x-1/2 w-4 h-4 bg-white border-t border-l border-gray-100 rotate-45"></div>
 
                 <div className="flex justify-between items-center border-b pb-2 mb-2">

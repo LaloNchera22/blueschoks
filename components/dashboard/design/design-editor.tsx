@@ -103,11 +103,13 @@ type SelectionState = {
   elementType: 'container' | 'title' | 'price' | 'cartButton' | 'description';
 } | null;
 
-const DUMMY_PRODUCTS = [
-  { id: '1', name: 'Camiseta Básica', price: 25.00, image_url: 'https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?w=500&auto=format&fit=crop&q=60' },
-  { id: '2', name: 'Gorra Urbana', price: 15.00, image_url: 'https://images.unsplash.com/photo-1588850561407-ed78c282e89b?w=500&auto=format&fit=crop&q=60' },
-  { id: '3', name: 'Sneakers Pro', price: 120.00, image_url: 'https://images.unsplash.com/photo-1552346154-21d32810aba3?w=500&auto=format&fit=crop&q=60' },
-  { id: '4', name: 'Mochila Viaje', price: 45.00, image_url: 'https://images.unsplash.com/photo-1553062407-98eeb64c6a62?w=500&auto=format&fit=crop&q=60' },
+const FONTS = [
+  { name: 'Inter', value: 'Inter' },
+  { name: 'Roboto', value: 'Roboto' },
+  { name: 'Open Sans', value: 'Open Sans' },
+  { name: 'Lato', value: 'Lato' },
+  { name: 'Montserrat', value: 'Montserrat' },
+  { name: 'Playfair', value: 'Playfair Display' },
 ];
 
 const PLATFORMS = [
@@ -209,7 +211,7 @@ export default function DesignEditor({ initialConfig, initialProducts, userId, s
 
   const [config, setConfig] = useState<DesignConfig>(safeInitialConfig);
   // Initialize products with local state
-  const [products, setProducts] = useState<Product[]>(initialProducts.length > 0 ? initialProducts : (DUMMY_PRODUCTS as any));
+  const [products, setProducts] = useState<Product[]>(initialProducts);
   const [activeTool, setActiveTool] = useState<ToolType>('global');
   const [selection, setSelection] = useState<SelectionState>(null);
   const [isSaving, setIsSaving] = useState(false);
@@ -538,7 +540,7 @@ export default function DesignEditor({ initialConfig, initialProducts, userId, s
 
       {/* --- SMART TOOLBAR (FIX: MOVED OUTSIDE SCROLL FLOW & ABSOLUTE POSITIONED) --- */}
       <div
-        className="absolute top-6 left-1/2 -translate-x-1/2 z-50 w-max mb-4 pointer-events-auto"
+        className="absolute top-20 left-1/2 -translate-x-1/2 z-30 w-max mb-4 pointer-events-auto"
         onClick={(e) => e.stopPropagation()}
       >
         <div className="h-14 px-6 rounded-full bg-white/90 shadow-lg border border-gray-200 flex items-center gap-4 transition-all duration-300 ease-out backdrop-blur-md">
@@ -822,7 +824,7 @@ export default function DesignEditor({ initialConfig, initialProducts, userId, s
         }}
       >
         {/* --- PREVIEW AREA (NEW STORE CLIENT STRUCTURE) --- */}
-        <div className="flex justify-center pb-32 px-4 pt-32"> {/* Added pt-32 to account for floating toolbar */}
+        <div className="flex justify-center pb-32 px-4 pt-40"> {/* Added pt-40 to account for floating toolbar */}
           <div className="w-full max-w-[420px] origin-top scale-[0.9] 2xl:scale-100 transition-transform bg-transparent">
              <div
                className="h-full min-h-[800px] pb-40 relative rounded-[32px] overflow-hidden"
@@ -848,7 +850,7 @@ export default function DesignEditor({ initialConfig, initialProducts, userId, s
                    {/* AVATAR */}
                    <div
                      className="relative mb-6 group cursor-pointer"
-                     onClick={(e) => { e.stopPropagation(); setActiveTool('header-avatar'); }}
+                     onClick={(e) => { e.stopPropagation(); setActiveTool('background'); }}
                    >
                        <div
                           className={cn(
@@ -935,31 +937,37 @@ export default function DesignEditor({ initialConfig, initialProducts, userId, s
 
                 {/* --- 3. PRODUCT GRID --- */}
                 <div className="px-4 pb-12">
-                   {/* FIX: ENSURE 2 COLUMNS AND LARGER GAP */}
-                   <div className="grid grid-cols-2 gap-4">
-                      {products.map((p) => {
-                          const isProductSelected = activeTool === 'product-individual' && selection?.productId === p.id;
+                   {products.length > 0 ? (
+                       <div className="grid grid-cols-2 gap-4">
+                          {products.map((p) => {
+                              const isProductSelected = activeTool === 'product-individual' && selection?.productId === p.id;
 
-                          return (
-                          <div
-                            key={p.id}
-                            className={cn(
-                                "relative transition-all duration-300",
-                                isProductSelected && "ring-2 ring-blue-500 bg-blue-50/50 rounded-2xl"
-                            )}
-                          >
-                             <ProductCard
-                                product={p}
-                                config={config}
-                                onSelectElement={(elementType) => {
-                                    setActiveTool('product-individual');
-                                    setSelection({ productId: p.id, elementType });
-                                }}
-                             />
-                             {/* Overlay for selection visualization if needed, but the ring above handles container selection. */}
-                          </div>
-                      )})}
-                   </div>
+                              return (
+                              <div
+                                key={p.id}
+                                className={cn(
+                                    "relative transition-all duration-300",
+                                    isProductSelected && "ring-2 ring-blue-500 bg-blue-50/50 rounded-2xl"
+                                )}
+                              >
+                                 <ProductCard
+                                    product={p}
+                                    config={config}
+                                    onSelectElement={(elementType) => {
+                                        setActiveTool('product-individual');
+                                        setSelection({ productId: p.id, elementType });
+                                    }}
+                                 />
+                                 {/* Overlay for selection visualization if needed, but the ring above handles container selection. */}
+                              </div>
+                          )})}
+                       </div>
+                   ) : (
+                       <div className="flex flex-col items-center justify-center py-10 text-center opacity-50">
+                            <ShoppingBag className="w-8 h-8 mb-2 text-gray-400" />
+                            <p className="text-sm font-medium text-gray-500">Tu tienda está vacía</p>
+                       </div>
+                   )}
                 </div>
                 </div>
 
@@ -971,7 +979,7 @@ export default function DesignEditor({ initialConfig, initialProducts, userId, s
 
       {/* --- SOCIALS MANAGER POPOVER --- */}
       {showSocialsManager && (
-         <div className="fixed bottom-28 left-1/2 -translate-x-1/2 z-50 bg-white rounded-2xl shadow-2xl p-4 w-[320px] border border-gray-100 animate-in fade-in zoom-in-95 duration-200">
+         <div className="fixed bottom-28 left-1/2 -translate-x-1/2 z-50 bg-white rounded-2xl shadow-2xl p-4 w-[320px] max-w-[90vw] border border-gray-100 animate-in fade-in zoom-in-95 duration-200">
             <div className="flex items-center justify-between mb-3 px-1">
               <h3 className="text-xs font-bold uppercase tracking-wide text-gray-500">Mis Redes</h3>
               <button onClick={() => setShowSocialsManager(false)} className="text-gray-400 hover:text-black">&times;</button>

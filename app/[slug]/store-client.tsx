@@ -137,25 +137,9 @@ export default function StoreClient({ profile, products, config }: StoreClientPr
                   </div>
                 )}
 
-                {/* SHOP NAME */}
-                <h1
-                  className="text-2xl font-bold text-neutral-900 tracking-tight mb-3"
-                  style={getTextStyle('title') as React.CSSProperties}
-                >
-                    {config.profile.shopName || 'Mi Tienda'}
-                </h1>
-
-                {/* BIO */}
-                <p
-                  className="max-w-xl text-sm text-neutral-500 leading-relaxed mb-6"
-                  style={getTextStyle('bio') as React.CSSProperties}
-                >
-                    {config.profile.bio || 'Bienvenido a mi tienda online'}
-                </p>
-
                 {/* SOCIALS */}
                 {socialLinks.length > 0 && (
-                   <div className="flex flex-wrap justify-center gap-3">
+                   <div className="flex flex-wrap justify-center gap-3 mb-6">
                        {socialLinks.map((link) => {
                            const platformDef = PLATFORMS.find(p => p.id === link.platform);
                            // Generic Icon Rule: Use LinkIcon for TikTok, Telegram, OnlyFans
@@ -184,6 +168,22 @@ export default function StoreClient({ profile, products, config }: StoreClientPr
                        })}
                    </div>
                 )}
+
+                {/* SHOP NAME */}
+                <h1
+                  className="text-2xl font-bold text-neutral-900 tracking-tight mb-3"
+                  style={getTextStyle('title') as React.CSSProperties}
+                >
+                    {config.profile.shopName || 'Mi Tienda'}
+                </h1>
+
+                {/* BIO */}
+                <p
+                  className="max-w-xl text-sm text-neutral-500 leading-relaxed mb-6"
+                  style={getTextStyle('bio') as React.CSSProperties}
+                >
+                    {config.profile.bio || 'Bienvenido a mi tienda online'}
+                </p>
             </div>
 
             {/* --- PRODUCT GRID (INLINED) --- */}
