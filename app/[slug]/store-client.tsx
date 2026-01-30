@@ -182,12 +182,14 @@ export default function StoreClient({ profile, products, config }: StoreClientPr
                 </h1>
 
                 {/* BIO */}
-                <p
-                  className="max-w-xl text-sm text-neutral-500 leading-relaxed mb-6"
-                  style={getTextStyle('bio') as React.CSSProperties}
-                >
-                    {config.profile.bio || 'Bienvenido a mi tienda online'}
-                </p>
+                {config.profile.bio && config.profile.bio.trim().length > 0 && (
+                  <p
+                    className="max-w-xl text-sm text-neutral-500 leading-relaxed mb-6"
+                    style={getTextStyle('bio') as React.CSSProperties}
+                  >
+                      {config.profile.bio}
+                  </p>
+                )}
             </div>
 
             {/* --- PRODUCT GRID (INLINED) --- */}

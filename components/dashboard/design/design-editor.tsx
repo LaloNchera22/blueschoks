@@ -1000,10 +1000,10 @@ export default function DesignEditor({ initialConfig, initialProducts, userId, s
                    {/* BIO */}
                    <textarea
                      value={config.profile.bio || ''}
-                     placeholder="Bienvenido a mi tienda online"
+                     placeholder="Haz clic para agregar un mensaje de bienvenida..."
                      rows={3}
                      className={cn(
-                       "bg-transparent border-none outline-none text-center w-full resize-none max-w-xl text-sm leading-relaxed mb-6 placeholder:text-neutral-400 rounded px-2 -mx-2",
+                       "bg-transparent border-none outline-none text-center w-full resize-none max-w-xl text-sm leading-relaxed mb-6 placeholder:italic placeholder:opacity-50 placeholder:text-gray-400 rounded px-2 -mx-2",
                        activeTool === 'header-bio' && "ring-2 ring-blue-500 bg-blue-50/50"
                      )}
                      style={getTextStyle('bio')}
