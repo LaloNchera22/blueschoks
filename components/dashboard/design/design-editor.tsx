@@ -5,8 +5,6 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { toast } from 'sonner';
 import {
-  Save,
-  Image as ImageIcon,
   Loader2,
   Lock,
   Star,
@@ -15,7 +13,7 @@ import {
   Instagram,
   Facebook,
   Twitter,
-  Link as LinkIcon,
+  Link2 as LinkIcon,
   MessageCircle,
   Trash2,
   MoreHorizontal,
@@ -28,7 +26,6 @@ import {
   AlignLeft,
   AlignCenter,
   AlignRight,
-  Type,
   ShoppingBag,
   Plus,
   Check,
@@ -36,7 +33,9 @@ import {
   ExternalLink,
   Upload,
   Copy,
-  Store
+  Store,
+  Mountain,
+  ALargeSmall
 } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { createClient } from '@/utils/supabase/client';
@@ -558,12 +557,8 @@ export default function DesignEditor({ initialConfig, initialProducts, userId, s
                 onClick={() => setActiveTool('background')}
                 className="flex flex-col items-center gap-1 group cursor-pointer"
              >
-              <div className="relative pointer-events-none">
-                 <ColorCircle
-                   color={config.colors.background}
-                   onChange={() => {}}
-                   size="sm"
-                 />
+              <div className="w-8 h-8 rounded-full border border-gray-200 bg-white flex items-center justify-center transition-all group-hover:bg-gray-50">
+                 <Mountain className="w-4 h-4 text-gray-600" strokeWidth={1.5} />
               </div>
               <span className="text-[9px] text-gray-500 font-semibold uppercase tracking-wider group-hover:text-black transition-colors">Fondo</span>
             </button>
@@ -573,7 +568,7 @@ export default function DesignEditor({ initialConfig, initialProducts, userId, s
                 className="flex flex-col items-center gap-1 group cursor-pointer"
              >
               <div className="w-8 h-8 rounded-full border border-gray-200 bg-white flex items-center justify-center transition-all group-hover:bg-gray-50">
-                 <Type className="w-4 h-4 text-gray-600" />
+                 <ALargeSmall className="w-4 h-4 text-gray-600" strokeWidth={1.5} />
               </div>
               <span className="text-[9px] text-gray-500 font-semibold uppercase tracking-wider group-hover:text-black transition-colors">Fuente</span>
             </button>
@@ -588,7 +583,7 @@ export default function DesignEditor({ initialConfig, initialProducts, userId, s
               title="Redes"
             >
               <div className="w-7 h-7 rounded-full border border-gray-200 flex items-center justify-center transition-all bg-white text-gray-600 hover:bg-gray-50 hover:scale-105">
-                <LinkIcon className="w-3.5 h-3.5" />
+                <LinkIcon className="w-3.5 h-3.5" strokeWidth={1.5} />
               </div>
               <span className="text-[9px] text-gray-500 font-semibold uppercase tracking-wider group-hover:text-black transition-colors">Redes</span>
             </button>
@@ -862,7 +857,7 @@ export default function DesignEditor({ initialConfig, initialProducts, userId, s
                 disabled={isSaving}
                 className="bg-black hover:bg-gray-800 text-white rounded-full w-7 h-7 flex items-center justify-center transition-all disabled:opacity-50 disabled:cursor-not-allowed shadow-sm"
                 >
-                {isSaving ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Save className="w-3.5 h-3.5" />}
+                {isSaving ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Check className="w-3.5 h-3.5" strokeWidth={1.5} />}
                 </button>
             </div>
           )}
