@@ -1,5 +1,5 @@
 import React from 'react';
-import { X, Image as ImageIcon, Trash2, Loader2, Upload } from 'lucide-react';
+import { Image as ImageIcon, Trash2, Loader2, Upload, Settings2 } from 'lucide-react';
 import { DesignConfig } from '@/lib/types/design-system';
 import { ColorCircle } from './color-circle';
 import { Slider } from '@/components/ui/slider';
@@ -14,11 +14,19 @@ interface BackgroundStylingToolbarProps {
   isUploading: boolean;
 }
 
+const PRESET_COLORS = [
+  '#FFFFFF', '#F3F4F6', '#E5E7EB', '#000000', // Grayscale
+  '#EF4444', '#F97316', '#F59E0B', // Warm
+  '#84CC16', '#10B981', '#06B6D4', // Cool Green/Teal
+  '#3B82F6', '#6366F1', '#8B5CF6', // Cool Blue/Purple
+  '#D946EF', '#EC4899', '#F43F5E'  // Pink/Rose
+];
+
 export function BackgroundStylingToolbar({
   config,
   onUpdate,
   onUploadImage,
-  onClose,
+  onClose, // Unused in inline mode but kept for interface compatibility
   isUploading
 }: BackgroundStylingToolbarProps) {
 
@@ -26,109 +34,117 @@ export function BackgroundStylingToolbar({
   const opacity = config.backgroundOpacity ?? 0.5;
 
   return (
-    <div className="flex items-center justify-center w-full h-full animate-in fade-in slide-in-from-top-2 duration-300">
+    <div className="flex items-center gap-3 w-full animate-in fade-in slide-in-from-top-2 duration-300 flex-1 min-w-0">
 
-      <Popover open={true} onOpenChange={(open) => !open && onClose()}>
-        <PopoverTrigger asChild>
-           <button className="flex flex-col items-center gap-0.5 outline-none">
-             <div className="w-7 h-7 rounded-full bg-black text-white flex items-center justify-center shadow-sm">
-                 <ImageIcon className="w-3.5 h-3.5" />
-             </div>
-           </button>
-        </PopoverTrigger>
-
-        <PopoverContent
-          className="w-[280px] max-w-[90vw] p-4 flex flex-col gap-4 bg-white"
-          side="bottom"
-          sideOffset={16}
-          onOpenAutoFocus={(e) => e.preventDefault()}
-        >
-          {/* Header */}
-          <div className="flex justify-end items-center border-b border-gray-100 pb-2">
-              <button onClick={onClose} className="text-gray-400 hover:text-black transition-colors">
-                  <X className="w-4 h-4" />
-              </button>
+       {/* 1. Colors Section (Scrollable) */}
+       <div className="flex-1 flex items-center gap-2 overflow-x-auto [&::-webkit-scrollbar]:hidden [-ms-overflow-style:'none'] [scrollbar-width:none] px-1 mask-fade-disabled">
+          {/* Custom Picker */}
+          <div className="shrink-0">
+             <ColorCircle
+                color={config.colors.background}
+                onChange={(c) => onUpdate(['colors', 'background'], c)}
+                size="sm"
+             />
           </div>
 
-          {/* 1. Solid Color */}
-          <div>
-             <div className="flex items-center gap-2 px-2 py-2 rounded-md border border-gray-200 bg-gray-50/50">
-                <ColorCircle
-                   color={config.colors.background}
-                   onChange={(c) => {
-                      onUpdate(['colors', 'background'], c);
-                   }}
-                   size="md"
+          <div className="w-px h-4 bg-gray-200 shrink-0 mx-1" />
+
+          {/* Presets */}
+          {PRESET_COLORS.map((color) => (
+             <button
+               key={color}
+               className={cn(
+                 "w-6 h-6 rounded-full border border-gray-200 shrink-0 transition-transform hover:scale-110 focus:outline-none focus:ring-2 focus:ring-black/5",
+                 config.colors.background?.toLowerCase() === color.toLowerCase() && "ring-2 ring-black ring-offset-1"
+               )}
+               style={{ backgroundColor: color }}
+               onClick={() => onUpdate(['colors', 'background'], color)}
+               title={color}
+             />
+          ))}
+       </div>
+
+       {/* Divider */}
+       <div className="w-px h-6 bg-gray-200 shrink-0" />
+
+       {/* 2. Image Section */}
+       <div className="shrink-0 flex items-center">
+          {!hasImage ? (
+             <label className={cn(
+               "flex items-center justify-center w-8 h-8 rounded-full bg-gray-50 hover:bg-gray-100 border border-gray-200 cursor-pointer transition-colors group",
+               isUploading && "opacity-50 cursor-not-allowed"
+             )} title="Subir Imagen de Fondo">
+                 {isUploading ? (
+                     <Loader2 className="w-4 h-4 text-gray-400 animate-spin" />
+                 ) : (
+                     <Upload className="w-4 h-4 text-gray-500 group-hover:text-black" />
+                 )}
+                 <input
+                    type="file"
+                    className="hidden"
+                    accept="image/*"
+                    onChange={onUploadImage}
+                    disabled={isUploading}
                  />
-             </div>
-          </div>
+             </label>
+          ) : (
+             <Popover>
+                <PopoverTrigger asChild>
+                   <button
+                     className="relative w-8 h-8 rounded-full border border-gray-200 overflow-hidden hover:ring-2 hover:ring-black/10 transition-all group"
+                     title="Ajustar Imagen"
+                   >
+                       <img
+                          src={config.backgroundImage}
+                          alt="Background"
+                          className="w-full h-full object-cover"
+                       />
+                       <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-colors flex items-center justify-center">
+                          <Settings2 className="w-4 h-4 text-white opacity-0 group-hover:opacity-100 drop-shadow-md" />
+                       </div>
+                   </button>
+                </PopoverTrigger>
+                <PopoverContent side="bottom" align="end" className="w-64 p-3">
+                    <div className="space-y-4">
+                        <div className="space-y-2">
+                            <div className="flex justify-between text-xs font-medium text-gray-500">
+                                <span>Opacidad</span>
+                                <span>{Math.round(opacity * 100)}%</span>
+                            </div>
+                            <Slider
+                                value={opacity * 100}
+                                max={100}
+                                min={0}
+                                step={1}
+                                onValueChange={(val) => onUpdate(['backgroundOpacity'], val / 100)}
+                            />
+                        </div>
+                        <div className="pt-2 border-t border-gray-100 flex justify-between items-center">
+                             <label className="text-xs text-blue-600 hover:text-blue-700 font-medium cursor-pointer flex items-center gap-1">
+                                <Upload className="w-3 h-3" />
+                                Cambiar
+                                <input
+                                    type="file"
+                                    className="hidden"
+                                    accept="image/*"
+                                    onChange={onUploadImage}
+                                />
+                             </label>
 
-          {/* 2. Image Upload */}
-          <div>
-
-             {!hasImage ? (
-                 <label className="flex flex-col items-center justify-center w-full h-24 border-2 border-dashed border-gray-300 rounded-lg cursor-pointer hover:bg-gray-50 hover:border-gray-400 transition-all group">
-                     <div className="flex flex-col items-center justify-center pt-5 pb-6">
-                         {isUploading ? (
-                             <Loader2 className="w-6 h-6 text-gray-400 animate-spin mb-2" />
-                         ) : (
-                             <Upload className="w-6 h-6 text-gray-400 group-hover:text-black mb-2 transition-colors" />
-                         )}
-                         <p className="text-xs text-gray-500 group-hover:text-black font-medium text-center px-2">
-                             {isUploading ? "Subiendo..." : "Subir imagen"}
-                         </p>
-                     </div>
-                     <input
-                        type="file"
-                        className="hidden"
-                        accept="image/*"
-                        onChange={onUploadImage}
-                        disabled={isUploading}
-                     />
-                 </label>
-             ) : (
-                 <div className="space-y-3">
-                     {/* Preview & Remove */}
-                     <div className="relative w-full h-24 rounded-lg overflow-hidden border border-gray-200 group">
-                         {/* Simulate the layering: Color + Image */}
-                         <div className="absolute inset-0" style={{ backgroundColor: config.colors.background }} />
-                         <img
-                            src={config.backgroundImage}
-                            alt="Background Preview"
-                            className="absolute inset-0 w-full h-full object-cover"
-                            style={{ opacity: opacity }}
-                         />
-
-                         <div className="absolute inset-0 bg-black/0 group-hover:bg-black/40 transition-colors flex items-center justify-center opacity-0 group-hover:opacity-100">
                              <button
                                 onClick={() => onUpdate(['backgroundImage'], undefined)}
-                                className="bg-white text-red-500 px-3 py-1.5 rounded-full text-xs font-bold flex items-center gap-1 hover:bg-red-50 shadow-sm"
+                                className="text-xs text-red-500 hover:text-red-600 font-medium flex items-center gap-1"
                              >
-                                 <Trash2 className="w-3 h-3" />
-                                 Quitar
+                                <Trash2 className="w-3 h-3" />
+                                Quitar
                              </button>
-                         </div>
-                     </div>
+                        </div>
+                    </div>
+                </PopoverContent>
+             </Popover>
+          )}
+       </div>
 
-                     {/* Opacity Slider */}
-                     <div className="space-y-1">
-                         <div className="flex justify-between text-xs text-gray-500">
-                             <span>Opacidad</span>
-                             <span>{Math.round(opacity * 100)}%</span>
-                         </div>
-                         <Slider
-                             value={opacity * 100}
-                             max={100}
-                             min={0}
-                             step={1}
-                             onValueChange={(val) => onUpdate(['backgroundOpacity'], val / 100)}
-                         />
-                     </div>
-                 </div>
-             )}
-          </div>
-        </PopoverContent>
-      </Popover>
     </div>
   );
 }
