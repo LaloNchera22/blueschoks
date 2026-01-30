@@ -1,5 +1,5 @@
 import React from 'react';
-import { X, Image as ImageIcon, Trash2, Loader2, Upload } from 'lucide-react';
+import { X, Mountain, Trash2, Loader2, Upload } from 'lucide-react';
 import { DesignConfig } from '@/lib/types/design-system';
 import { ColorCircle } from './color-circle';
 import { Slider } from '@/components/ui/slider';
@@ -32,7 +32,7 @@ export function BackgroundStylingToolbar({
         <PopoverTrigger asChild>
            <button className="flex flex-col items-center gap-0.5 outline-none">
              <div className="w-7 h-7 rounded-full bg-black text-white flex items-center justify-center shadow-sm">
-                 <ImageIcon className="w-3.5 h-3.5" />
+                 <Mountain className="w-3.5 h-3.5" strokeWidth={1.5} />
              </div>
            </button>
         </PopoverTrigger>
@@ -46,7 +46,7 @@ export function BackgroundStylingToolbar({
           {/* Header */}
           <div className="flex justify-end items-center border-b border-gray-100 pb-2">
               <button onClick={onClose} className="text-gray-400 hover:text-black transition-colors">
-                  <X className="w-4 h-4" />
+                  <X className="w-4 h-4" strokeWidth={1.5} />
               </button>
           </div>
 
@@ -72,7 +72,7 @@ export function BackgroundStylingToolbar({
                          {isUploading ? (
                              <Loader2 className="w-6 h-6 text-gray-400 animate-spin mb-2" />
                          ) : (
-                             <Upload className="w-6 h-6 text-gray-400 group-hover:text-black mb-2 transition-colors" />
+                             <Upload className="w-6 h-6 text-gray-400 group-hover:text-black mb-2 transition-colors" strokeWidth={1.5} />
                          )}
                          <p className="text-xs text-gray-500 group-hover:text-black font-medium text-center px-2">
                              {isUploading ? "Subiendo..." : "Subir imagen"}
@@ -104,7 +104,7 @@ export function BackgroundStylingToolbar({
                                 onClick={() => onUpdate(['backgroundImage'], undefined)}
                                 className="bg-white text-red-500 px-3 py-1.5 rounded-full text-xs font-bold flex items-center gap-1 hover:bg-red-50 shadow-sm"
                              >
-                                 <Trash2 className="w-3 h-3" />
+                                 <Trash2 className="w-3 h-3" strokeWidth={1.5} />
                                  Quitar
                              </button>
                          </div>
