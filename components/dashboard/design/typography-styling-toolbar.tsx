@@ -1,5 +1,5 @@
 import React from 'react';
-import { Type, X } from 'lucide-react';
+import { ALargeSmall, X } from 'lucide-react';
 import { DesignConfig } from '@/lib/types/design-system';
 import { FontPicker } from './font-picker';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
@@ -21,7 +21,7 @@ export function TypographyStylingToolbar({
         <PopoverTrigger asChild>
            <button className="flex flex-col items-center gap-0.5 outline-none">
              <div className="w-7 h-7 rounded-full bg-black text-white flex items-center justify-center shadow-sm">
-                 <Type className="w-3.5 h-3.5" />
+                 <ALargeSmall className="w-3.5 h-3.5" strokeWidth={1.5} />
              </div>
            </button>
         </PopoverTrigger>

@@ -1,5 +1,5 @@
 import React from 'react';
-import { X, Image as ImageIcon, Trash2, Loader2, Upload } from 'lucide-react';
+import { X, Mountain, Trash2, Loader2, Upload } from 'lucide-react';
 import { DesignConfig } from '@/lib/types/design-system';
 import { ColorCircle } from './color-circle';
 import { Slider } from '@/components/ui/slider';
@@ -32,7 +32,7 @@ export function BackgroundStylingToolbar({
         <PopoverTrigger asChild>
            <button className="flex flex-col items-center gap-0.5 outline-none">
              <div className="w-7 h-7 rounded-full bg-black text-white flex items-center justify-center shadow-sm">
-                 <ImageIcon className="w-3.5 h-3.5" />
+                 <Mountain className="w-3.5 h-3.5" strokeWidth={1.5} />
              </div>
            </button>
         </PopoverTrigger>

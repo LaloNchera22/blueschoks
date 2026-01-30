@@ -72,7 +72,7 @@ export function AppSidebar({
                className="absolute top-4 right-4 md:top-6 md:right-4 text-slate-400 hover:text-slate-700 hover:bg-slate-100 rounded-full p-1 transition-colors z-50"
                title="Cerrar menú"
              >
-               <X size={16} />
+               <X size={16} strokeWidth={1.5} />
              </button>
           )}
 
@@ -91,7 +91,7 @@ export function AppSidebar({
                 className="bg-amber-50 border border-amber-100 rounded-xl p-3 flex items-center gap-3 cursor-pointer hover:bg-amber-100/50 transition-colors group/plan block"
               >
                  <div className="bg-amber-100 text-amber-600 p-1.5 rounded-lg group-hover/plan:bg-amber-200 transition-colors">
-                   <Crown size={14} strokeWidth={3} />
+                   <Crown size={14} strokeWidth={1.5} />
                  </div>
                  <div>
                    <h3 className="font-bold text-[10px] uppercase tracking-wider text-amber-800">Plan Pro</h3>
@@ -128,15 +128,15 @@ export function AppSidebar({
            </div>
 
            <Link href="/dashboard/products" className={getItemClass("/dashboard/products")} prefetch={false}>
-              <Package size={18} /> <span>Mis Productos</span>
+              <Package size={18} strokeWidth={1.5} /> <span>Mis Productos</span>
            </Link>
 
            <Link href="/dashboard/design" className={getItemClass("/dashboard/design")} prefetch={false}>
-              <Palette size={18} /> <span>Diseño</span>
+              <Palette size={18} strokeWidth={1.5} /> <span>Diseño</span>
            </Link>
 
            <Link href="/dashboard/settings" className={getItemClass("/dashboard/settings")} prefetch={false}>
-              <Settings size={18} /> <span>Configuración</span>
+              <Settings size={18} strokeWidth={1.5} /> <span>Configuración</span>
            </Link>
         </div>
 
@@ -150,11 +150,11 @@ export function AppSidebar({
            <div className="bg-slate-50 border border-slate-200 rounded-xl p-3 shadow-sm">
               <div className="flex items-center gap-2 mb-3">
                  <div className="bg-blue-50 text-blue-600 p-1.5 rounded-md">
-                   <Home size={14} />
+                   <Home size={14} strokeWidth={1.5} />
                  </div>
                  <span className="font-bold text-xs text-slate-700 truncate flex-1">{hasShopUrl ? shopUrl : "Sin Tienda"}</span>
                  <a href={storeLink} target={hasShopUrl ? "_blank" : "_self"} className="text-slate-400 hover:text-blue-600 transition-colors">
-                    <ExternalLink size={14} />
+                    <ExternalLink size={14} strokeWidth={1.5} />
                  </a>
               </div>
 
@@ -170,15 +170,15 @@ export function AppSidebar({
                  }`}
               >
                  {copied ? (
-                     <div className="flex items-center"><Check size={12} className="mr-2"/> Link Copiado</div>
+                     <div className="flex items-center"><Check size={12} className="mr-2" strokeWidth={1.5}/> Link Copiado</div>
                  ) : (
-                     <div className="flex items-center"><Copy size={12} className="mr-2"/> {hasShopUrl ? "Copiar Link" : "Configurar Link"}</div>
+                     <div className="flex items-center"><Copy size={12} className="mr-2" strokeWidth={1.5}/> {hasShopUrl ? "Copiar Link" : "Configurar Link"}</div>
                  )}
               </Button>
 
               <div className="mt-2 pt-2 border-t border-slate-200/50 text-center">
                  <Link href="/dashboard/settings" className="text-[10px] font-bold text-slate-400 hover:text-slate-800 flex items-center justify-center gap-1 transition-colors uppercase" prefetch={false}>
-                    <Globe size={10} /> Editar dominio
+                    <Globe size={10} strokeWidth={1.5} /> Editar dominio
                  </Link>
               </div>
            </div>
