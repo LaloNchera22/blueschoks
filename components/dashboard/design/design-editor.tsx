@@ -57,6 +57,7 @@ interface DesignEditorProps {
   initialProducts: Product[];
   userId: string;
   slug: string;
+  isPro?: boolean;
 }
 
 // "Atom" selection key
@@ -173,7 +174,7 @@ function SortableSocialItem({ id, link, onDelete }: { id: string, link: LinkItem
 
 // --- MAIN COMPONENT ---
 
-export default function DesignEditor({ initialConfig, initialProducts, userId, slug }: DesignEditorProps) {
+export default function DesignEditor({ initialConfig, initialProducts, userId, slug, isPro = false }: DesignEditorProps) {
   // Ensure we have valid defaults for new fields if they don't exist yet
   const safeInitialConfig = useMemo(() => {
     return {
