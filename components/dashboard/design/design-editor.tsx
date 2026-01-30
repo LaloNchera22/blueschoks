@@ -66,6 +66,7 @@ import { ProductStylingToolbar } from './product-styling-toolbar';
 import { ProfileStylingToolbar } from './profile-styling-toolbar';
 import { BackgroundStylingToolbar } from './background-styling-toolbar';
 import { TypographyStylingToolbar } from './typography-styling-toolbar';
+import { CardStylingToolbar } from './card-styling-toolbar';
 import { ColorCircle } from './color-circle';
 import { ProductCard } from '@/components/store/product-card';
 import { FontLoaderListener } from '@/components/ui/font-loader-listener';
@@ -91,6 +92,7 @@ type ToolType =
   | 'header-avatar'
   | 'header-title'
   | 'header-bio'
+  | 'card-styling'
   | 'card-title'
   | 'card-price'
   | 'card-button'
@@ -510,6 +512,14 @@ export default function DesignEditor({ initialConfig, initialProducts, userId, s
             onClose={() => setActiveTool('global')}
           />
         );
+      case 'card-styling':
+        return (
+          <CardStylingToolbar
+            config={config}
+            onUpdate={updateConfig}
+            onClose={() => setActiveTool('global')}
+          />
+        );
       case 'social-global':
         return (
           <div className="flex items-center gap-4 animate-in fade-in slide-in-from-top-2 duration-300">
@@ -571,6 +581,16 @@ export default function DesignEditor({ initialConfig, initialProducts, userId, s
                  <ALargeSmall className="w-4 h-4 text-gray-600" strokeWidth={1.5} />
               </div>
               <span className="text-[9px] text-gray-500 font-semibold uppercase tracking-wider group-hover:text-black transition-colors">Fuente</span>
+            </button>
+
+             <button
+                onClick={() => setActiveTool('card-styling')}
+                className="flex flex-col items-center gap-1 group cursor-pointer"
+             >
+              <div className="w-8 h-8 rounded-full border border-gray-200 bg-white flex items-center justify-center transition-all group-hover:bg-gray-50">
+                 <Square className="w-4 h-4 text-gray-600" strokeWidth={1.5} />
+              </div>
+              <span className="text-[9px] text-gray-500 font-semibold uppercase tracking-wider group-hover:text-black transition-colors">Tarjetas</span>
             </button>
 
             {/* Separator */}
