@@ -522,41 +522,24 @@ export default function DesignEditor({ initialConfig, initialProducts, userId, s
         );
       case 'social-global':
         return (
-          <div className="flex items-center gap-4 animate-in fade-in slide-in-from-top-2 duration-300">
-             <div className="flex flex-col items-center gap-1">
-                <ColorCircle color={config.socialStyle?.buttonColor || '#f9fafb'} onChange={(c) => updateConfig(['socialStyle', 'buttonColor'], c)} size="sm" />
-                <span className="text-[9px] text-gray-500 font-semibold uppercase tracking-wider">Fondo</span>
-             </div>
-             <div className="flex flex-col items-center gap-1">
-                <ColorCircle color={config.socialStyle?.iconColor || '#4b5563'} onChange={(c) => updateConfig(['socialStyle', 'iconColor'], c)} size="sm" />
-                <span className="text-[9px] text-gray-500 font-semibold uppercase tracking-wider">Icono</span>
-             </div>
-             <div className="flex flex-col items-center gap-1">
-                <ColorCircle color={config.socialStyle?.textColor || '#6b7280'} onChange={(c) => updateConfig(['socialStyle', 'textColor'], c)} size="sm" />
-                <span className="text-[9px] text-gray-500 font-semibold uppercase tracking-wider">Texto</span>
-             </div>
+          <div className="flex items-center gap-3 animate-in fade-in slide-in-from-top-2 duration-300">
+             <ColorCircle color={config.socialStyle?.buttonColor || '#f9fafb'} onChange={(c) => updateConfig(['socialStyle', 'buttonColor'], c)} size="sm" />
+             <ColorCircle color={config.socialStyle?.iconColor || '#4b5563'} onChange={(c) => updateConfig(['socialStyle', 'iconColor'], c)} size="sm" />
+             <ColorCircle color={config.socialStyle?.textColor || '#6b7280'} onChange={(c) => updateConfig(['socialStyle', 'textColor'], c)} size="sm" />
 
-             <div className="flex flex-col items-center gap-1">
-                <FontPicker value={config.socialStyle?.font || config.fonts.body} onChange={(f) => updateConfig(['socialStyle', 'font'], f)} className="h-7 w-28" />
-                <span className="text-[9px] text-gray-500 font-semibold uppercase tracking-wider">Fuente</span>
-             </div>
+             <FontPicker value={config.socialStyle?.font || config.fonts.body} onChange={(f) => updateConfig(['socialStyle', 'font'], f)} className="h-7 w-28" />
 
              <div className="w-px h-6 bg-gray-200 mx-1" />
 
              <button
                 onClick={() => setShowSocialsManager(!showSocialsManager)}
                 className={cn(
-                  "flex flex-col items-center gap-1 group",
-                  showSocialsManager && "opacity-100"
-                )}
-             >
-                <div className={cn(
                   "w-7 h-7 rounded-full border border-gray-200 flex items-center justify-center transition-all",
                   showSocialsManager ? "bg-black text-white border-black" : "bg-white text-gray-600 hover:bg-gray-50"
-                )}>
-                  <MoreHorizontal className="w-3.5 h-3.5" />
-                </div>
-                <span className="text-[9px] text-gray-500 font-semibold uppercase tracking-wider">Gestionar</span>
+                )}
+                title="Gestionar"
+             >
+                <MoreHorizontal className="w-3.5 h-3.5" />
              </button>
           </div>
         );
@@ -613,7 +596,7 @@ export default function DesignEditor({ initialConfig, initialProducts, userId, s
         return (
           <div className="flex items-center gap-4 animate-in fade-in slide-in-from-top-2 duration-300">
             {/* Image Input (Replaced) */}
-            <label className="relative cursor-pointer group">
+            <label className="relative cursor-pointer group" title={isUploadingImage ? 'Subiendo...' : 'Subir Foto'}>
                 <input
                   type="file"
                   accept="image/*"
@@ -621,15 +604,12 @@ export default function DesignEditor({ initialConfig, initialProducts, userId, s
                   className="hidden"
                   disabled={isUploadingImage}
                 />
-                <div className="flex items-center gap-2 h-7 rounded-full border border-gray-200 bg-gray-50 px-3 hover:bg-gray-100 transition-colors cursor-pointer">
+                <div className="flex items-center justify-center w-7 h-7 rounded-full border border-gray-200 bg-gray-50 hover:bg-gray-100 transition-colors cursor-pointer">
                    {isUploadingImage ? (
-                      <Loader2 className="w-3 h-3 animate-spin text-gray-500" />
+                      <Loader2 className="w-3.5 h-3.5 animate-spin text-gray-500" />
                    ) : (
-                      <Upload className="w-3 h-3 text-gray-500" />
+                      <Upload className="w-3.5 h-3.5 text-gray-500" />
                    )}
-                   <span className="text-xs font-medium text-gray-600">
-                      {isUploadingImage ? 'Subiendo...' : 'Subir Foto'}
-                   </span>
                 </div>
             </label>
 
@@ -668,43 +648,34 @@ export default function DesignEditor({ initialConfig, initialProducts, userId, s
             </div>
 
             {/* Border Toggle/Color */}
-            <div className="flex flex-col items-center gap-1">
-               <div className="flex items-center gap-1 relative">
-                  <ColorCircle
-                      color={config.profile.avatarBorderColor || 'transparent'}
-                      onChange={(c) => updateConfig(['profile', 'avatarBorderColor'], c)}
-                      size="sm"
-                  />
-                  {config.profile.avatarBorderColor && (
-                      <button
-                          onClick={(e) => {
-                              e.stopPropagation();
-                              updateConfig(['profile', 'avatarBorderColor'], undefined);
-                          }}
-                          className="absolute -top-1 -right-1 bg-gray-100 border border-gray-300 rounded-full p-0.5 hover:bg-gray-200 transition-colors shadow-sm z-10"
-                          title="Quitar borde"
-                      >
-                          <Minus size={10} className="text-gray-600" />
-                      </button>
-                  )}
-               </div>
-               <span className="text-[9px] text-gray-500 font-semibold uppercase tracking-wider">Borde</span>
-            </div>
+             <div className="flex items-center gap-1 relative">
+                <ColorCircle
+                    color={config.profile.avatarBorderColor || 'transparent'}
+                    onChange={(c) => updateConfig(['profile', 'avatarBorderColor'], c)}
+                    size="sm"
+                />
+                {config.profile.avatarBorderColor && (
+                    <button
+                        onClick={(e) => {
+                            e.stopPropagation();
+                            updateConfig(['profile', 'avatarBorderColor'], undefined);
+                        }}
+                        className="absolute -top-1 -right-1 bg-gray-100 border border-gray-300 rounded-full p-0.5 hover:bg-gray-200 transition-colors shadow-sm z-10"
+                        title="Quitar borde"
+                    >
+                        <Minus size={10} className="text-gray-600" />
+                    </button>
+                )}
+             </div>
           </div>
         );
       case 'card-button':
         return (
           <div className="flex items-center gap-4 animate-in fade-in slide-in-from-top-2 duration-300">
-             <div className="flex flex-col items-center gap-1">
-                <ColorCircle color={config.cardStyle?.buttonColor || '#000000'} onChange={(c) => updateConfig(['cardStyle', 'buttonColor'], c)} size="sm" />
-                <span className="text-[9px] text-gray-500 font-semibold uppercase tracking-wider">Fondo</span>
-             </div>
-             <div className="flex flex-col items-center gap-1">
-                <ColorCircle color={config.cardStyle?.buttonTextColor || '#ffffff'} onChange={(c) => updateConfig(['cardStyle', 'buttonTextColor'], c)} size="sm" />
-                <span className="text-[9px] text-gray-500 font-semibold uppercase tracking-wider">Texto</span>
-             </div>
+             <ColorCircle color={config.cardStyle?.buttonColor || '#000000'} onChange={(c) => updateConfig(['cardStyle', 'buttonColor'], c)} size="sm" />
+             <ColorCircle color={config.cardStyle?.buttonTextColor || '#ffffff'} onChange={(c) => updateConfig(['cardStyle', 'buttonTextColor'], c)} size="sm" />
 
-             <div className="flex flex-col items-center gap-1 w-24">
+             <div className="flex items-center gap-1 w-24">
                 <input
                   type="range"
                   min="0"
@@ -713,8 +684,8 @@ export default function DesignEditor({ initialConfig, initialProducts, userId, s
                   value={config.cardStyle?.borderRadius || 8}
                   onChange={(e) => updateConfig(['cardStyle', 'borderRadius'], Number(e.target.value))}
                   className="w-full h-1 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-black"
+                  title="Redondez"
                 />
-                <span className="text-[9px] text-gray-500 font-semibold uppercase tracking-wider">Redondez</span>
              </div>
           </div>
         );
@@ -722,14 +693,11 @@ export default function DesignEditor({ initialConfig, initialProducts, userId, s
       case 'card-price':
         return (
            <div className="flex items-center gap-4 animate-in fade-in slide-in-from-top-2 duration-300">
-              <div className="flex flex-col items-center gap-1">
-                <ColorCircle
-                  color={activeTool === 'card-title' ? (config.cardStyle?.titleColor || config.colors.text) : (config.cardStyle?.priceColor || config.colors.text)}
-                  onChange={(c) => updateConfig(['cardStyle', activeTool === 'card-title' ? 'titleColor' : 'priceColor'], c)}
-                  size="sm"
-                />
-                <span className="text-[9px] text-gray-500 font-semibold uppercase tracking-wider">Color</span>
-              </div>
+              <ColorCircle
+                color={activeTool === 'card-title' ? (config.cardStyle?.titleColor || config.colors.text) : (config.cardStyle?.priceColor || config.colors.text)}
+                onChange={(c) => updateConfig(['cardStyle', activeTool === 'card-title' ? 'titleColor' : 'priceColor'], c)}
+                size="sm"
+              />
            </div>
         );
       case 'product-individual':
@@ -762,14 +730,11 @@ export default function DesignEditor({ initialConfig, initialProducts, userId, s
         if (activeTool && activeTool.startsWith('social-icon-') && selectedSocialLink) {
            return (
               <div className="flex items-center gap-4 animate-in fade-in slide-in-from-top-2 duration-300">
-                 <div className="flex flex-col items-center gap-1">
-                   <ColorCircle
-                     color={selectedSocialLink.color || config.colors.primary}
-                     onChange={(c) => updateSocialLink(selectedSocialLink.id, 'color', c)}
-                     size="sm"
-                   />
-                   <span className="text-[9px] text-gray-500 font-semibold uppercase tracking-wider">Icono</span>
-                 </div>
+                 <ColorCircle
+                   color={selectedSocialLink.color || config.colors.primary}
+                   onChange={(c) => updateSocialLink(selectedSocialLink.id, 'color', c)}
+                   size="sm"
+                 />
 
                  <div className="w-px h-6 bg-gray-200" />
 

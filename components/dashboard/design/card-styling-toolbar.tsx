@@ -14,31 +14,26 @@ interface CardStylingToolbarProps {
 
 export const CardStylingToolbar = ({ config, onUpdate, onClose }: CardStylingToolbarProps) => {
   return (
-    <div className="flex items-center gap-4 animate-in fade-in slide-in-from-top-2 duration-300">
+    <div className="flex items-center gap-3 animate-in fade-in slide-in-from-top-2 duration-300">
         {/* Background Color */}
-        <div className="flex flex-col items-center gap-1">
-           <ColorCircle
+        <ColorCircle
              color={config.colors.cardBackground || '#ffffff'}
              onChange={(c) => onUpdate(['colors', 'cardBackground'], c)}
              size="sm"
-           />
-           <span className="text-[9px] text-gray-500 font-semibold uppercase tracking-wider">Color</span>
-        </div>
+        />
 
         <div className="w-px h-6 bg-gray-200" />
 
         {/* Opacity */}
-        <div className="flex flex-col items-center gap-1 w-24">
+        <div className="flex items-center gap-1 w-20">
            <Slider
              value={config.cardStyle.opacity ?? 1}
              max={1}
              step={0.1}
              onValueChange={(val) => onUpdate(['cardStyle', 'opacity'], val)}
-             className="w-20"
+             className="w-full"
+             title={`Opacidad ${Math.round((config.cardStyle.opacity ?? 1) * 100)}%`}
            />
-           <span className="text-[9px] text-gray-500 font-semibold uppercase tracking-wider">
-             Opacidad {Math.round((config.cardStyle.opacity ?? 1) * 100)}%
-           </span>
         </div>
 
         <div className="w-px h-6 bg-gray-200" />
@@ -80,13 +75,12 @@ export const CardStylingToolbar = ({ config, onUpdate, onClose }: CardStylingToo
          <div className="w-px h-6 bg-gray-200" />
 
          {/* Shadow Toggle */}
-         <div className="flex flex-col items-center gap-1">
+         <div className="flex items-center" title="Sombra">
             <Switch
               checked={config.cardStyle.shadow ?? true}
               onCheckedChange={(c) => onUpdate(['cardStyle', 'shadow'], c)}
               className="scale-75"
             />
-            <span className="text-[9px] text-gray-500 font-semibold uppercase tracking-wider">Sombra</span>
          </div>
     </div>
   );
