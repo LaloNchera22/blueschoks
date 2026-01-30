@@ -39,6 +39,8 @@ export const DEFAULT_DESIGN: DesignConfig = {
     buttonTextColor: '#ffffff',
     priceColor: '#000000',
     titleColor: '#000000',
+    shadow: true,
+    opacity: 1,
   },
 };
 
@@ -105,6 +107,8 @@ export function sanitizeDesign(raw: any, profileFallback?: any): DesignConfig {
       buttonTextColor: typeof raw.cardStyle?.buttonTextColor === 'string' ? raw.cardStyle.buttonTextColor : DEFAULT_DESIGN.cardStyle.buttonTextColor,
       priceColor: typeof raw.cardStyle?.priceColor === 'string' ? raw.cardStyle.priceColor : DEFAULT_DESIGN.cardStyle.priceColor,
       titleColor: typeof raw.cardStyle?.titleColor === 'string' ? raw.cardStyle.titleColor : DEFAULT_DESIGN.cardStyle.titleColor,
+      shadow: typeof raw.cardStyle?.shadow === 'boolean' ? raw.cardStyle.shadow : DEFAULT_DESIGN.cardStyle.shadow,
+      opacity: typeof raw.cardStyle?.opacity === 'number' ? raw.cardStyle.opacity : DEFAULT_DESIGN.cardStyle.opacity,
     }
   };
 

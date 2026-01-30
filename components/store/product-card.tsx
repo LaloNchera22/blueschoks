@@ -115,25 +115,53 @@ export function ProductCard({ product, config, onSelectElement, onAddToCart }: P
   // 4. Lógica de Estilos (Existente)
   const style = product.style_config || {}
 
+  const cardStyle = config?.cardStyle || {
+      borderRadius: 16,
+      buttonColor: '#000000',
+      buttonTextColor: '#ffffff',
+      priceColor: '#000000',
+      titleColor: '#1f2937',
+      shadow: true,
+      opacity: 1
+  }
+  const globalColors = config?.colors || { cardBackground: '#ffffff', text: '#1f2937' }
+
+  // Helper para convertir Hex a RGBA
+  const hexToRgba = (hex: string, alpha: number) => {
+    if (!hex) return `rgba(255, 255, 255, ${alpha})`;
+    if (hex === 'transparent') return `rgba(0, 0, 0, 0)`;
+    if (hex.startsWith('rgba')) return hex;
+
+    let c = hex;
+    if (c.startsWith('#')) c = c.substring(1);
+
+    if (c.length === 3) c = c.split('').map(x => x + x).join('');
+
+    // Fallback si no es hex válido
+    if (c.length !== 6) return hex;
+
+    const r = parseInt(c.substring(0, 2), 16);
+    const g = parseInt(c.substring(2, 4), 16);
+    const b = parseInt(c.substring(4, 6), 16);
+
+    return `rgba(${r}, ${g}, ${b}, ${alpha})`;
+  }
+
+  const rawCardBg = style.cardBackground || globalColors.cardBackground || '#ffffff';
+  // Si localmente está definido como transparente, respetarlo, si no usar opacidad global
+  const cardBg = style.cardBackground === 'transparent'
+      ? 'transparent'
+      : hexToRgba(rawCardBg, cardStyle.opacity ?? 1);
+
   const getBgStyle = (colorValue: string | undefined) => {
     if (!colorValue || colorValue === 'transparent' || colorValue === 'rgba(0,0,0,0)') {
       return 'transparent';
     }
     return colorValue;
   };
-
-  const cardBg = getBgStyle(style.cardBackground);
   const descBg = getBgStyle(style.descriptionBackground);
-  const isCardTransparent = cardBg === 'transparent';
 
-  const cardStyle = config?.cardStyle || {
-      borderRadius: 16,
-      buttonColor: '#000000',
-      buttonTextColor: '#ffffff',
-      priceColor: '#000000',
-      titleColor: '#1f2937'
-  }
-  const globalColors = config?.colors || { cardBackground: '#ffffff', text: '#1f2937' }
+  const isCardTransparent = (cardStyle.opacity === 0) || cardBg === 'transparent' || cardBg.endsWith(', 0)');
 
   const titleFont = style.titleFont
   const priceFont = style.priceFont
@@ -158,10 +186,11 @@ export function ProductCard({ product, config, onSelectElement, onAddToCart }: P
       <div
         className={`
           h-full flex flex-col relative overflow-hidden transition-all duration-300 group cursor-pointer
-          ${isCardTransparent ? '' : 'rounded-2xl shadow-sm'}
+          ${(cardStyle.shadow && !isCardTransparent) ? 'shadow-sm' : ''}
         `}
         style={{
           backgroundColor: cardBg,
+          borderRadius: cardStyle.borderRadius ?? 16,
           border: isCardTransparent ? 'none' : `1px solid ${style.borderColor || 'rgba(0,0,0,0.05)'}`
         }}
         onClick={handleCardClick}
