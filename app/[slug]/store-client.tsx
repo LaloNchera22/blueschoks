@@ -150,12 +150,21 @@ export default function StoreClient({ profile, products, config }: StoreClientPr
                                   className="group flex flex-col items-center gap-1 min-w-[60px]"
                                >
                                    <div
-                                      className="p-3 rounded-full bg-gray-50 text-gray-600 group-hover:bg-gray-100 group-hover:text-gray-900 transition-all duration-300 border border-gray-100 shadow-sm"
-                                      style={{ color: link.color ? link.color : undefined }}
+                                      className="p-3 rounded-full transition-all duration-300 border border-gray-100 shadow-sm hover:scale-105"
+                                      style={{
+                                          backgroundColor: config.socialStyle?.buttonColor || '#f9fafb',
+                                          color: link.color ? link.color : (config.socialStyle?.iconColor || '#4b5563')
+                                      }}
                                    >
                                        <Icon size={20} strokeWidth={1.5} />
                                    </div>
-                                   <span className="text-[10px] font-medium text-gray-500 group-hover:text-gray-900 transition-colors">
+                                   <span
+                                      className="text-[10px] font-medium transition-colors"
+                                      style={{
+                                          color: config.socialStyle?.textColor || '#6b7280',
+                                          fontFamily: config.socialStyle?.font || config.fonts.body
+                                      }}
+                                   >
                                       {platformDef?.label || link.platform}
                                    </span>
                                </Link>

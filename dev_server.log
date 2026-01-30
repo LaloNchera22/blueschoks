@@ -9,24 +9,18 @@
   · serverActions
 
 ✓ Starting...
-Attention: Next.js now collects completely anonymous telemetry regarding usage.
-This information is used to shape Next.js' roadmap and prioritize features.
-You can learn more, including how to opt-out if you'd not like to participate in this anonymous program, by visiting the following URL:
-https://nextjs.org/telemetry
-
-✓ Ready in 1133ms
-○ Compiling /test-verification ...
-⨯ Error: useCart debe usarse dentro de un CartProvider
-    at useCart (components/shop/cart-context.tsx:110:23)
-    at StoreClient (app/[slug]/store-client.tsx:49:32)
-  108 | export const useCart = () => {
-  109 |   const context = useContext(CartContext)
-> 110 |   if (!context) throw new Error("useCart debe usarse dentro de un CartProvider")
-      |                       ^
-  111 |   return context
-  112 | } {
-  digest: '2959418428'
-}
- GET /test-verification 500 in 9.2s (compile: 8.4s, render: 798ms)
- GET /test-verification 200 in 661ms (compile: 125ms, render: 536ms)
-✓ Compiled in 110ms
+✓ Ready in 1905ms
+○ Compiling /test-design ...
+ GET /test-design 200 in 8.0s (compile: 7.4s, render: 624ms)
+ GET /test-design 200 in 150ms (compile: 11ms, render: 139ms)
+ GET /test-design 200 in 324ms (compile: 135ms, render: 189ms)
+ GET /test-design 200 in 394ms (compile: 171ms, render: 223ms)
+ GET /test-design 200 in 273ms (compile: 106ms, render: 168ms)
+ GET /test-design 200 in 470ms (compile: 171ms, render: 300ms)
+ GET /test-design 200 in 383ms (compile: 152ms, render: 230ms)
+Rendering Toolbar. activeTool: global
+ GET /test-design 200 in 432ms (compile: 165ms, render: 267ms)
+Rendering Toolbar. activeTool: global
+ GET /test-design 200 in 439ms (compile: 131ms, render: 308ms)
+Rendering Toolbar. activeTool: global
+ GET /test-design 200 in 81ms (compile: 6ms, render: 75ms)

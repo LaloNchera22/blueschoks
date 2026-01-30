@@ -57,6 +57,13 @@ export interface ProfileConfig {
   bioStyle?: TextStyle;
 }
 
+export interface SocialStyle {
+  buttonColor?: string;
+  iconColor?: string;
+  textColor?: string;
+  font?: string;
+}
+
 export interface DesignConfig {
   backgroundImage?: string;
   backgroundOpacity?: number;
@@ -72,6 +79,7 @@ export interface DesignConfig {
   };
   profile: ProfileConfig;
   socialLinks: LinkItem[];
+  socialStyle?: SocialStyle;
   checkout: CheckoutConfig;
   cardStyle: CardStyle;
 }
