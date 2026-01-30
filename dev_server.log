@@ -14,6 +14,19 @@ This information is used to shape Next.js' roadmap and prioritize features.
 You can learn more, including how to opt-out if you'd not like to participate in this anonymous program, by visiting the following URL:
 https://nextjs.org/telemetry
 
-✓ Ready in 1312ms
-○ Compiling /test-design-editor ...
- GET /test-design-editor 200 in 10.8s (compile: 9.9s, render: 829ms)
+✓ Ready in 1133ms
+○ Compiling /test-verification ...
+⨯ Error: useCart debe usarse dentro de un CartProvider
+    at useCart (components/shop/cart-context.tsx:110:23)
+    at StoreClient (app/[slug]/store-client.tsx:49:32)
+  108 | export const useCart = () => {
+  109 |   const context = useContext(CartContext)
+> 110 |   if (!context) throw new Error("useCart debe usarse dentro de un CartProvider")
+      |                       ^
+  111 |   return context
+  112 | } {
+  digest: '2959418428'
+}
+ GET /test-verification 500 in 9.2s (compile: 8.4s, render: 798ms)
+ GET /test-verification 200 in 661ms (compile: 125ms, render: 536ms)
+✓ Compiled in 110ms
