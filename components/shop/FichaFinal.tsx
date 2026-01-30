@@ -75,10 +75,10 @@ export default function TarjetaFinal({ product }: { product: Product }) {
 
   return (
     <div className="group flex flex-col gap-3 w-full select-none relative bg-white rounded-2xl">
-      
+
       {/* IMAGEN + CONTROLES */}
       <div className="relative w-full aspect-[3/4] bg-gray-100 rounded-[20px] overflow-hidden shadow-sm border border-gray-100">
-        
+
         {/* Contador */}
         {hasMultipleImages && (
             <div className="absolute top-3 right-3 bg-black/60 text-white text-[10px] font-bold px-2 py-1 rounded-full z-20 backdrop-blur-md">
@@ -89,7 +89,7 @@ export default function TarjetaFinal({ product }: { product: Product }) {
         {/* Foto */}
         {currentImage ? (
           <Image
-            src={currentImage} 
+            src={currentImage}
             alt={product.name}
             fill
             className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
@@ -117,7 +117,7 @@ export default function TarjetaFinal({ product }: { product: Product }) {
         {/* --- BARRA INFERIOR (BOTONES) --- */}
         {/* Esto es lo que no se veía antes */}
         <div className="absolute bottom-3 left-3 right-3 flex gap-2 z-[50]">
-            
+
             {/* Selector (- 1 +) */}
             <div className="flex items-center bg-white rounded-full shadow-xl px-1 gap-1 h-11 border border-gray-100">
                 <button onClick={handleDecrement} className="w-8 h-full flex items-center justify-center hover:bg-slate-100 rounded-full text-slate-600">
@@ -130,7 +130,7 @@ export default function TarjetaFinal({ product }: { product: Product }) {
             </div>
 
             {/* Botón AGREGAR */}
-            <button 
+            <button
                 onClick={handleAddToCart}
                 className="flex-1 bg-black text-white rounded-full h-11 flex items-center justify-center font-bold text-xs uppercase tracking-wider shadow-xl hover:bg-gray-800 active:scale-95 transition-all gap-2"
             >

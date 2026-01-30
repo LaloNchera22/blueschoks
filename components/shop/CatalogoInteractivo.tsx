@@ -3,7 +3,7 @@
 import { useState, useEffect, useMemo, memo } from "react"
 // Importamos openCart del contexto
 import { useCart, CartItem } from "./cart-context"
-import CartSidebar from "./cart-sidebar" 
+import CartSidebar from "./cart-sidebar"
 import { Plus, Minus, ShoppingBag, Check, Globe, Share2, Trash2, Send, X, ShoppingCart, ChevronLeft, ChevronRight, Facebook, Instagram, Twitter, Youtube, Linkedin, Mail, MessageCircle, Video, AtSign, Music } from "lucide-react"
 import { useEditorStore } from "@/hooks/useEditorStore"
 import { ThemeConfig, DEFAULT_THEME_CONFIG } from "@/lib/types/theme-config"
@@ -41,7 +41,7 @@ interface Product {
   description?: string | null;
   image_url?: string | null;
   images?: string[] | null;
-  quantity?: number; 
+  quantity?: number;
   stock?: number;
   [key: string]: unknown;
 }
@@ -50,9 +50,9 @@ const CatalogoInteractivo = memo(function CatalogoInteractivo({ products, shop, 
   // 1. Calculamos el total manualmente
   const { items, openCart, removeItem } = useCart()
   const { setSelectedComponent, selectedComponent, theme: editorTheme } = useEditorStore()
-  
+
   const [isClient, setIsClient] = useState(false)
-  const [isCartOpen, setIsCartOpen] = useState(false) 
+  const [isCartOpen, setIsCartOpen] = useState(false)
 
   // Use editor theme if in editor mode, otherwise use shop.theme_config or legacy fallback
   const theme = isEditor ? editorTheme : (shop.theme_config || DEFAULT_THEME_CONFIG);
@@ -136,7 +136,7 @@ const CatalogoInteractivo = memo(function CatalogoInteractivo({ products, shop, 
       {!isEditor && <CartSidebar shop={shop} />}
 
       {/* CONTENEDOR PRINCIPAL */}
-      <div 
+      <div
           className="min-h-screen transition-all duration-500 flex flex-col items-center pb-32"
           style={finalBgStyle}
           onClick={() => isEditor && setSelectedComponent('global_bg')}
@@ -150,7 +150,7 @@ const CatalogoInteractivo = memo(function CatalogoInteractivo({ products, shop, 
                         <AvatarImage src={shop.avatar_url || shop.image_url || undefined} alt={shop.shop_name || "Avatar"} />
                         <AvatarFallback className="font-bold text-2xl bg-current/5 text-current/70">{getInitials(shop.shop_name || "")}</AvatarFallback>
                    </Avatar>
-                   
+
                    {/* Botón Carrito Header */}
                    {!isEditor && totalItems > 0 && (
                         <button onClick={() => setIsCartOpen(true)} className="absolute -bottom-2 -right-2 bg-black text-white p-2 rounded-full shadow-lg hover:scale-110 transition-transform z-10">
@@ -307,16 +307,16 @@ const CatalogoInteractivo = memo(function CatalogoInteractivo({ products, shop, 
       {/* --- DRAWER DEL CARRITO (MODAL) --- */}
       <AnimatePresence>
         {isCartOpen && (
-            <motion.div 
-                initial={{ opacity: 0 }} 
-                animate={{ opacity: 1 }} 
+            <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
                 exit={{ opacity: 0 }}
                 className="fixed inset-0 z-50 flex items-end sm:items-center justify-center bg-black/60 backdrop-blur-sm p-0 sm:p-4"
                 onClick={() => setIsCartOpen(false)}
             >
-                <motion.div 
-                    initial={{ y: "100%" }} 
-                    animate={{ y: 0 }} 
+                <motion.div
+                    initial={{ y: "100%" }}
+                    animate={{ y: 0 }}
                     exit={{ y: "100%" }}
                     transition={{ type: "spring", damping: 25, stiffness: 300 }}
                     className="bg-white w-full max-w-md sm:rounded-3xl rounded-t-3xl overflow-hidden shadow-2xl max-h-[85vh] flex flex-col border border-slate-200"
@@ -342,11 +342,11 @@ const CatalogoInteractivo = memo(function CatalogoInteractivo({ products, shop, 
                                 <div key={item.id} className="flex items-center gap-4 p-3 bg-white rounded-2xl border border-slate-100 shadow-sm">
                                     <div className="w-20 h-20 bg-gray-100 rounded-xl overflow-hidden relative shrink-0 border border-gray-200">
                                         {item.image_url ? (
-                                            <Image 
-                                                src={item.image_url} 
-                                                alt={item.name || "Producto"} 
-                                                fill 
-                                                className="object-cover" 
+                                            <Image
+                                                src={item.image_url}
+                                                alt={item.name || "Producto"}
+                                                fill
+                                                className="object-cover"
                                             />
                                         ) : (
                                             <div className="flex items-center justify-center w-full h-full text-gray-300"><ShoppingBag size={24}/></div>
@@ -373,7 +373,7 @@ const CatalogoInteractivo = memo(function CatalogoInteractivo({ products, shop, 
                                 <span className="text-gray-600 font-bold uppercase tracking-wider text-sm">Total a pagar</span>
                                 <span className="font-black text-3xl text-slate-900 leading-none">${total}</span>
                             </div>
-                            <Button 
+                            <Button
                                 onClick={handleCheckout}
                                 className="w-full h-14 text-lg font-black uppercase tracking-wide bg-green-600 hover:bg-green-700 text-white rounded-xl shadow-lg shadow-green-600/20 flex items-center justify-center gap-3 transition-transform active:scale-95"
                             >
@@ -462,7 +462,7 @@ const TarjetaCuadrada = memo(function TarjetaCuadrada({ product, theme, isEditor
     addToCart(product, quantity)
     setIsAdded(true)
     setTimeout(() => setIsAdded(false), 1500)
-    setQuantity(1) 
+    setQuantity(1)
   }
 
   // Card click to edit
@@ -631,14 +631,14 @@ const TarjetaCuadrada = memo(function TarjetaCuadrada({ product, theme, isEditor
                         borderColor: theme.cards.quantitySelector.borderColor
                     }}
                 >
-                    <button 
+                    <button
                         onClick={(e) => { e.stopPropagation(); setQuantity(Math.max(1, quantity - 1)); }}
                         className="w-7 h-full flex items-center justify-center hover:opacity-70 transition active:scale-90"
                     >
                         <Minus size={14} />
                     </button>
                     <span className="text-xs font-semibold w-4 text-center tabular-nums">{quantity}</span>
-                    <button 
+                    <button
                         onClick={(e) => { e.stopPropagation(); setQuantity(quantity + 1); }}
                         className="w-7 h-full flex items-center justify-center hover:opacity-70 transition active:scale-90"
                     >

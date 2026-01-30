@@ -16,7 +16,7 @@ export function HeroUrlClaimer() {
   }
 
   return (
-    <form 
+    <form
       onSubmit={handleSubmit}
       className="w-full max-w-xl mx-auto flex flex-col sm:flex-row items-center gap-3 mt-8 lg:mt-4"
     >
@@ -39,8 +39,8 @@ export function HeroUrlClaimer() {
       </div>
 
       {/* Botón Principal (Desktop & Mobile) */}
-      <Button 
-        type="submit" 
+      <Button
+        type="submit"
         className="h-14 lg:h-12 px-8 rounded-lg font-bold text-lg bg-slate-900 text-white hover:bg-slate-800 shadow-xl shadow-slate-200 hover:scale-[1.02] transition-all w-full sm:w-auto shrink-0"
       >
         Empezar Gratis

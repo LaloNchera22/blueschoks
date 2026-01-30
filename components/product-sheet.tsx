@@ -100,14 +100,14 @@ export default function ProductSheet({ isPro = false, productToEdit, trigger }: 
             </button>
         )}
       </SheetTrigger>
-      
-      {/* CAMBIO 1: h-[100dvh] asegura el alto total del viewport dinámico. 
+
+      {/* CAMBIO 1: h-[100dvh] asegura el alto total del viewport dinámico.
           p-0 para quitar padding nativo y controlarlo dentro.
       */}
       <SheetContent side="right" className="w-full sm:max-w-4xl sm:w-[900px] p-0 bg-slate-50/50 border-l border-slate-200 flex flex-col h-[100dvh] outline-none">
-        
+
         <form action={handleSubmit} className="flex flex-col h-full overflow-hidden">
-            
+
             {/* HEADER: shrink-0 evita que se aplaste */}
             <SheetHeader className="px-6 py-4 border-b border-slate-200 bg-white flex flex-row items-center justify-between space-y-0 shrink-0">
                 <div className="flex items-center gap-3">
@@ -137,7 +137,7 @@ export default function ProductSheet({ isPro = false, productToEdit, trigger }: 
             {/* CONTENIDO PRINCIPAL: flex-1 y overflow-hidden para que NO crezca más allá de la pantalla */}
             <div className="flex-1 p-6 overflow-hidden">
                 <div className="grid grid-cols-1 md:grid-cols-12 gap-6 h-full">
-                    
+
                     {/* COLUMNA IZQUIERDA: overflow-y-auto por si hay muchas imágenes, pero contenido contenido */}
                     <div className="md:col-span-5 flex flex-col gap-3 h-full overflow-y-auto pr-1">
                         <Label className="text-xs font-bold text-slate-500 uppercase tracking-widest flex items-center gap-2 shrink-0">
@@ -147,7 +147,7 @@ export default function ProductSheet({ isPro = false, productToEdit, trigger }: 
                         <div className="grid grid-cols-2 gap-3 auto-rows-min">
                              {/* Botón Upload */}
                              {(!isLimitReached || isPro) && (
-                                <div 
+                                <div
                                     onClick={() => fileInputRef.current?.click()}
                                     className="aspect-square bg-white border-2 border-dashed border-slate-300 rounded-xl flex flex-col items-center justify-center cursor-pointer hover:border-blue-500 hover:bg-blue-50/30 transition-all group w-full"
                                 >
@@ -173,9 +173,9 @@ export default function ProductSheet({ isPro = false, productToEdit, trigger }: 
                                             sizes="(max-width: 768px) 50vw, 25vw"
                                         />
                                     )}
-                                    <button 
-                                        type="button" 
-                                        onClick={() => removeFile(i)} 
+                                    <button
+                                        type="button"
+                                        onClick={() => removeFile(i)}
                                         className="absolute top-1 right-1 bg-white/90 backdrop-blur text-slate-500 hover:text-red-500 p-1 rounded-full shadow-sm transition-colors border border-slate-100 z-10"
                                     >
                                         <Trash2 size={12} />
@@ -187,7 +187,7 @@ export default function ProductSheet({ isPro = false, productToEdit, trigger }: 
 
                     {/* COLUMNA DERECHA: h-full y flex-col es la CLAVE */}
                     <div className="md:col-span-7 bg-white p-5 rounded-2xl border border-slate-200 shadow-sm flex flex-col gap-4 h-full overflow-hidden">
-                        
+
                         <div className="space-y-1.5 shrink-0">
                             <Label className="text-xs font-bold text-slate-700">Nombre</Label>
                             <Input name="name" required placeholder="Ej. Camiseta Premium" defaultValue={formDataState.name} className="h-10 bg-slate-50 border-slate-200 focus:bg-white focus:ring-2 focus:ring-slate-100 rounded-lg font-bold text-slate-900 text-sm" />
@@ -204,11 +204,11 @@ export default function ProductSheet({ isPro = false, productToEdit, trigger }: 
                         {/* DESCRIPCIÓN: flex-1 para ocupar TODO el espacio restante y h-full en el textarea */}
                         <div className="space-y-1.5 flex flex-col flex-1 min-h-0">
                             <Label className="text-xs font-bold text-slate-700">Descripción</Label>
-                            <Textarea 
-                                name="description" 
-                                placeholder="Detalles del producto..." 
-                                defaultValue={formDataState.description} 
-                                className="flex-1 w-full bg-slate-50 border-slate-200 focus:bg-white focus:ring-2 focus:ring-slate-100 rounded-lg p-3 text-sm text-slate-700 resize-none leading-relaxed h-full" 
+                            <Textarea
+                                name="description"
+                                placeholder="Detalles del producto..."
+                                defaultValue={formDataState.description}
+                                className="flex-1 w-full bg-slate-50 border-slate-200 focus:bg-white focus:ring-2 focus:ring-slate-100 rounded-lg p-3 text-sm text-slate-700 resize-none leading-relaxed h-full"
                             />
                         </div>
                     </div>

@@ -95,9 +95,9 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
   const closeCart = () => setIsCartOpen(false)
 
   return (
-    <CartContext.Provider value={{ 
-        items, addToCart, removeItem, updateQuantity, removeFromCart, clearCart, 
-        cartTotal, cartCount, 
+    <CartContext.Provider value={{
+        items, addToCart, removeItem, updateQuantity, removeFromCart, clearCart,
+        cartTotal, cartCount,
         isCartOpen, openCart, closeCart // Exportamos los controles
     }}>
       {children}

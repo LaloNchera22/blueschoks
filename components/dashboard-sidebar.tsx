@@ -38,10 +38,10 @@ export function AppSidebar({
     setTimeout(() => setCopied(false), 2000)
   }
 
-  const getItemClass = (path: string) => 
+  const getItemClass = (path: string) =>
     `flex items-center gap-3 px-4 py-3 rounded-xl transition-all font-medium text-sm mb-1 ${
-      pathname === path 
-      ? "bg-slate-900 text-white shadow-md" 
+      pathname === path
+      ? "bg-slate-900 text-white shadow-md"
       : "text-slate-600 hover:bg-slate-50 hover:text-slate-900"
     }`
 

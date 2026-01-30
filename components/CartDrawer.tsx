@@ -14,7 +14,7 @@ export default function CartDrawer({ whatsappNumber, shopName }: { whatsappNumbe
     if (!whatsappNumber) return alert('Esta tienda no tiene número de WhatsApp configurado.')
 
     let message = `👋 Hola *${shopName}*, me interesa hacer este pedido:\n\n`
-    
+
     items.forEach(item => {
       message += `▪️ ${item.quantity}x ${item.name} - $${item.price * item.quantity}\n`
     })
@@ -24,7 +24,7 @@ export default function CartDrawer({ whatsappNumber, shopName }: { whatsappNumbe
 
     // Codificamos el texto para que funcione en la URL
     const url = `https://wa.me/${whatsappNumber}?text=${encodeURIComponent(message)}`
-    
+
     // Abrir en nueva pestaña
     window.open(url, '_blank')
   }
@@ -34,7 +34,7 @@ export default function CartDrawer({ whatsappNumber, shopName }: { whatsappNumbe
   return (
     <>
       {/* BOTÓN FLOTANTE (ABRIR CARRITO) */}
-      <button 
+      <button
         onClick={() => setIsOpen(true)}
         className="fixed bottom-6 right-6 bg-[#1a1a8e] text-white p-4 rounded-full shadow-2xl z-50 flex items-center gap-2 hover:scale-105 transition-transform animate-bounce-slow"
       >
@@ -50,9 +50,9 @@ export default function CartDrawer({ whatsappNumber, shopName }: { whatsappNumbe
         <div className="fixed inset-0 z-[60] flex justify-end">
           {/* Fondo oscuro al hacer click cierra */}
           <div className="absolute inset-0 bg-black/50 backdrop-blur-sm" onClick={() => setIsOpen(false)} />
-          
+
           <div className="relative w-full max-w-md bg-white h-full shadow-2xl flex flex-col animate-slide-in">
-            
+
             {/* Header del Carrito */}
             <div className="p-5 border-b flex justify-between items-center bg-gray-50">
               <h2 className="font-black text-xl text-[#1a1a8e] uppercase">Tu Pedido</h2>
@@ -78,7 +78,7 @@ export default function CartDrawer({ whatsappNumber, shopName }: { whatsappNumbe
                     <h3 className="font-bold text-gray-800">{item.name}</h3>
                     <p className="text-[#1a1a8e] font-bold">${item.price}</p>
                   </div>
-                  
+
                   {/* Controles de Cantidad */}
                   <div className="flex items-center gap-2 bg-gray-100 rounded-lg p-1">
                     <button onClick={() => decreaseQuantity(item.id)} className="w-6 h-6 flex items-center justify-center font-bold text-gray-500 hover:bg-white rounded">-</button>
@@ -95,8 +95,8 @@ export default function CartDrawer({ whatsappNumber, shopName }: { whatsappNumbe
                 <span className="text-gray-500 font-medium">Total a pagar:</span>
                 <span className="text-2xl font-black text-[#1a1a8e]">${total}</span>
               </div>
-              
-              <button 
+
+              <button
                 onClick={handleCheckout}
                 className="w-full bg-[#25D366] text-white py-4 rounded-xl font-bold text-lg hover:bg-[#1ebc57] transition-all flex items-center justify-center gap-2 shadow-lg shadow-green-200"
               >

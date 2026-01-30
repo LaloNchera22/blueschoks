@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useRef, useEffect } from 'react'
-import { addProduct } from '@/app/actions' 
+import { addProduct } from '@/app/actions'
 import { useRouter } from 'next/navigation'
 import Image from 'next/image'
 
@@ -12,10 +12,10 @@ interface Props {
 export default function AddProductModal({ isPro = false }: Props) {
   const [isOpen, setIsOpen] = useState(false)
   const [loading, setLoading] = useState(false)
-  
+
   // ESTADO PARA ACUMULAR LAS FOTOS (Array de Archivos)
-  const [selectedFiles, setSelectedFiles] = useState<File[]>([]) 
-  const [previews, setPreviews] = useState<string[]>([]) 
+  const [selectedFiles, setSelectedFiles] = useState<File[]>([])
+  const [previews, setPreviews] = useState<string[]>([])
   const previewsRef = useRef<string[]>([])
 
   // Sincronizar ref con state para limpieza al desmontar
@@ -69,7 +69,7 @@ export default function AddProductModal({ isPro = false }: Props) {
 
     const updatedFiles = selectedFiles.filter((_, idx) => idx !== indexToRemove)
     setSelectedFiles(updatedFiles)
-    
+
     // Actualizamos previews filtrando
     setPreviews(prev => prev.filter((_, idx) => idx !== indexToRemove))
   }
@@ -77,35 +77,35 @@ export default function AddProductModal({ isPro = false }: Props) {
   // --- 3. ENVÍO DEL FORMULARIO ---
   async function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault()
-    
+
     if (selectedFiles.length === 0) {
       alert("Debes subir al menos una imagen.")
       return
     }
 
     setLoading(true)
-    
+
     const formData = new FormData(event.currentTarget)
-    
+
     // TRUCO IMPORTANTE:
     // El input file original solo tiene la "última selección" o está vacío.
     // Borramos lo que tenga y agregamos MANUALMENTE nuestra lista acumulada.
-    formData.delete('image') 
+    formData.delete('image')
     selectedFiles.forEach(file => {
       formData.append('image', file)
     })
-    
+
     const result = await addProduct(formData)
-    
+
     setLoading(false)
-    
+
     if (result?.success) {
       setIsOpen(false)
       // Revocar todas las URLs antes de limpiar el estado
       previews.forEach(url => URL.revokeObjectURL(url))
       setSelectedFiles([]) // Limpiar memoria
       setPreviews([])
-      router.refresh() 
+      router.refresh()
     } else {
       alert(result?.error || 'Ocurrió un error')
     }
@@ -113,7 +113,7 @@ export default function AddProductModal({ isPro = false }: Props) {
 
   return (
     <>
-      <button 
+      <button
         onClick={() => setIsOpen(true)}
         className="bg-[#1a1a8e] text-white font-black uppercase tracking-widest px-6 py-3 rounded-xl hover:bg-[#2a2a9e] transition shadow-lg flex items-center gap-2"
       >
@@ -123,7 +123,7 @@ export default function AddProductModal({ isPro = false }: Props) {
       {isOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm md:p-4">
           <div className="bg-white w-full h-[100dvh] md:h-auto md:max-h-[90vh] md:max-w-md md:rounded-3xl shadow-2xl relative animate-in fade-in zoom-in duration-200 flex flex-col overflow-hidden">
-            
+
             {/* Header */}
             <div className="flex-none flex items-center justify-between p-4 border-b bg-white">
                 <h2 className="text-xl font-black text-[#1a1a8e] uppercase tracking-tight">

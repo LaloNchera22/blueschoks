@@ -7,7 +7,7 @@ export default function SidebarShareButton({ username }: { username: string }) {
 
   const handleCopy = () => {
     if (!username) return alert('Primero configura tu usuario en Configuración.')
-    
+
     // Construimos el link completo
     const origin = window.location.origin // Esto detecta si es localhost o blueshocks.com
     const link = `${origin}/${username}`
@@ -22,8 +22,8 @@ export default function SidebarShareButton({ username }: { username: string }) {
       onClick={handleCopy}
       className={`
         w-full mt-6 py-3 px-4 rounded-xl flex items-center justify-center gap-2 font-bold transition-all
-        ${copied 
-          ? 'bg-green-100 text-green-700 border border-green-200' 
+        ${copied
+          ? 'bg-green-100 text-green-700 border border-green-200'
           : 'bg-[#1a1a8e] text-white hover:bg-[#2a2a9e] shadow-lg shadow-indigo-500/30'
         }
       `}

@@ -8,31 +8,31 @@ export default function BotonAyuda() {
   const [openQuestion, setOpenQuestion] = useState<number | null>(null)
 
   const faqs = [
-    { 
-      id: 1, 
-      q: "¿Cómo agrego un nuevo producto?", 
-      a: "Ve a la sección 'Mis Productos' en el menú lateral y haz clic en el botón negro '+ Nuevo Producto' situado en la esquina superior derecha." 
+    {
+      id: 1,
+      q: "¿Cómo agrego un nuevo producto?",
+      a: "Ve a la sección 'Mis Productos' en el menú lateral y haz clic en el botón negro '+ Nuevo Producto' situado en la esquina superior derecha."
     },
-    { 
-      id: 2, 
-      q: "¿Cómo comparto mi tienda?", 
-      a: "En el menú lateral, justo debajo de tu nombre, encontrarás un botón llamado 'Copiar Enlace'. Al pulsarlo, tendrás el link listo para enviar." 
+    {
+      id: 2,
+      q: "¿Cómo comparto mi tienda?",
+      a: "En el menú lateral, justo debajo de tu nombre, encontrarás un botón llamado 'Copiar Enlace'. Al pulsarlo, tendrás el link listo para enviar."
     },
-    { 
-      id: 3, 
-      q: "¿Puedo personalizar los colores?", 
-      a: "Sí. Dirígete a 'Configuración' para ajustar el logo, los colores y la información visible de tu tienda." 
+    {
+      id: 3,
+      q: "¿Puedo personalizar los colores?",
+      a: "Sí. Dirígete a 'Configuración' para ajustar el logo, los colores y la información visible de tu tienda."
     },
   ]
 
   return (
     <div className="fixed bottom-6 right-6 z-[9999] flex flex-col items-end gap-4 font-sans">
-      
+
       {/* --- VENTANA DE AYUDA (MODAL) --- */}
-      <div 
+      <div
         className={`w-[360px] bg-white rounded-2xl shadow-2xl border border-gray-200 overflow-hidden transition-all duration-300 origin-bottom-right transform ${
-          isOpen 
-          ? "opacity-100 scale-100 translate-y-0" 
+          isOpen
+          ? "opacity-100 scale-100 translate-y-0"
           : "opacity-0 scale-95 translate-y-10 pointer-events-none"
         }`}
       >
@@ -42,8 +42,8 @@ export default function BotonAyuda() {
                 <h3 className="font-bold text-lg leading-tight">Centro de Ayuda</h3>
                 <p className="text-gray-400 text-xs mt-1">Resolvemos tus dudas al instante.</p>
             </div>
-            <button 
-                onClick={() => setIsOpen(false)} 
+            <button
+                onClick={() => setIsOpen(false)}
                 className="bg-white/10 p-1.5 rounded-full hover:bg-white/20 transition-colors"
             >
                 <X size={16} />
@@ -54,14 +54,14 @@ export default function BotonAyuda() {
         <div className="max-h-[350px] overflow-y-auto custom-scrollbar">
             {faqs.map((faq) => (
                 <div key={faq.id} className="border-b border-gray-100 last:border-0">
-                    <button 
+                    <button
                         onClick={() => setOpenQuestion(openQuestion === faq.id ? null : faq.id)}
                         className="w-full flex justify-between items-center p-4 text-left hover:bg-gray-50 transition-colors group"
                     >
                         <span className={`text-sm font-bold transition-colors ${openQuestion === faq.id ? 'text-black' : 'text-slate-700'}`}>
                             {faq.q}
                         </span>
-                        
+
                         {/* FLECHAS NEGRAS */}
                         {openQuestion === faq.id ? (
                             <ChevronUp size={18} className="text-black shrink-0" />
@@ -69,8 +69,8 @@ export default function BotonAyuda() {
                             <ChevronDown size={18} className="text-black shrink-0" />
                         )}
                     </button>
-                    
-                    <div 
+
+                    <div
                         className={`overflow-hidden transition-all duration-300 ease-in-out ${
                             openQuestion === faq.id ? "max-h-40 opacity-100" : "max-h-0 opacity-0"
                         }`}
@@ -85,19 +85,19 @@ export default function BotonAyuda() {
 
         {/* Footer */}
         <div className="p-4 bg-gray-50 border-t border-gray-100">
-            <a 
-                href="https://wa.me/5211234567890" 
+            <a
+                href="https://wa.me/5211234567890"
                 target="_blank"
                 className="flex items-center justify-center gap-2 w-full bg-black text-white font-bold py-3 rounded-xl text-xs uppercase tracking-wide shadow-md hover:bg-gray-900 hover:shadow-lg transition-all"
             >
-                <MessageCircle size={16} /> 
+                <MessageCircle size={16} />
                 <span>Contactar Soporte</span>
             </a>
         </div>
       </div>
 
       {/* --- BOTÓN FLOTANTE (FORZADO A NEGRO) --- */}
-      <button 
+      <button
         onClick={() => setIsOpen(!isOpen)}
         // ESTA LÍNEA OBLIGA AL BOTÓN A SER NEGRO PASE LO QUE PASE
         style={{ backgroundColor: isOpen ? '#ffffff' : '#000000', color: isOpen ? '#000000' : '#ffffff' }}

@@ -33,13 +33,13 @@ export default function TarjetaNueva({ product }: { product: Product }) {
 
   return (
     <div className="group flex flex-col gap-3 w-full cursor-pointer bg-white">
-      
+
       {/* 1. FOTO VERTICAL (Aspecto 3:4) */}
       <div className="relative w-full aspect-[3/4] bg-slate-100 rounded-[20px] overflow-hidden shadow-sm border border-slate-100">
-        
+
         {imageSrc ? (
           <Image
-            src={imageSrc} 
+            src={imageSrc}
             alt={product.name}
             fill
             className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
@@ -53,7 +53,7 @@ export default function TarjetaNueva({ product }: { product: Product }) {
         )}
 
         {/* Botón Circular Flotante */}
-        <button 
+        <button
             onClick={(e) => {
                 e.stopPropagation();
                 addToCart(product);
@@ -75,9 +75,9 @@ export default function TarjetaNueva({ product }: { product: Product }) {
             </span>
         </div>
       </div>
-      
+
       {/* Botón Móvil */}
-      <button 
+      <button
         onClick={() => addToCart(product)}
         className="md:hidden w-full bg-slate-900 text-white py-3 rounded-xl text-xs font-bold mt-2"
       >

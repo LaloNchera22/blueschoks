@@ -22,7 +22,7 @@ export default function ShoppingCart({ shopPhone, shopName }: { shopPhone: strin
 
   return (
     <>
-      <button 
+      <button
         onClick={() => setIsOpen(true)}
         className="fixed bottom-6 right-6 z-50 bg-slate-900 text-white p-4 rounded-full shadow-2xl hover:scale-110 transition-transform active:scale-95 flex items-center justify-center animate-in zoom-in duration-300"
       >

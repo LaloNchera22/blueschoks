@@ -51,7 +51,7 @@ export default function CreateProductForm({ isPro = false, productCount = 0 }: {
 
   const handleFiles = (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = Array.from(e.target.files || [])
-    
+
     // Validación Plan
     if (!isPro && (previews.length + files.length) > 3) {
       alert("⚠️ Plan Gratuito: Máximo 3 fotos. Actualiza a PRO para ilimitadas.")
@@ -92,13 +92,13 @@ export default function CreateProductForm({ isPro = false, productCount = 0 }: {
   return (
     <div className="max-w-5xl mx-auto">
       <form action={handleSubmit}>
-        
+
         {/* --- HEADER DE LA PÁGINA --- */}
         <div className="flex items-center justify-between mb-8">
             <div className="flex items-center gap-4">
-                <Button 
-                    type="button" 
-                    variant="ghost" 
+                <Button
+                    type="button"
+                    variant="ghost"
                     onClick={() => router.back()}
                     className="h-10 w-10 p-0 rounded-full hover:bg-slate-100 text-slate-500"
                 >
@@ -110,16 +110,16 @@ export default function CreateProductForm({ isPro = false, productCount = 0 }: {
                 </div>
             </div>
             <div className="flex gap-3">
-                <Button 
-                    type="button" 
-                    variant="outline" 
+                <Button
+                    type="button"
+                    variant="outline"
                     onClick={() => router.back()}
                     className="hidden sm:flex border-slate-200 text-slate-700 font-bold"
                 >
                     Cancelar
                 </Button>
-                <Button 
-                    type="submit" 
+                <Button
+                    type="submit"
                     disabled={isLoading}
                     className="bg-slate-900 hover:bg-black text-white px-6 font-bold shadow-lg shadow-slate-900/10 transition-all active:scale-95"
                 >
@@ -131,7 +131,7 @@ export default function CreateProductForm({ isPro = false, productCount = 0 }: {
         {/* --- TARJETA PRINCIPAL (LAYOUT 2 COLUMNAS) --- */}
         <div className="bg-white rounded-3xl border border-slate-200 shadow-sm overflow-hidden">
             <div className="grid grid-cols-1 lg:grid-cols-12 divide-y lg:divide-y-0 lg:divide-x divide-slate-100">
-                
+
                 {/* COLUMNA IZQUIERDA: MULTIMEDIA (5/12) */}
                 <div className="lg:col-span-5 p-8 bg-slate-50/50">
                     <div className="space-y-4 sticky top-8">
@@ -150,7 +150,7 @@ export default function CreateProductForm({ isPro = false, productCount = 0 }: {
                         <div className="grid grid-cols-2 gap-4">
                             {/* Botón Upload Grande */}
                             {(!isLimitReached || isPro) && (
-                                <div 
+                                <div
                                     onClick={() => fileInputRef.current?.click()}
                                     className="aspect-square bg-white border-2 border-dashed border-slate-300 rounded-2xl flex flex-col items-center justify-center cursor-pointer hover:border-blue-500 hover:bg-blue-50/30 transition-all group"
                                 >
@@ -177,14 +177,14 @@ export default function CreateProductForm({ isPro = false, productCount = 0 }: {
                                         />
                                     )}
                                     {/* Botón Borrar siempre visible y elegante */}
-                                    <button 
-                                        type="button" 
-                                        onClick={() => removeFile(i)} 
+                                    <button
+                                        type="button"
+                                        onClick={() => removeFile(i)}
                                         className="absolute top-2 right-2 bg-white/90 backdrop-blur text-slate-500 hover:text-red-500 p-1.5 rounded-full shadow-sm transition-colors border border-slate-100"
                                     >
                                         <Trash2 size={14} />
                                     </button>
-                                    
+
                                     {i === 0 && (
                                         <div className="absolute bottom-2 left-2 bg-black/70 text-white text-[10px] font-bold px-2 py-0.5 rounded-md backdrop-blur-sm">
                                             Portada
@@ -193,7 +193,7 @@ export default function CreateProductForm({ isPro = false, productCount = 0 }: {
                                 </div>
                             ))}
                         </div>
-                        
+
                         <p className="text-xs text-slate-400 leading-relaxed">
                            💡 <strong>Tip:</strong> La primera imagen será la portada de tu producto. Usa fotos cuadradas o verticales para mejores resultados.
                         </p>
@@ -203,13 +203,13 @@ export default function CreateProductForm({ isPro = false, productCount = 0 }: {
                 {/* COLUMNA DERECHA: DETALLES (7/12) */}
                 <div className="lg:col-span-7 p-8 bg-white">
                     <div className="space-y-8 max-w-lg">
-                        
+
                         {/* Nombre */}
                         <div className="space-y-3">
                             <Label className="text-sm font-bold text-slate-700">Nombre del Producto</Label>
-                            <Input 
-                                name="name" required placeholder="Ej. Hoodie Oversize Essential" 
-                                className="h-12 bg-slate-50 border-slate-200 focus:bg-white focus:border-slate-300 focus:ring-4 focus:ring-slate-100 rounded-xl font-bold text-lg text-slate-900 placeholder:text-slate-400 transition-all" 
+                            <Input
+                                name="name" required placeholder="Ej. Hoodie Oversize Essential"
+                                className="h-12 bg-slate-50 border-slate-200 focus:bg-white focus:border-slate-300 focus:ring-4 focus:ring-slate-100 rounded-xl font-bold text-lg text-slate-900 placeholder:text-slate-400 transition-all"
                             />
                         </div>
 
@@ -218,9 +218,9 @@ export default function CreateProductForm({ isPro = false, productCount = 0 }: {
                             <Label className="text-sm font-bold text-slate-700">Precio</Label>
                             <div className="relative">
                                 <span className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 font-bold text-xl">$</span>
-                                <Input 
-                                    name="price" type="number" step="0.01" required placeholder="0.00" 
-                                    className="pl-10 h-12 bg-slate-50 border-slate-200 focus:bg-white focus:border-slate-300 focus:ring-4 focus:ring-slate-100 rounded-xl font-bold text-xl text-slate-900 placeholder:text-slate-400 transition-all" 
+                                <Input
+                                    name="price" type="number" step="0.01" required placeholder="0.00"
+                                    className="pl-10 h-12 bg-slate-50 border-slate-200 focus:bg-white focus:border-slate-300 focus:ring-4 focus:ring-slate-100 rounded-xl font-bold text-xl text-slate-900 placeholder:text-slate-400 transition-all"
                                 />
                             </div>
                         </div>
@@ -228,9 +228,9 @@ export default function CreateProductForm({ isPro = false, productCount = 0 }: {
                         {/* Descripción */}
                         <div className="space-y-3">
                             <Label className="text-sm font-bold text-slate-700">Descripción</Label>
-                            <Textarea 
-                                name="description" placeholder="Describe los detalles, materiales, tallas y cuidados..." 
-                                className="min-h-[200px] bg-slate-50 border-slate-200 focus:bg-white focus:border-slate-300 focus:ring-4 focus:ring-slate-100 rounded-xl p-4 text-base text-slate-700 placeholder:text-slate-400 leading-relaxed resize-none transition-all" 
+                            <Textarea
+                                name="description" placeholder="Describe los detalles, materiales, tallas y cuidados..."
+                                className="min-h-[200px] bg-slate-50 border-slate-200 focus:bg-white focus:border-slate-300 focus:ring-4 focus:ring-slate-100 rounded-xl p-4 text-base text-slate-700 placeholder:text-slate-400 leading-relaxed resize-none transition-all"
                             />
                         </div>
 

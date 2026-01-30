@@ -20,7 +20,7 @@ export default function SubscribeButton() {
           mode: 'subscription',
         }),
       })
-      
+
       if (!response.ok) {
         throw new Error('Error en la petición de checkout');
       }

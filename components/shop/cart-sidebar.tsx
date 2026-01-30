@@ -25,7 +25,7 @@ export default function CartSidebar({ shop }: { shop: Shop }) {
 
   const whatsappLink = useMemo(() => {
     if (!shop || !shop.whatsapp) return null;
-    const phone = shop.whatsapp.replace(/\D/g, ''); 
+    const phone = shop.whatsapp.replace(/\D/g, '');
     // Format: Hola, quiero pedir: 1x ProdA ($100), 2x ProdB ($50) Total: $200
     let itemList = items.map((item: CartItem) => {
         return `${item.quantity}x ${item.name} (${formatPrice(item.price * item.quantity)})`
@@ -42,12 +42,12 @@ export default function CartSidebar({ shop }: { shop: Shop }) {
 
   return (
     <Sheet open={isCartOpen} onOpenChange={closeCart} modal={true}>
-      <SheetContent 
-        side="right" 
+      <SheetContent
+        side="right"
         className="w-full sm:w-[400px] bg-white p-0 flex flex-col z-[100] h-full shadow-2xl border-l border-gray-100/50"
       >
         <SheetTitle className="hidden">Carrito de Compras</SheetTitle>
-        
+
         {/* HEADER */}
         <div className="p-6 border-b border-gray-100 bg-white/95 backdrop-blur-sm flex justify-between items-center z-10 shrink-0 sticky top-0">
             <div className="flex flex-col">
@@ -99,7 +99,7 @@ export default function CartSidebar({ shop }: { shop: Shop }) {
                                     <div className="w-full h-full flex items-center justify-center"><ShoppingBag size={20} className="opacity-20"/></div>
                                 )}
                             </div>
-                            
+
                             {/* Product Info */}
                             <div className="flex-1 flex flex-col py-1">
                                 <div className="flex justify-between items-start gap-2 mb-1">
@@ -140,9 +140,9 @@ export default function CartSidebar({ shop }: { shop: Shop }) {
                         <span className="text-2xl font-black text-slate-900">{formatPrice(cartTotal)}</span>
                     </div>
                 </div>
-                
+
                 {whatsappLink ? (
-                    <a 
+                    <a
                         href={whatsappLink}
                         target="_blank"
                         rel="noopener noreferrer"
@@ -152,7 +152,7 @@ export default function CartSidebar({ shop }: { shop: Shop }) {
                         <ArrowRight size={18} className="group-hover:translate-x-1 transition-transform"/>
                     </a>
                 ) : (
-                    <button 
+                    <button
                         onClick={() => alert("⚠️ Error: El dueño de la tienda no ha configurado su número de WhatsApp en el Panel de Control.")}
                         className="w-full bg-gray-100 text-gray-400 py-4 rounded-full font-bold flex items-center justify-center gap-3 cursor-not-allowed"
                     >
