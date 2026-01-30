@@ -107,11 +107,11 @@ export function BackgroundStylingToolbar({
                      {/* Opacity Slider (Mini) */}
                      <div className="w-20 px-2" title="Opacidad">
                          <Slider
-                             value={[opacity * 100]}
+                             value={opacity * 100}
                              max={100}
                              min={0}
                              step={5}
-                             onValueChange={(val) => onUpdate(['backgroundOpacity'], val[0] / 100)}
+                             onValueChange={(val) => onUpdate(['backgroundOpacity'], val / 100)}
                              className="h-4"
                          />
                      </div>
