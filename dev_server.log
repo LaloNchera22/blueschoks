@@ -9,11 +9,11 @@
   · serverActions
 
 ✓ Starting...
-Attention: Next.js now collects completely anonymous telemetry regarding usage.
-This information is used to shape Next.js' roadmap and prioritize features.
-You can learn more, including how to opt-out if you'd not like to participate in this anonymous program, by visiting the following URL:
-https://nextjs.org/telemetry
-
-✓ Ready in 1312ms
-○ Compiling /test-design-editor ...
- GET /test-design-editor 200 in 10.8s (compile: 9.9s, render: 829ms)
+✓ Ready in 1118ms
+ GET /test-design-editor 200 in 2.3s (compile: 1829ms, render: 467ms)
+SUPABASE_SERVICE_ROLE_KEY is missing. Falling back to ANON_KEY. This may cause 404s if RLS is strict.
+SUPABASE_SERVICE_ROLE_KEY is missing. Falling back to ANON_KEY. This may cause 404s if RLS is strict.
+ GET /placeholder.png 200 in 1277ms (compile: 1074ms, render: 203ms)
+⨯ The requested resource isn't a valid image for /placeholder.png received null
+ GET /test-sidebar 200 in 1421ms (compile: 1149ms, render: 272ms)
+[?25h

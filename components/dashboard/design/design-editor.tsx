@@ -5,8 +5,7 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { toast } from 'sonner';
 import {
-  Save,
-  Image as ImageIcon,
+  Mountain,
   Loader2,
   Lock,
   Star,
@@ -15,7 +14,7 @@ import {
   Instagram,
   Facebook,
   Twitter,
-  Link as LinkIcon,
+  Link2,
   MessageCircle,
   Trash2,
   MoreHorizontal,
@@ -28,7 +27,7 @@ import {
   AlignLeft,
   AlignCenter,
   AlignRight,
-  Type,
+  ALargeSmall,
   ShoppingBag,
   Plus,
   Check,
@@ -113,15 +112,15 @@ const FONTS = [
 
 const PLATFORMS = [
   { id: 'instagram', icon: Instagram, label: 'Instagram', placeholder: 'https://instagram.com/usuario' },
-  { id: 'tiktok', icon: LinkIcon, label: 'TikTok', placeholder: 'https://tiktok.com/@usuario' },
+  { id: 'tiktok', icon: Link2, label: 'TikTok', placeholder: 'https://tiktok.com/@usuario' },
   { id: 'whatsapp', icon: MessageCircle, label: 'WhatsApp', placeholder: 'https://wa.me/...' },
-  { id: 'telegram', label: 'Telegram', icon: LinkIcon, placeholder: 'https://t.me/tu_usuario', prefix: 'https://t.me/' },
-  { id: 'onlyfans', label: 'OnlyFans', icon: LinkIcon, placeholder: 'https://onlyfans.com/tu_usuario', prefix: 'https://onlyfans.com/', color: '#00AFF0' },
+  { id: 'telegram', label: 'Telegram', icon: Link2, placeholder: 'https://t.me/tu_usuario', prefix: 'https://t.me/' },
+  { id: 'onlyfans', label: 'OnlyFans', icon: Link2, placeholder: 'https://onlyfans.com/tu_usuario', prefix: 'https://onlyfans.com/', color: '#00AFF0' },
   { id: 'twitter', icon: Twitter, label: 'Twitter', placeholder: 'https://twitter.com/usuario' },
   { id: 'facebook', icon: Facebook, label: 'Facebook', placeholder: 'https://facebook.com/usuario' },
   { id: 'website', icon: Store, label: 'Mi Tienda Web', placeholder: 'https://...' },
   { id: 'email', icon: Mail, label: 'Email', placeholder: 'mailto:...' },
-  { id: 'other', icon: LinkIcon, label: 'Otro', placeholder: 'https://...' },
+  { id: 'other', icon: Link2, label: 'Otro', placeholder: 'https://...' },
 ];
 
 // --- HELPER FUNCTIONS ---
@@ -159,7 +158,7 @@ function SortableSocialItem({ id, link, onDelete }: { id: string, link: LinkItem
     transition,
   };
 
-  const PlatformIcon = PLATFORMS.find(p => p.id === link.platform)?.icon || LinkIcon;
+  const PlatformIcon = PLATFORMS.find(p => p.id === link.platform)?.icon || Link2;
 
   return (
     <div
@@ -531,7 +530,7 @@ export default function DesignEditor({ initialConfig, initialProducts, userId, s
                 className="flex flex-col items-center gap-1 group cursor-pointer"
              >
               <div className="w-8 h-8 rounded-full border border-gray-200 bg-white flex items-center justify-center transition-all group-hover:bg-gray-50">
-                 <Type className="w-4 h-4 text-gray-600" />
+                 <ALargeSmall className="w-4 h-4 text-gray-600" strokeWidth={1.5} />
               </div>
               <span className="text-[9px] text-gray-500 font-semibold uppercase tracking-wider group-hover:text-black transition-colors">Fuente</span>
             </button>
@@ -850,7 +849,7 @@ export default function DesignEditor({ initialConfig, initialProducts, userId, s
                   className="flex flex-col items-center justify-center group cursor-pointer p-2 rounded-xl hover:bg-gray-100 transition-all"
                   title="Fondo"
                >
-                  <ImageIcon className="w-6 h-6 text-gray-600 group-hover:text-black transition-colors" strokeWidth={1.5} />
+                  <Mountain className="w-6 h-6 text-gray-600 group-hover:text-black transition-colors" strokeWidth={1.5} />
               </button>
 
                {/* Typography */}
@@ -859,7 +858,7 @@ export default function DesignEditor({ initialConfig, initialProducts, userId, s
                   className="flex flex-col items-center justify-center group cursor-pointer p-2 rounded-xl hover:bg-gray-100 transition-all"
                   title="Fuente"
                >
-                  <Type className="w-6 h-6 text-gray-600 group-hover:text-black transition-colors" strokeWidth={1.5} />
+                  <ALargeSmall className="w-6 h-6 text-gray-600 group-hover:text-black transition-colors" strokeWidth={1.5} />
               </button>
 
               {/* Socials */}
@@ -871,7 +870,7 @@ export default function DesignEditor({ initialConfig, initialProducts, userId, s
                 )}
                 title="Redes"
               >
-                  <LinkIcon className={cn(
+                  <Link2 className={cn(
                     "w-6 h-6 transition-colors",
                     showSocialsManager ? "text-black" : "text-gray-600 group-hover:text-black"
                   )} strokeWidth={1.5} />
@@ -1041,7 +1040,7 @@ export default function DesignEditor({ initialConfig, initialProducts, userId, s
                 disabled={isSaving}
                 className="bg-black hover:bg-gray-800 text-white rounded-full w-7 h-7 flex items-center justify-center transition-all disabled:opacity-50 disabled:cursor-not-allowed shadow-sm"
                 >
-                {isSaving ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Save className="w-3.5 h-3.5" />}
+                {isSaving ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Check className="w-3.5 h-3.5" strokeWidth={1.5} />}
                 </button>
             </div>
           )}
@@ -1136,7 +1135,7 @@ export default function DesignEditor({ initialConfig, initialProducts, userId, s
                    <div className="flex flex-wrap justify-center gap-3 mb-4">
                        {config.socialLinks.map((link) => {
                            const platformDef = PLATFORMS.find(p => p.id === link.platform);
-                           const Icon = platformDef?.icon || LinkIcon;
+                           const Icon = platformDef?.icon || Link2;
 
                            const isSelected = activeTool === `social-icon-${link.id}`;
                            return (

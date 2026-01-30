@@ -1,5 +1,5 @@
 import React from 'react';
-import { Loader2, Save, Minus, Copy, ChevronDown, X } from 'lucide-react';
+import { Loader2, Check, Minus, Copy, ChevronDown, X } from 'lucide-react';
 import { ProductStyle } from '@/lib/types/design-system';
 import { Database } from '@/utils/supabase/types';
 import { ColorCircle } from './color-circle';
@@ -63,7 +63,7 @@ export function ProductStylingToolbar({
              >
                 <div className="flex justify-end items-center border-b border-gray-100 pb-2 mb-1">
                     <button onClick={onClose} className="text-gray-400 hover:text-black">
-                        <X className="w-4 h-4" />
+                        <X className="w-4 h-4" strokeWidth={1.5} />
                     </button>
                 </div>
 
@@ -181,7 +181,7 @@ export function ProductStylingToolbar({
                   className="absolute -top-1 -right-1 bg-gray-100 border border-gray-300 rounded-full p-0.5 hover:bg-gray-200 transition-colors shadow-sm z-10"
                   title="Reset color"
                 >
-                  <Minus size={10} className="text-gray-600" />
+                  <Minus size={10} className="text-gray-600" strokeWidth={1.5} />
                 </button>
               )}
             </div>
@@ -296,7 +296,7 @@ export function ProductStylingToolbar({
              >
                 <div className="flex justify-end items-center border-b border-gray-100 pb-2 mb-2">
                    <button onClick={onClose} className="text-gray-400 hover:text-black">
-                     <X className="w-4 h-4" />
+                     <X className="w-4 h-4" strokeWidth={1.5} />
                    </button>
                 </div>
 
@@ -351,7 +351,7 @@ export function ProductStylingToolbar({
         title="Aplicar a todos"
       >
         <div className="w-7 h-7 rounded-full border border-gray-200 bg-white flex items-center justify-center hover:bg-gray-50 hover:scale-105 transition-all text-gray-600">
-          <Copy className="w-3.5 h-3.5" />
+          <Copy className="w-3.5 h-3.5" strokeWidth={1.5} />
         </div>
       </button>
 
@@ -376,7 +376,7 @@ export function ProductStylingToolbar({
         title="Guardar cambios del producto"
       >
         <div className="w-7 h-7 rounded-full bg-black text-white flex items-center justify-center hover:bg-gray-800 hover:scale-105 transition-all shadow-sm">
-          {isSaving ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Save className="w-3.5 h-3.5" />}
+          {isSaving ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Check className="w-3.5 h-3.5" strokeWidth={1.5} />}
         </div>
       </button>
 
@@ -389,7 +389,7 @@ export function ProductStylingToolbar({
         title="Cerrar selección"
       >
          <div className="w-7 h-7 rounded-full border border-gray-200 bg-gray-50 flex items-center justify-center hover:bg-red-50 hover:text-red-500 hover:border-red-100 transition-all text-gray-500">
-           <X className="w-3.5 h-3.5" />
+           <X className="w-3.5 h-3.5" strokeWidth={1.5} />
          </div>
       </button>
 
