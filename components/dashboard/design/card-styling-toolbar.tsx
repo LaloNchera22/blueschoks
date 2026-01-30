@@ -30,10 +30,10 @@ export const CardStylingToolbar = ({ config, onUpdate, onClose }: CardStylingToo
         {/* Opacity */}
         <div className="flex flex-col items-center gap-1 w-24">
            <Slider
-             value={[config.cardStyle.opacity ?? 1]}
+             value={config.cardStyle.opacity ?? 1}
              max={1}
              step={0.1}
-             onValueChange={(vals) => onUpdate(['cardStyle', 'opacity'], vals[0])}
+             onValueChange={(val) => onUpdate(['cardStyle', 'opacity'], val)}
              className="w-20"
            />
            <span className="text-[9px] text-gray-500 font-semibold uppercase tracking-wider">
