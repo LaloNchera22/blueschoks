@@ -5,7 +5,6 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { toast } from 'sonner';
 import {
-  Image as ImageIcon,
   Loader2,
   Lock,
   Star,
