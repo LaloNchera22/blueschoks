@@ -906,7 +906,7 @@ export default function DesignEditor({ initialConfig, initialProducts, userId, s
                 <div className="flex flex-col items-center text-center pt-16 pb-10 px-6"> {/* Increased pt-8 to pt-16 for visual balance without header */}
                    {/* AVATAR */}
                    <div
-                     className="relative mb-6 group cursor-pointer"
+                     className="relative mb-6 group cursor-pointer hover:opacity-80 transition-opacity"
                      onClick={(e) => {
                        e.stopPropagation();
                        setActiveTool('header-avatar');
