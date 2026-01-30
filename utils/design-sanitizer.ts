@@ -20,6 +20,12 @@ export const DEFAULT_DESIGN: DesignConfig = {
     avatarBorderColor: undefined, // Default to no border or handle null as no border
   },
   socialLinks: [],
+  socialStyle: {
+    buttonColor: undefined,
+    iconColor: undefined,
+    textColor: undefined,
+    font: undefined,
+  },
   checkout: {
     whatsappNumber: '',
     currency: 'MXN',
@@ -80,6 +86,12 @@ export function sanitizeDesign(raw: any, profileFallback?: any): DesignConfig {
       active: typeof link.active === 'boolean' ? link.active : true,
       color: typeof link.color === 'string' ? link.color : undefined,
     })),
+    socialStyle: {
+      buttonColor: typeof raw.socialStyle?.buttonColor === 'string' ? raw.socialStyle.buttonColor : DEFAULT_DESIGN.socialStyle?.buttonColor,
+      iconColor: typeof raw.socialStyle?.iconColor === 'string' ? raw.socialStyle.iconColor : DEFAULT_DESIGN.socialStyle?.iconColor,
+      textColor: typeof raw.socialStyle?.textColor === 'string' ? raw.socialStyle.textColor : DEFAULT_DESIGN.socialStyle?.textColor,
+      font: typeof raw.socialStyle?.font === 'string' ? raw.socialStyle.font : DEFAULT_DESIGN.socialStyle?.font,
+    },
     checkout: {
       whatsappNumber: typeof raw.checkout?.whatsappNumber === 'string' ? raw.checkout.whatsappNumber : DEFAULT_DESIGN.checkout.whatsappNumber,
       currency: typeof raw.checkout?.currency === 'string' ? raw.checkout.currency : DEFAULT_DESIGN.checkout.currency,

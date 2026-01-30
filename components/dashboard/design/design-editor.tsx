@@ -70,6 +70,7 @@ import { ColorCircle } from './color-circle';
 import { ProductCard } from '@/components/store/product-card';
 import { FontLoaderListener } from '@/components/ui/font-loader-listener';
 import { GOOGLE_FONTS_LIST } from '@/utils/font-loader';
+import { FontPicker } from './font-picker';
 
 // --- TYPES ---
 type Product = Database['public']['Tables']['products']['Row'];
@@ -94,6 +95,7 @@ type ToolType =
   | 'card-price'
   | 'card-button'
   | 'product-individual'
+  | 'social-global'
   | `social-icon-${string}`; // social-icon-[id]
 
 type SelectionState = {
@@ -508,6 +510,46 @@ export default function DesignEditor({ initialConfig, initialProducts, userId, s
             onClose={() => setActiveTool('global')}
           />
         );
+      case 'social-global':
+        return (
+          <div className="flex items-center gap-4 animate-in fade-in slide-in-from-top-2 duration-300">
+             <div className="flex flex-col items-center gap-1">
+                <ColorCircle color={config.socialStyle?.buttonColor || '#f9fafb'} onChange={(c) => updateConfig(['socialStyle', 'buttonColor'], c)} size="sm" />
+                <span className="text-[9px] text-gray-500 font-semibold uppercase tracking-wider">Fondo</span>
+             </div>
+             <div className="flex flex-col items-center gap-1">
+                <ColorCircle color={config.socialStyle?.iconColor || '#4b5563'} onChange={(c) => updateConfig(['socialStyle', 'iconColor'], c)} size="sm" />
+                <span className="text-[9px] text-gray-500 font-semibold uppercase tracking-wider">Icono</span>
+             </div>
+             <div className="flex flex-col items-center gap-1">
+                <ColorCircle color={config.socialStyle?.textColor || '#6b7280'} onChange={(c) => updateConfig(['socialStyle', 'textColor'], c)} size="sm" />
+                <span className="text-[9px] text-gray-500 font-semibold uppercase tracking-wider">Texto</span>
+             </div>
+
+             <div className="flex flex-col items-center gap-1">
+                <FontPicker value={config.socialStyle?.font || config.fonts.body} onChange={(f) => updateConfig(['socialStyle', 'font'], f)} className="h-7 w-28" />
+                <span className="text-[9px] text-gray-500 font-semibold uppercase tracking-wider">Fuente</span>
+             </div>
+
+             <div className="w-px h-6 bg-gray-200 mx-1" />
+
+             <button
+                onClick={() => setShowSocialsManager(!showSocialsManager)}
+                className={cn(
+                  "flex flex-col items-center gap-1 group",
+                  showSocialsManager && "opacity-100"
+                )}
+             >
+                <div className={cn(
+                  "w-7 h-7 rounded-full border border-gray-200 flex items-center justify-center transition-all",
+                  showSocialsManager ? "bg-black text-white border-black" : "bg-white text-gray-600 hover:bg-gray-50"
+                )}>
+                  <MoreHorizontal className="w-3.5 h-3.5" />
+                </div>
+                <span className="text-[9px] text-gray-500 font-semibold uppercase tracking-wider">Gestionar</span>
+             </button>
+          </div>
+        );
       case 'global':
         return (
           <div className="flex items-center gap-3 animate-in fade-in slide-in-from-top-2 duration-300">
@@ -540,17 +582,12 @@ export default function DesignEditor({ initialConfig, initialProducts, userId, s
 
             {/* Socials Manager Button */}
             <button
-              onClick={() => setShowSocialsManager(!showSocialsManager)}
-              className={cn(
-                "flex flex-col items-center gap-1 group",
-                showSocialsManager && "opacity-100"
-              )}
+              onClick={() => setActiveTool('social-global')}
+              className="flex flex-col items-center gap-1 group"
+              title="Redes"
             >
-              <div className={cn(
-                "w-7 h-7 rounded-full border border-gray-200 flex items-center justify-center transition-all",
-                showSocialsManager ? "bg-black text-white border-black" : "bg-white text-gray-600 hover:bg-gray-50 hover:scale-105"
-              )}>
-                <MoreHorizontal className="w-3.5 h-3.5" />
+              <div className="w-7 h-7 rounded-full border border-gray-200 flex items-center justify-center transition-all bg-white text-gray-600 hover:bg-gray-50 hover:scale-105">
+                <LinkIcon className="w-3.5 h-3.5" />
               </div>
               <span className="text-[9px] text-gray-500 font-semibold uppercase tracking-wider group-hover:text-black transition-colors">Redes</span>
             </button>
@@ -814,223 +851,7 @@ export default function DesignEditor({ initialConfig, initialProducts, userId, s
       >
         <div className="w-full h-11 px-2 rounded-full bg-white/90 shadow-lg border border-gray-200 flex items-center justify-between gap-1 transition-all duration-300 ease-out backdrop-blur-md overflow-hidden">
 
-          {(activeTool === 'header-title' || activeTool === 'header-bio') && (
-              <ProfileStylingToolbar
-                activeTool={activeTool}
-                config={config}
-                onUpdateConfig={updateConfig}
-              />
-          )}
-
-          {activeTool === 'background' && (
-             <BackgroundStylingToolbar
-                config={config}
-                onUpdate={updateConfig}
-                onUploadImage={handleBackgroundUpload}
-                onClose={() => setActiveTool('global')}
-                isUploading={isUploadingImage}
-             />
-          )}
-
-          {activeTool === 'typography' && (
-             <TypographyStylingToolbar
-                config={config}
-                onUpdate={updateConfig}
-                onClose={() => setActiveTool('global')}
-             />
-          )}
-
-          {/* 1. GLOBAL TOOLS (Default) */}
-          {activeTool === 'global' && (
-            <div className="flex items-center gap-6 animate-in fade-in slide-in-from-top-2 duration-300 flex-1 justify-center w-full px-4">
-               {/* Background */}
-               <button
-                  onClick={() => setActiveTool('background')}
-                  className="flex flex-col items-center justify-center group cursor-pointer p-2 rounded-xl hover:bg-gray-100 transition-all"
-                  title="Fondo"
-               >
-                  <Mountain className="w-6 h-6 text-gray-600 group-hover:text-black transition-colors" strokeWidth={1.5} />
-              </button>
-
-               {/* Typography */}
-               <button
-                  onClick={() => setActiveTool('typography')}
-                  className="flex flex-col items-center justify-center group cursor-pointer p-2 rounded-xl hover:bg-gray-100 transition-all"
-                  title="Fuente"
-               >
-                  <ALargeSmall className="w-6 h-6 text-gray-600 group-hover:text-black transition-colors" strokeWidth={1.5} />
-              </button>
-
-              {/* Socials */}
-              <button
-                onClick={() => setShowSocialsManager(!showSocialsManager)}
-                className={cn(
-                  "flex flex-col items-center justify-center group cursor-pointer p-2 rounded-xl hover:bg-gray-100 transition-all",
-                  showSocialsManager && "bg-gray-100 text-black"
-                )}
-                title="Redes"
-              >
-                  <Link2 className={cn(
-                    "w-6 h-6 transition-colors",
-                    showSocialsManager ? "text-black" : "text-gray-600 group-hover:text-black"
-                  )} strokeWidth={1.5} />
-              </button>
-            </div>
-          )}
-
-
-          {/* 3. HEADER AVATAR TOOLS (Existing, but moved to top) */}
-          {activeTool === 'header-avatar' && (
-            <div className="flex items-center gap-4 animate-in fade-in slide-in-from-top-2 duration-300">
-              {/* Image Input (Replaced) */}
-              <label className="relative cursor-pointer group">
-                  <input
-                    type="file"
-                    accept="image/*"
-                    onChange={handleImageUpload}
-                    className="hidden"
-                    disabled={isUploadingImage}
-                  />
-                  <div className="flex items-center justify-center w-7 h-7 rounded-full border border-gray-200 bg-gray-50 hover:bg-gray-100 transition-colors cursor-pointer">
-                     {isUploadingImage ? (
-                        <Loader2 className="w-3.5 h-3.5 animate-spin text-gray-500" />
-                     ) : (
-                        <Upload className="w-3.5 h-3.5 text-gray-500" />
-                     )}
-                  </div>
-              </label>
-
-              {/* Shape Selector */}
-              <div className="flex items-center bg-gray-50 rounded-full p-1 border border-gray-100">
-                <button
-                  onClick={() => updateConfig(['profile', 'avatarShape'], 'circle')}
-                  className={cn(
-                    "w-5 h-5 rounded-full flex items-center justify-center transition-all",
-                    config.profile.avatarShape === 'circle' ? "bg-white shadow-sm text-black" : "text-gray-400 hover:text-gray-600"
-                  )}
-                  title="Círculo"
-                >
-                  <Circle className="w-2.5 h-2.5" />
-                </button>
-                <button
-                  onClick={() => updateConfig(['profile', 'avatarShape'], 'square')}
-                  className={cn(
-                    "w-5 h-5 rounded-full flex items-center justify-center transition-all",
-                    (config.profile.avatarShape === 'square' || config.profile.avatarShape === 'rounded') ? "bg-white shadow-sm text-black" : "text-gray-400 hover:text-gray-600"
-                  )}
-                  title="Cuadrado Redondeado"
-                >
-                  <div className="w-2.5 h-2.5 border-2 border-current rounded-sm" />
-                </button>
-                <button
-                  onClick={() => updateConfig(['profile', 'avatarShape'], 'none')}
-                  className={cn(
-                    "w-5 h-5 rounded-full flex items-center justify-center transition-all",
-                    config.profile.avatarShape === 'none' ? "bg-white shadow-sm text-black" : "text-gray-400 hover:text-gray-600"
-                  )}
-                  title="Cuadrado Recto (Sin Borde)"
-                >
-                  <Square className="w-2.5 h-2.5" />
-                </button>
-              </div>
-
-              {/* Border Toggle/Color */}
-              <div className="flex flex-col items-center gap-1">
-                 <div className="flex items-center gap-1 relative">
-                    <ColorCircle
-                        color={config.profile.avatarBorderColor || 'transparent'}
-                        onChange={(c) => updateConfig(['profile', 'avatarBorderColor'], c)}
-                        size="sm"
-                    />
-                    {config.profile.avatarBorderColor && (
-                        <button
-                            onClick={(e) => {
-                                e.stopPropagation();
-                                updateConfig(['profile', 'avatarBorderColor'], undefined);
-                            }}
-                            className="absolute -top-1 -right-1 bg-gray-100 border border-gray-300 rounded-full p-0.5 hover:bg-gray-200 transition-colors shadow-sm z-10"
-                            title="Quitar borde"
-                        >
-                            <Minus size={10} className="text-gray-600" />
-                        </button>
-                    )}
-                 </div>
-              </div>
-            </div>
-          )}
-
-          {/* 5. ATOMIC SOCIAL ICON (Existing) */}
-          {activeTool?.startsWith('social-icon-') && selectedSocialLink && (
-             <div className="flex items-center gap-4 animate-in fade-in slide-in-from-top-2 duration-300">
-                <div className="flex flex-col items-center gap-1">
-                  <ColorCircle
-                    color={selectedSocialLink.color || config.colors.primary}
-                    onChange={(c) => updateSocialLink(selectedSocialLink.id, 'color', c)}
-                    size="sm"
-                  />
-                </div>
-             </div>
-          )}
-
-          {/* 6. CARD BUTTON TOOLS (Existing) */}
-          {activeTool === 'card-button' && (
-            <div className="flex items-center gap-4 animate-in fade-in slide-in-from-top-2 duration-300">
-               <div className="flex flex-col items-center gap-1">
-                  <ColorCircle color={config.cardStyle?.buttonColor || '#000000'} onChange={(c) => updateConfig(['cardStyle', 'buttonColor'], c)} size="sm" />
-               </div>
-               <div className="flex flex-col items-center gap-1">
-                  <ColorCircle color={config.cardStyle?.buttonTextColor || '#ffffff'} onChange={(c) => updateConfig(['cardStyle', 'buttonTextColor'], c)} size="sm" />
-               </div>
-
-               <div className="flex flex-col items-center gap-1 w-24">
-                  <input
-                    type="range"
-                    min="0"
-                    max="24"
-                    step="2"
-                    value={config.cardStyle?.borderRadius || 8}
-                    onChange={(e) => updateConfig(['cardStyle', 'borderRadius'], Number(e.target.value))}
-                    className="w-full h-1 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-black"
-                  />
-               </div>
-            </div>
-          )}
-
-          {/* 7. CARD TITLE/PRICE TOOLS (Existing) */}
-          {(activeTool === 'card-title' || activeTool === 'card-price') && (
-             <div className="flex items-center gap-4 animate-in fade-in slide-in-from-top-2 duration-300">
-                <div className="flex flex-col items-center gap-1">
-                  <ColorCircle
-                    color={activeTool === 'card-title' ? (config.cardStyle?.titleColor || config.colors.text) : (config.cardStyle?.priceColor || config.colors.text)}
-                    onChange={(c) => updateConfig(['cardStyle', activeTool === 'card-title' ? 'titleColor' : 'priceColor'], c)}
-                    size="sm"
-                  />
-                </div>
-             </div>
-          )}
-
-           {/* NEW: PRODUCT INDIVIDUAL TOOLS (Refactored) */}
-           {activeTool === 'product-individual' && selectedProduct && selection && (
-              <ProductStylingToolbar
-                product={selectedProduct}
-                activeElement={selection.elementType}
-                onUpdate={updateSelectedProductStyle}
-                onSave={handleSaveProduct}
-                onApplyAll={handleApplyToAll}
-                onClose={() => {
-                  setActiveTool('global');
-                  setSelection(null);
-                }}
-                isSaving={isSavingProduct}
-                fonts={GOOGLE_FONTS_LIST.map(f => ({ name: f, value: f }))}
-                defaultColors={{
-                  title: config.cardStyle?.titleColor || config.colors.text,
-                  price: config.cardStyle?.priceColor || config.colors.primary,
-                  button: config.cardStyle?.buttonColor || '#000000',
-                  buttonText: config.cardStyle?.buttonTextColor || '#ffffff'
-                }}
-              />
-           )}
+          {renderToolbarContent()}
 
           {/* SAVE BUTTON (Always visible on right) */}
           {activeTool !== 'product-individual' && (
@@ -1146,14 +967,23 @@ export default function DesignEditor({ initialConfig, initialProducts, userId, s
                                >
                                    <div
                                       className={cn(
-                                          "p-3 rounded-full bg-gray-50 text-gray-600 hover:bg-gray-100 hover:text-gray-900 transition-all duration-300 border border-gray-100 shadow-sm",
+                                          "p-3 rounded-full transition-all duration-300 border border-gray-100 shadow-sm hover:scale-105",
                                           isSelected && "ring-2 ring-blue-500 ring-offset-2 scale-110"
                                       )}
-                                      style={{ color: link.color ? link.color : undefined }}
+                                      style={{
+                                          backgroundColor: config.socialStyle?.buttonColor || '#f9fafb',
+                                          color: link.color ? link.color : (config.socialStyle?.iconColor || '#4b5563')
+                                      }}
                                    >
                                        <Icon size={20} strokeWidth={1.5} />
                                    </div>
-                                   <span className="text-[10px] font-medium text-gray-500 group-hover:text-gray-900 transition-colors">
+                                   <span
+                                      className="text-[10px] font-medium transition-colors"
+                                      style={{
+                                          color: config.socialStyle?.textColor || '#6b7280',
+                                          fontFamily: config.socialStyle?.font || config.fonts.body
+                                      }}
+                                   >
                                       {platformDef?.label || link.platform}
                                    </span>
                                </button>

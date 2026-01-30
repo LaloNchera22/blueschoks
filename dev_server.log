@@ -9,11 +9,18 @@
   · serverActions
 
 ✓ Starting...
-✓ Ready in 1118ms
- GET /test-design-editor 200 in 2.3s (compile: 1829ms, render: 467ms)
-SUPABASE_SERVICE_ROLE_KEY is missing. Falling back to ANON_KEY. This may cause 404s if RLS is strict.
-SUPABASE_SERVICE_ROLE_KEY is missing. Falling back to ANON_KEY. This may cause 404s if RLS is strict.
- GET /placeholder.png 200 in 1277ms (compile: 1074ms, render: 203ms)
-⨯ The requested resource isn't a valid image for /placeholder.png received null
- GET /test-sidebar 200 in 1421ms (compile: 1149ms, render: 272ms)
-[?25h
+✓ Ready in 1905ms
+○ Compiling /test-design ...
+ GET /test-design 200 in 8.0s (compile: 7.4s, render: 624ms)
+ GET /test-design 200 in 150ms (compile: 11ms, render: 139ms)
+ GET /test-design 200 in 324ms (compile: 135ms, render: 189ms)
+ GET /test-design 200 in 394ms (compile: 171ms, render: 223ms)
+ GET /test-design 200 in 273ms (compile: 106ms, render: 168ms)
+ GET /test-design 200 in 470ms (compile: 171ms, render: 300ms)
+ GET /test-design 200 in 383ms (compile: 152ms, render: 230ms)
+Rendering Toolbar. activeTool: global
+ GET /test-design 200 in 432ms (compile: 165ms, render: 267ms)
+Rendering Toolbar. activeTool: global
+ GET /test-design 200 in 439ms (compile: 131ms, render: 308ms)
+Rendering Toolbar. activeTool: global
+ GET /test-design 200 in 81ms (compile: 6ms, render: 75ms)
