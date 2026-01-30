@@ -43,6 +43,7 @@ export interface TextStyle {
   fontFamily?: string;
   bold?: boolean;
   italic?: boolean;
+  uppercase?: boolean;
   align?: 'left' | 'center' | 'right';
   color?: string;
   size?: number;
