@@ -70,11 +70,11 @@ export function TextEditorDrawer({
              <Minus className="w-4 h-4" />
            </button>
            <Slider
-             value={[currentSize]}
+             value={currentSize}
              min={10}
              max={100}
              step={1}
-             onValueChange={([val]) => onUpdate('size', val)}
+             onValueChange={(val) => onUpdate('size', val)}
              className="flex-1"
            />
            <button

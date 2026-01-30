@@ -78,11 +78,11 @@ export function CardStylingDrawer({ config, onUpdate }: CardStylingDrawerProps) 
              <span className="text-xs font-medium bg-gray-100 px-2 py-1 rounded text-gray-600">{config.cardStyle.borderRadius}px</span>
           </div>
           <Slider
-            value={[config.cardStyle.borderRadius || 8]}
+            value={config.cardStyle.borderRadius || 8}
             max={32}
             min={0}
             step={2}
-            onValueChange={([val]) => onUpdate(['cardStyle', 'borderRadius'], val)}
+            onValueChange={(val) => onUpdate(['cardStyle', 'borderRadius'], val)}
           />
        </div>
 

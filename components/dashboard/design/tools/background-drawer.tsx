@@ -100,11 +100,11 @@ export function BackgroundDrawer({
                         <span>{Math.round(opacity * 100)}%</span>
                     </div>
                     <Slider
-                        value={[opacity * 100]}
+                        value={opacity * 100}
                         max={100}
                         min={0}
                         step={1}
-                        onValueChange={([val]) => onUpdate(['backgroundOpacity'], val / 100)}
+                        onValueChange={(val) => onUpdate(['backgroundOpacity'], val / 100)}
                     />
                 </div>
             </div>
