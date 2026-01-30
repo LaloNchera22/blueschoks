@@ -70,6 +70,8 @@ export default function AddProductModal({ isPro = false }: Props) {
     const updatedFiles = selectedFiles.filter((_, idx) => idx !== indexToRemove)
     setSelectedFiles(updatedFiles)
     
+
+    
     // Actualizamos previews filtrando
     setPreviews(prev => prev.filter((_, idx) => idx !== indexToRemove))
   }
