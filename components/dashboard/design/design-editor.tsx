@@ -310,6 +310,8 @@ export default function DesignEditor({ initialConfig, initialProducts, userId, s
     } as React.CSSProperties;
   };
 
+  const selectedProduct = getSelectedProduct();
+
   // --- RENDER DRAWER CONTENT ---
   const renderDrawerContent = () => {
      switch(activeTool) {
@@ -401,8 +403,6 @@ export default function DesignEditor({ initialConfig, initialProducts, userId, s
            return null;
      }
   };
-
-  const selectedProduct = getSelectedProduct();
 
   // Avatar Classes
   const avatarClasses = useMemo(() => {
