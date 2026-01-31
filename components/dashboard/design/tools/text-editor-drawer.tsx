@@ -48,11 +48,11 @@ export function TextEditorDrawer({
   const isUppercase = currentStyle.uppercase || false;
 
   return (
-    <div className="flex flex-col gap-6">
+    <div className="flex flex-col gap-3">
 
       {/* 0. Text Content (Optional) */}
       {onTextChange && (
-        <div className="space-y-3">
+        <div className="space-y-2">
           {inputLabel && (
              <label className="text-xs font-bold text-gray-500 uppercase tracking-wider">{inputLabel}</label>
           )}
@@ -77,21 +77,21 @@ export function TextEditorDrawer({
       )}
 
       {/* 1. Font Family & Size */}
-      <div className="space-y-3">
+      <div className="space-y-2">
         <label className="text-xs font-bold text-gray-500 uppercase tracking-wider">Tipografía</label>
         <div className="flex gap-3">
            <div className="flex-1">
              <FontPicker
                value={currentFont}
                onChange={(val) => onUpdate('fontFamily', val)}
-               className="w-full h-12 text-base px-4 justify-between"
+               className="w-full h-10 text-sm px-3 justify-between"
              />
            </div>
         </div>
       </div>
 
       {/* 2. Size Slider */}
-      <div className="space-y-3">
+      <div className="space-y-2">
         <div className="flex justify-between items-center">
           <label className="text-xs font-bold text-gray-500 uppercase tracking-wider">Tamaño</label>
           <span className="text-xs font-medium bg-gray-100 px-2 py-1 rounded text-gray-600">{currentSize}px</span>
@@ -99,7 +99,7 @@ export function TextEditorDrawer({
         <div className="flex items-center gap-4">
            <button
              onClick={() => onUpdate('size', Math.max(10, currentSize - 1))}
-             className="w-8 h-8 flex items-center justify-center rounded-full bg-gray-100 text-gray-600 hover:bg-gray-200"
+             className="w-7 h-7 flex items-center justify-center rounded-full bg-gray-100 text-gray-600 hover:bg-gray-200"
            >
              <Minus className="w-4 h-4" />
            </button>
@@ -113,7 +113,7 @@ export function TextEditorDrawer({
            />
            <button
              onClick={() => onUpdate('size', Math.min(100, currentSize + 1))}
-             className="w-8 h-8 flex items-center justify-center rounded-full bg-gray-100 text-gray-600 hover:bg-gray-200"
+             className="w-7 h-7 flex items-center justify-center rounded-full bg-gray-100 text-gray-600 hover:bg-gray-200"
            >
              <Plus className="w-4 h-4" />
            </button>
@@ -121,14 +121,14 @@ export function TextEditorDrawer({
       </div>
 
       {/* 3. Style Toggles (The "Canva" row) */}
-      <div className="space-y-3">
+      <div className="space-y-2">
          <label className="text-xs font-bold text-gray-500 uppercase tracking-wider">Estilo</label>
-         <div className="flex items-center justify-between gap-2 p-2 bg-gray-50 rounded-xl border border-gray-100">
+         <div className="flex items-center justify-between gap-2 p-1 bg-gray-50 rounded-xl border border-gray-100">
             {/* Bold */}
             <button
               onClick={() => onUpdate('bold', !currentStyle.bold)}
               className={cn(
-                "flex-1 h-10 rounded-lg flex items-center justify-center transition-all",
+                "flex-1 h-9 rounded-lg flex items-center justify-center transition-all",
                 currentStyle.bold ? "bg-black text-white shadow-sm" : "text-gray-600 hover:bg-gray-200"
               )}
             >
@@ -139,7 +139,7 @@ export function TextEditorDrawer({
             <button
               onClick={() => onUpdate('italic', !currentStyle.italic)}
               className={cn(
-                "flex-1 h-10 rounded-lg flex items-center justify-center transition-all",
+                "flex-1 h-9 rounded-lg flex items-center justify-center transition-all",
                 currentStyle.italic ? "bg-black text-white shadow-sm" : "text-gray-600 hover:bg-gray-200"
               )}
             >
@@ -150,7 +150,7 @@ export function TextEditorDrawer({
             <button
               onClick={() => onUpdate('uppercase', !isUppercase)}
               className={cn(
-                "flex-1 h-10 rounded-lg flex items-center justify-center transition-all",
+                "flex-1 h-9 rounded-lg flex items-center justify-center transition-all",
                 isUppercase ? "bg-black text-white shadow-sm" : "text-gray-600 hover:bg-gray-200"
               )}
             >
@@ -165,7 +165,7 @@ export function TextEditorDrawer({
                  key={align}
                  onClick={() => onUpdate('align', align)}
                  className={cn(
-                   "flex-1 h-10 rounded-lg flex items-center justify-center transition-all",
+                   "flex-1 h-9 rounded-lg flex items-center justify-center transition-all",
                    currentStyle.align === align ? "bg-white text-black shadow-sm ring-1 ring-gray-200" : "text-gray-400 hover:text-gray-600"
                  )}
                >
@@ -178,9 +178,9 @@ export function TextEditorDrawer({
       </div>
 
       {/* 4. Color */}
-      <div className="space-y-3">
+      <div className="space-y-2">
          <label className="text-xs font-bold text-gray-500 uppercase tracking-wider">Color</label>
-         <div className="flex gap-4 items-center p-3 bg-gray-50 rounded-xl border border-gray-100">
+         <div className="flex gap-4 items-center p-2 bg-gray-50 rounded-xl border border-gray-100">
             <ColorCircle
               color={currentColor}
               onChange={(c) => onUpdate('color', c)}

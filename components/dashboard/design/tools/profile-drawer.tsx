@@ -25,11 +25,11 @@ export function ProfileDrawer({
   const hasAvatar = !!config.profile.avatarUrl;
 
   return (
-    <div className="flex flex-col gap-6">
+    <div className="flex flex-col gap-3">
 
        {/* 1. Avatar Upload */}
-       <div className="flex items-center gap-4 p-4 bg-gray-50 rounded-xl border border-gray-100">
-           <div className="relative w-20 h-20 shrink-0">
+       <div className="flex items-center gap-4 p-3 bg-gray-50 rounded-xl border border-gray-100">
+           <div className="relative w-16 h-16 shrink-0">
                {hasAvatar ? (
                    <img
                      src={config.profile.avatarUrl}
@@ -69,13 +69,13 @@ export function ProfileDrawer({
        </div>
 
        {/* 2. Shape */}
-       <div className="space-y-3">
+       <div className="space-y-2">
           <label className="text-xs font-bold text-gray-500 uppercase tracking-wider">Forma</label>
           <div className="flex gap-2">
              <button
                 onClick={() => onUpdate(['profile', 'avatarShape'], 'circle')}
                 className={cn(
-                  "flex-1 h-12 rounded-xl flex items-center justify-center gap-2 transition-all border",
+                  "flex-1 h-10 rounded-xl flex items-center justify-center gap-2 transition-all border",
                   config.profile.avatarShape === 'circle'
                     ? "bg-black text-white border-black"
                     : "bg-white text-gray-600 border-gray-200 hover:bg-gray-50"
@@ -88,7 +88,7 @@ export function ProfileDrawer({
              <button
                 onClick={() => onUpdate(['profile', 'avatarShape'], 'square')}
                 className={cn(
-                  "flex-1 h-12 rounded-xl flex items-center justify-center gap-2 transition-all border",
+                  "flex-1 h-10 rounded-xl flex items-center justify-center gap-2 transition-all border",
                   (config.profile.avatarShape === 'square' || config.profile.avatarShape === 'rounded')
                     ? "bg-black text-white border-black"
                     : "bg-white text-gray-600 border-gray-200 hover:bg-gray-50"
@@ -101,9 +101,9 @@ export function ProfileDrawer({
        </div>
 
        {/* 3. Border */}
-       <div className="space-y-3">
+       <div className="space-y-2">
           <label className="text-xs font-bold text-gray-500 uppercase tracking-wider">Borde</label>
-          <div className="flex items-center gap-4 bg-gray-50 p-3 rounded-xl border border-gray-100">
+          <div className="flex items-center gap-4 bg-gray-50 p-2 rounded-xl border border-gray-100">
              <div className="flex-1 flex gap-3 items-center">
                 <ColorCircle
                   color={config.profile.avatarBorderColor || 'transparent'}

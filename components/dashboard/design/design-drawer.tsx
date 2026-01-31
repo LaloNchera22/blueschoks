@@ -36,16 +36,16 @@ export function DesignDrawer({
           className
         )}
       >
-        <div className="w-12 h-1.5 bg-gray-300 rounded-full mx-auto mt-2 mb-4" /> {/* Drag Handle Visual */}
+        <div className="w-12 h-1.5 bg-gray-300 rounded-full mx-auto mt-2 mb-2" /> {/* Drag Handle Visual */}
 
         {(title || description) && (
-          <SheetHeader className="px-6 mb-4 text-left">
-            {title && <SheetTitle className="text-xl font-bold">{title}</SheetTitle>}
+          <SheetHeader className="px-4 mb-2 text-left">
+            {title && <SheetTitle className="text-lg font-bold">{title}</SheetTitle>}
             {description && <SheetDescription>{description}</SheetDescription>}
           </SheetHeader>
         )}
 
-        <div className="px-6 pb-8 safe-area-bottom">
+        <div className="px-4 pb-4 safe-area-bottom">
           {children}
         </div>
       </SheetContent>
