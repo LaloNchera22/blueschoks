@@ -19,14 +19,17 @@ import {
 import { CSS } from '@dnd-kit/utilities';
 import { GripVertical, Trash2, ChevronDown, ChevronUp, Link as LinkIcon } from 'lucide-react';
 
-import { LinkItem } from '@/lib/types/design-system';
+import { LinkItem, SocialStyle } from '@/lib/types/design-system';
 import { PLATFORMS } from '../constants';
 import { ColorCircle } from '../color-circle';
+import { FontPicker } from '../font-picker';
 import { cn } from '@/lib/utils';
 
 interface SocialsDrawerProps {
   links: LinkItem[];
+  socialStyle?: SocialStyle;
   onUpdateLinks: (links: LinkItem[]) => void;
+  onUpdateStyle: (style: SocialStyle) => void;
 }
 
 // --- Sortable Item Component ---
@@ -82,7 +85,7 @@ function SortableSocialItem({ link, onUpdate, onDelete, isExpanded, onToggleExpa
            <Icon className="w-4 h-4 text-gray-700" />
         </div>
 
-        <span className="font-medium text-sm text-gray-700 flex-1">{platformDef?.label || link.platform}</span>
+        <span className="font-medium text-sm text-gray-700 flex-1">{link.label || platformDef?.label || link.platform}</span>
 
         <button
           onClick={onToggleExpand}
@@ -108,8 +111,20 @@ function SortableSocialItem({ link, onUpdate, onDelete, isExpanded, onToggleExpa
               />
            </div>
 
+           {/* Label Input (New) */}
+           <div className="space-y-1">
+              <label className="text-[10px] font-bold text-gray-400 uppercase tracking-wider">Etiqueta</label>
+              <input
+                type="text"
+                value={link.label}
+                onChange={(e) => onUpdate(link.id, { label: e.target.value })}
+                placeholder={platformDef?.label || "Nombre del enlace"}
+                className="w-full h-10 px-3 rounded-lg border border-gray-200 bg-gray-50 text-sm focus:outline-none focus:ring-2 focus:ring-black/5 transition-all"
+              />
+           </div>
+
            {/* Color & Actions */}
-           <div className="flex items-center justify-between">
+           <div className="flex items-center justify-between pt-2">
               <div className="flex flex-col gap-1">
                  <label className="text-[10px] font-bold text-gray-400 uppercase tracking-wider">Color de icono</label>
                  <ColorCircle
@@ -134,7 +149,7 @@ function SortableSocialItem({ link, onUpdate, onDelete, isExpanded, onToggleExpa
 }
 
 // --- Main Component ---
-export function SocialsDrawer({ links, onUpdateLinks }: SocialsDrawerProps) {
+export function SocialsDrawer({ links, socialStyle, onUpdateLinks, onUpdateStyle }: SocialsDrawerProps) {
   const [expandedId, setExpandedId] = useState<string | null>(null);
 
   const sensors = useSensors(
@@ -145,19 +160,8 @@ export function SocialsDrawer({ links, onUpdateLinks }: SocialsDrawerProps) {
   );
 
   const handleDragEnd = (event: DragEndEvent) => {
-    const { active, over } = event;
-    if (over && active.id !== over.id) {
-        // Need to import arrayMove from dnd-kit/sortable in parent or implement logic here.
-        // For simplicity, I'll assume arrayMove is available or manual logic.
-        // Actually, arrayMove is named export from @dnd-kit/sortable.
-        // Wait, I can't import arrayMove here because I didn't import it at the top.
-        // Let's rely on parent logic? No, onUpdateLinks expects full array.
-        // I need to import arrayMove.
-    }
+     // Handled inline in DndContext
   };
-
-  // Re-implementing arrayMove-like logic to avoid extra import lines if not present, but better to import.
-  // I'll add arrayMove to imports.
 
   const addLink = (platform: string) => {
     const platformDef = PLATFORMS.find(p => p.id === platform);
@@ -181,11 +185,43 @@ export function SocialsDrawer({ links, onUpdateLinks }: SocialsDrawerProps) {
     onUpdateLinks(links.filter(l => l.id !== id));
   };
 
-  // Filter out already added platforms? Or allow multiple? Usually one per platform is standard but multiple 'other' allowed.
-  // For now show all.
+  // Helper to update style
+  const updateStyle = (key: keyof SocialStyle, value: any) => {
+    onUpdateStyle({
+        ...socialStyle,
+        [key]: value
+    });
+  };
 
   return (
     <div className="flex flex-col gap-6">
+
+       {/* 0. Visual Styles (New) */}
+       <div className="space-y-3 pb-6 border-b border-gray-100">
+          <label className="text-xs font-bold text-gray-500 uppercase tracking-wider">Estilos Visuales</label>
+          <div className="grid grid-cols-2 gap-4">
+             {/* Button Background */}
+             <div className="space-y-1">
+                <label className="text-[10px] font-bold text-gray-400">Fondo Botones</label>
+                <ColorCircle color={socialStyle?.buttonColor || '#f9fafb'} onChange={(c) => updateStyle('buttonColor', c)} />
+             </div>
+             {/* Icon Color */}
+             <div className="space-y-1">
+                <label className="text-[10px] font-bold text-gray-400">Iconos Global</label>
+                <ColorCircle color={socialStyle?.iconColor || '#4b5563'} onChange={(c) => updateStyle('iconColor', c)} />
+             </div>
+              {/* Text Color */}
+             <div className="space-y-1">
+                <label className="text-[10px] font-bold text-gray-400">Texto</label>
+                <ColorCircle color={socialStyle?.textColor || '#6b7280'} onChange={(c) => updateStyle('textColor', c)} />
+             </div>
+              {/* Font */}
+             <div className="space-y-1 col-span-2">
+                <label className="text-[10px] font-bold text-gray-400">Tipografía</label>
+                <FontPicker value={socialStyle?.font || 'Inter'} onChange={(f) => updateStyle('font', f)} className="w-full" />
+             </div>
+          </div>
+       </div>
 
        {/* 1. Active List */}
        <div className="space-y-3">
@@ -199,7 +235,7 @@ export function SocialsDrawer({ links, onUpdateLinks }: SocialsDrawerProps) {
                 if (over && active.id !== over.id) {
                     const oldIndex = links.findIndex((item) => item.id === active.id);
                     const newIndex = links.findIndex((item) => item.id === over.id);
-                    // Minimal arrayMove implementation
+                    // Minimal arrayMove implementation manually to avoid import issues if package outdated
                     const newLinks = [...links];
                     const [movedItem] = newLinks.splice(oldIndex, 1);
                     newLinks.splice(newIndex, 0, movedItem);
@@ -233,9 +269,6 @@ export function SocialsDrawer({ links, onUpdateLinks }: SocialsDrawerProps) {
           <label className="text-xs font-bold text-gray-500 uppercase tracking-wider">Agregar Nueva</label>
           <div className="grid grid-cols-4 gap-2">
              {PLATFORMS.map((platform) => {
-                const isAdded = links.some(l => l.platform === platform.id && platform.id !== 'other' && platform.id !== 'website');
-                // Optional: Disable if added. But keeping enabled allows replacements or multiples if needed.
-
                 return (
                  <button
                    key={platform.id}

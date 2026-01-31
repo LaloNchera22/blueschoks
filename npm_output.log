@@ -14,9 +14,51 @@ This information is used to shape Next.js' roadmap and prioritize features.
 You can learn more, including how to opt-out if you'd not like to participate in this anonymous program, by visiting the following URL:
 https://nextjs.org/telemetry
 
-✓ Ready in 1160ms
-○ Compiling /test-design ...
- GET /test-design 200 in 8.1s (compile: 7.4s, render: 638ms)
-✓ Compiled in 95ms
- GET /test-design 200 in 356ms (compile: 101ms, render: 256ms)
-[?25h
+✓ Ready in 1895ms
+○ Compiling /test-socials ...
+⨯ Error: useCart debe usarse dentro de un CartProvider
+    at useCart (components/shop/cart-context.tsx:110:23)
+    at StoreClient (app/[slug]/store-client.tsx:49:32)
+  108 | export const useCart = () => {
+  109 |   const context = useContext(CartContext)
+> 110 |   if (!context) throw new Error("useCart debe usarse dentro de un CartProvider")
+      |                       ^
+  111 |   return context
+  112 | } {
+  digest: '2119602515'
+}
+ GET /test-socials 500 in 7.9s (compile: 7.2s, render: 628ms)
+⨯ Error: useCart debe usarse dentro de un CartProvider
+    at useCart (components/shop/cart-context.tsx:110:23)
+    at StoreClient (app/[slug]/store-client.tsx:49:32)
+  108 | export const useCart = () => {
+  109 |   const context = useContext(CartContext)
+> 110 |   if (!context) throw new Error("useCart debe usarse dentro de un CartProvider")
+      |                       ^
+  111 |   return context
+  112 | } {
+  digest: '2119602515'
+}
+ GET /test-socials 500 in 112ms (compile: 8ms, render: 104ms)
+ GET /test-socials 200 in 555ms (compile: 146ms, render: 409ms)
+TypeError: fetch failed
+    at ignore-listed frames {
+  [cause]: Error: getaddrinfo EAI_AGAIN via.placeholder.com
+      at ignore-listed frames {
+    errno: -3001,
+    code: 'EAI_AGAIN',
+    syscall: 'getaddrinfo',
+    hostname: 'via.placeholder.com'
+  }
+}
+TypeError: fetch failed
+    at ignore-listed frames {
+  [cause]: Error: getaddrinfo EAI_AGAIN via.placeholder.com
+      at ignore-listed frames {
+    errno: -3001,
+    code: 'EAI_AGAIN',
+    syscall: 'getaddrinfo',
+    hostname: 'via.placeholder.com'
+  }
+}
+✓ Compiled in 223ms
