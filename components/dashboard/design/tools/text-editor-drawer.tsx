@@ -25,13 +25,21 @@ interface TextEditorDrawerProps {
   onUpdate: (key: keyof TextStyle, value: any) => void;
   defaultFont: string;
   defaultColor: string;
+  textValue?: string;
+  onTextChange?: (value: string) => void;
+  inputType?: 'input' | 'textarea';
+  inputLabel?: string;
 }
 
 export function TextEditorDrawer({
   currentStyle,
   onUpdate,
   defaultFont,
-  defaultColor
+  defaultColor,
+  textValue,
+  onTextChange,
+  inputType = 'input',
+  inputLabel
 }: TextEditorDrawerProps) {
 
   const currentFont = currentStyle.fontFamily || defaultFont;
@@ -41,6 +49,32 @@ export function TextEditorDrawer({
 
   return (
     <div className="flex flex-col gap-6">
+
+      {/* 0. Text Content (Optional) */}
+      {onTextChange && (
+        <div className="space-y-3">
+          {inputLabel && (
+             <label className="text-xs font-bold text-gray-500 uppercase tracking-wider">{inputLabel}</label>
+          )}
+          {inputType === 'textarea' ? (
+             <textarea
+               value={textValue || ''}
+               onChange={(e) => onTextChange(e.target.value)}
+               className="w-full border border-gray-200 rounded-lg p-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/20 resize-none"
+               rows={3}
+               placeholder="Escribe tu mensaje..."
+             />
+          ) : (
+             <input
+               type="text"
+               value={textValue || ''}
+               onChange={(e) => onTextChange(e.target.value)}
+               className="w-full border border-gray-200 rounded-lg p-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/20"
+               placeholder="Escribe aquí..."
+             />
+          )}
+        </div>
+      )}
 
       {/* 1. Font Family & Size */}
       <div className="space-y-3">
