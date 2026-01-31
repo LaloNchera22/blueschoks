@@ -5,10 +5,29 @@
 ▲ Next.js 16.1.5 (Turbopack)
 - Local:         http://localhost:3000
 - Network:       http://192.168.0.2:3000
-- Environments: .env.local
 - Experiments (use with caution):
   · serverActions
 
 ✓ Starting...
-✓ Ready in 1118ms
- GET / 200 in 997ms (compile: 414ms, render: 583ms)
+Attention: Next.js now collects completely anonymous telemetry regarding usage.
+This information is used to shape Next.js' roadmap and prioritize features.
+You can learn more, including how to opt-out if you'd not like to participate in this anonymous program, by visiting the following URL:
+https://nextjs.org/telemetry
+
+✓ Ready in 1166ms
+○ Compiling /test-card-design ...
+ GET /test-card-design 200 in 12.8s (compile: 12.0s, render: 816ms)
+TypeError: fetch failed
+    at ignore-listed frames {
+  [cause]: Error: getaddrinfo EAI_AGAIN via.placeholder.com
+      at ignore-listed frames {
+    errno: -3001,
+    code: 'EAI_AGAIN',
+    syscall: 'getaddrinfo',
+    hostname: 'via.placeholder.com'
+  }
+}
+○ Compiling /_error ...
+ GET /_next/image?url=https%3A%2F%2Fvia.placeholder.com%2F300&w=640&q=75 500 in 4.2s (compile: 4.1s, render: 65ms)
+ GET /_next/image?url=https%3A%2F%2Fvia.placeholder.com%2F300&w=640&q=75 500 in 4.2s (compile: 4.1s, render: 65ms)
+✓ Compiled in 137ms

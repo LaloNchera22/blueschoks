@@ -20,18 +20,6 @@ const config: Config = {
       },
     },
     extend: {
-      colors: {
-        "primary": "#0d59f2",
-        "background-light": "#f5f6f8",
-        "background-dark": "#050a14",
-        "surface-dark": "#0f1623",
-      },
-      fontFamily: {
-        "display": ["var(--font-inter)", "sans-serif"]
-      },
-      backgroundImage: {
-        'hero-glow': 'radial-gradient(circle at 50% 0%, rgba(13, 89, 242, 0.25) 0%, rgba(5, 10, 20, 0) 70%)',
-      },
       keyframes: {
         "accordion-down": {
           from: { height: "0" },
