@@ -360,7 +360,9 @@ export default function DesignEditor({ initialConfig, initialProducts, userId, s
            return (
               <SocialsDrawer
                  links={config.socialLinks}
+                 socialStyle={config.socialStyle}
                  onUpdateLinks={(links) => updateConfig(['socialLinks'], links)}
+                 onUpdateStyle={(style) => updateConfig(['socialStyle'], style)}
               />
            );
         case 'profile-global':
@@ -585,6 +587,15 @@ export default function DesignEditor({ initialConfig, initialProducts, userId, s
                                        >
                                            <Icon size={20} strokeWidth={1.5} />
                                        </div>
+                                       <span
+                                          className="text-[10px] font-medium transition-colors"
+                                          style={{
+                                              color: config.socialStyle?.textColor || '#6b7280',
+                                              fontFamily: config.socialStyle?.font || config.fonts.body
+                                          }}
+                                       >
+                                          {link.label || platformDef?.label || link.platform}
+                                       </span>
                                    </div>
                                )
                            })}

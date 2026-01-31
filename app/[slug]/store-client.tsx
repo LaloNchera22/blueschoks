@@ -165,7 +165,7 @@ export default function StoreClient({ profile, products, config }: StoreClientPr
                                           fontFamily: config.socialStyle?.font || config.fonts.body
                                       }}
                                    >
-                                      {platformDef?.label || link.platform}
+                                      {link.label || platformDef?.label || link.platform}
                                    </span>
                                </Link>
                            )
