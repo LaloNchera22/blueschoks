@@ -2,7 +2,7 @@
 
 import { useState } from "react"
 import { useRouter } from "next/navigation"
-import { Button } from "@/components/ui/button"
+import { Link as LinkIcon } from "lucide-react"
 
 export function HeroUrlClaimer() {
   const [shopName, setShopName] = useState("")
@@ -18,33 +18,28 @@ export function HeroUrlClaimer() {
   return (
     <form
       onSubmit={handleSubmit}
-      className="w-full max-w-xl mx-auto flex flex-col sm:flex-row items-center gap-3 mt-8 lg:mt-4"
+      className="w-full max-w-md mx-auto"
     >
-      {/* Input Container estilo Linktree */}
-      <div className="relative flex-1 w-full group">
-        <div className="flex w-full items-center rounded-lg border-2 border-slate-200 bg-white px-4 h-14 lg:h-12 transition-all focus-within:border-black focus-within:shadow-md">
-          <span className="text-slate-400 font-medium shrink-0 select-none mr-1">
-            blueshocks.com/
-          </span>
-          <input
-            type="text"
-            value={shopName}
-            onChange={(e) => setShopName(e.target.value.replace(/\s+/g, '').toLowerCase())}
-            placeholder="tu-marca"
-            className="flex-1 border-0 bg-transparent p-0 text-lg font-bold text-slate-900 placeholder:text-slate-300 focus:ring-0 focus:outline-none w-full"
-            autoCorrect="off"
-            autoCapitalize="none"
-          />
+      <div className="w-full p-1 rounded-xl bg-white/5 border border-white/10 backdrop-blur-md shadow-xl flex items-center group focus-within:border-primary/50 transition-colors">
+        <div className="pl-4 text-slate-500 group-focus-within:text-primary transition-colors">
+          <LinkIcon className="w-5 h-5" />
         </div>
+        <input
+          type="text"
+          value={shopName}
+          onChange={(e) => setShopName(e.target.value.replace(/\s+/g, '').toLowerCase())}
+          placeholder="tunombre.store/..."
+          className="w-full bg-transparent border-0 focus:ring-0 text-white placeholder-slate-500 text-sm py-3 px-3 outline-none"
+          autoCorrect="off"
+          autoCapitalize="none"
+        />
+        <button
+          type="submit"
+          className="bg-primary hover:bg-blue-600 text-white text-sm font-bold px-4 py-2.5 rounded-lg shadow-[0_0_15px_rgba(13,89,242,0.4)] transition-all whitespace-nowrap"
+        >
+          Crear
+        </button>
       </div>
-
-      {/* Botón Principal (Desktop & Mobile) */}
-      <Button
-        type="submit"
-        className="h-14 lg:h-12 px-8 rounded-lg font-bold text-lg bg-slate-900 text-white hover:bg-slate-800 shadow-xl shadow-slate-200 hover:scale-[1.02] transition-all w-full sm:w-auto shrink-0"
-      >
-        Empezar Gratis
-      </Button>
     </form>
   )
 }

@@ -34,6 +34,15 @@ const config: Config = {
         "accordion-down": "accordion-down 0.2s ease-out",
         "accordion-up": "accordion-up 0.2s ease-out",
       },
+      colors: {
+        "primary": "#0d59f2",
+        "background-light": "#f5f6f8",
+        "background-dark": "#050a14",
+        "surface-dark": "#0f1623",
+      },
+      backgroundImage: {
+        'hero-glow': 'radial-gradient(circle at 50% 0%, rgba(13, 89, 242, 0.25) 0%, rgba(5, 10, 20, 0) 70%)',
+      }
     },
   },
   plugins: [tailwindcssAnimate],

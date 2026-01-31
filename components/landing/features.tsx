@@ -1,39 +1,57 @@
+import { BarChart3, CreditCard, Boxes, Globe } from "lucide-react"
+
 export function Features() {
   return (
-    <section className="w-full px-4 pb-20 lg:pb-0">
-      <div className="grid md:grid-cols-3 lg:grid-cols-3 gap-4 lg:gap-8 w-full text-left max-w-5xl mx-auto">
-          {/* Card 1 */}
-          <div className="group border border-slate-100 rounded-xl p-4 lg:p-4 bg-white shadow-[0_2px_10px_-3px_rgba(0,0,0,0.05)] hover:shadow-lg transition-all hover:-translate-y-1 flex flex-col justify-center">
-              <div className="flex items-center gap-3 mb-2">
-                  <div className="w-8 h-8 lg:w-8 lg:h-8 bg-blue-50 rounded-lg flex items-center justify-center text-blue-600 shrink-0">
-                      <svg className="w-4 h-4 lg:w-5 lg:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>
-                  </div>
-                  <h3 className="font-bold text-base lg:text-base text-slate-900">Súper Rápido</h3>
-              </div>
-              <p className="text-sm lg:text-sm text-slate-500 leading-snug">Sube productos desde tu celular en segundos. Optimizado para velocidad.</p>
+    <section className="px-4 pb-20 w-full max-w-5xl mx-auto">
+      <h2 className="text-2xl font-bold text-white mb-8 text-center">Todo lo que necesitas</h2>
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+        {/* Panel de Analíticas */}
+        <div className="group relative p-6 rounded-2xl bg-surface-dark border border-white/5 hover:border-primary/50 transition-colors overflow-hidden shadow-lg">
+          <div className="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity">
+            <BarChart3 className="w-16 h-16 text-primary" />
           </div>
+          <div className="flex items-center justify-center w-10 h-10 rounded-lg bg-primary/10 text-primary mb-4">
+            <BarChart3 className="w-6 h-6" />
+          </div>
+          <h3 className="text-base font-bold text-white mb-2">Panel de Analíticas</h3>
+          <p className="text-slate-400 text-sm">Rastrea visitas, ventas y productos top en tiempo real.</p>
+        </div>
 
-          {/* Card 2 */}
-          <div className="group border border-slate-100 rounded-xl p-4 lg:p-4 bg-white shadow-[0_2px_10px_-3px_rgba(0,0,0,0.05)] hover:shadow-lg transition-all hover:-translate-y-1 flex flex-col justify-center">
-              <div className="flex items-center gap-3 mb-2">
-                  <div className="w-8 h-8 lg:w-8 lg:h-8 bg-purple-50 rounded-lg flex items-center justify-center text-purple-600 shrink-0">
-                      <svg className="w-4 h-4 lg:w-5 lg:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"></path></svg>
-                  </div>
-                  <h3 className="font-bold text-base lg:text-base text-slate-900">Sin Comisiones</h3>
-              </div>
-              <p className="text-sm lg:text-sm text-slate-500 leading-snug">Tus ganancias son 100% tuyas. No cobramos comisiones ocultas.</p>
+        {/* Pagos Fáciles */}
+        <div className="group relative p-6 rounded-2xl bg-surface-dark border border-white/5 hover:border-primary/50 transition-colors overflow-hidden shadow-lg">
+          <div className="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity">
+            <CreditCard className="w-16 h-16 text-primary" />
           </div>
+          <div className="flex items-center justify-center w-10 h-10 rounded-lg bg-primary/10 text-primary mb-4">
+            <CreditCard className="w-6 h-6" />
+          </div>
+          <h3 className="text-base font-bold text-white mb-2">Pagos Fáciles</h3>
+          <p className="text-slate-400 text-sm">Acepta tarjetas, transferencias y pagos locales al instante.</p>
+        </div>
 
-          {/* Card 3 */}
-          <div className="group border border-slate-100 rounded-xl p-4 lg:p-4 bg-white shadow-[0_2px_10px_-3px_rgba(0,0,0,0.05)] hover:shadow-lg transition-all hover:-translate-y-1 flex flex-col justify-center">
-              <div className="flex items-center gap-3 mb-2">
-                  <div className="w-8 h-8 lg:w-8 lg:h-8 bg-green-50 rounded-lg flex items-center justify-center text-green-600 shrink-0">
-                      <svg className="w-4 h-4 lg:w-5 lg:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"></path></svg>
-                  </div>
-                  <h3 className="font-bold text-base lg:text-base text-slate-900">Pagos Flexibles</h3>
-              </div>
-              <p className="text-sm lg:text-sm text-slate-500 leading-snug">Acuerda el pago directo con tu cliente vía WhatsApp o efectivo.</p>
+        {/* Inventario Inteligente */}
+        <div className="group relative p-6 rounded-2xl bg-surface-dark border border-white/5 hover:border-primary/50 transition-colors overflow-hidden shadow-lg">
+          <div className="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity">
+            <Boxes className="w-16 h-16 text-primary" />
           </div>
+          <div className="flex items-center justify-center w-10 h-10 rounded-lg bg-primary/10 text-primary mb-4">
+            <Boxes className="w-6 h-6" />
+          </div>
+          <h3 className="text-base font-bold text-white mb-2">Inventario Inteligente</h3>
+          <p className="text-slate-400 text-sm">Actualización automática de stock con cada pedido.</p>
+        </div>
+
+        {/* Dominio Personalizado */}
+        <div className="group relative p-6 rounded-2xl bg-surface-dark border border-white/5 hover:border-primary/50 transition-colors overflow-hidden shadow-lg">
+          <div className="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity">
+            <Globe className="w-16 h-16 text-primary" />
+          </div>
+          <div className="flex items-center justify-center w-10 h-10 rounded-lg bg-primary/10 text-primary mb-4">
+            <Globe className="w-6 h-6" />
+          </div>
+          <h3 className="text-base font-bold text-white mb-2">Dominio Personalizado</h3>
+          <p className="text-slate-400 text-sm">Conecta tu propio dominio para un look profesional.</p>
+        </div>
       </div>
     </section>
   )

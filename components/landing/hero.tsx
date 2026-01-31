@@ -2,34 +2,31 @@ import { HeroUrlClaimer } from "@/components/hero-url-claimer"
 
 export function Hero() {
   return (
-    <section className="w-full flex flex-col items-center justify-center px-4 text-center py-20 lg:py-0">
-      <div className="flex flex-col items-center w-full max-w-4xl mx-auto">
-
+    <section className="relative px-4 py-32 flex flex-col items-center text-center overflow-hidden w-full bg-background-dark">
+      <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[150%] h-[500px] bg-hero-glow pointer-events-none opacity-80"></div>
+      <div className="relative z-10 flex flex-col gap-6 items-center w-full max-w-4xl mx-auto">
         {/* Badge */}
-        <div className="inline-flex items-center gap-2 bg-slate-100 border border-slate-200 text-slate-600 px-4 py-1.5 rounded-full text-[10px] sm:text-xs font-bold uppercase tracking-wide mb-8 lg:mb-4 shadow-sm">
-          <span>✨ La nueva forma de vender online</span>
+        <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full border border-primary/30 bg-primary/10 backdrop-blur-sm">
+            <span className="relative flex h-2 w-2">
+                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-primary opacity-75"></span>
+                <span className="relative inline-flex rounded-full h-2 w-2 bg-primary"></span>
+            </span>
+            <span className="text-xs font-medium text-blue-400">v2.0 ya está aquí</span>
         </div>
 
-        {/* Título Principal */}
-        <h1 className="text-4xl md:text-6xl lg:text-4xl font-black tracking-tighter text-[#0F172A] mb-6 lg:mb-4 leading-[1.1]">
-          Tu Tienda Online <br />
-          En 30 Segundos.
+        <h1 className="text-4xl sm:text-5xl md:text-6xl font-black leading-[1.1] tracking-tight text-transparent bg-clip-text bg-gradient-to-b from-white to-white/60">
+            Lanza tu tienda de WhatsApp en <span className="text-primary">30 Segundos</span>.
         </h1>
-
-        {/* Subtítulo */}
-        <p className="text-lg text-slate-500 max-w-xl mb-10 lg:mb-4 leading-relaxed mx-auto font-medium">
-          Crea tu catálogo digital, comparte el link y recibe pedidos directamente en tu WhatsApp. Sin comisiones.
+        <p className="text-slate-400 text-base sm:text-lg leading-relaxed max-w-xl mx-auto">
+            Sin código. Únete a más de 10,000 emprendedores modernos que venden más rápido que nunca.
         </p>
 
         {/* Input Component */}
-        <div className="w-full mb-2">
+        <div className="w-full mt-4">
             <HeroUrlClaimer />
         </div>
 
-        <p className="text-xs text-slate-400 mt-3 font-medium mb-10 lg:mb-0">
-          Prueba gratis. No se requiere tarjeta de crédito.
-        </p>
-
+        <p className="text-xs text-slate-500 mt-2">Prueba gratis de 14 días • Sin tarjeta de crédito</p>
       </div>
     </section>
   )
