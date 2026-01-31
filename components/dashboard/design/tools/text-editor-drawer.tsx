@@ -146,28 +146,15 @@ export function TextEditorDrawer({
       {/* 4. Color */}
       <div className="space-y-3">
          <label className="text-xs font-bold text-gray-500 uppercase tracking-wider">Color</label>
-         <div className="flex gap-3 overflow-x-auto pb-2 scrollbar-hide">
-            {/* Current Selection Indicator */}
-            <div className="shrink-0">
-               <ColorCircle
-                 color={currentColor}
-                 onChange={(c) => onUpdate('color', c)}
-                 size="lg"
-               />
-            </div>
-
-            {/* Presets (Common Colors) */}
-            {['#000000', '#ffffff', '#333333', '#EF4444', '#F97316', '#F59E0B', '#10B981', '#3B82F6', '#6366F1', '#8B5CF6', '#EC4899'].map((preset) => (
-               <button
-                 key={preset}
-                 onClick={() => onUpdate('color', preset)}
-                 className={cn(
-                   "w-10 h-10 rounded-full border border-gray-200 shrink-0",
-                   currentColor === preset && "ring-2 ring-blue-500 ring-offset-2"
-                 )}
-                 style={{ backgroundColor: preset }}
-               />
-            ))}
+         <div className="flex gap-4 items-center p-3 bg-gray-50 rounded-xl border border-gray-100">
+            <ColorCircle
+              color={currentColor}
+              onChange={(c) => onUpdate('color', c)}
+              size="lg"
+            />
+            <span className="text-sm text-gray-600 font-medium">
+               Selecciona un color
+            </span>
          </div>
       </div>
 
