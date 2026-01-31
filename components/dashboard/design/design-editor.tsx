@@ -322,6 +322,10 @@ export default function DesignEditor({ initialConfig, initialProducts, userId, s
                  onUpdate={(key, val) => updateConfig(['profile', 'titleStyle', key], val)}
                  defaultFont={config.fonts.heading}
                  defaultColor={config.colors.text}
+                 textValue={config.profile.shopName}
+                 onTextChange={(val) => updateConfig(['profile', 'shopName'], val)}
+                 inputType="input"
+                 inputLabel="Título"
               />
            );
         case 'header-bio':
@@ -331,6 +335,10 @@ export default function DesignEditor({ initialConfig, initialProducts, userId, s
                  onUpdate={(key, val) => updateConfig(['profile', 'bioStyle', key], val)}
                  defaultFont={config.fonts.body}
                  defaultColor={config.colors.text}
+                 textValue={config.profile.bio}
+                 onTextChange={(val) => updateConfig(['profile', 'bio'], val)}
+                 inputType="textarea"
+                 inputLabel="Mensaje de Bienvenida"
               />
            );
         case 'background':
