@@ -1,23 +1,19 @@
-import { NavbarV2 } from "@/components/landing/v2/navbar-v2"
-import { HeroV2 } from "@/components/landing/v2/hero-v2"
-import { TrustSection } from "@/components/landing/v2/trust-section"
-import { HowItWorksSection } from "@/components/landing/v2/how-it-works-section"
-import { FeaturesSection } from "@/components/landing/v2/features-section"
-import { AppPreviewSection } from "@/components/landing/v2/app-preview-section"
-import { FooterActionBar } from "@/components/landing/v2/footer-action-bar"
+import { Navbar } from "@/components/landing/navbar"
+import { Hero } from "@/components/landing/hero"
+import { Features } from "@/components/landing/features"
+import { Footer } from "@/components/landing/footer"
 
 export default function LandingPage() {
   return (
-    <div className="min-h-screen bg-background-dark text-white font-display antialiased overflow-x-hidden selection:bg-primary/30">
-      <NavbarV2 />
-      <main className="relative flex flex-col w-full max-w-lg mx-auto min-h-screen bg-background-dark pt-0">
-        <HeroV2 />
-        <TrustSection />
-        <HowItWorksSection />
-        <FeaturesSection />
-        <AppPreviewSection />
+    <div className="min-h-screen flex flex-col bg-white font-sans text-slate-900 selection:bg-blue-100 overflow-x-hidden lg:h-screen lg:overflow-hidden">
+      <Navbar />
+      <main className="flex-1 w-full flex flex-col items-center lg:justify-evenly">
+        <Hero />
+        <div className="w-full">
+          <Features />
+        </div>
       </main>
-      <FooterActionBar />
+      <Footer />
     </div>
   )
 }
