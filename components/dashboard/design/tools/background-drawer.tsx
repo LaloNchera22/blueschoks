@@ -48,7 +48,7 @@ export function BackgroundDrawer({
              <div className="p-4 bg-gray-50 border-t border-gray-100 animate-in slide-in-from-top-2 duration-200">
                 <label
                    htmlFor="background-color-picker"
-                   className="flex gap-4 items-center p-3 bg-white rounded-xl border border-gray-200 shadow-sm cursor-pointer hover:bg-gray-50 transition-colors"
+                   className="w-full flex gap-4 items-center p-3 bg-white rounded-xl border border-gray-200 shadow-sm cursor-pointer hover:bg-gray-50 transition-colors"
                 >
                    <ColorCircle
                      id="background-color-picker"

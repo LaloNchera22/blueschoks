@@ -488,6 +488,12 @@ export default function DesignEditor({ initialConfig, initialProducts, userId, s
          onClose={() => setActiveTool(null)}
          title={getDrawerTitle()}
          className={cn(activeTool === 'product-individual' && "h-[70vh]")}
+         onOpenAutoFocus={(e) => {
+            // Fix: Prevent auto-opening color picker in Socials menu
+            if (activeTool === 'social-global') {
+               e.preventDefault();
+            }
+         }}
       >
          {renderDrawerContent()}
       </DesignDrawer>

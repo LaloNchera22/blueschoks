@@ -2,7 +2,7 @@
 > blueshock@0.1.0 dev
 > next dev
 
-▲ Next.js 16.1.5 (Turbopack)
+▲ Next.js 16.1.6 (Turbopack)
 - Local:         http://localhost:3000
 - Network:       http://192.168.0.2:3000
 - Experiments (use with caution):
@@ -14,8 +14,7 @@ This information is used to shape Next.js' roadmap and prioritize features.
 You can learn more, including how to opt-out if you'd not like to participate in this anonymous program, by visiting the following URL:
 https://nextjs.org/telemetry
 
-✓ Ready in 1168ms
-○ Compiling /test-color-picker ...
- GET /test-color-picker 200 in 4.1s (compile: 3.7s, render: 361ms)
- GET /test-color-picker 200 in 66ms (compile: 6ms, render: 61ms)
-✓ Compiled in 110ms
+✓ Ready in 1209ms
+○ Compiling /test-background-drawer ...
+ GET /test-background-drawer 200 in 6.2s (compile: 5.8s, render: 446ms)
+ GET /test-background-drawer 200 in 153ms (compile: 12ms, render: 141ms)

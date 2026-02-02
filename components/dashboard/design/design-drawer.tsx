@@ -17,6 +17,7 @@ interface DesignDrawerProps {
   description?: string;
   children: React.ReactNode;
   className?: string;
+  onOpenAutoFocus?: (event: Event) => void;
 }
 
 export function DesignDrawer({
@@ -25,7 +26,8 @@ export function DesignDrawer({
   title,
   description,
   children,
-  className
+  className,
+  onOpenAutoFocus
 }: DesignDrawerProps) {
   return (
     <Sheet open={isOpen} onOpenChange={(open) => !open && onClose()}>
@@ -35,6 +37,7 @@ export function DesignDrawer({
           "max-h-[85vh] overflow-y-auto rounded-t-[20px] px-0 pb-0",
           className
         )}
+        onOpenAutoFocus={onOpenAutoFocus}
       >
         <div className="w-12 h-1.5 bg-gray-300 rounded-full mx-auto mt-2 mb-2" /> {/* Drag Handle Visual */}
 
