@@ -77,7 +77,7 @@ export default function StoreClient({ profile, products, config }: StoreClientPr
   const socialLinks = Array.isArray(config?.socialLinks) ? config.socialLinks.filter(l => l.active) : []
 
   return (
-    <div className="min-h-screen w-full flex justify-center items-center relative" style={{ backgroundColor: bgColor, color: textColor }}>
+    <div className="h-[100dvh] w-full flex justify-center items-center relative overflow-hidden" style={{ backgroundColor: bgColor, color: textColor }}>
       <FontLoaderListener config={config} products={products} />
 
       {/* Background Image Layer */}
@@ -95,7 +95,7 @@ export default function StoreClient({ profile, products, config }: StoreClientPr
       )}
 
       {/* CONTENEDOR PRINCIPAL: Sin bordes blancos, sin bg-white fijo */}
-      <div className="w-full max-w-[430px] min-h-screen relative z-10 flex flex-col shadow-2xl overflow-hidden">
+      <div className="w-full max-w-[430px] h-full relative z-10 flex flex-col shadow-2xl overflow-y-auto overflow-x-hidden">
           {/*
             Header Sticky Bar
             Contains: Small Logo (optional), Cart Trigger

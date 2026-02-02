@@ -222,7 +222,7 @@ function RegisterForm() {
 
 export default function RegisterPage() {
   return (
-    <div className="w-full h-screen grid lg:grid-cols-2 overflow-hidden">
+    <div className="w-full h-full grid lg:grid-cols-2 overflow-hidden">
       
       {/* Columna Izquierda: Formulario (Ahora más compacto) */}
       <div className="flex flex-col h-full bg-white p-4 lg:p-6 relative overflow-y-auto items-center justify-center">
