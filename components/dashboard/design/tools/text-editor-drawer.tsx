@@ -63,6 +63,7 @@ export function TextEditorDrawer({
                className="w-full border border-gray-200 rounded-lg p-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/20 resize-none"
                rows={3}
                placeholder="Escribe tu mensaje..."
+               autoFocus={false}
              />
           ) : (
              <input
@@ -71,6 +72,7 @@ export function TextEditorDrawer({
                onChange={(e) => onTextChange(e.target.value)}
                className="w-full border border-gray-200 rounded-lg p-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/20"
                placeholder="Escribe aquí..."
+               autoFocus={false}
              />
           )}
         </div>
