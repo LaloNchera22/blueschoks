@@ -97,36 +97,36 @@ function SortableSocialItem({ link, onUpdate, onDelete, isExpanded, onToggleExpa
 
       {/* Expanded Content */}
       {isExpanded && (
-        <div className="p-4 border-t border-gray-100 bg-white space-y-4 animate-in slide-in-from-top-2 duration-200">
+        <div className="p-3 border-t border-gray-100 bg-white space-y-4 animate-in slide-in-from-top-2 duration-200">
 
            {/* URL Input */}
            <div className="space-y-1">
-              <label className="text-[10px] font-bold text-gray-400 uppercase tracking-wider">Enlace</label>
+              <label className="text-sm font-bold text-gray-400 uppercase tracking-wider">Enlace</label>
               <input
                 type="text"
                 value={link.url}
                 onChange={(e) => onUpdate(link.id, { url: e.target.value })}
                 placeholder={platformDef?.placeholder || "https://..."}
-                className="w-full h-10 px-3 rounded-lg border border-gray-200 bg-gray-50 text-sm focus:outline-none focus:ring-2 focus:ring-black/5 transition-all"
+                className="w-full h-8 px-3 rounded-lg border border-gray-200 bg-gray-50 text-sm focus:outline-none focus:ring-2 focus:ring-black/5 transition-all"
               />
            </div>
 
            {/* Label Input (New) */}
            <div className="space-y-1">
-              <label className="text-[10px] font-bold text-gray-400 uppercase tracking-wider">Etiqueta</label>
+              <label className="text-sm font-bold text-gray-400 uppercase tracking-wider">Etiqueta</label>
               <input
                 type="text"
                 value={link.label}
                 onChange={(e) => onUpdate(link.id, { label: e.target.value })}
                 placeholder={platformDef?.label || "Nombre del enlace"}
-                className="w-full h-10 px-3 rounded-lg border border-gray-200 bg-gray-50 text-sm focus:outline-none focus:ring-2 focus:ring-black/5 transition-all"
+                className="w-full h-8 px-3 rounded-lg border border-gray-200 bg-gray-50 text-sm focus:outline-none focus:ring-2 focus:ring-black/5 transition-all"
               />
            </div>
 
            {/* Color & Actions */}
            <div className="flex items-center justify-between pt-2">
               <div className="flex flex-col gap-1">
-                 <label className="text-[10px] font-bold text-gray-400 uppercase tracking-wider">Color de icono</label>
+                 <label className="text-sm font-bold text-gray-400 uppercase tracking-wider">Color</label>
                  <ColorCircle
                    color={link.color || '#000000'}
                    onChange={(c) => onUpdate(link.id, { color: c })}
@@ -199,27 +199,29 @@ export function SocialsDrawer({ links, socialStyle, onUpdateLinks, onUpdateStyle
        {/* 0. Visual Styles (New) */}
        <div className="space-y-3 pb-6 border-b border-gray-100">
           <label className="text-xs font-bold text-gray-500 uppercase tracking-wider">Estilos Visuales</label>
-          <div className="grid grid-cols-2 gap-4">
+
+          <div className="flex flex-row gap-4 items-end">
              {/* Button Background */}
-             <div className="space-y-1">
-                <label className="text-[10px] font-bold text-gray-400">Fondo Botones</label>
+             <div className="space-y-1 flex-1">
+                <label className="text-sm font-bold text-gray-400">Fondo</label>
                 <ColorCircle color={socialStyle?.buttonColor || '#f9fafb'} onChange={(c) => updateStyle('buttonColor', c)} />
              </div>
              {/* Icon Color */}
-             <div className="space-y-1">
-                <label className="text-[10px] font-bold text-gray-400">Iconos Global</label>
+             <div className="space-y-1 flex-1">
+                <label className="text-sm font-bold text-gray-400">Icono</label>
                 <ColorCircle color={socialStyle?.iconColor || '#4b5563'} onChange={(c) => updateStyle('iconColor', c)} />
              </div>
               {/* Text Color */}
-             <div className="space-y-1">
-                <label className="text-[10px] font-bold text-gray-400">Texto</label>
+             <div className="space-y-1 flex-1">
+                <label className="text-sm font-bold text-gray-400">Texto</label>
                 <ColorCircle color={socialStyle?.textColor || '#6b7280'} onChange={(c) => updateStyle('textColor', c)} />
              </div>
-              {/* Font */}
-             <div className="space-y-1 col-span-2">
-                <label className="text-[10px] font-bold text-gray-400">Tipografía</label>
-                <FontPicker value={socialStyle?.font || 'Inter'} onChange={(f) => updateStyle('font', f)} className="w-full" />
-             </div>
+          </div>
+
+          {/* Font */}
+          <div className="space-y-1">
+            <label className="text-sm font-bold text-gray-400">Tipografía</label>
+            <FontPicker value={socialStyle?.font || 'Inter'} onChange={(f) => updateStyle('font', f)} className="w-full" />
           </div>
        </div>
 

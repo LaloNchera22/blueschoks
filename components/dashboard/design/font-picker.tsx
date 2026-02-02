@@ -110,7 +110,7 @@ export function FontPicker({ value, onChange, className }: FontPickerProps) {
             </div>
           </div>
 
-          <div className="overflow-y-auto max-h-[300px] p-1 custom-scrollbar">
+          <div className="overflow-y-auto max-h-60 p-1 custom-scrollbar">
              {filteredFonts.length === 0 ? (
                 <div className="p-4 text-center text-xs text-gray-400">
                    No se encontraron fuentes
