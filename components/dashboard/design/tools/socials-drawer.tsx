@@ -17,7 +17,7 @@ import {
   useSortable
 } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
-import { GripVertical, Trash2, ChevronDown, ChevronUp, Link as LinkIcon } from 'lucide-react';
+import { GripVertical, Trash2, ChevronDown, ChevronUp, Link as LinkIcon, ChevronRight } from 'lucide-react';
 
 import { LinkItem, SocialStyle } from '@/lib/types/design-system';
 import { PLATFORMS } from '../constants';
@@ -151,6 +151,7 @@ function SortableSocialItem({ link, onUpdate, onDelete, isExpanded, onToggleExpa
 // --- Main Component ---
 export function SocialsDrawer({ links, socialStyle, onUpdateLinks, onUpdateStyle }: SocialsDrawerProps) {
   const [expandedId, setExpandedId] = useState<string | null>(null);
+  const [showVisualStyles, setShowVisualStyles] = useState(false);
 
   const sensors = useSensors(
     useSensor(PointerSensor),
@@ -197,32 +198,44 @@ export function SocialsDrawer({ links, socialStyle, onUpdateLinks, onUpdateStyle
     <div className="flex flex-col gap-6">
 
        {/* 0. Visual Styles (New) */}
-       <div className="space-y-3 pb-6 border-b border-gray-100">
-          <label className="text-xs font-bold text-gray-500 uppercase tracking-wider">Estilos Visuales</label>
+       <div className="border border-gray-200 rounded-xl overflow-hidden bg-white shadow-sm transition-all duration-200">
+          <button
+            onClick={() => setShowVisualStyles(!showVisualStyles)}
+            className="w-full p-4 flex items-center justify-between hover:bg-gray-50 active:bg-gray-100 transition-colors"
+          >
+             <div className="flex items-center gap-3">
+               <span className="font-semibold text-sm text-gray-900">Estilos Visuales</span>
+             </div>
+             {showVisualStyles ? <ChevronDown className="w-5 h-5 text-gray-400" /> : <ChevronRight className="w-5 h-5 text-gray-400" />}
+          </button>
 
-          <div className="flex flex-row gap-4 items-end">
-             {/* Button Background */}
-             <div className="space-y-1 flex-1">
-                <label className="text-sm font-bold text-gray-400">Fondo</label>
-                <ColorCircle color={socialStyle?.buttonColor || '#f9fafb'} onChange={(c) => updateStyle('buttonColor', c)} />
-             </div>
-             {/* Icon Color */}
-             <div className="space-y-1 flex-1">
-                <label className="text-sm font-bold text-gray-400">Icono</label>
-                <ColorCircle color={socialStyle?.iconColor || '#4b5563'} onChange={(c) => updateStyle('iconColor', c)} />
-             </div>
-              {/* Text Color */}
-             <div className="space-y-1 flex-1">
-                <label className="text-sm font-bold text-gray-400">Texto</label>
-                <ColorCircle color={socialStyle?.textColor || '#6b7280'} onChange={(c) => updateStyle('textColor', c)} />
-             </div>
-          </div>
+          {showVisualStyles && (
+             <div className="p-4 bg-gray-50 border-t border-gray-100 space-y-4 animate-in slide-in-from-top-2 duration-200">
+                <div className="flex flex-row gap-4 items-end">
+                   {/* Button Background */}
+                   <div className="space-y-1 flex-1">
+                      <label className="text-sm font-bold text-gray-400">Fondo</label>
+                      <ColorCircle color={socialStyle?.buttonColor || '#f9fafb'} onChange={(c) => updateStyle('buttonColor', c)} />
+                   </div>
+                   {/* Icon Color */}
+                   <div className="space-y-1 flex-1">
+                      <label className="text-sm font-bold text-gray-400">Icono</label>
+                      <ColorCircle color={socialStyle?.iconColor || '#4b5563'} onChange={(c) => updateStyle('iconColor', c)} />
+                   </div>
+                    {/* Text Color */}
+                   <div className="space-y-1 flex-1">
+                      <label className="text-sm font-bold text-gray-400">Texto</label>
+                      <ColorCircle color={socialStyle?.textColor || '#6b7280'} onChange={(c) => updateStyle('textColor', c)} />
+                   </div>
+                </div>
 
-          {/* Font */}
-          <div className="space-y-1">
-            <label className="text-sm font-bold text-gray-400">Tipografía</label>
-            <FontPicker value={socialStyle?.font || 'Inter'} onChange={(f) => updateStyle('font', f)} className="w-full" />
-          </div>
+                {/* Font */}
+                <div className="space-y-1">
+                  <label className="text-sm font-bold text-gray-400">Tipografía</label>
+                  <FontPicker value={socialStyle?.font || 'Inter'} onChange={(f) => updateStyle('font', f)} className="w-full" />
+                </div>
+             </div>
+          )}
        </div>
 
        {/* 1. Active List */}
