@@ -57,6 +57,11 @@
   .text-stroke {
     -webkit-text-stroke: 1px white;
   }
+
+  /* PREVENT INPUT ZOOM ON MOBILE */
+  input, textarea, select {
+    font-size: 16px !important;
+  }
 }
 
 :root {
@@ -134,5 +139,13 @@
   }
   body {
     @apply bg-background text-foreground;
+  }
+
+  /* GLOBAL BODY LOCK - PREVENT DOUBLE SCROLL */
+  html, body {
+    height: 100dvh;
+    overflow: hidden;
+    position: fixed;
+    width: 100%;
   }
 }

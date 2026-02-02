@@ -34,10 +34,10 @@ export default function LoginPage() {
 
   return (
     // Layout Grid: Full height, no scroll, split screen on MD+
-    <div className="w-full h-screen overflow-hidden grid md:grid-cols-2 font-sans bg-white">
+    <div className="w-full h-full overflow-hidden grid md:grid-cols-2 font-sans bg-white">
       
       {/* --- COLUMNA IZQUIERDA: FORMULARIO --- */}
-      <div className="flex flex-col justify-center items-center px-6 relative bg-white h-full">
+      <div className="flex flex-col justify-center items-center px-6 relative bg-white h-full overflow-y-auto">
         
         {/* Botón Volver */}
         <div className="absolute top-4 left-4">

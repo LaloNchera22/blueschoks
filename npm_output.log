@@ -14,7 +14,7 @@ This information is used to shape Next.js' roadmap and prioritize features.
 You can learn more, including how to opt-out if you'd not like to participate in this anonymous program, by visiting the following URL:
 https://nextjs.org/telemetry
 
-✓ Ready in 1209ms
-○ Compiling /test-background-drawer ...
- GET /test-background-drawer 200 in 6.2s (compile: 5.8s, render: 446ms)
- GET /test-background-drawer 200 in 153ms (compile: 12ms, render: 141ms)
+✓ Ready in 1157ms
+○ Compiling /login ...
+ HEAD /login 200 in 6.2s (compile: 5.8s, render: 382ms)
+ GET /login 200 in 113ms (compile: 12ms, render: 101ms)
