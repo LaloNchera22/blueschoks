@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { Search, Check, ChevronDown } from 'lucide-react';
 import { GOOGLE_FONTS_LIST, loadGoogleFont } from '@/utils/font-loader';
 import { cn } from '@/lib/utils';
@@ -56,21 +56,29 @@ export function FontPicker({ value, onChange, className }: FontPickerProps) {
   const [search, setSearch] = useState('');
   const [visibleCount, setVisibleCount] = useState(50);
 
-  // Reset visible count on search change
-  useEffect(() => {
-    setVisibleCount(50);
-  }, [search]);
+  const observer = useRef<IntersectionObserver | null>(null);
 
   const filteredFonts = GOOGLE_FONTS_LIST.filter(font =>
     font.toLowerCase().includes(search.toLowerCase())
   );
 
-  const handleScroll = (e: React.UIEvent<HTMLDivElement>) => {
-    const { scrollTop, scrollHeight, clientHeight } = e.currentTarget;
-    if (scrollHeight - scrollTop <= clientHeight + 200) {
-      setVisibleCount((prev) => Math.min(prev + 50, filteredFonts.length));
+  const lastElementRef = useCallback((node: HTMLDivElement | null) => {
+    if (observer.current) observer.current.disconnect();
+
+    if (node) {
+      observer.current = new IntersectionObserver(entries => {
+        if (entries[0].isIntersecting) {
+          setVisibleCount((prev) => Math.min(prev + 50, filteredFonts.length));
+        }
+      }, { threshold: 0.1, rootMargin: '100px' });
+      observer.current.observe(node);
     }
-  };
+  }, [filteredFonts.length]);
+
+  // Reset visible count on search change
+  useEffect(() => {
+    setVisibleCount(50);
+  }, [search]);
 
   return (
     <Popover open={open} onOpenChange={setOpen}>
@@ -102,26 +110,29 @@ export function FontPicker({ value, onChange, className }: FontPickerProps) {
             </div>
           </div>
 
-          <div
-            className="overflow-y-auto max-h-[300px] p-1 custom-scrollbar"
-            onScroll={handleScroll}
-          >
+          <div className="overflow-y-auto max-h-[300px] p-1 custom-scrollbar">
              {filteredFonts.length === 0 ? (
                 <div className="p-4 text-center text-xs text-gray-400">
                    No se encontraron fuentes
                 </div>
              ) : (
-                filteredFonts.slice(0, visibleCount).map((font) => (
-                  <FontOption
-                    key={font}
-                    font={font}
-                    isSelected={value === font}
-                    onClick={() => {
-                      onChange(font);
-                      setOpen(false);
-                    }}
-                  />
-                ))
+                <>
+                  {filteredFonts.slice(0, visibleCount).map((font) => (
+                    <FontOption
+                      key={font}
+                      font={font}
+                      isSelected={value === font}
+                      onClick={() => {
+                        onChange(font);
+                        setOpen(false);
+                      }}
+                    />
+                  ))}
+                  {/* Sentinel element for infinite scroll */}
+                  {visibleCount < filteredFonts.length && (
+                    <div ref={lastElementRef} className="h-4 w-full" />
+                  )}
+                </>
              )}
           </div>
       </PopoverContent>
