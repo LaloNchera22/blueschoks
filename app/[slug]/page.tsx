@@ -23,7 +23,9 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
   const config = (profile.design_config || profile.theme_config) as unknown as DesignConfig
   const title = config?.profile?.shopName || profile.shop_name || 'Mi Tienda'
   const desc = config?.profile?.bio || profile.design_subtitle_text || 'Bienvenido a mi tienda'
-  const image = config?.profile?.avatarUrl || profile.avatar_url
+
+  const baseUrl = process.env.NEXT_PUBLIC_URL || 'http://localhost:3000'
+  const ogImageUrl = `${baseUrl}/api/og/${slug}`
 
   return {
     title,
@@ -31,7 +33,7 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
     openGraph: {
       title,
       description: desc,
-      images: image ? [{ url: image }] : []
+      images: [{ url: ogImageUrl }]
     }
   }
 }
