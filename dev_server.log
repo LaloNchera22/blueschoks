@@ -14,6 +14,9 @@ This information is used to shape Next.js' roadmap and prioritize features.
 You can learn more, including how to opt-out if you'd not like to participate in this anonymous program, by visiting the following URL:
 https://nextjs.org/telemetry
 
-✓ Ready in 1266ms
-○ Compiling /test-text-editor ...
- GET /test-text-editor 200 in 8.3s (compile: 7.8s, render: 470ms)
+✓ Ready in 1229ms
+○ Compiling /test-font-picker ...
+ GET /test-font-picker 200 in 5.9s (compile: 5.6s, render: 329ms)
+ GET /test-font-picker 200 in 87ms (compile: 6ms, render: 80ms)
+ GET /test-font-picker 200 in 265ms (compile: 70ms, render: 196ms)
+✓ Compiled in 193ms
