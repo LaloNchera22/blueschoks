@@ -1,0 +1,49 @@
+
+> blueshock@0.1.0 dev
+> next dev
+
+▲ Next.js 16.1.5 (Turbopack)
+- Local:         http://localhost:3000
+- Network:       http://192.168.0.2:3000
+- Experiments (use with caution):
+  · serverActions
+
+✓ Starting...
+Attention: Next.js now collects completely anonymous telemetry regarding usage.
+This information is used to shape Next.js' roadmap and prioritize features.
+You can learn more, including how to opt-out if you'd not like to participate in this anonymous program, by visiting the following URL:
+https://nextjs.org/telemetry
+
+✓ Ready in 1209ms
+○ Compiling /test-design ...
+ GET /test-design 200 in 11.4s (compile: 10.3s, render: 1024ms)
+○ Compiling /[slug] ...
+SUPABASE_SERVICE_ROLE_KEY is missing. Falling back to ANON_KEY. This may cause 404s if RLS is strict.
+⨯ Error: supabaseUrl is required.
+    at createAdminClient (utils/supabase/server.ts:11:32)
+    at StorePage (app/[slug]/page.tsx:44:43)
+   9 |   if (!serviceRoleKey) {
+  10 |     console.warn("SUPABASE_SERVICE_ROLE_KEY is missing. Falling back to ANON_KEY. This may cause 404s if RLS is strict.")
+> 11 |     return createSupabaseClient<Database>(
+     |                                ^
+  12 |       process.env.NEXT_PUBLIC_SUPABASE_URL!,
+  13 |       process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+  14 |     ) {
+  digest: '2655450429'
+}
+SUPABASE_SERVICE_ROLE_KEY is missing. Falling back to ANON_KEY. This may cause 404s if RLS is strict.
+⨯ Error: supabaseUrl is required.
+    at createAdminClient (utils/supabase/server.ts:11:32)
+    at Module.generateMetadata (app/[slug]/page.tsx:12:43)
+   9 |   if (!serviceRoleKey) {
+  10 |     console.warn("SUPABASE_SERVICE_ROLE_KEY is missing. Falling back to ANON_KEY. This may cause 404s if RLS is strict.")
+> 11 |     return createSupabaseClient<Database>(
+     |                                ^
+  12 |       process.env.NEXT_PUBLIC_SUPABASE_URL!,
+  13 |       process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+  14 |     ) {
+  digest: '2319822469'
+}
+ GET /placeholder.png 200 in 6.7s (compile: 6.3s, render: 318ms)
+⨯ The requested resource isn't a valid image for /placeholder.png received null
+✓ Compiled in 355ms

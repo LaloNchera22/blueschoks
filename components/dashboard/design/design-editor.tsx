@@ -391,7 +391,7 @@ export default function DesignEditor({ initialConfig, initialProducts, userId, s
   };
 
   return (
-    <div className="w-full h-[100dvh] relative overflow-hidden flex flex-col font-sans bg-gray-50">
+    <div className="w-full h-full relative overflow-hidden flex flex-col font-sans bg-gray-50">
       <FontLoaderListener config={config} products={products} />
       <input
         type="file"
@@ -452,7 +452,7 @@ export default function DesignEditor({ initialConfig, initialProducts, userId, s
       {/* --- MAIN PREVIEW AREA (Scrollable) --- */}
       <div
         id="store-preview-container"
-        className="flex-1 overflow-y-auto w-full relative z-10"
+        className="flex-1 overflow-y-auto w-full relative z-10 pb-24"
         onClick={(e) => {
           e.stopPropagation();
           if(activeTool === 'product-individual' && selection) {
@@ -475,11 +475,11 @@ export default function DesignEditor({ initialConfig, initialProducts, userId, s
       </div>
 
       {/* --- BOTTOM NAVIGATION (Fixed at bottom via Flex) --- */}
-      <div className="flex-none z-50 w-full relative bg-white">
+      <div className="absolute bottom-0 left-0 right-0 z-50 w-full bg-white border-t border-gray-100 shadow-[0_-4px_20px_-10px_rgba(0,0,0,0.1)]">
           <BottomNav
              activeTool={typeof activeTool === 'string' && ['background', 'typography', 'card-styling', 'social-global', 'profile-global'].includes(activeTool) ? activeTool : ''}
              onSelectTool={(tool) => setActiveTool(tool)}
-             className="relative bottom-auto left-auto right-auto border-t"
+             className="relative shadow-none border-none bg-transparent"
           />
       </div>
 
