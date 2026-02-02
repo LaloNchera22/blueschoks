@@ -10,9 +10,10 @@ export type BottomNavTool = 'background' | 'typography' | 'card-styling' | 'soci
 interface BottomNavProps {
   activeTool: string;
   onSelectTool: (tool: string) => void;
+  className?: string;
 }
 
-export function BottomNav({ activeTool, onSelectTool }: BottomNavProps) {
+export function BottomNav({ activeTool, onSelectTool, className }: BottomNavProps) {
 
   const navItems = [
     { id: 'background', label: 'Fondo', icon: Mountain },
@@ -23,7 +24,10 @@ export function BottomNav({ activeTool, onSelectTool }: BottomNavProps) {
   ];
 
   return (
-    <div className="fixed bottom-0 left-0 right-0 z-40 bg-white border-t border-gray-100 pb-safe shadow-[0_-4px_20px_-10px_rgba(0,0,0,0.1)]">
+    <div className={cn(
+      "fixed bottom-0 left-0 right-0 z-40 bg-white border-t border-gray-100 pb-safe shadow-[0_-4px_20px_-10px_rgba(0,0,0,0.1)]",
+      className
+    )}>
        <div className="flex items-center justify-around px-2 py-3 max-w-md mx-auto">
           {navItems.map((item) => (
             <button
