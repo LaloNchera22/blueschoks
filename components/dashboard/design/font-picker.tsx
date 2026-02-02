@@ -95,7 +95,7 @@ export function FontPicker({ value, onChange, className }: FontPickerProps) {
         </button>
       </PopoverTrigger>
 
-      <PopoverContent className="w-64 p-0 overflow-hidden bg-white z-50" sideOffset={8}>
+      <PopoverContent className="w-64 p-0 overflow-hidden bg-white z-[70]" sideOffset={8}>
           <div className="p-3 border-b border-gray-100 bg-white z-10">
             <div className="relative">
               <Search className="w-3 h-3 absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
@@ -109,7 +109,7 @@ export function FontPicker({ value, onChange, className }: FontPickerProps) {
             </div>
           </div>
 
-          <div className="overflow-y-auto max-h-[250px] p-1 custom-scrollbar">
+          <div className="!overflow-y-auto max-h-[250px] p-1 custom-scrollbar touch-pan-y overscroll-contain relative z-[60]">
              {filteredFonts.length === 0 ? (
                 <div className="p-4 text-center text-xs text-gray-400">
                    No se encontraron fuentes
