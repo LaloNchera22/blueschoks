@@ -180,8 +180,12 @@ export function TextEditorDrawer({
       {/* 4. Color */}
       <div className="space-y-2">
          <label className="text-xs font-bold text-gray-500 uppercase tracking-wider">Color</label>
-         <div className="flex gap-4 items-center p-2 bg-gray-50 rounded-xl border border-gray-100">
+         <label
+            htmlFor="text-editor-color-picker"
+            className="flex gap-4 items-center p-2 bg-gray-50 rounded-xl border border-gray-100 cursor-pointer w-full active:scale-95 transition-transform"
+         >
             <ColorCircle
+              id="text-editor-color-picker"
               color={currentColor}
               onChange={(c) => onUpdate('color', c)}
               size="lg"
@@ -189,7 +193,7 @@ export function TextEditorDrawer({
             <span className="text-sm text-gray-600 font-medium">
                Selecciona un color
             </span>
-         </div>
+         </label>
       </div>
 
     </div>
