@@ -53,7 +53,7 @@ export default async function DesignPage() {
   const validSlug = profile.slug || profile.username || user.id;
 
   return (
-    <div className="h-[calc(100vh-4rem)] w-full bg-gray-50 overflow-hidden">
+    <div className="h-[calc(100dvh-4rem)] md:h-[100dvh] w-full bg-gray-50 overflow-hidden">
       <DesignEditor
         initialConfig={cleanConfig}
         initialProducts={products}
