@@ -132,10 +132,14 @@ export function StorePreview({
                            return (
                                <div
                                   key={link.id}
-                                  className="flex flex-col items-center gap-1"
+                                  className="flex flex-col items-center gap-1 cursor-pointer group"
+                                  onClick={(e) => {
+                                      e.stopPropagation();
+                                      onSelectTool('social-global');
+                                  }}
                                >
                                    <div
-                                      className="p-3 rounded-full transition-all border border-gray-100 shadow-sm"
+                                      className="p-3 rounded-full transition-all border border-gray-100 shadow-sm group-hover:scale-105 group-hover:shadow-md"
                                       style={{
                                           backgroundColor: config.socialStyle?.buttonColor || '#f9fafb',
                                           color: link.color || config.socialStyle?.iconColor || '#4b5563'
