@@ -1,49 +1,27 @@
 'use client';
 
 import React, { useState, useMemo, useRef } from 'react';
-import Image from 'next/image';
 import Link from 'next/link';
 import { toast } from 'sonner';
 import {
   Loader2,
   Lock,
   Star,
-  Smartphone,
-  Link2 as LinkIcon,
-  ShoppingBag,
-  Check,
-  Globe,
-  Plus
+  Check
 } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { createClient } from '@/utils/supabase/client';
-import {
-  DndContext,
-  closestCenter,
-  KeyboardSensor,
-  PointerSensor,
-  useSensor,
-  useSensors,
-} from '@dnd-kit/core';
-import {
-  arrayMove,
-  SortableContext,
-  sortableKeyboardCoordinates,
-  horizontalListSortingStrategy
-} from '@dnd-kit/sortable';
 
-import { DesignConfig, LinkItem, ProductStyle } from '@/lib/types/design-system';
+import { DesignConfig, ProductStyle } from '@/lib/types/design-system';
 import { saveDesignConfig } from '@/app/dashboard/actions/design-actions';
 import { updateProductStyle, applyStyleToAllProducts, saveProductStylesBulk } from '@/app/dashboard/products/actions';
 import { Database } from '@/utils/supabase/types';
-import { cn } from '@/lib/utils';
 import { DEFAULT_DESIGN } from '@/utils/design-sanitizer';
 
 // Components
-import { ProductCard } from '@/components/store/product-card';
+import { StorePreview } from './store-preview';
 import { FontLoaderListener } from '@/components/ui/font-loader-listener';
 import { GOOGLE_FONTS_LIST } from '@/utils/font-loader';
-import { PLATFORMS, FONTS } from './constants';
 import { ProductStylingToolbar } from './product-styling-toolbar';
 
 // New Architecture Components
@@ -296,20 +274,6 @@ export default function DesignEditor({ initialConfig, initialProducts, userId, s
     toast.success("Fondo actualizado");
   };
 
-  // Helper for Text Styles
-  const getTextStyle = (type: 'title' | 'bio') => {
-    const styleConfig = type === 'title' ? config.profile.titleStyle : config.profile.bioStyle;
-    return {
-      fontFamily: styleConfig?.fontFamily || (type === 'title' ? config.fonts.heading : config.fonts.body),
-      fontWeight: styleConfig?.bold ? 'bold' : 'normal',
-      fontStyle: styleConfig?.italic ? 'italic' : 'normal',
-      textTransform: styleConfig?.uppercase ? 'uppercase' : 'none',
-      textAlign: styleConfig?.align || 'center',
-      color: styleConfig?.color || config.colors.text,
-      fontSize: styleConfig?.size ? `${styleConfig.size}px` : undefined,
-    } as React.CSSProperties;
-  };
-
   const selectedProduct = getSelectedProduct();
 
   // --- RENDER DRAWER CONTENT ---
@@ -385,9 +349,6 @@ export default function DesignEditor({ initialConfig, initialProducts, userId, s
            );
         case 'product-individual':
            if (!selectedProduct || !selection) return null;
-           // We reuse the existing toolbar but wrap it or adapt it?
-           // The existing toolbar is complex. We can render it directly or adapt it.
-           // For now, let's render it inside the drawer div.
            return (
               <ProductStylingToolbar
                 product={selectedProduct}
@@ -414,17 +375,6 @@ export default function DesignEditor({ initialConfig, initialProducts, userId, s
      }
   };
 
-  // Avatar Classes
-  const avatarClasses = useMemo(() => {
-    switch(config.profile.avatarShape) {
-      case 'none': return 'rounded-none';
-      case 'square': return 'rounded-2xl';
-      case 'rounded': return 'rounded-2xl';
-      case 'circle':
-      default: return 'rounded-full';
-    }
-  }, [config.profile.avatarShape]);
-
   const getDrawerTitle = () => {
      switch(activeTool) {
         case 'header-title': return 'Editar Título';
@@ -441,7 +391,7 @@ export default function DesignEditor({ initialConfig, initialProducts, userId, s
   };
 
   return (
-    <div className="w-full h-full relative overflow-hidden flex flex-col font-sans bg-gray-50">
+    <div className="w-full h-[100dvh] relative overflow-hidden flex flex-col font-sans bg-gray-50">
       <FontLoaderListener config={config} products={products} />
       <input
         type="file"
@@ -467,16 +417,16 @@ export default function DesignEditor({ initialConfig, initialProducts, userId, s
 
       {/* --- BACKGROUND LAYERS --- */}
       <div
-        className="absolute inset-0 transition-colors duration-1000 ease-in-out pointer-events-none"
+        className="absolute inset-0 transition-colors duration-1000 ease-in-out pointer-events-none z-0"
         style={{ backgroundColor: config.colors.background }}
       />
       <div
-        className="absolute inset-0 opacity-40 backdrop-blur-3xl pointer-events-none"
+        className="absolute inset-0 opacity-40 backdrop-blur-3xl pointer-events-none z-0"
         style={{
           background: `radial-gradient(circle at 50% 50%, ${config.colors.primary} 0%, transparent 70%)`
         }}
       />
-      <div className="absolute inset-0 bg-white/20 backdrop-blur-3xl pointer-events-none" />
+      <div className="absolute inset-0 bg-white/20 backdrop-blur-3xl pointer-events-none z-0" />
 
       {/* --- TOP BAR (SAVE & PRO) --- */}
       <div className="absolute top-4 right-4 z-50 flex gap-3">
@@ -501,189 +451,43 @@ export default function DesignEditor({ initialConfig, initialProducts, userId, s
 
       {/* --- MAIN PREVIEW AREA (Scrollable) --- */}
       <div
-        className="w-full h-full overflow-y-auto [&::-webkit-scrollbar]:hidden [-ms-overflow-style:'none'] [scrollbar-width:none] relative z-10 pb-32"
+        id="store-preview-container"
+        className="flex-1 overflow-y-auto w-full relative z-10"
         onClick={(e) => {
           e.stopPropagation();
-          // Do not close everything on click, maybe just deselect items?
-          // Keeping activeTool logic for drawer, clicking canvas shouldn't necessarily close unless specific intent?
-          // Let's allow clicking empty space to close selection but keep general nav.
           if(activeTool === 'product-individual' && selection) {
               setSelection(null);
               setActiveTool(null);
           }
         }}
       >
-          <div className="flex justify-center px-4 pt-20">
-             <div className="w-full max-w-[420px] origin-top scale-[0.95] md:scale-100 transition-transform">
-                <div
-                   className="min-h-[800px] pb-40 relative rounded-[32px] overflow-hidden"
-                   style={{ backgroundColor: config.colors.background || '#ffffff' }}
-                >
-                   {/* User Background Image */}
-                   {config.backgroundImage && (
-                      <div className="absolute inset-0 z-0 pointer-events-none">
-                         <img
-                            src={config.backgroundImage}
-                            alt="Background"
-                            className="w-full h-full object-cover"
-                            style={{ opacity: config.backgroundOpacity ?? 0.5 }}
-                         />
-                      </div>
-                   )}
-
-                   <div className="relative z-10 pt-16 px-6 text-center">
-                       {/* 1. HEADER SECTIONS */}
-
-                       {/* AVATAR */}
-                       <div
-                         className="relative mb-6 inline-block group cursor-pointer"
-                         onClick={(e) => {
-                            e.stopPropagation();
-                            setActiveTool('header-avatar');
-                         }}
-                       >
-                           <div className={cn(
-                              "relative h-32 w-32 overflow-hidden ring-4 ring-white/50 shadow-xl transition-all",
-                              avatarClasses,
-                              activeTool === 'header-avatar' && "ring-blue-500 scale-105"
-                           )}>
-                               {config.profile.avatarUrl ? (
-                                   <Image src={config.profile.avatarUrl} alt="Avatar" fill className="object-cover" />
-                               ) : (
-                                   <div className="w-full h-full flex items-center justify-center bg-gray-100 text-gray-300">
-                                       <Smartphone className="w-10 h-10" />
-                                   </div>
-                               )}
-                           </div>
-                           <div className="absolute -bottom-2 -right-2 bg-white rounded-full p-2 shadow-md opacity-0 group-hover:opacity-100 transition-opacity">
-                              <Check className="w-4 h-4 text-blue-500" />
-                           </div>
-                       </div>
-
-                       {/* SHOP NAME */}
-                       <div className="mb-3">
-                           <input
-                             type="text"
-                             value={config.profile.shopName || ''}
-                             placeholder="Tu Tienda"
-                             readOnly // Make readOnly so clicking opens drawer instead of keyboard
-                             className={cn(
-                               "bg-transparent border-none outline-none text-center w-full text-2xl font-bold tracking-tight placeholder:text-neutral-400/50 cursor-pointer",
-                               activeTool === 'header-title' && "ring-2 ring-blue-500/50 rounded-lg bg-blue-50/10"
-                             )}
-                             style={getTextStyle('title')}
-                             onClick={(e) => { e.stopPropagation(); setActiveTool('header-title'); }}
-                           />
-                       </div>
-
-                       {/* SOCIALS */}
-                       <div className="flex flex-wrap justify-center gap-3 mb-6">
-                           {config.socialLinks.map((link) => {
-                               const platformDef = PLATFORMS.find(p => p.id === link.platform);
-                               const Icon = platformDef?.icon || LinkIcon;
-                               return (
-                                   <div
-                                      key={link.id}
-                                      className="flex flex-col items-center gap-1"
-                                   >
-                                       <div
-                                          className="p-3 rounded-full transition-all border border-gray-100 shadow-sm"
-                                          style={{
-                                              backgroundColor: config.socialStyle?.buttonColor || '#f9fafb',
-                                              color: link.color || config.socialStyle?.iconColor || '#4b5563'
-                                          }}
-                                       >
-                                           <Icon size={20} strokeWidth={1.5} />
-                                       </div>
-                                       <span
-                                          className="text-[10px] font-medium transition-colors"
-                                          style={{
-                                              color: config.socialStyle?.textColor || '#6b7280',
-                                              fontFamily: config.socialStyle?.font || config.fonts.body
-                                          }}
-                                       >
-                                          {link.label || platformDef?.label || link.platform}
-                                       </span>
-                                   </div>
-                               )
-                           })}
-                           {config.socialLinks.length === 0 && (
-                              <button
-                                onClick={() => setActiveTool('social-global')}
-                                className="flex items-center gap-2 text-xs text-gray-400 border border-dashed border-gray-300 rounded-full px-4 py-2 hover:bg-gray-50 transition-colors"
-                              >
-                                 <Plus className="w-3 h-3" /> Agregar Redes
-                              </button>
-                           )}
-                       </div>
-
-                       {/* BIO */}
-                       <div className="mb-8">
-                           <textarea
-                             value={config.profile.bio || ''}
-                             placeholder="Mensaje de bienvenida..."
-                             readOnly
-                             rows={2}
-                             className={cn(
-                               "bg-transparent border-none outline-none text-center w-full resize-none text-sm leading-relaxed placeholder:italic placeholder:opacity-50 placeholder:text-gray-400 rounded-lg cursor-pointer",
-                               activeTool === 'header-bio' && "ring-2 ring-blue-500/50 bg-blue-50/10"
-                             )}
-                             style={getTextStyle('bio')}
-                             onClick={(e) => { e.stopPropagation(); setActiveTool('header-bio'); }}
-                           />
-                       </div>
-
-                       {/* 2. PRODUCTS */}
-                       <div className="pb-12 text-left">
-                           {products.length > 0 ? (
-                               <div className="grid grid-cols-2 gap-4">
-                                  {products.map((p) => {
-                                      const isProductSelected = activeTool === 'product-individual' && selection?.productId === p.id;
-                                      return (
-                                      <div
-                                        key={p.id}
-                                        className={cn(
-                                            "relative transition-all duration-300",
-                                            isProductSelected && "ring-2 ring-blue-500 rounded-2xl scale-[1.02]"
-                                        )}
-                                      >
-                                         <ProductCard
-                                            product={p}
-                                            config={config}
-                                            onSelectElement={(elementType) => {
-                                                setActiveTool('product-individual');
-                                                setSelection({ productId: p.id, elementType });
-                                            }}
-                                         />
-                                      </div>
-                                  )})}
-                               </div>
-                           ) : (
-                               <div className="flex flex-col items-center justify-center py-10 text-center opacity-50">
-                                    <ShoppingBag className="w-8 h-8 mb-2 text-gray-400" />
-                                    <p className="text-sm font-medium text-gray-500">Tu tienda está vacía</p>
-                               </div>
-                           )}
-                       </div>
-
-                   </div>
-                </div>
-             </div>
-          </div>
+          <StorePreview
+             config={config}
+             products={products}
+             activeTool={typeof activeTool === 'string' ? activeTool : null}
+             onSelectTool={(tool) => setActiveTool(tool)}
+             selection={selection}
+             onSelectElement={(pid, elemType) => {
+                 setActiveTool('product-individual');
+                 setSelection({ productId: pid, elementType: elemType });
+             }}
+          />
       </div>
 
-      {/* --- BOTTOM NAVIGATION --- */}
-      <BottomNav
-         activeTool={typeof activeTool === 'string' && ['background', 'typography', 'card-styling', 'social-global', 'profile-global'].includes(activeTool) ? activeTool : ''}
-         onSelectTool={(tool) => setActiveTool(tool)}
-      />
+      {/* --- BOTTOM NAVIGATION (Fixed at bottom via Flex) --- */}
+      <div className="flex-none z-50 w-full relative bg-white">
+          <BottomNav
+             activeTool={typeof activeTool === 'string' && ['background', 'typography', 'card-styling', 'social-global', 'profile-global'].includes(activeTool) ? activeTool : ''}
+             onSelectTool={(tool) => setActiveTool(tool)}
+             className="relative bottom-auto left-auto right-auto border-t"
+          />
+      </div>
 
       {/* --- DRAWERS --- */}
       <DesignDrawer
          isOpen={!!activeTool}
          onClose={() => setActiveTool(null)}
          title={getDrawerTitle()}
-         // Add explicit height for product drawer if needed
          className={activeTool === 'product-individual' ? "h-[85vh]" : undefined}
       >
          {renderDrawerContent()}
@@ -691,8 +495,14 @@ export default function DesignEditor({ initialConfig, initialProducts, userId, s
 
       {/* --- PRO LOCK OVERLAY --- */}
       {!isPro && (
-        <div className="absolute inset-0 z-[100] backdrop-blur-md bg-white/30 flex items-center justify-center p-4">
-          <div className="bg-white rounded-3xl shadow-2xl p-8 max-w-md text-center border border-white/50 animate-in fade-in zoom-in duration-300">
+        <div className="absolute inset-0 z-[100] backdrop-blur-md bg-white/30 flex items-center justify-center p-4 pointer-events-none">
+          {/* pointer-events-none because it's usually blocked by UI logic, but if it's an overlay it should block?
+              Wait, if !isPro, we show this. It SHOULD block.
+              But the original code didn't have pointer-events-none.
+              It was z-[100].
+              It blocks everything.
+          */}
+          <div className="bg-white rounded-3xl shadow-2xl p-8 max-w-md text-center border border-white/50 animate-in fade-in zoom-in duration-300 pointer-events-auto">
              <div className="w-16 h-16 bg-slate-900 text-white rounded-full flex items-center justify-center mx-auto mb-6 shadow-lg shadow-slate-900/20">
                 <Lock className="w-7 h-7" />
              </div>
