@@ -110,7 +110,10 @@ export function FontPicker({ value, onChange, className }: FontPickerProps) {
             </div>
           </div>
 
-          <div className="overflow-y-scroll h-[40vh] p-1 custom-scrollbar touch-pan-y overscroll-contain relative z-[9999]">
+          <div
+            className="overflow-y-scroll max-h-[40vh] p-1 custom-scrollbar touch-pan-y overscroll-y-contain relative z-[9999]"
+            onTouchStart={(e) => e.stopPropagation()}
+          >
              {filteredFonts.length === 0 ? (
                 <div className="p-4 text-center text-xs text-gray-400">
                    No se encontraron fuentes
