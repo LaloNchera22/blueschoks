@@ -46,8 +46,12 @@ export function BackgroundDrawer({
 
           {selectedOption === 'solid' && (
              <div className="p-4 bg-gray-50 border-t border-gray-100 animate-in slide-in-from-top-2 duration-200">
-                <div className="flex gap-4 items-center p-3 bg-white rounded-xl border border-gray-200 shadow-sm">
+                <label
+                   htmlFor="background-color-picker"
+                   className="flex gap-4 items-center p-3 bg-white rounded-xl border border-gray-200 shadow-sm cursor-pointer hover:bg-gray-50 transition-colors"
+                >
                    <ColorCircle
+                     id="background-color-picker"
                      color={config.colors.background}
                      onChange={(c) => onUpdate(['colors', 'background'], c)}
                      size="lg"
@@ -55,7 +59,7 @@ export function BackgroundDrawer({
                    <span className="text-sm text-gray-600 font-medium">
                      Selecciona un color base
                    </span>
-                </div>
+                </label>
              </div>
           )}
        </div>

@@ -6,12 +6,14 @@ interface ColorCircleProps {
   color: string;
   onChange: (c: string) => void;
   size?: "sm" | "md" | "lg";
+  id?: string;
 }
 
 export const ColorCircle = ({
   color,
   onChange,
-  size = "md"
+  size = "md",
+  id
 }: ColorCircleProps) => {
   const sizeClasses = {
     sm: "w-7 h-7",
@@ -29,6 +31,7 @@ export const ColorCircle = ({
     >
       <input
         type="color"
+        id={id}
         value={color || '#000000'}
         onChange={(e) => onChange(e.target.value)}
         className="absolute inset-0 w-full h-full opacity-0 cursor-pointer p-0 border-0"
