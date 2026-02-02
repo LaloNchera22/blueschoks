@@ -1,6 +1,6 @@
 'use client';
 
-import React from 'react';
+import React, { useState } from 'react';
 import {
   Bold,
   Italic,
@@ -10,7 +10,9 @@ import {
   CaseUpper,
   CaseLower,
   Minus,
-  Plus
+  Plus,
+  ChevronDown,
+  ChevronRight
 } from 'lucide-react';
 import { DesignConfig, TextStyle } from '@/lib/types/design-system';
 import { FontPicker } from '../font-picker';
@@ -46,6 +48,7 @@ export function TextEditorDrawer({
   const currentColor = currentStyle.color || defaultColor;
   const currentSize = currentStyle.size || 16;
   const isUppercase = currentStyle.uppercase || false;
+  const [showColorPicker, setShowColorPicker] = useState(false);
 
   return (
     <div className="flex flex-col gap-3">
@@ -180,23 +183,39 @@ export function TextEditorDrawer({
       </div>
 
       {/* 4. Color */}
-      <div className="space-y-2">
-         <label className="text-xs font-bold text-gray-500 uppercase tracking-wider">Color</label>
-         <label
-            htmlFor="text-editor-color-picker"
-            className="flex gap-4 items-center p-2 bg-gray-50 rounded-xl border border-gray-100 cursor-pointer w-full active:scale-95 transition-transform"
-         >
-            <ColorCircle
-              id="text-editor-color-picker"
-              color={currentColor}
-              onChange={(c) => onUpdate('color', c)}
-              size="lg"
-            />
-            <span className="text-sm text-gray-600 font-medium">
-               Selecciona un color
-            </span>
-         </label>
-      </div>
+      <div className="border border-gray-200 rounded-xl overflow-hidden bg-white shadow-sm transition-all duration-200">
+          <button
+            onClick={() => setShowColorPicker(!showColorPicker)}
+            className="w-full p-4 flex items-center justify-between hover:bg-gray-50 active:bg-gray-100 transition-colors"
+          >
+             <div className="flex items-center gap-3">
+               <div className={cn("p-2 rounded-lg", showColorPicker ? "bg-black text-white" : "bg-gray-100 text-gray-500")}>
+                 <div className="w-5 h-5 rounded-full border border-white/20" style={{ backgroundColor: currentColor }} />
+               </div>
+               <span className="font-semibold text-sm text-gray-900">Color de Texto</span>
+             </div>
+             {showColorPicker ? <ChevronDown className="w-5 h-5 text-gray-400" /> : <ChevronRight className="w-5 h-5 text-gray-400" />}
+          </button>
+
+          {showColorPicker && (
+             <div className="p-4 bg-gray-50 border-t border-gray-100 animate-in slide-in-from-top-2 duration-200">
+                <label
+                   htmlFor="text-editor-color-picker"
+                   className="w-full flex gap-4 items-center p-3 bg-white rounded-xl border border-gray-200 shadow-sm cursor-pointer hover:bg-gray-50 transition-colors"
+                >
+                   <ColorCircle
+                     id="text-editor-color-picker"
+                     color={currentColor}
+                     onChange={(c) => onUpdate('color', c)}
+                     size="lg"
+                   />
+                   <span className="text-sm text-gray-600 font-medium">
+                     Selecciona un color
+                   </span>
+                </label>
+             </div>
+          )}
+       </div>
 
     </div>
   );

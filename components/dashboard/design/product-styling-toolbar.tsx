@@ -45,7 +45,7 @@ export function ProductStylingToolbar({
         const cardColor = isCardTransparent ? '#ffffff' : (product.style_config?.cardBackground || '#ffffff');
 
         return (
-          <Popover open={true} onOpenChange={(open) => !open && onClose()}>
+          <Popover onOpenChange={(open) => !open && onClose()}>
             <PopoverTrigger asChild>
               <div className="flex flex-col items-center gap-0.5 cursor-pointer">
                  <div className="w-7 h-7 rounded-full bg-black text-white flex items-center justify-center shadow-sm">
@@ -274,7 +274,7 @@ export function ProductStylingToolbar({
         const currentColor = isDescTransparent ? '#ffffff' : (product.style_config?.descriptionBackground || product.style_config?.footerBackground || '#ffffff');
 
         return (
-          <Popover open={true} onOpenChange={(open) => !open && onClose()}>
+          <Popover onOpenChange={(open) => !open && onClose()}>
              <PopoverTrigger asChild>
                 <div className="flex flex-col items-center gap-0.5 cursor-pointer">
                    <div className="w-7 h-7 rounded-full bg-black text-white flex items-center justify-center shadow-sm">
