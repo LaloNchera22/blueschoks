@@ -25,6 +25,7 @@ import { GOOGLE_FONTS_LIST } from '@/utils/font-loader';
 import { ProductStylingToolbar } from './product-styling-toolbar';
 
 // New Architecture Components
+import { cn } from '@/lib/utils';
 import { DesignDrawer } from './design-drawer';
 import { BottomNav } from './bottom-nav';
 import { TextEditorDrawer } from './tools/text-editor-drawer';
@@ -475,20 +476,18 @@ export default function DesignEditor({ initialConfig, initialProducts, userId, s
       </div>
 
       {/* --- BOTTOM NAVIGATION (Fixed at bottom via Flex) --- */}
-      <div className="absolute bottom-0 left-0 right-0 z-50 w-full bg-white border-t border-gray-100 shadow-[0_-4px_20px_-10px_rgba(0,0,0,0.1)]">
-          <BottomNav
-             activeTool={typeof activeTool === 'string' && ['background', 'typography', 'card-styling', 'social-global', 'profile-global'].includes(activeTool) ? activeTool : ''}
-             onSelectTool={(tool) => setActiveTool(tool)}
-             className="relative shadow-none border-none bg-transparent"
-          />
-      </div>
+      <BottomNav
+          activeTool={typeof activeTool === 'string' && ['background', 'typography', 'card-styling', 'social-global', 'profile-global'].includes(activeTool) ? activeTool : ''}
+          onSelectTool={(tool) => setActiveTool(tool)}
+          className="z-[60]"
+      />
 
       {/* --- DRAWERS --- */}
       <DesignDrawer
          isOpen={!!activeTool}
          onClose={() => setActiveTool(null)}
          title={getDrawerTitle()}
-         className={activeTool === 'product-individual' ? "h-[85vh]" : undefined}
+         className={cn("mb-[90px]", activeTool === 'product-individual' && "h-[70vh]")}
       >
          {renderDrawerContent()}
       </DesignDrawer>
