@@ -479,7 +479,7 @@ export default function DesignEditor({ initialConfig, initialProducts, userId, s
       <BottomNav
           activeTool={typeof activeTool === 'string' && ['background', 'typography', 'card-styling', 'social-global', 'profile-global'].includes(activeTool) ? activeTool : ''}
           onSelectTool={(tool) => setActiveTool(tool)}
-          className="z-[60]"
+          className="z-40"
       />
 
       {/* --- DRAWERS --- */}
@@ -487,7 +487,7 @@ export default function DesignEditor({ initialConfig, initialProducts, userId, s
          isOpen={!!activeTool}
          onClose={() => setActiveTool(null)}
          title={getDrawerTitle()}
-         className={cn("mb-[90px]", activeTool === 'product-individual' && "h-[70vh]")}
+         className={cn(activeTool === 'product-individual' && "h-[70vh]")}
       >
          {renderDrawerContent()}
       </DesignDrawer>

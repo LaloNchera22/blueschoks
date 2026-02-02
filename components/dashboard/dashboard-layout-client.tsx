@@ -1,8 +1,10 @@
 "use client"
 
 import { useState } from "react"
+import { usePathname } from "next/navigation"
 import AppSidebar from "@/components/dashboard-sidebar"
 import { StickyHeader } from "@/components/dashboard/sticky-header"
+import { cn } from "@/lib/utils"
 
 interface DashboardLayoutClientProps {
   children: React.ReactNode
@@ -20,6 +22,8 @@ export default function DashboardLayoutClient({
   subscriptionEnd,
 }: DashboardLayoutClientProps) {
   const [isSidebarOpen, setIsSidebarOpen] = useState(true)
+  const pathname = usePathname()
+  const isDesignPage = pathname?.startsWith("/dashboard/design")
 
   return (
     <div className="flex h-screen w-full bg-slate-50 overflow-hidden">
@@ -32,7 +36,12 @@ export default function DashboardLayoutClient({
         onClose={() => setIsSidebarOpen(false)}
       />
 
-      <main className="flex-1 overflow-y-auto h-full relative flex flex-col transition-all duration-300">
+      <main
+        className={cn(
+          "flex-1 h-full relative flex flex-col transition-all duration-300",
+          isDesignPage ? "overflow-hidden" : "overflow-y-auto"
+        )}
+      >
         <StickyHeader isSidebarOpen={isSidebarOpen} onOpen={() => setIsSidebarOpen(true)} />
 
         {children}
