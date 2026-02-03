@@ -13,10 +13,11 @@ interface ProductCardProps {
   product: Product
   config: DesignConfig
   onSelectElement?: (element: 'container' | 'title' | 'price' | 'cartButton' | 'description') => void
+  onProductClick?: () => void
   onAddToCart?: (product: Product) => void
 }
 
-export function ProductCard({ product, config, onSelectElement, onAddToCart }: ProductCardProps) {
+export function ProductCard({ product, config, onSelectElement, onProductClick, onAddToCart }: ProductCardProps) {
   // 1. ESTADO PARA EL CARRUSEL & MODAL
   const [currentImg, setCurrentImg] = useState(0)
   const [isModalOpen, setIsModalOpen] = useState(false)
@@ -173,7 +174,13 @@ export function ProductCard({ product, config, onSelectElement, onAddToCart }: P
 
   const currentMediaUrl = gallery[currentImg];
 
-  const handleCardClick = () => {
+  const handleCardClick = (e?: React.MouseEvent) => {
+    if (onProductClick) {
+      if (e) e.preventDefault()
+      onProductClick()
+      return
+    }
+
     if (onSelectElement) {
       onSelectElement('container')
     } else {
