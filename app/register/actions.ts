@@ -21,21 +21,7 @@ export async function signup(formData: FormData) {
   const rawSlug = slugRaw || shopName
   const username = rawSlug.toLowerCase().replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, '')
 
-  // 2. Check preventivo
-  // Verificamos si el slug ya existe en la tabla profiles antes de intentar crear el usuario
-  if (username) {
-    const { data: existingUser } = await supabase
-      .from('profiles')
-      .select('username')
-      .eq('username', username)
-      .single();
-
-    if (existingUser) {
-      return redirect("/register?message=Este nombre de tienda ya está ocupado. Por favor intenta con otro.");
-    }
-  }
-
-  // 3. Creación del usuario con metadatos
+  // 2. Creación del usuario con metadatos
   // Pasamos los datos extra en options.data para que el Trigger de Supabase capture first_name, last_name, etc.
   const { error } = await supabase.auth.signUp({
     email,
@@ -52,7 +38,7 @@ export async function signup(formData: FormData) {
     },
   })
 
-  // 4. Manejo de errores (Doble seguridad)
+  // 3. Manejo de errores
   if (error) {
     // Si el error devuelto contiene el código 23505 (unique_violation)
     if (error.code === '23505' || error.message?.includes('unique')) {
