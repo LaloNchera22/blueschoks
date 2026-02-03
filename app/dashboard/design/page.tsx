@@ -2,25 +2,26 @@ import { createClient } from "@/utils/supabase/server";
 import { redirect } from "next/navigation";
 import { sanitizeDesign, DEFAULT_DESIGN } from "@/utils/design-sanitizer";
 import DesignEditor from "@/components/dashboard/design/design-editor";
+import { getProfile } from "@/utils/user-data";
+import UpgradeBanner from "@/components/dashboard/upgrade-banner";
 
 export const dynamic = 'force-dynamic';
 
 export default async function DesignPage() {
-  const supabase = await createClient();
+  const profile = await getProfile();
 
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-
-  if (!user) {
+  if (!profile) {
     return redirect("/login");
   }
+
+  const supabase = await createClient();
+  const userId = profile.id;
 
   // 1. Fetch RAW data (Store & Products)
   // We use Promise.all to fetch in parallel
   const [storeResponse, productsResponse] = await Promise.all([
-    supabase.from('stores').select('*').eq('owner_id', user.id).single(),
-    supabase.from('products').select('*').eq('user_id', user.id).order('created_at', { ascending: false })
+    supabase.from('stores').select('*').eq('owner_id', userId).single(),
+    supabase.from('products').select('*').eq('user_id', userId).order('created_at', { ascending: false })
   ]);
 
   const store = storeResponse.data;
@@ -33,8 +34,8 @@ export default async function DesignPage() {
       <DesignEditor
         initialConfig={DEFAULT_DESIGN}
         initialProducts={[]}
-        userId={user.id}
-        slug={user.id} // Fallback slug
+        userId={userId}
+        slug={userId}
       />
     );
   }
@@ -48,16 +49,20 @@ export default async function DesignPage() {
   const cleanConfig = sanitizeDesign(rawConfig, store);
 
   // Guarantee valid slug
-  const validSlug = store.slug || user.id;
+  const validSlug = store.slug || userId;
+
+  if (!profile.is_pro) {
+    return <UpgradeBanner />;
+  }
 
   return (
     <div className="flex-1 w-full h-full bg-gray-50 overflow-hidden">
       <DesignEditor
         initialConfig={cleanConfig}
         initialProducts={products}
-        userId={user.id}
+        userId={userId}
         slug={validSlug}
-        isPro={store.is_pro || false}
+        isPro={true}
       />
     </div>
   );

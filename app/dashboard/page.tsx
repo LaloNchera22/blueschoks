@@ -3,7 +3,7 @@ import { redirect } from "next/navigation"
 import { Plus, PackageSearch, Star } from "lucide-react"
 import Link from "next/link"
 import ProductCardClient from "./product-card"
-import { getUser } from "@/utils/user-data"
+import { getProfile } from "@/utils/user-data"
 import { PaginationControls } from "@/components/ui/pagination-controls"
 
 const ITEMS_PER_PAGE = 12
@@ -13,8 +13,8 @@ export default async function DashboardPage({
 }: {
   searchParams: Promise<{ [key: string]: string | string[] | undefined }>
 }) {
-  const user = await getUser()
-  if (!user) redirect("/login")
+  const profile = await getProfile()
+  if (!profile) redirect("/login")
 
   const resolvedSearchParams = await searchParams
   const page = typeof resolvedSearchParams.page === "string" ? parseInt(resolvedSearchParams.page) : 1
@@ -26,29 +26,24 @@ export default async function DashboardPage({
   const supabase = await createClient()
 
   // Use Promise.all to fetch data in parallel
-  const [productsResponse, storeResponse] = await Promise.all([
+  // We removed stores query as we use profile.is_pro now
+  const [productsResponse] = await Promise.all([
     supabase
       .from("products")
       .select("*", { count: "exact" })
-      .eq("user_id", user.id)
+      .eq("user_id", profile.id)
       .order("created_at", { ascending: false })
-      .range(from, to),
-    supabase
-      .from("stores")
-      .select("is_pro")
-      .eq("owner_id", user.id)
-      .single()
+      .range(from, to)
   ])
 
   const { data: products, count } = productsResponse
-  const store = storeResponse.data
   const totalPages = count ? Math.ceil(count / ITEMS_PER_PAGE) : 0
 
   return (
     <div className="p-8 md:p-12 w-full max-w-7xl mx-auto space-y-10">
       
       {/* UPGRADE BANNER */}
-      {store && !store.is_pro && (
+      {!profile.is_pro && (
         <div className="bg-gradient-to-r from-yellow-50 to-orange-50 border border-yellow-200 rounded-2xl p-6 flex flex-col md:flex-row items-center justify-between gap-4 shadow-sm animate-in slide-in-from-top-4">
             <div className="flex items-center gap-4">
                 <div className="p-3 bg-white rounded-full text-yellow-500 shadow-sm ring-1 ring-yellow-100">
