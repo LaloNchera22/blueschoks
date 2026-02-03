@@ -40,7 +40,7 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
   // Resolve background color (prioritize config, then legacy field, then default)
   // We don't default here because the API route has its own default if missing,
   // but passing a clean value is better.
-  const bgColor = config?.colors?.background || profile.design_bg_color || '#1a472a'
+  const bgColor = config?.colors?.background || (profile as any).design_bg_color || '#1a472a'
 
   const baseUrl = process.env.NEXT_PUBLIC_URL || 'http://localhost:3000'
   // Use query param format as requested
