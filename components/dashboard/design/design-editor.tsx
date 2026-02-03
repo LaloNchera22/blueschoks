@@ -91,8 +91,6 @@ export default function DesignEditor({ initialConfig, initialProducts, userId, s
 
   const [config, setConfig] = useState<DesignConfig>(safeInitialConfig);
   const [products, setProducts] = useState<Product[]>(initialProducts);
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const [debugData, setDebugData] = useState<any>(null);
   // null means closed, string means open drawer
   const [activeTool, setActiveTool] = useState<ToolType | string | null>(null);
 
@@ -119,7 +117,6 @@ export default function DesignEditor({ initialConfig, initialProducts, userId, s
       }
 
       console.log("✅ DATOS RECIBIDOS CRUDOS:", data);
-      setDebugData(data?.theme_config);
 
       // 2. Sincronización OBLIGATORIA (Hydration)
       const newConfig: DesignConfig = { ...DEFAULT_DESIGN };
@@ -474,18 +471,6 @@ export default function DesignEditor({ initialConfig, initialProducts, userId, s
 
   return (
     <div className="w-full h-full relative overflow-hidden flex flex-col font-sans bg-gray-50">
-      {/* --- BLOQUE DE DEBUG TEMPORAL --- */}
-      <div className="absolute top-0 left-0 z-[9999] bg-gray-800 text-white p-4 m-4 rounded text-xs font-mono overflow-auto border-2 border-yellow-500 max-h-96 max-w-md">
-        <p className="font-bold text-yellow-400">🔍 DIAGNÓSTICO DE DATOS:</p>
-        <p>ID Usuario: {userId}</p>
-        <p>Nombre Tienda (State): {config.profile.shopName}</p>
-        <p>Color (State): {config.colors.primary}</p>
-        <hr className="my-2 border-gray-600"/>
-        <p className="font-bold text-green-400">📦 LO QUE LLEGA DE LA DB (Theme Config):</p>
-        <pre>{JSON.stringify(debugData, null, 2)}</pre>
-      </div>
-      {/* ---------------------------------- */}
-
       <FontLoaderListener config={config} products={products} />
       <input
         type="file"
