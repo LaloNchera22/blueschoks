@@ -98,65 +98,108 @@ export default function DesignEditor({ initialConfig, initialProducts, userId, s
   React.useEffect(() => {
     if (!userId) return;
 
-    const loadUserData = async () => {
+    const loadDesign = async () => {
+      console.log("⚡ Intentando cargar diseño para usuario:", userId);
+
       const supabase = createClient();
       const { data, error } = await supabase
         .from('profiles')
-        .select('shop_name, avatar_url, theme_config')
+        .select('*') // Traemos TODO para asegurar
         .eq('id', userId)
         .single();
 
       if (error) {
-        console.error('Error fetching design:', error);
+        console.error("❌ Error cargando perfil:", error);
         return;
       }
 
+      console.log("✅ Datos recibidos de DB:", data);
+
       if (data) {
-        // 1. Cargar nombre de la tienda
-        // 2. Cargar Avatar
-        // 3. HIDRATAR EL DISEÑO
+        // Start with default to ensure structure
+        const newConfig: DesignConfig = { ...DEFAULT_DESIGN };
+
+        // Helper to access loose DB config
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        const saved: any = data.theme_config || {};
+        const dbConfig: any = data.theme_config || {};
 
-        // Explicit mapping to DesignConfig structure
-        const loadedConfig: DesignConfig = {
-          ...DEFAULT_DESIGN,
-          ...saved,
-          colors: {
-            ...DEFAULT_DESIGN.colors,
-            ...(saved.colors || {}),
-            // Handle flat primaryColor or nested
-            primary: saved.colors?.primary || saved.primaryColor || DEFAULT_DESIGN.colors.primary,
-          },
-          fonts: {
-            heading: saved.fonts?.heading || saved.font || DEFAULT_DESIGN.fonts.heading,
-            body: saved.fonts?.body || saved.font || DEFAULT_DESIGN.fonts.body,
-          },
-          profile: {
-            ...DEFAULT_DESIGN.profile,
-            ...(saved.profile || {}),
-            shopName: data.shop_name || saved.profile?.shopName || '',
-            avatarUrl: data.avatar_url || saved.profile?.avatarUrl || '',
-            displayName: data.shop_name || saved.profile?.displayName || '',
-          },
-          cardStyle: {
-            ...DEFAULT_DESIGN.cardStyle,
-            ...(saved.cardStyle || {}),
-            // Handle potentially flat borderRadius if present in legacy data
-            borderRadius: saved.cardStyle?.borderRadius ?? saved.borderRadius ?? DEFAULT_DESIGN.cardStyle.borderRadius,
-          },
-          socialLinks: Array.isArray(saved.socialLinks) ? saved.socialLinks : (saved.links || []),
-          // Ensure other objects are not undefined
-          checkout: { ...DEFAULT_DESIGN.checkout, ...(saved.checkout || {}) },
-          socialStyle: { ...DEFAULT_DESIGN.socialStyle, ...(saved.socialStyle || {}) },
-        };
+        // 1. Cargar Textos Básicos (Priority to root columns)
+        if (data.shop_name) {
+             newConfig.profile = { ...newConfig.profile, shopName: data.shop_name, displayName: data.shop_name };
+        }
+        if (data.avatar_url) {
+             newConfig.profile = { ...newConfig.profile, avatarUrl: data.avatar_url };
+        }
 
-        console.log('Diseño cargado:', loadedConfig);
-        setConfig(loadedConfig);
+        // 2. Cargar Configuración Visual (Theme Config)
+        if (data.theme_config) {
+            // Mapeo defensivo: Si existe en DB, úsalo.
+
+            // Colors
+            if (dbConfig.colors) {
+                newConfig.colors = { ...newConfig.colors, ...dbConfig.colors };
+            }
+            // Legacy Flat: primaryColor
+            if (dbConfig.primaryColor) {
+                newConfig.colors.primary = dbConfig.primaryColor;
+            }
+
+            // Fonts
+            if (dbConfig.fonts) {
+                newConfig.fonts = { ...newConfig.fonts, ...dbConfig.fonts };
+            }
+            // Legacy Flat: font
+            if (dbConfig.font) {
+                newConfig.fonts.heading = dbConfig.font;
+                newConfig.fonts.body = dbConfig.font;
+            }
+
+            // Card Style & Border Radius
+            if (dbConfig.cardStyle) {
+                newConfig.cardStyle = { ...newConfig.cardStyle, ...dbConfig.cardStyle };
+            }
+            // Legacy Flat: borderRadius
+            if (dbConfig.borderRadius !== undefined) {
+                 newConfig.cardStyle.borderRadius = dbConfig.borderRadius;
+            }
+
+            // Background Image
+            if (dbConfig.backgroundImage) {
+                newConfig.backgroundImage = dbConfig.backgroundImage;
+            }
+
+            // Social Links
+            if (dbConfig.socialLinks && Array.isArray(dbConfig.socialLinks)) {
+                newConfig.socialLinks = dbConfig.socialLinks;
+            } else if (dbConfig.links && Array.isArray(dbConfig.links)) {
+                newConfig.socialLinks = dbConfig.links;
+            }
+
+            // Social Style
+            if (dbConfig.socialStyle) {
+                newConfig.socialStyle = { ...newConfig.socialStyle, ...dbConfig.socialStyle };
+            }
+
+            // Checkout
+            if (dbConfig.checkout) {
+                newConfig.checkout = { ...newConfig.checkout, ...dbConfig.checkout };
+            }
+
+            // Profile Nested (merge but respect root columns if they exist)
+            if (dbConfig.profile) {
+                newConfig.profile = { ...newConfig.profile, ...dbConfig.profile };
+                // Re-apply root columns if they were present, as they are source of truth for these fields
+                if (data.shop_name) newConfig.profile.shopName = data.shop_name;
+                if (data.avatar_url) newConfig.profile.avatarUrl = data.avatar_url;
+            }
+        }
+
+        console.log("🎨 Configuración final aplicada:", newConfig);
+        setConfig(newConfig);
       }
     };
 
-    loadUserData();
+    loadDesign();
   }, [userId]);
   const [selection, setSelection] = useState<SelectionState>(null);
   const [isSaving, setIsSaving] = useState(false);
