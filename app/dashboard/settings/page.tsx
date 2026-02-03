@@ -15,7 +15,7 @@ export default async function SettingsPage() {
   // 3. Empaquetar datos para el formulario
   const initialData = {
     shop_name: profile?.shop_name || "",
-    slug: profile?.slug || "",
+    slug: profile?.username || "",
     whatsapp: profile?.whatsapp || "",
     email: user.email || ""
   }

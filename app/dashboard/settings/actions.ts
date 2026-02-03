@@ -53,7 +53,6 @@ export async function updateSettings(prevState: SettingsState, formData: FormDat
   // Obtenemos el perfil actual para comparar cambios
   // Esto es vital para evitar errores de unicidad si el slug no ha cambiado,
   // y para evitar bloqueos de RLS si intentamos escribir lo mismo.
-  // CAMBIO: Usamos 'profiles' en lugar de 'stores' y 'id' en lugar de 'owner_id'
   const { data: currentProfile } = await supabase
     .from('profiles')
     .select('*')
@@ -68,15 +67,15 @@ export async function updateSettings(prevState: SettingsState, formData: FormDat
     }
   }
 
-  // 2. SLUG
+  // 2. SLUG (Mapeado a username)
   // Relajamos validación: permitimos letras, números y guiones.
   // Solo actualizamos si es diferente al actual.
   if (rawSlug && rawSlug.trim() !== "") {
     const cleanSlug = rawSlug.toLowerCase().trim().replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, '')
 
     if (cleanSlug.length > 0) {
-       if (!currentProfile || cleanSlug !== currentProfile.slug) {
-         updates.slug = cleanSlug
+       if (!currentProfile || cleanSlug !== currentProfile.username) {
+         updates.username = cleanSlug
        }
     }
   }
@@ -99,7 +98,6 @@ export async function updateSettings(prevState: SettingsState, formData: FormDat
     const hasDataChanges = Object.keys(updates).length > 1;
 
     if (hasDataChanges || !currentProfile) {
-      // CAMBIO: Usamos 'profiles' y 'id'
       const { data, error: updateError } = await supabase
         .from("profiles")
         .update(updates)
@@ -128,11 +126,11 @@ export async function updateSettings(prevState: SettingsState, formData: FormDat
     revalidatePath("/dashboard/settings")
 
     // Lógica de revalidación de caché (Slug)
-    let finalSlug = updates.slug;
+    let finalSlug = updates.username;
 
     if (!finalSlug) {
         // Si no se actualizó el slug, usamos el actual.
-        finalSlug = currentProfile?.slug;
+        finalSlug = currentProfile?.username;
     }
 
     if (finalSlug) {
