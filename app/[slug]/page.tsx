@@ -11,17 +11,29 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
   const { slug } = await params
   const supabase = await createAdminClient()
 
+  // 1. Fetch Store First (Source of Truth for Slugs)
+  const { data: store } = await supabase
+    .from('stores')
+    .select('owner_id, shop_name')
+    .eq('slug', slug)
+    .single()
+
+  if (!store) return { title: 'Tienda no encontrada' }
+
+  // 2. Fetch Profile Details
   const { data: profile } = await supabase
     .from('profiles')
-    .select('shop_name, design_title_text, design_subtitle_text, avatar_url, theme_config, design_config, design_bg_color')
-    .eq('slug', slug)
+    .select('shop_name, design_title_text, design_subtitle_text, avatar_url, theme_config, design_config')
+    .eq('id', store.owner_id)
     .single()
 
   if (!profile) return { title: 'Tienda no encontrada' }
 
   // Prioritize design_config (new source), fall back to theme_config (legacy)
   const config = (profile.design_config || profile.theme_config) as unknown as DesignConfig
-  const title = config?.profile?.shopName || profile.shop_name || 'Mi Tienda'
+
+  // Title Precedence: Design Config -> Store Settings -> Profile -> Default
+  const title = config?.profile?.shopName || store.shop_name || profile.shop_name || 'Mi Tienda'
   const desc = config?.profile?.bio || profile.design_subtitle_text || 'Bienvenido a mi tienda'
   const avatar = config?.profile?.avatarUrl || profile.avatar_url || ''
 
@@ -31,14 +43,8 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
   const bgColor = config?.colors?.background || profile.design_bg_color || '#1a472a'
 
   const baseUrl = process.env.NEXT_PUBLIC_URL || 'http://localhost:3000'
-
-  // Construct URL with query parameters
-  const queryParams = new URLSearchParams()
-  queryParams.set('title', title)
-  if (avatar) queryParams.set('avatar', avatar)
-  if (bgColor) queryParams.set('bg', bgColor)
-
-  const ogImageUrl = `${baseUrl}/api/og?${queryParams.toString()}`
+  // Use query param format as requested
+  const ogImageUrl = `${baseUrl}/api/og?username=${slug}`
 
   return {
     title,
@@ -56,18 +62,29 @@ export default async function StorePage({ params }: { params: Promise<{ slug: st
   const { slug } = await params
   const supabase = await createAdminClient()
 
-  // 1. Fetch Profile
+  // 1. Fetch Store First (Source of Truth for Slugs)
+  const { data: store } = await supabase
+    .from('stores')
+    .select('owner_id, shop_name')
+    .eq('slug', slug)
+    .single()
+
+  if (!store) {
+    return notFound()
+  }
+
+  // 2. Fetch Profile (using owner_id from store)
   const { data: profile } = await supabase
     .from('profiles')
     .select('*, design_config') // Explicitly select design_config to ensure it's available even if * misses it due to types
-    .eq('slug', slug)
+    .eq('id', store.owner_id)
     .single()
 
   if (!profile) {
     return notFound()
   }
 
-  // 2. Fetch Products
+  // 3. Fetch Products
   const { data: products } = await supabase
     .from('products')
     .select('*')

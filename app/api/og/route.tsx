@@ -1,16 +1,74 @@
 import { ImageResponse } from 'next/og';
+import { createAdminClient } from '@/utils/supabase/server';
+import { DesignConfig } from '@/lib/types/design-system';
 
 export const runtime = 'edge';
 
 export async function GET(request: Request) {
   try {
     const { searchParams } = new URL(request.url);
+    const username = searchParams.get('username');
 
-    // Extract parameters
-    const title = searchParams.get('title') || 'Mi Tienda';
-    const avatar = searchParams.get('avatar');
-    // Default to a dark green if no background is provided, as requested ("elegante")
-    const bg = searchParams.get('bg') || '#1a472a';
+    if (!username) {
+      return new Response('Username is required', { status: 400 });
+    }
+
+    // Initialize Supabase Admin Client
+    const supabase = await createAdminClient();
+
+    // 1. Fetch Store by slug (username)
+    const { data: store } = await supabase
+      .from('stores')
+      .select('owner_id, shop_name')
+      .eq('slug', username)
+      .single();
+
+    if (!store) {
+      return new Response('Store not found', { status: 404 });
+    }
+
+    // 2. Fetch Profile Data using owner_id
+    const { data: profile } = await supabase
+      .from('profiles')
+      .select('shop_name, avatar_url, design_config, theme_config, design_bg_color, design_title_text, design_title_color')
+      .eq('id', store.owner_id)
+      .single();
+
+    if (!profile) {
+      return new Response('Profile not found', { status: 404 });
+    }
+
+    // Resolve Design Configuration
+    // Prioritize modern design_config, fall back to legacy fields
+    const config = (profile.design_config || profile.theme_config) as unknown as DesignConfig;
+
+    // Background
+    const backgroundColor =
+      config?.colors?.background ||
+      profile.design_bg_color ||
+      '#ffffff';
+
+    const backgroundImage = config?.backgroundImage ? `url(${config.backgroundImage})` : undefined;
+
+    // Text Color
+    const textColor =
+      config?.profile?.titleStyle?.color ||
+      config?.colors?.text ||
+      profile.design_title_color ||
+      '#000000';
+
+    // Shop Name
+    // Precedence: Design Config (Visual Override) -> Store Settings (Official Name) -> Fallback
+    const shopName =
+      config?.profile?.shopName ||
+      store.shop_name ||
+      profile.shop_name ||
+      'Mi Tienda';
+
+    // Avatar
+    const avatarUrl =
+      config?.profile?.avatarUrl ||
+      profile.avatar_url;
 
     return new ImageResponse(
       (
@@ -22,22 +80,27 @@ export async function GET(request: Request) {
             flexDirection: 'column',
             alignItems: 'center',
             justifyContent: 'center',
-            backgroundColor: bg,
+            backgroundColor: backgroundColor,
+            backgroundImage: backgroundImage,
+            backgroundSize: 'cover',
+            backgroundPosition: 'center',
+            color: textColor,
             fontFamily: 'sans-serif',
           }}
         >
           {/* Avatar */}
-          {avatar && (
+          {avatarUrl && (
             <img
-              src={avatar}
-              alt="Profile"
+              src={avatarUrl}
+              alt={shopName}
               style={{
-                width: 250,
-                height: 250,
-                borderRadius: '50%',
+                width: 180,
+                height: 180,
+                borderRadius: config?.profile?.avatarShape === 'square' ? '20px' : '50%',
                 objectFit: 'cover',
-                marginBottom: 20,
-                boxShadow: '0 8px 30px rgba(0,0,0,0.2)',
+                marginBottom: 40,
+                border: config?.profile?.avatarBorderColor ? `4px solid ${config.profile.avatarBorderColor}` : 'none',
+                boxShadow: '0 10px 30px rgba(0,0,0,0.15)',
               }}
             />
           )}
@@ -45,35 +108,19 @@ export async function GET(request: Request) {
           {/* Shop Name */}
           <div
             style={{
-              fontSize: 64,
+              fontSize: 60,
               fontWeight: 'bold',
-              color: 'white',
               textAlign: 'center',
               padding: '0 40px',
-              maxWidth: '90%',
+              lineHeight: 1.2,
               display: 'flex',
               overflow: 'hidden',
-              whiteSpace: 'nowrap',
               textOverflow: 'ellipsis',
-              marginBottom: 40, // Space between title and footer
-              textShadow: '0 2px 10px rgba(0,0,0,0.3)', // Ensure readability
+              whiteSpace: 'nowrap',
+              maxWidth: '90%',
             }}
           >
-            {title}
-          </div>
-
-          {/* Footer / Branding */}
-          <div
-            style={{
-              position: 'absolute',
-              bottom: 40,
-              fontSize: 24,
-              color: 'rgba(255, 255, 255, 0.8)',
-              fontWeight: 'bold',
-              letterSpacing: '1px',
-            }}
-          >
-            BlueShocks
+            {shopName}
           </div>
         </div>
       ),
