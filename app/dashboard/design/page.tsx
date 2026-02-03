@@ -52,12 +52,9 @@ export default async function DesignPage() {
   // Guarantee valid slug
   const validSlug = store.slug || userId;
 
-  console.log('Estado PRO:', profile?.is_pro);
-  const isPro = profile?.is_pro;
-
-  if (!isPro) {
-    return <UpgradeBanner />;
-  }
+  // No longer blocking server-side based on is_pro.
+  // We pass the profile to the client component to handle the check and subscription.
+  // This resolves the mobile z-index trap by letting the client component manage the lock screen.
 
   return (
     <DesignClientPage
