@@ -490,7 +490,7 @@ export default function DesignEditor({ initialConfig, initialProducts, userId, s
          className={cn(activeTool === 'product-individual' && "h-[70vh]")}
          onOpenAutoFocus={(e) => {
             // Fix: Prevent auto-opening color picker in Socials menu or keyboard in text inputs
-            if (['social-global', 'header-title', 'header-bio'].includes(activeTool as string)) {
+            if (['social-global', 'header-title', 'header-bio', 'card-styling'].includes(activeTool as string)) {
                e.preventDefault();
             }
          }}
