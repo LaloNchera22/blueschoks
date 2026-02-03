@@ -35,6 +35,12 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
   // Title Precedence: Design Config -> Store Settings -> Profile -> Default
   const title = config?.profile?.shopName || store.shop_name || profile.shop_name || 'Mi Tienda'
   const desc = config?.profile?.bio || profile.design_subtitle_text || 'Bienvenido a mi tienda'
+  const avatar = config?.profile?.avatarUrl || profile.avatar_url || ''
+
+  // Resolve background color (prioritize config, then legacy field, then default)
+  // We don't default here because the API route has its own default if missing,
+  // but passing a clean value is better.
+  const bgColor = config?.colors?.background || profile.design_bg_color || '#1a472a'
 
   const baseUrl = process.env.NEXT_PUBLIC_URL || 'http://localhost:3000'
   // Use query param format as requested
