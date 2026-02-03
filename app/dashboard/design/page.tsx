@@ -26,7 +26,7 @@ export default async function DesignPage() {
   // 2. SANITIZE
   // Use 'theme_config' from profiles table.
   // @ts-ignore: profile type might not be fully updated in generated types
-  const rawConfig = profile.theme_config;
+  const rawConfig = profile.design_config || profile.theme_config;
 
   // We pass 'profile' as the fallback object.
   const cleanConfig = sanitizeDesign(rawConfig, profile);

@@ -109,7 +109,7 @@ export default function DesignEditor({ initialConfig, initialProducts, userId, s
       // 1. Petición directa a la única fuente de verdad
       const { data, error } = await supabase
         .from('profiles')
-        .select('shop_name, avatar_url, theme_config')
+        .select('shop_name, avatar_url, theme_config, design_config')
         .eq('id', userId)
         .single();
 
@@ -138,7 +138,7 @@ export default function DesignEditor({ initialConfig, initialProducts, userId, s
 
       // C) Configuración Visual (El punto donde fallaba)
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      const config = (data.theme_config as any) || {};
+      const config = (data.design_config as any) || (data.theme_config as any) || {};
 
       // Mapeo defensivo de propiedades anidadas (Modern)
       if (config.colors) newConfig.colors = { ...newConfig.colors, ...config.colors };
@@ -210,7 +210,7 @@ export default function DesignEditor({ initialConfig, initialProducts, userId, s
       const supabase = createClient();
       const { error: designError } = await supabase
         .from('profiles')
-        .update({ theme_config: config }) // Column theme_config
+        .update({ theme_config: config, design_config: null }) // Column theme_config
         .eq('id', userId);
 
       if (designError) throw new Error("Error saving design: " + designError.message);
