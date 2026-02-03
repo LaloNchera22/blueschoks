@@ -63,24 +63,30 @@ export default async function StorePage({ params }: { params: Promise<{ slug: st
   const supabase = await createAdminClient()
 
   // 1. Fetch Store First (Source of Truth for Slugs)
-  const { data: store } = await supabase
+  const { data: store, error: storeError } = await supabase
     .from('stores')
     .select('owner_id, shop_name')
     .eq('slug', slug)
     .single()
 
   if (!store) {
+    console.log('Buscando slug:', slug);
+    console.log('Resultado de DB (store):', store);
+    console.log('Error de DB (store):', storeError);
     return notFound()
   }
 
   // 2. Fetch Profile (using owner_id from store)
-  const { data: profile } = await supabase
+  const { data: profile, error: profileError } = await supabase
     .from('profiles')
     .select('*, design_config') // Explicitly select design_config to ensure it's available even if * misses it due to types
     .eq('id', store.owner_id)
     .single()
 
   if (!profile) {
+    console.log('Buscando perfil para store.owner_id:', store.owner_id);
+    console.log('Resultado de DB (profile):', profile);
+    console.log('Error de DB (profile):', profileError);
     return notFound()
   }
 
