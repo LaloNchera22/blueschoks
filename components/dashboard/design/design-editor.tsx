@@ -94,112 +94,72 @@ export default function DesignEditor({ initialConfig, initialProducts, userId, s
   // null means closed, string means open drawer
   const [activeTool, setActiveTool] = useState<ToolType | string | null>(null);
 
-  // 1. Logic to Load Design from PROFILES
+  // REEMPLAZO TOTAL DE LA LÓGICA DE CARGA INICIAL
   React.useEffect(() => {
     if (!userId) return;
 
-    const loadDesign = async () => {
-      console.log("⚡ Intentando cargar diseño para usuario:", userId);
+    const fetchProfileData = async () => {
+      try {
+        console.log("⚡ [DesignEditor] Iniciando carga de perfil...");
+        const supabase = createClient();
+        // 1. Consulta la ÚNICA fuente de verdad: tabla 'profiles'
+        const { data, error } = await supabase
+          .from('profiles')
+          .select('shop_name, avatar_url, theme_config')
+          .eq('id', userId)
+          .single();
 
-      const supabase = createClient();
-      const { data, error } = await supabase
-        .from('profiles')
-        .select('*') // Traemos TODO para asegurar
-        .eq('id', userId)
-        .single();
+        if (error) throw error;
 
-      if (error) {
-        console.error("❌ Error cargando perfil:", error);
-        return;
-      }
+        if (data) {
+           // Start with defaults to ensure full structure
+           const newConfig: DesignConfig = { ...DEFAULT_DESIGN };
 
-      console.log("✅ Datos recibidos de DB:", data);
+           // 2. Sincroniza Datos Básicos
+           if (data.shop_name) {
+             newConfig.profile.shopName = data.shop_name;
+             newConfig.profile.displayName = data.shop_name;
+           }
+           if (data.avatar_url) {
+             newConfig.profile.avatarUrl = data.avatar_url;
+           }
 
-      if (data) {
-        // Start with default to ensure structure
-        const newConfig: DesignConfig = { ...DEFAULT_DESIGN };
+           // 3. Sincroniza Configuración de Diseño (Hydration)
+           // Mapeamos el JSON guardado a la estructura de DesignConfig
+           // eslint-disable-next-line @typescript-eslint/no-explicit-any
+           const savedConfig = (data.theme_config as any) || {};
 
-        // Helper to access loose DB config
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        const dbConfig: any = data.theme_config || {};
+           // Direct mapping of nested objects if they exist (Modern format)
+           if (savedConfig.colors) newConfig.colors = { ...newConfig.colors, ...savedConfig.colors };
+           if (savedConfig.fonts) newConfig.fonts = { ...newConfig.fonts, ...savedConfig.fonts };
+           if (savedConfig.cardStyle) newConfig.cardStyle = { ...newConfig.cardStyle, ...savedConfig.cardStyle };
+           if (savedConfig.profile) newConfig.profile = { ...newConfig.profile, ...savedConfig.profile };
+           if (savedConfig.socialLinks) newConfig.socialLinks = savedConfig.socialLinks;
+           if (savedConfig.socialStyle) newConfig.socialStyle = { ...newConfig.socialStyle, ...savedConfig.socialStyle };
+           if (savedConfig.checkout) newConfig.checkout = { ...newConfig.checkout, ...savedConfig.checkout };
+           if (savedConfig.backgroundImage) newConfig.backgroundImage = savedConfig.backgroundImage;
 
-        // 1. Cargar Textos Básicos (Priority to root columns)
-        if (data.shop_name) {
-             newConfig.profile = { ...newConfig.profile, shopName: data.shop_name, displayName: data.shop_name };
+           // Flat properties (Legacy format support as requested)
+           if (savedConfig.primaryColor) newConfig.colors.primary = savedConfig.primaryColor;
+           if (savedConfig.font) {
+             newConfig.fonts.heading = savedConfig.font;
+             newConfig.fonts.body = savedConfig.font;
+           }
+           if (savedConfig.borderRadius !== undefined) newConfig.cardStyle.borderRadius = savedConfig.borderRadius;
+
+           // Force update from root columns again to ensure consistency
+           if (data.shop_name) newConfig.profile.shopName = data.shop_name;
+           if (data.avatar_url) newConfig.profile.avatarUrl = data.avatar_url;
+
+           console.log('✅ Diseño sincronizado correctamente desde DB', newConfig);
+           setConfig(newConfig);
         }
-        if (data.avatar_url) {
-             newConfig.profile = { ...newConfig.profile, avatarUrl: data.avatar_url };
-        }
-
-        // 2. Cargar Configuración Visual (Theme Config)
-        if (data.theme_config) {
-            // Mapeo defensivo: Si existe en DB, úsalo.
-
-            // Colors
-            if (dbConfig.colors) {
-                newConfig.colors = { ...newConfig.colors, ...dbConfig.colors };
-            }
-            // Legacy Flat: primaryColor
-            if (dbConfig.primaryColor) {
-                newConfig.colors.primary = dbConfig.primaryColor;
-            }
-
-            // Fonts
-            if (dbConfig.fonts) {
-                newConfig.fonts = { ...newConfig.fonts, ...dbConfig.fonts };
-            }
-            // Legacy Flat: font
-            if (dbConfig.font) {
-                newConfig.fonts.heading = dbConfig.font;
-                newConfig.fonts.body = dbConfig.font;
-            }
-
-            // Card Style & Border Radius
-            if (dbConfig.cardStyle) {
-                newConfig.cardStyle = { ...newConfig.cardStyle, ...dbConfig.cardStyle };
-            }
-            // Legacy Flat: borderRadius
-            if (dbConfig.borderRadius !== undefined) {
-                 newConfig.cardStyle.borderRadius = dbConfig.borderRadius;
-            }
-
-            // Background Image
-            if (dbConfig.backgroundImage) {
-                newConfig.backgroundImage = dbConfig.backgroundImage;
-            }
-
-            // Social Links
-            if (dbConfig.socialLinks && Array.isArray(dbConfig.socialLinks)) {
-                newConfig.socialLinks = dbConfig.socialLinks;
-            } else if (dbConfig.links && Array.isArray(dbConfig.links)) {
-                newConfig.socialLinks = dbConfig.links;
-            }
-
-            // Social Style
-            if (dbConfig.socialStyle) {
-                newConfig.socialStyle = { ...newConfig.socialStyle, ...dbConfig.socialStyle };
-            }
-
-            // Checkout
-            if (dbConfig.checkout) {
-                newConfig.checkout = { ...newConfig.checkout, ...dbConfig.checkout };
-            }
-
-            // Profile Nested (merge but respect root columns if they exist)
-            if (dbConfig.profile) {
-                newConfig.profile = { ...newConfig.profile, ...dbConfig.profile };
-                // Re-apply root columns if they were present, as they are source of truth for these fields
-                if (data.shop_name) newConfig.profile.shopName = data.shop_name;
-                if (data.avatar_url) newConfig.profile.avatarUrl = data.avatar_url;
-            }
-        }
-
-        console.log("🎨 Configuración final aplicada:", newConfig);
-        setConfig(newConfig);
+      } catch (error: any) {
+        console.error('Error crítico cargando perfil:', error.message);
       }
     };
 
-    loadDesign();
+    fetchProfileData();
   }, [userId]);
   const [selection, setSelection] = useState<SelectionState>(null);
   const [isSaving, setIsSaving] = useState(false);
