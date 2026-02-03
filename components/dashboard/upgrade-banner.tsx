@@ -5,7 +5,7 @@ import { Lock, Star } from 'lucide-react';
 
 export default function UpgradeBanner() {
   return (
-    <div className="w-full h-full flex items-center justify-center p-4 bg-gray-50">
+    <div className="w-full flex-1 flex items-center justify-center p-4 bg-gray-50 relative z-0">
       <div className="bg-white rounded-3xl shadow-2xl p-8 max-w-md text-center border border-slate-100 animate-in fade-in zoom-in duration-300">
          <div className="w-16 h-16 bg-slate-900 text-white rounded-full flex items-center justify-center mx-auto mb-6 shadow-lg shadow-slate-900/20">
             <Lock className="w-7 h-7" />

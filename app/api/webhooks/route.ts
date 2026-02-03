@@ -66,7 +66,6 @@ export async function POST(request: Request) {
         // Dijo "Guárdalo en stripe_customer_id solo si existe, si es null ignóralo o guarda null."
         // Voy a optar por "solo si existe" (ignorar si es null) para no sobrescribir con null si por alguna razón extraña ya tuviera uno (ej. renovación).
 
-        // Verified: Updates 'profiles' table ensuring PRO status sync.
         const { error } = await supabaseAdmin
           .from('profiles')
           .update(updateData)
