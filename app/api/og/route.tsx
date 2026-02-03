@@ -28,15 +28,33 @@ export async function GET(request: Request) {
     }
 
     // 2. Extract Data
-    // Use theme_config for primary color, default to black
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const themeConfig = (profile as any).theme_config || {};
-    const bgColor = themeConfig.primaryColor || '#000000';
+
+    // Colores dinámicos
+    const primaryColor = themeConfig.primaryColor || themeConfig.colors?.primary || '#1a1a1a';
+    const bgColor = themeConfig.colors?.background || primaryColor;
+    const textColor = themeConfig.colors?.text || 'white';
+
+    // Configuración de Avatar (Forma)
+    const avatarShape = themeConfig.profile?.avatarShape || 'circle';
+    const borderRadius = avatarShape === 'circle' ? '50%' : '32px';
 
     // Shop Name
     const shopName = profile.shop_name || 'Mi Tienda';
 
     // Avatar
     const avatarUrl = profile.avatar_url;
+
+    // Estilos comunes para la imagen
+    const imageStyle = {
+      borderRadius: borderRadius,
+      width: '250px',
+      height: '250px',
+      marginBottom: '40px',
+      objectFit: 'cover' as const,
+      border: '8px solid rgba(255,255,255,0.2)',
+    };
 
     return new ImageResponse(
       (
@@ -54,31 +72,21 @@ export async function GET(request: Request) {
         >
           {/* 1. FOTO / AVATAR */}
           {avatarUrl ? (
+            // eslint-disable-next-line @next/next/no-img-element
             <img
               src={avatarUrl}
               alt={shopName}
-              style={{
-                borderRadius: '50%',
-                width: '250px',
-                height: '250px',
-                marginBottom: '40px',
-                objectFit: 'cover',
-                border: '8px solid rgba(255,255,255,0.2)'
-              }}
+              style={imageStyle}
             />
           ) : (
             <div
               style={{
-                borderRadius: '50%',
-                width: '250px',
-                height: '250px',
-                marginBottom: '40px',
-                border: '8px solid rgba(255,255,255,0.2)',
+                ...imageStyle,
                 backgroundColor: 'rgba(255,255,255,0.1)',
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
-                color: 'white',
+                color: textColor,
                 fontSize: 100,
                 fontWeight: 'bold',
               }}
@@ -91,7 +99,7 @@ export async function GET(request: Request) {
           <div
             style={{
               fontSize: 70,
-              color: 'white',
+              color: textColor,
               fontWeight: 900,
               textAlign: 'center',
               textShadow: '0 4px 12px rgba(0,0,0,0.4)', // Soft shadow to ensure readability on any bg
@@ -108,6 +116,7 @@ export async function GET(request: Request) {
         height: 630,
       }
     );
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
   } catch (e: any) {
     console.error('OG Generation Error:', e);
     return new Response(`Failed to generate image: ${e.message}`, { status: 500 });
