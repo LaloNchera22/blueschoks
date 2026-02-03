@@ -96,12 +96,13 @@ export default function DesignEditor({ initialConfig, initialProducts, userId, s
 
   // 1. Logic to Load Design from PROFILES
   React.useEffect(() => {
-    const fetchDesign = async () => {
+    if (!userId) return;
+
+    const loadUserData = async () => {
       const supabase = createClient();
-      // We search in PROFILES, not stores
       const { data, error } = await supabase
         .from('profiles')
-        .select('theme_config, shop_name, avatar_url')
+        .select('shop_name, avatar_url, theme_config')
         .eq('id', userId)
         .single();
 
@@ -110,17 +111,52 @@ export default function DesignEditor({ initialConfig, initialProducts, userId, s
         return;
       }
 
-      if (data?.theme_config) {
-        // 2. Map the saved configuration to the local editor state
-        // We use sanitizeDesign to ensure the structure is correct and apply fallbacks
-        const cleanConfig = sanitizeDesign(data.theme_config, data);
-        setConfig(cleanConfig);
+      if (data) {
+        // 1. Cargar nombre de la tienda
+        // 2. Cargar Avatar
+        // 3. HIDRATAR EL DISEÑO
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const saved: any = data.theme_config || {};
+
+        // Explicit mapping to DesignConfig structure
+        const loadedConfig: DesignConfig = {
+          ...DEFAULT_DESIGN,
+          ...saved,
+          colors: {
+            ...DEFAULT_DESIGN.colors,
+            ...(saved.colors || {}),
+            // Handle flat primaryColor or nested
+            primary: saved.colors?.primary || saved.primaryColor || DEFAULT_DESIGN.colors.primary,
+          },
+          fonts: {
+            heading: saved.fonts?.heading || saved.font || DEFAULT_DESIGN.fonts.heading,
+            body: saved.fonts?.body || saved.font || DEFAULT_DESIGN.fonts.body,
+          },
+          profile: {
+            ...DEFAULT_DESIGN.profile,
+            ...(saved.profile || {}),
+            shopName: data.shop_name || saved.profile?.shopName || '',
+            avatarUrl: data.avatar_url || saved.profile?.avatarUrl || '',
+            displayName: data.shop_name || saved.profile?.displayName || '',
+          },
+          cardStyle: {
+            ...DEFAULT_DESIGN.cardStyle,
+            ...(saved.cardStyle || {}),
+            // Handle potentially flat borderRadius if present in legacy data
+            borderRadius: saved.cardStyle?.borderRadius ?? saved.borderRadius ?? DEFAULT_DESIGN.cardStyle.borderRadius,
+          },
+          socialLinks: Array.isArray(saved.socialLinks) ? saved.socialLinks : (saved.links || []),
+          // Ensure other objects are not undefined
+          checkout: { ...DEFAULT_DESIGN.checkout, ...(saved.checkout || {}) },
+          socialStyle: { ...DEFAULT_DESIGN.socialStyle, ...(saved.socialStyle || {}) },
+        };
+
+        console.log('Diseño cargado:', loadedConfig);
+        setConfig(loadedConfig);
       }
     };
 
-    if (userId) {
-      fetchDesign();
-    }
+    loadUserData();
   }, [userId]);
   const [selection, setSelection] = useState<SelectionState>(null);
   const [isSaving, setIsSaving] = useState(false);
