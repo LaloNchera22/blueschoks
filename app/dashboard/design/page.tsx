@@ -1,9 +1,8 @@
 import { createClient } from "@/utils/supabase/server";
 import { redirect } from "next/navigation";
 import { sanitizeDesign, DEFAULT_DESIGN } from "@/utils/design-sanitizer";
-import DesignEditor from "@/components/dashboard/design/design-editor";
 import { getProfile } from "@/utils/user-data";
-import UpgradeBanner from "@/components/dashboard/upgrade-banner";
+import DesignClientPage from "./design-client-page";
 
 export const dynamic = 'force-dynamic';
 
@@ -29,13 +28,15 @@ export default async function DesignPage() {
 
   if (storeResponse.error || !store) {
     console.error("DesignPage: Error fetching store", storeResponse.error);
-    // Even if DB fails, return a working UI with defaults
+    // Even if DB fails, return a working UI with defaults via the Client Page
+    // ensuring the Lock logic is still respected.
     return (
-      <DesignEditor
+      <DesignClientPage
         initialConfig={DEFAULT_DESIGN}
         initialProducts={[]}
         userId={userId}
         slug={userId}
+        initialProfile={profile}
       />
     );
   }
@@ -51,19 +52,16 @@ export default async function DesignPage() {
   // Guarantee valid slug
   const validSlug = store.slug || userId;
 
-  if (!profile.is_pro) {
-    return <UpgradeBanner />;
-  }
+  // No longer blocking server-side based on is_pro.
+  // We pass the profile to the client component to handle the check and subscription.
 
   return (
-    <div className="flex-1 w-full h-full bg-gray-50 overflow-hidden">
-      <DesignEditor
-        initialConfig={cleanConfig}
-        initialProducts={products}
-        userId={userId}
-        slug={validSlug}
-        isPro={true}
-      />
-    </div>
+    <DesignClientPage
+      initialConfig={cleanConfig}
+      initialProducts={products}
+      userId={userId}
+      slug={validSlug}
+      initialProfile={profile}
+    />
   );
 }
