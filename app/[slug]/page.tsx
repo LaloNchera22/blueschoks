@@ -11,29 +11,27 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
   const { slug } = await params
   const supabase = await createAdminClient()
 
-  // 1. Fetch Store First (Source of Truth for Slugs)
-  const { data: store } = await supabase
-    .from('stores')
-    .select('owner_id, shop_name')
-    .eq('slug', slug)
-    .single()
-
-  if (!store) return { title: 'Tienda no encontrada' }
-
-  // 2. Fetch Profile Details
+  // 1. Fetch Profile First (New Source of Truth for URL via Username)
   const { data: profile } = await supabase
     .from('profiles')
-    .select('shop_name, design_title_text, design_subtitle_text, avatar_url, theme_config, design_config, design_bg_color')
-    .eq('id', store.owner_id)
+    .select('id, shop_name, design_title_text, design_subtitle_text, avatar_url, theme_config, design_config, design_bg_color')
+    .eq('username', slug)
     .single()
 
   if (!profile) return { title: 'Tienda no encontrada' }
+
+  // 2. Fetch Store Details (Secondary, for fallback shop_name)
+  const { data: store } = await supabase
+    .from('stores')
+    .select('shop_name')
+    .eq('owner_id', profile.id)
+    .single()
 
   // Prioritize design_config (new source), fall back to theme_config (legacy)
   const config = (profile.design_config || profile.theme_config) as unknown as DesignConfig
 
   // Title Precedence: Design Config -> Store Settings -> Profile -> Default
-  const title = config?.profile?.shopName || store.shop_name || profile.shop_name || 'Mi Tienda'
+  const title = config?.profile?.shopName || store?.shop_name || profile.shop_name || 'Mi Tienda'
   const desc = config?.profile?.bio || (profile as any).design_subtitle_text || 'Bienvenido a mi tienda'
   const avatar = config?.profile?.avatarUrl || profile.avatar_url || ''
 
@@ -62,33 +60,25 @@ export default async function StorePage({ params }: { params: Promise<{ slug: st
   const { slug } = await params
   const supabase = await createAdminClient()
 
-  // 1. Fetch Store First (Source of Truth for Slugs)
-  const { data: store, error: storeError } = await supabase
-    .from('stores')
-    .select('owner_id, shop_name')
-    .eq('slug', slug)
-    .single()
-
-  if (!store) {
-    console.log('Buscando slug:', slug);
-    console.log('Resultado de DB (store):', store);
-    console.log('Error de DB (store):', storeError);
-    return notFound()
-  }
-
-  // 2. Fetch Profile (using owner_id from store)
+  // 1. Fetch Profile First (New Source of Truth for URL via Username)
   const { data: profile, error: profileError } = await supabase
     .from('profiles')
     .select('*, design_config') // Explicitly select design_config to ensure it's available even if * misses it due to types
-    .eq('id', store.owner_id)
+    .eq('username', slug)
     .single()
 
   if (!profile) {
-    console.log('Buscando perfil para store.owner_id:', store.owner_id);
-    console.log('Resultado de DB (profile):', profile);
+    console.log('Buscando usuario:', slug);
     console.log('Error de DB (profile):', profileError);
     return notFound()
   }
+
+  // 2. Fetch Store (Secondary, for fallback data)
+  const { data: store } = await supabase
+    .from('stores')
+    .select('shop_name')
+    .eq('owner_id', profile.id)
+    .single()
 
   // 3. Fetch Products
   const { data: products } = await supabase

@@ -19,7 +19,7 @@ export default async function DashboardLayout({
 
   return (
     <DashboardLayoutClient
-       shopUrl={profile?.slug || ""}
+       shopUrl={profile?.username || ""}
        userEmail={user.email || ""}
        isPro={profile?.is_pro ?? false}
        // 👇 AQUÍ ESTÁ EL ARREGLO: (profile as any)
