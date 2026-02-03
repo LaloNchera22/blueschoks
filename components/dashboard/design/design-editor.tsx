@@ -209,10 +209,6 @@ export default function DesignEditor({ initialConfig, initialProducts, userId, s
     const file = e.target.files?.[0];
     if (!file) return;
 
-    if (file.size > 5 * 1024 * 1024) {
-      toast.error("La imagen debe ser menor a 5MB");
-      return;
-    }
 
     setIsUploadingImage(true);
     const supabase = createClient();
@@ -244,10 +240,6 @@ export default function DesignEditor({ initialConfig, initialProducts, userId, s
     const file = e.target.files?.[0];
     if (!file) return;
 
-    if (file.size > 5 * 1024 * 1024) {
-      toast.error("La imagen debe ser menor a 5MB");
-      return;
-    }
 
     setIsUploadingImage(true);
     const supabase = createClient();
