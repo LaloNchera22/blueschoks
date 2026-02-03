@@ -13,7 +13,7 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
 
   const { data: profile } = await supabase
     .from('profiles')
-    .select('shop_name, design_title_text, design_subtitle_text, avatar_url, theme_config, design_config')
+    .select('shop_name, design_title_text, design_subtitle_text, avatar_url, theme_config, design_config, design_bg_color')
     .eq('slug', slug)
     .single()
 
@@ -23,9 +23,22 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
   const config = (profile.design_config || profile.theme_config) as unknown as DesignConfig
   const title = config?.profile?.shopName || profile.shop_name || 'Mi Tienda'
   const desc = config?.profile?.bio || profile.design_subtitle_text || 'Bienvenido a mi tienda'
+  const avatar = config?.profile?.avatarUrl || profile.avatar_url || ''
+
+  // Resolve background color (prioritize config, then legacy field, then default)
+  // We don't default here because the API route has its own default if missing,
+  // but passing a clean value is better.
+  const bgColor = config?.colors?.background || profile.design_bg_color || '#1a472a'
 
   const baseUrl = process.env.NEXT_PUBLIC_URL || 'http://localhost:3000'
-  const ogImageUrl = `${baseUrl}/api/og/${slug}`
+
+  // Construct URL with query parameters
+  const queryParams = new URLSearchParams()
+  queryParams.set('title', title)
+  if (avatar) queryParams.set('avatar', avatar)
+  if (bgColor) queryParams.set('bg', bgColor)
+
+  const ogImageUrl = `${baseUrl}/api/og?${queryParams.toString()}`
 
   return {
     title,
