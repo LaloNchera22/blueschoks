@@ -10,6 +10,19 @@ import { useState, useEffect, Suspense, useRef } from "react"
 import { signup } from "@/app/register/actions"
 import { createClient } from "@/utils/supabase/client"
 
+const COUNTRY_CODES = [
+  { code: "+52", flag: "🇲🇽", name: "MX" },
+  { code: "+57", flag: "🇨🇴", name: "CO" },
+  { code: "+54", flag: "🇦🇷", name: "AR" },
+  { code: "+1", flag: "🇺🇸", name: "US" },
+  { code: "+56", flag: "🇨🇱", name: "CL" },
+  { code: "+51", flag: "🇵🇪", name: "PE" },
+  { code: "+34", flag: "🇪🇸", name: "ES" },
+  { code: "+593", flag: "🇪🇨", name: "EC" },
+  { code: "+58", flag: "🇻🇪", name: "VE" },
+  { code: "+55", flag: "🇧🇷", name: "BR" },
+]
+
 function RegisterForm() {
   const searchParams = useSearchParams()
   const message = searchParams.get("message")
@@ -18,6 +31,14 @@ function RegisterForm() {
   const [shopName, setShopName] = useState("")
   const [slug, setSlug] = useState("")
   const [isSlugEdited, setIsSlugEdited] = useState(false)
+
+  // Estados para validación y UI
+  const [password, setPassword] = useState("")
+  const [confirmPassword, setConfirmPassword] = useState("")
+  const [countryCode, setCountryCode] = useState("+52")
+  const [phoneNumber, setPhoneNumber] = useState("")
+  const [formError, setFormError] = useState("")
+  const [isLoading, setIsLoading] = useState(false)
 
   const generateSlug = (text: string) => {
     return text.toLowerCase().replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, '')
@@ -63,6 +84,31 @@ function RegisterForm() {
     })
   }
 
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault()
+    setFormError("")
+    setIsLoading(true)
+
+    if (password !== confirmPassword) {
+      setFormError("Las contraseñas no coinciden")
+      setIsLoading(false)
+      return
+    }
+
+    const fullPhone = `${countryCode}${phoneNumber}`
+    const formData = new FormData(e.currentTarget)
+
+    // Sobreescribir el campo phone con el número completo concatenado
+    formData.set("phone", fullPhone)
+
+    // Llamar a la server action
+    await signup(formData)
+
+    // Si la redirección ocurre, este código podría no ejecutarse,
+    // pero si hay error y vuelve, quitamos loading.
+    setIsLoading(false)
+  }
+
   return (
     <div className="flex-1 flex flex-col justify-center max-w-xl mx-auto w-full space-y-2">
           
@@ -77,7 +123,7 @@ function RegisterForm() {
         </p>
       </div>
 
-      <form action={signup} className="space-y-2">
+      <form onSubmit={handleSubmit} className="space-y-2">
         
         {/* FILA 1: Nombre y Apellido */}
         <div className="grid grid-cols-2 gap-2">
@@ -94,13 +140,38 @@ function RegisterForm() {
           </div>
         </div>
 
-        {/* FILA 2: WhatsApp y Nombre Tienda (Fusionados en una fila para ahorrar espacio) */}
+        {/* FILA 2: WhatsApp y Nombre Tienda */}
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
             <div className="grid gap-1">
                 <Label htmlFor="phone" className="text-xs font-bold text-slate-700">WhatsApp</Label>
-                <div className="relative">
-                    <Phone className="absolute left-2.5 top-2.5 h-4 w-4 text-slate-400" />
-                    <Input id="phone" name="phone" type="tel" placeholder="55 1234 5678" className="pl-8 h-9 text-sm" required />
+                <div className="flex gap-2">
+                  <div className="relative w-[100px]">
+                     <select
+                       className="h-9 w-full rounded-md border border-input bg-background px-2 py-1 text-sm shadow-sm transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50 appearance-none pl-2"
+                       value={countryCode}
+                       onChange={(e) => setCountryCode(e.target.value)}
+                     >
+                        {COUNTRY_CODES.map((c) => (
+                          <option key={c.code} value={c.code}>
+                            {c.flag} {c.code}
+                          </option>
+                        ))}
+                     </select>
+                     {/* Chevron Icon for Select */}
+                     <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-slate-400">
+                       <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" /></svg>
+                     </div>
+                  </div>
+                  <div className="relative flex-1">
+                      <Input
+                        value={phoneNumber}
+                        onChange={(e) => setPhoneNumber(e.target.value)}
+                        type="tel"
+                        placeholder="55 1234 5678"
+                        className="h-9 text-sm"
+                        required
+                      />
+                  </div>
                 </div>
             </div>
             <div className="grid gap-1">
@@ -151,24 +222,60 @@ function RegisterForm() {
           </div>
         </div>
 
-        {/* FILA 4: Correo y Contraseña (Fusionados para ahorrar espacio) */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
-            <div className="grid gap-1">
-                <Label htmlFor="email" className="text-xs font-bold text-slate-700">Correo</Label>
-                <div className="relative">
-                    <Mail className="absolute left-2.5 top-2.5 h-4 w-4 text-slate-400" />
-                    <Input id="email" name="email" type="email" placeholder="hola@mail.com" className="pl-8 h-9 text-sm" required />
-                </div>
+        {/* FILA 4: Correo */}
+        <div className="grid gap-1">
+            <Label htmlFor="email" className="text-xs font-bold text-slate-700">Correo</Label>
+            <div className="relative">
+                <Mail className="absolute left-2.5 top-2.5 h-4 w-4 text-slate-400" />
+                <Input id="email" name="email" type="email" placeholder="hola@mail.com" className="pl-8 h-9 text-sm" required />
             </div>
+        </div>
+
+        {/* FILA 5: Contraseña y Confirmación */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
             <div className="grid gap-1">
                 <Label htmlFor="password" className="text-xs font-bold text-slate-700">Contraseña</Label>
                 <div className="relative">
                     <Lock className="absolute left-2.5 top-2.5 h-4 w-4 text-slate-400" />
-                    <Input id="password" name="password" type="password" placeholder="••••••••" className="pl-8 h-9 text-sm" required />
+                    <Input
+                      id="password"
+                      name="password"
+                      type="password"
+                      placeholder="••••••••"
+                      className="pl-8 h-9 text-sm"
+                      required
+                      value={password}
+                      onChange={(e) => setPassword(e.target.value)}
+                    />
+                </div>
+            </div>
+            <div className="grid gap-1">
+                <Label htmlFor="confirmPassword" className="text-xs font-bold text-slate-700">Confirmar Contraseña</Label>
+                <div className="relative">
+                    <Lock className="absolute left-2.5 top-2.5 h-4 w-4 text-slate-400" />
+                    <Input
+                      id="confirmPassword"
+                      name="confirmPassword"
+                      type="password"
+                      placeholder="••••••••"
+                      className="pl-8 h-9 text-sm"
+                      required
+                      value={confirmPassword}
+                      onChange={(e) => setConfirmPassword(e.target.value)}
+                    />
                 </div>
             </div>
         </div>
 
+        {/* Error de validación local */}
+        {formError && (
+          <div className="p-2 bg-red-50 text-red-600 text-xs rounded-md flex items-center gap-2 border border-red-100 font-bold">
+            <AlertCircle className="w-4 h-4" />
+            {formError}
+          </div>
+        )}
+
+        {/* Mensaje del servidor */}
         {message && (
           <div className="p-3 bg-red-50 text-red-600 text-xs rounded-md flex items-center gap-2 border border-red-100 font-bold">
             <AlertCircle className="w-4 h-4" />
@@ -176,8 +283,8 @@ function RegisterForm() {
           </div>
         )}
 
-        <Button type="submit" className="w-full h-9 font-bold bg-[#0F172A] hover:bg-slate-800 text-sm mt-1">
-          Crear Tienda Gratis
+        <Button type="submit" className="w-full h-9 font-bold bg-[#0F172A] hover:bg-slate-800 text-sm mt-1" disabled={isLoading}>
+          {isLoading ? "Creando tienda..." : "Crear Tienda Gratis"}
         </Button>
       </form>
 
