@@ -1,6 +1,6 @@
 "use client"
 
-import React, { useMemo } from 'react'
+import React, { useMemo, useEffect } from 'react'
 import Image from 'next/image'
 import Link from 'next/link'
 import {
@@ -76,8 +76,28 @@ export default function StoreClient({ profile, products, config }: StoreClientPr
 
   const socialLinks = Array.isArray(config?.socialLinks) ? config.socialLinks.filter(l => l.active) : []
 
+  useEffect(() => {
+    // UNLOCK BODY FOR PUBLIC STORE NATURAL SCROLL
+    document.body.style.setProperty('overflow', 'auto', 'important')
+    document.body.style.setProperty('height', 'auto', 'important')
+    document.body.style.setProperty('position', 'static', 'important')
+    document.documentElement.style.setProperty('overflow', 'auto', 'important')
+    document.documentElement.style.setProperty('height', 'auto', 'important')
+    document.documentElement.style.setProperty('position', 'static', 'important')
+
+    return () => {
+      // RESTORE GLOBAL LOCK
+      document.body.style.overflow = ''
+      document.body.style.height = ''
+      document.body.style.position = ''
+      document.documentElement.style.overflow = ''
+      document.documentElement.style.height = ''
+      document.documentElement.style.position = ''
+    }
+  }, [])
+
   return (
-    <div className="h-[100dvh] w-full flex justify-center items-center relative overflow-hidden" style={{ backgroundColor: bgColor, color: textColor }}>
+    <div className="min-h-screen w-full flex justify-center items-center relative" style={{ backgroundColor: bgColor, color: textColor }}>
       <FontLoaderListener config={config} products={products} />
 
       {/* Background Image Layer */}
@@ -95,7 +115,7 @@ export default function StoreClient({ profile, products, config }: StoreClientPr
       )}
 
       {/* CONTENEDOR PRINCIPAL: Sin bordes blancos, sin bg-white fijo */}
-      <div className="w-full max-w-[430px] h-full relative z-10 flex flex-col shadow-2xl overflow-y-auto overflow-x-hidden">
+      <div className="w-full max-w-[430px] min-h-full relative z-10 flex flex-col shadow-2xl">
           {/*
             Header Sticky Bar
             Contains: Small Logo (optional), Cart Trigger

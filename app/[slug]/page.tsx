@@ -23,7 +23,7 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
   // 2. Fetch Profile Details
   const { data: profile } = await supabase
     .from('profiles')
-    .select('shop_name, design_title_text, design_subtitle_text, avatar_url, theme_config, design_config')
+    .select('shop_name, design_title_text, design_subtitle_text, avatar_url, theme_config, design_config, design_bg_color')
     .eq('id', store.owner_id)
     .single()
 
