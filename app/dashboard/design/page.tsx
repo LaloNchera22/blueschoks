@@ -51,7 +51,10 @@ export default async function DesignPage() {
   // Guarantee valid slug
   const validSlug = store.slug || userId;
 
-  if (!profile.is_pro) {
+  console.log('Estado PRO:', profile?.is_pro);
+  const isPro = profile?.is_pro;
+
+  if (!isPro) {
     return <UpgradeBanner />;
   }
 
