@@ -2,21 +2,7 @@
 > blueshock@0.1.0 dev
 > next dev
 
-▲ Next.js 16.1.5 (Turbopack)
-- Local:         http://localhost:3000
-- Network:       http://192.168.0.2:3000
-- Experiments (use with caution):
-  · serverActions
-
-✓ Starting...
-Attention: Next.js now collects completely anonymous telemetry regarding usage.
-This information is used to shape Next.js' roadmap and prioritize features.
-You can learn more, including how to opt-out if you'd not like to participate in this anonymous program, by visiting the following URL:
-https://nextjs.org/telemetry
-
-✓ Ready in 1126ms
-○ Compiling /test-color ...
- GET /test-color 200 in 5.2s (compile: 4.7s, render: 419ms)
-✓ Compiled in 105ms
- GET /test-color 200 in 470ms (compile: 353ms, render: 117ms)
-✓ Compiled in 84ms
+⨯ Failed to load next.config.ts, see more info here https://nextjs.org/docs/messages/next-config-error
+TypeError: Cannot read properties of undefined (reading 'replace')
+    at Object.<anonymous> (next.config.compiled.js:16:64)
+[?25h
