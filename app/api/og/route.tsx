@@ -16,27 +16,23 @@ export async function GET(request: Request) {
     // Initialize Supabase Admin Client
     const supabase = await createAdminClient();
 
-    // 1. Fetch Store by slug (username)
-    const { data: store } = await supabase
-      .from('stores')
-      .select('owner_id, shop_name')
-      .eq('slug', username)
-      .single();
-
-    if (!store) {
-      return new Response('Store not found', { status: 404 });
-    }
-
-    // 2. Fetch Profile Data using owner_id
+    // 1. Fetch Profile Data by username
     const { data: profile } = await supabase
       .from('profiles')
-      .select('shop_name, avatar_url, design_config, theme_config, design_bg_color, design_title_text, design_title_color')
-      .eq('id', store.owner_id)
+      .select('id, shop_name, avatar_url, design_config, theme_config, design_bg_color, design_title_text, design_title_color')
+      .eq('username', username)
       .single();
 
     if (!profile) {
       return new Response('Profile not found', { status: 404 });
     }
+
+    // 2. Fetch Store (Secondary, for shop_name fallback)
+    const { data: store } = await supabase
+      .from('stores')
+      .select('shop_name')
+      .eq('owner_id', profile.id)
+      .single();
 
     // Resolve Design Configuration
     // Prioritize modern design_config, fall back to legacy fields
@@ -61,7 +57,7 @@ export async function GET(request: Request) {
     // Precedence: Design Config (Visual Override) -> Store Settings (Official Name) -> Fallback
     const shopName =
       config?.profile?.shopName ||
-      store.shop_name ||
+      store?.shop_name ||
       profile.shop_name ||
       'Mi Tienda';
 

@@ -134,7 +134,7 @@ export default function SettingsForm({ initialData }: { initialData: InitialData
               <Label htmlFor="slug" className="font-bold text-slate-700 mb-2 block">URL de la Tienda</Label>
               <div className={`flex items-center rounded-lg border overflow-hidden h-11 transition-all ${!editSlug ? 'bg-slate-100 border-slate-200 cursor-not-allowed' : 'bg-white border-slate-300 focus-within:ring-2 focus-within:ring-slate-900'}`}>
                   <span className="pl-3 pr-2 text-slate-400 text-sm font-medium select-none bg-transparent">
-                      blueshocks.com/shop/
+                      blueshocks.com/
                   </span>
                   <input 
                       id="slug"
