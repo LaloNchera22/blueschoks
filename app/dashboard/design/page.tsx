@@ -16,50 +16,29 @@ export default async function DesignPage() {
   const supabase = await createClient();
   const userId = profile.id;
 
-  // 1. Fetch RAW data (Store & Products)
-  // We use Promise.all to fetch in parallel
-  const [storeResponse, productsResponse] = await Promise.all([
-    supabase.from('stores').select('*').eq('owner_id', userId).single(),
-    supabase.from('products').select('*').eq('user_id', userId).order('created_at', { ascending: false })
-  ]);
-
-  const store = storeResponse.data;
-  const products = productsResponse.data || [];
-
-  if (storeResponse.error || !store) {
-    console.error("DesignPage: Error fetching store", storeResponse.error);
-    // Even if DB fails, return a working UI with defaults via the Client Page
-    // ensuring the Lock logic is still respected.
-    return (
-      <DesignClientPage
-        initialConfig={DEFAULT_DESIGN}
-        initialProducts={[]}
-        userId={userId}
-        slug={userId}
-        initialProfile={profile}
-      />
-    );
-  }
+  // 1. Fetch Products only (Store is obsolete for design)
+  const { data: products } = await supabase
+    .from('products')
+    .select('*')
+    .eq('user_id', userId)
+    .order('created_at', { ascending: false });
 
   // 2. SANITIZE
-  // Use 'config' from stores table.
-  const rawConfig = store.config;
+  // Use 'theme_config' from profiles table.
+  // @ts-ignore: profile type might not be fully updated in generated types
+  const rawConfig = profile.theme_config;
 
-  // We pass 'store' as the fallback profile object.
-  // sanitizeDesign expects { shop_name, avatar_url }. 'stores' has 'shop_name'.
-  const cleanConfig = sanitizeDesign(rawConfig, store);
+  // We pass 'profile' as the fallback object.
+  const cleanConfig = sanitizeDesign(rawConfig, profile);
 
   // Guarantee valid slug
-  const validSlug = store.slug || userId;
-
-  // No longer blocking server-side based on is_pro.
-  // We pass the profile to the client component to handle the check and subscription.
-  // This resolves the mobile z-index trap by letting the client component manage the lock screen.
+  // @ts-ignore: profile type might not be fully updated
+  const validSlug = profile.username || userId;
 
   return (
     <DesignClientPage
       initialConfig={cleanConfig}
-      initialProducts={products}
+      initialProducts={products || []}
       userId={userId}
       slug={validSlug}
       initialProfile={profile}
