@@ -8,6 +8,7 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Loader2, Store, Globe, Smartphone, Mail, CheckCircle2, AlertCircle, Pencil } from "lucide-react"
+import { RESERVED_SLUGS } from "@/lib/constants"
 
 const COUNTRY_CODES = [
   { code: "+52", country: "MX", label: "México (+52)" },
@@ -35,6 +36,8 @@ export default function SettingsForm({ initialData }: { initialData: InitialData
   const [editShop, setEditShop] = useState(false)
   const [editSlug, setEditSlug] = useState(false)
   const [editContact, setEditContact] = useState(false)
+
+  const [slugError, setSlugError] = useState<string | null>(null)
   
   // WHATSAPP LOGIC
   const [phonePrefix, setPhonePrefix] = useState("+52")
@@ -51,6 +54,23 @@ export default function SettingsForm({ initialData }: { initialData: InitialData
       setEditContact(false)
     }
   }, [state.success])
+
+  useEffect(() => {
+    if (!editSlug) {
+      setSlugError(null)
+    }
+  }, [editSlug])
+
+  const handleSlugChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const val = e.target.value.toLowerCase().trim()
+    if (RESERVED_SLUGS.includes(val)) {
+        e.target.setCustomValidity("Este nombre de usuario está reservado por el sistema. Por favor elige otro.")
+        setSlugError("Este nombre de usuario está reservado por el sistema. Por favor elige otro.")
+    } else {
+        e.target.setCustomValidity("")
+        setSlugError(null)
+    }
+  }
 
   useEffect(() => {
     if (initialData.whatsapp) {
@@ -132,7 +152,7 @@ export default function SettingsForm({ initialData }: { initialData: InitialData
           </div>
           <div className="p-6">
               <Label htmlFor="slug" className="font-bold text-slate-700 mb-2 block">URL de la Tienda</Label>
-              <div className={`flex items-center rounded-lg border overflow-hidden h-11 transition-all ${!editSlug ? 'bg-slate-100 border-slate-200 cursor-not-allowed' : 'bg-white border-slate-300 focus-within:ring-2 focus-within:ring-slate-900'}`}>
+              <div className={`flex items-center rounded-lg border overflow-hidden h-11 transition-all ${!editSlug ? 'bg-slate-100 border-slate-200 cursor-not-allowed' : slugError ? 'bg-white border-red-500 ring-1 ring-red-500' : 'bg-white border-slate-300 focus-within:ring-2 focus-within:ring-slate-900'}`}>
                   <span className="pl-3 pr-2 text-slate-400 text-sm font-medium select-none bg-transparent">
                       blueshocks.com/
                   </span>
@@ -141,10 +161,17 @@ export default function SettingsForm({ initialData }: { initialData: InitialData
                       name="slug"
                       defaultValue={initialData.slug}
                       readOnly={!editSlug}
+                      onChange={handleSlugChange}
                       placeholder="tu-marca"
                       className={`flex-1 bg-transparent border-none focus:ring-0 text-slate-900 font-bold text-sm outline-none ${!editSlug && "text-slate-500 cursor-not-allowed"}`}
                   />
               </div>
+              {slugError && (
+                 <p className="text-red-600 text-xs mt-2 font-bold flex items-center gap-1">
+                    <AlertCircle size={12} />
+                    {slugError}
+                 </p>
+              )}
           </div>
           {editSlug && (
               <div className="px-6 py-4 bg-slate-50 border-t border-slate-100 flex justify-end gap-3 animate-in slide-in-from-top-2">

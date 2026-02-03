@@ -9,6 +9,7 @@ import { ArrowLeft, Store, User, Phone, Globe, Edit3, Mail, Lock, AlertCircle } 
 import { useState, useEffect, Suspense, useRef } from "react"
 import { signup } from "@/app/register/actions"
 import { createClient } from "@/utils/supabase/client"
+import { RESERVED_SLUGS } from "@/lib/constants"
 
 function RegisterForm() {
   const searchParams = useSearchParams()
@@ -18,9 +19,18 @@ function RegisterForm() {
   const [shopName, setShopName] = useState("")
   const [slug, setSlug] = useState("")
   const [isSlugEdited, setIsSlugEdited] = useState(false)
+  const [slugError, setSlugError] = useState<string | null>(null)
 
   const generateSlug = (text: string) => {
     return text.toLowerCase().replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, '')
+  }
+
+  const validateSlug = (val: string) => {
+    if (RESERVED_SLUGS.includes(val)) {
+      setSlugError("Este nombre de usuario está reservado por el sistema. Por favor elige otro.")
+    } else {
+      setSlugError(null)
+    }
   }
 
   useEffect(() => {
@@ -28,7 +38,9 @@ function RegisterForm() {
     if (shopFromUrl) {
       setShopName(shopFromUrl)
       if (!isSlugEdited) {
-         setSlug(generateSlug(shopFromUrl))
+         const newSlug = generateSlug(shopFromUrl)
+         setSlug(newSlug)
+         validateSlug(newSlug)
       }
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -37,7 +49,9 @@ function RegisterForm() {
   const handleShopNameChange = (val: string) => {
     setShopName(val)
     if (!isSlugEdited) {
-      setSlug(generateSlug(val))
+      const newSlug = generateSlug(val)
+      setSlug(newSlug)
+      validateSlug(newSlug)
     }
   }
 
@@ -45,6 +59,7 @@ function RegisterForm() {
     const val = generateSlug(e.target.value)
     setSlug(val)
     setIsSlugEdited(true)
+    validateSlug(val)
   }
 
   const handleEditClick = () => {
@@ -77,7 +92,16 @@ function RegisterForm() {
         </p>
       </div>
 
-      <form action={signup} className="space-y-2">
+      <form
+        action={signup}
+        className="space-y-2"
+        onSubmit={(e) => {
+          if (slugError) {
+            e.preventDefault()
+            slugInputRef.current?.focus()
+          }
+        }}
+      >
         
         {/* FILA 1: Nombre y Apellido */}
         <div className="grid grid-cols-2 gap-2">
@@ -136,7 +160,7 @@ function RegisterForm() {
           
           <div 
             onClick={() => slugInputRef.current?.focus()}
-            className={`flex items-center rounded-md border px-3 h-9 text-sm ring-offset-background transition-colors cursor-text ${isSlugEdited ? 'border-blue-500 bg-blue-50/20' : 'border-input bg-slate-50'}`}
+            className={`flex items-center rounded-md border px-3 h-9 text-sm ring-offset-background transition-colors cursor-text ${slugError ? 'border-red-500 bg-red-50' : isSlugEdited ? 'border-blue-500 bg-blue-50/20' : 'border-input bg-slate-50'}`}
           >
             <span className="text-slate-500 select-none text-xs sm:text-sm">blueshocks.com/</span>
             <input 
@@ -149,6 +173,9 @@ function RegisterForm() {
               autoComplete="off"
             />
           </div>
+          {slugError && (
+             <p className="text-[10px] text-red-600 font-bold ml-1">{slugError}</p>
+          )}
         </div>
 
         {/* FILA 4: Correo y Contraseña (Fusionados para ahorrar espacio) */}

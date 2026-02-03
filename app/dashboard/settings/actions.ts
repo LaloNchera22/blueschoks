@@ -3,10 +3,14 @@
 import { createClient } from "@/utils/supabase/server"
 import { revalidatePath, revalidateTag } from "next/cache"
 import { z } from "zod"
+import { RESERVED_SLUGS } from "@/lib/constants"
 
 const settingsSchema = z.object({
   shopName: z.string().optional(),
-  slug: z.string().optional(),
+  slug: z.string().optional().refine(
+    (val) => !val || !RESERVED_SLUGS.includes(val.toLowerCase().trim()),
+    { message: "Este nombre de usuario está reservado por el sistema. Por favor elige otro." }
+  ),
   countryCode: z.string().optional(),
   localPhone: z.string().regex(/^\d+$/, "Solo números").min(10, "Mínimo 10 dígitos").optional().or(z.literal('')),
   email: z.string().email().optional().or(z.literal('')),
@@ -41,7 +45,7 @@ export async function updateSettings(prevState: SettingsState, formData: FormDat
   const validated = settingsSchema.safeParse(rawData)
 
   if (!validated.success) {
-    return { error: "Datos inválidos. Revisa el formato." }
+    return { error: validated.error.errors[0]?.message || "Datos inválidos. Revisa el formato." }
   }
 
   const { shopName, slug: rawSlug, countryCode, localPhone, email } = validated.data
