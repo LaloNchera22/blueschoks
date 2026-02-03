@@ -54,7 +54,7 @@ export async function GET(request: Request) {
     const textColor =
       config?.profile?.titleStyle?.color ||
       config?.colors?.text ||
-      profile.design_title_color ||
+      (profile as any).design_title_color ||
       '#000000';
 
     // Shop Name

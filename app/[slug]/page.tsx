@@ -34,7 +34,7 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
 
   // Title Precedence: Design Config -> Store Settings -> Profile -> Default
   const title = config?.profile?.shopName || store.shop_name || profile.shop_name || 'Mi Tienda'
-  const desc = config?.profile?.bio || profile.design_subtitle_text || 'Bienvenido a mi tienda'
+  const desc = config?.profile?.bio || (profile as any).design_subtitle_text || 'Bienvenido a mi tienda'
   const avatar = config?.profile?.avatarUrl || profile.avatar_url || ''
 
   // Resolve background color (prioritize config, then legacy field, then default)
