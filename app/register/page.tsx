@@ -101,8 +101,20 @@ function RegisterForm() {
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
+
+    if (slugError) {
+      slugInputRef.current?.focus()
+      return
+    }
+
     setFormError("")
     setIsLoading(true)
+
+    if (password.length < 6) {
+      setFormError("La contraseña debe tener al menos 6 caracteres")
+      setIsLoading(false)
+      return
+    }
 
     if (password !== confirmPassword) {
       setFormError("Las contraseñas no coinciden")
@@ -141,12 +153,7 @@ function RegisterForm() {
       <form
         action={signup}
         className="space-y-2"
-        onSubmit={(e) => {
-          if (slugError) {
-            e.preventDefault()
-            slugInputRef.current?.focus()
-          }
-        }}
+        onSubmit={handleSubmit}
       >
         
         {/* FILA 1: Nombre y Apellido */}
@@ -275,6 +282,7 @@ function RegisterForm() {
                       onChange={(e) => setPassword(e.target.value)}
                     />
                 </div>
+                <p className="text-gray-500 text-xs">Mínimo 6 caracteres</p>
             </div>
             <div className="grid gap-1">
                 <Label htmlFor="confirmPassword" className="text-xs font-bold text-slate-700">Confirmar Contraseña</Label>
@@ -291,6 +299,7 @@ function RegisterForm() {
                       onChange={(e) => setConfirmPassword(e.target.value)}
                     />
                 </div>
+                <p className="text-gray-500 text-xs">Mínimo 6 caracteres</p>
             </div>
         </div>
 
