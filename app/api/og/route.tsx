@@ -45,7 +45,7 @@ export async function GET(request: Request) {
     // Background
     const backgroundColor =
       config?.colors?.background ||
-      profile.design_bg_color ||
+      (profile as any).design_bg_color ||
       '#ffffff';
 
     const backgroundImage = config?.backgroundImage ? `url(${config.backgroundImage})` : undefined;
