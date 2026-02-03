@@ -50,20 +50,14 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
   // Fallback description as requested
   const description = bio || 'Visita mi catálogo online y haz tu pedido por WhatsApp.';
 
-  const baseUrl = process.env.NEXT_PUBLIC_URL || 'http://localhost:3000';
-  const ogRoute = `${baseUrl}/api/og?username=${slug}`;
-
-  // Logic: User uploaded logo (avatarUrl) -> Use it. Else -> BlueShocks default (api/og or static).
-  // We prioritize the user's avatar if available.
-  const images = avatarUrl ? [avatarUrl] : [{ url: ogRoute }];
-
   return {
-    title,
+    title: {
+      absolute: title,
+    },
     description,
     openGraph: {
       title,
       description,
-      images,
     }
   }
 }
