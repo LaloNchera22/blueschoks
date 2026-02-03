@@ -53,29 +53,29 @@ export async function updateSettings(prevState: SettingsState, formData: FormDat
   // Obtenemos el perfil actual para comparar cambios
   // Esto es vital para evitar errores de unicidad si el slug no ha cambiado,
   // y para evitar bloqueos de RLS si intentamos escribir lo mismo.
-  const { data: currentStore } = await supabase
-    .from('stores')
+  const { data: currentProfile } = await supabase
+    .from('profiles')
     .select('*')
-    .eq('owner_id', user.id)
+    .eq('id', user.id)
     .single()
 
   // 1. SHOP NAME
   if (shopName && shopName.trim() !== "") {
     const cleanShopName = shopName.trim()
-    if (!currentStore || cleanShopName !== currentStore.shop_name) {
+    if (!currentProfile || cleanShopName !== currentProfile.shop_name) {
       updates.shop_name = cleanShopName
     }
   }
 
-  // 2. SLUG
+  // 2. SLUG (Mapeado a username)
   // Relajamos validación: permitimos letras, números y guiones.
   // Solo actualizamos si es diferente al actual.
   if (rawSlug && rawSlug.trim() !== "") {
     const cleanSlug = rawSlug.toLowerCase().trim().replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, '')
 
     if (cleanSlug.length > 0) {
-       if (!currentStore || cleanSlug !== currentStore.slug) {
-         updates.slug = cleanSlug
+       if (!currentProfile || cleanSlug !== currentProfile.username) {
+         updates.username = cleanSlug
        }
     }
   }
@@ -83,7 +83,7 @@ export async function updateSettings(prevState: SettingsState, formData: FormDat
   // 3. WHATSAPP
   if (countryCode && localPhone && localPhone.trim() !== "") {
     const cleanPhone = (countryCode.replace('+', '') + localPhone).trim()
-    if (!currentStore || cleanPhone !== currentStore.whatsapp) {
+    if (!currentProfile || cleanPhone !== currentProfile.whatsapp) {
       updates.whatsapp = cleanPhone
     }
   }
@@ -94,14 +94,14 @@ export async function updateSettings(prevState: SettingsState, formData: FormDat
     // pero para eficiencia, si no hay cambios reales de datos, podemos saltar o solo updatear fecha.
     // En este caso, si el objeto updates tiene mas de 1 llave, significa que hubo cambio de datos.
 
-    // Si NO hay currentStore (caso raro), forzamos update.
+    // Si NO hay currentProfile (caso raro), forzamos update.
     const hasDataChanges = Object.keys(updates).length > 1;
 
-    if (hasDataChanges || !currentStore) {
+    if (hasDataChanges || !currentProfile) {
       const { data, error: updateError } = await supabase
-        .from("stores")
+        .from("profiles")
         .update(updates)
-        .eq("owner_id", user.id)
+        .eq("id", user.id)
         .select()
 
       if (updateError) {
@@ -110,7 +110,7 @@ export async function updateSettings(prevState: SettingsState, formData: FormDat
       }
 
       if (!data || data.length === 0) {
-        throw new Error("No se encontró la tienda para actualizar")
+        throw new Error("No se encontró el perfil para actualizar")
       }
     }
 
@@ -126,11 +126,11 @@ export async function updateSettings(prevState: SettingsState, formData: FormDat
     revalidatePath("/dashboard/settings")
 
     // Lógica de revalidación de caché (Slug)
-    let finalSlug = updates.slug;
+    let finalSlug = updates.username;
 
     if (!finalSlug) {
         // Si no se actualizó el slug, usamos el actual.
-        finalSlug = currentStore?.slug;
+        finalSlug = currentProfile?.username;
     }
 
     if (finalSlug) {
