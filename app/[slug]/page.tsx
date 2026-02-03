@@ -14,11 +14,11 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
   // 1. Fetch Profile First (New Source of Truth for URL via Username)
   const { data: profile } = await supabase
     .from('profiles')
-    .select('id, shop_name, design_title_text, design_subtitle_text, avatar_url, theme_config, design_config, design_bg_color')
+    .select('*')
     .eq('username', slug)
     .single()
 
-  if (!profile) return { title: 'Tienda no encontrada' }
+  if (!profile) return { title: 'Tienda no encontrada - BlueShocks' }
 
   // 2. Fetch Store Details (Secondary, for fallback shop_name)
   const { data: store } = await supabase
@@ -27,30 +27,43 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
     .eq('owner_id', profile.id)
     .single()
 
-  // Prioritize design_config (new source), fall back to theme_config (legacy)
-  const config = (profile.design_config || profile.theme_config) as unknown as DesignConfig
+  // 3. Resolve Config
+  // Ensure we match the page logic regarding PRO status and sanitization
+  const isPro = profile.is_pro || false;
+  const rawConfig = isPro
+    ? (profile.design_config || profile.theme_config) as unknown as Partial<DesignConfig> | null
+    : null;
 
-  // Title Precedence: Design Config -> Store Settings -> Profile -> Default
-  const title = config?.profile?.shopName || store?.shop_name || profile.shop_name || 'Mi Tienda'
-  const desc = config?.profile?.bio || (profile as any).design_subtitle_text || 'Bienvenido a mi tienda'
-  const avatar = config?.profile?.avatarUrl || profile.avatar_url || ''
+  // Use robust sanitizer with fallback to profile/store data
+  const profileWithFallback = {
+    ...profile,
+    shop_name: profile.shop_name || store?.shop_name
+  };
 
-  // Resolve background color (prioritize config, then legacy field, then default)
-  // We don't default here because the API route has its own default if missing,
-  // but passing a clean value is better.
-  const bgColor = config?.colors?.background || (profile as any).design_bg_color || '#1a472a'
+  const config = sanitizeDesign(rawConfig, profileWithFallback);
 
-  const baseUrl = process.env.NEXT_PUBLIC_URL || 'http://localhost:3000'
-  // Use query param format as requested
-  const ogImageUrl = `${baseUrl}/api/og?username=${slug}`
+  const shopName = config.profile.shopName || 'Mi Tienda';
+  const bio = config.profile.bio;
+  const avatarUrl = config.profile.avatarUrl;
+
+  const title = `${shopName} | BlueShocks`;
+  // Fallback description as requested
+  const description = bio || 'Visita mi catálogo online y haz tu pedido por WhatsApp.';
+
+  const baseUrl = process.env.NEXT_PUBLIC_URL || 'http://localhost:3000';
+  const ogRoute = `${baseUrl}/api/og?username=${slug}`;
+
+  // Logic: User uploaded logo (avatarUrl) -> Use it. Else -> BlueShocks default (api/og or static).
+  // We prioritize the user's avatar if available.
+  const images = avatarUrl ? [avatarUrl] : [{ url: ogRoute }];
 
   return {
     title,
-    description: desc,
+    description,
     openGraph: {
       title,
-      description: desc,
-      images: [{ url: ogImageUrl }]
+      description,
+      images,
     }
   }
 }
