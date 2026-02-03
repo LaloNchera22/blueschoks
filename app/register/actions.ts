@@ -45,6 +45,11 @@ export async function signup(formData: FormData) {
 
   // 3. Manejo de errores
   if (error) {
+    // Manejo de contraseña débil
+    if (error.code === 'weak_password' || error.message?.includes('Password should be at least 6 characters')) {
+      return redirect("/register?message=La contraseña es muy débil. Por favor usa al menos 6 caracteres.")
+    }
+
     // Si el error devuelto contiene el código 23505 (unique_violation)
     if (error.code === '23505' || error.message?.includes('unique')) {
       return redirect("/register?message=Este nombre de tienda ya está ocupado. Por favor intenta con otro.")
