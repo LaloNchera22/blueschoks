@@ -10,13 +10,8 @@
   · serverActions
 
 ✓ Starting...
-Attention: Next.js now collects completely anonymous telemetry regarding usage.
-This information is used to shape Next.js' roadmap and prioritize features.
-You can learn more, including how to opt-out if you'd not like to participate in this anonymous program, by visiting the following URL:
-https://nextjs.org/telemetry
-
 ⚠ The "middleware" file convention is deprecated. Please use "proxy" instead. Learn more: https://nextjs.org/docs/messages/middleware-to-proxy
-✓ Ready in 1881ms
-○ Compiling /test-design-editor ...
- GET /test-design-editor 200 in 10.1s (compile: 8.9s, proxy.ts: 524ms, render: 739ms)
- GET /test-design-editor 200 in 82ms (compile: 9ms, proxy.ts: 17ms, render: 56ms)
+✓ Ready in 1216ms
+○ Compiling /test-design-debug ...
+ GET /test-design-debug 200 in 4.0s (compile: 3.4s, proxy.ts: 149ms, render: 471ms)
+[?25h
