@@ -16,18 +16,18 @@ export default async function DesignPage() {
     return redirect("/login");
   }
 
-  // 1. Fetch RAW data (Profile & Products)
+  // 1. Fetch RAW data (Store & Products)
   // We use Promise.all to fetch in parallel
-  const [profileResponse, productsResponse] = await Promise.all([
-    supabase.from('profiles').select('*').eq('id', user.id).single(),
+  const [storeResponse, productsResponse] = await Promise.all([
+    supabase.from('stores').select('*').eq('owner_id', user.id).single(),
     supabase.from('products').select('*').eq('user_id', user.id).order('created_at', { ascending: false })
   ]);
 
-  const profile = profileResponse.data;
+  const store = storeResponse.data;
   const products = productsResponse.data || [];
 
-  if (profileResponse.error || !profile) {
-    console.error("DesignPage: Error fetching profile", profileResponse.error);
+  if (storeResponse.error || !store) {
+    console.error("DesignPage: Error fetching store", storeResponse.error);
     // Even if DB fails, return a working UI with defaults
     return (
       <DesignEditor
@@ -40,17 +40,15 @@ export default async function DesignPage() {
   }
 
   // 2. SANITIZE
-  // We prioritize 'design_config' if intended, but current app uses 'theme_config'.
-  // We will check 'theme_config' first as it likely contains the user's data.
-  // The sanitizer will perform a HARD RESET if the structure doesn't match the new DesignConfig.
+  // Use 'config' from stores table.
+  const rawConfig = store.config;
 
-  // Note: We pass the profile to help populate default fields like shopName/avatar if config is missing.
-  // FIX: Prioritize design_config (new) over theme_config (legacy) to ensure persistence.
-  const rawConfig = profile.design_config || profile.theme_config;
-  const cleanConfig = sanitizeDesign(rawConfig, profile);
+  // We pass 'store' as the fallback profile object.
+  // sanitizeDesign expects { shop_name, avatar_url }. 'stores' has 'shop_name'.
+  const cleanConfig = sanitizeDesign(rawConfig, store);
 
   // Guarantee valid slug
-  const validSlug = profile.slug || profile.username || user.id;
+  const validSlug = store.slug || user.id;
 
   return (
     <div className="flex-1 w-full h-full bg-gray-50 overflow-hidden">
@@ -59,7 +57,7 @@ export default async function DesignPage() {
         initialProducts={products}
         userId={user.id}
         slug={validSlug}
-        isPro={profile.is_pro || false}
+        isPro={store.is_pro || false}
       />
     </div>
   );

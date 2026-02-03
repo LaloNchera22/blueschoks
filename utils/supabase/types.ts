@@ -138,6 +138,8 @@ export interface Database {
           slug: string | null
           whatsapp: string | null
           updated_at: string | null
+          config: DesignConfig | null
+          is_pro: boolean | null
         }
         Insert: {
           id?: string
@@ -146,6 +148,8 @@ export interface Database {
           slug?: string | null
           whatsapp?: string | null
           updated_at?: string | null
+          config?: DesignConfig | null
+          is_pro?: boolean | null
         }
         Update: {
           id?: string
@@ -154,6 +158,8 @@ export interface Database {
           slug?: string | null
           whatsapp?: string | null
           updated_at?: string | null
+          config?: DesignConfig | null
+          is_pro?: boolean | null
         }
         Relationships: [
           {

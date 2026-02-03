@@ -1,6 +1,6 @@
 import { createClient } from "@/utils/supabase/server"
 import { redirect } from "next/navigation"
-import { Plus, PackageSearch } from "lucide-react"
+import { Plus, PackageSearch, Star } from "lucide-react"
 import Link from "next/link"
 import ProductCardClient from "./product-card"
 import { getUser } from "@/utils/user-data"
@@ -25,18 +25,49 @@ export default async function DashboardPage({
 
   const supabase = await createClient()
 
-  const { data: products, count } = await supabase
-    .from("products")
-    .select("*", { count: "exact" })
-    .eq("user_id", user.id)
-    .order("created_at", { ascending: false })
-    .range(from, to)
+  // Use Promise.all to fetch data in parallel
+  const [productsResponse, storeResponse] = await Promise.all([
+    supabase
+      .from("products")
+      .select("*", { count: "exact" })
+      .eq("user_id", user.id)
+      .order("created_at", { ascending: false })
+      .range(from, to),
+    supabase
+      .from("stores")
+      .select("is_pro")
+      .eq("owner_id", user.id)
+      .single()
+  ])
 
+  const { data: products, count } = productsResponse
+  const store = storeResponse.data
   const totalPages = count ? Math.ceil(count / ITEMS_PER_PAGE) : 0
 
   return (
     <div className="p-8 md:p-12 w-full max-w-7xl mx-auto space-y-10">
       
+      {/* UPGRADE BANNER */}
+      {store && !store.is_pro && (
+        <div className="bg-gradient-to-r from-yellow-50 to-orange-50 border border-yellow-200 rounded-2xl p-6 flex flex-col md:flex-row items-center justify-between gap-4 shadow-sm animate-in slide-in-from-top-4">
+            <div className="flex items-center gap-4">
+                <div className="p-3 bg-white rounded-full text-yellow-500 shadow-sm ring-1 ring-yellow-100">
+                    <Star size={24} className="fill-current" />
+                </div>
+                <div>
+                    <h3 className="font-bold text-yellow-900 text-lg">Tu tienda es Gratuita</h3>
+                    <p className="text-yellow-700/80 font-medium">Actualiza a PRO para desbloquear el editor avanzado y eliminar la marca de agua.</p>
+                </div>
+            </div>
+            <Link
+                href="/dashboard/pricing"
+                className="whitespace-nowrap bg-yellow-400 hover:bg-yellow-300 text-yellow-950 px-6 py-2.5 rounded-full font-bold text-sm transition-colors shadow-md shadow-yellow-400/20"
+            >
+                Mejorar Plan
+            </Link>
+        </div>
+      )}
+
       {/* HEADER */}
       <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 border-b border-slate-200/60 pb-6">
           <div>
