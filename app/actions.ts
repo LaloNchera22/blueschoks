@@ -99,9 +99,6 @@ export async function addProduct(formData: FormData) {
   const uploadPromises = imagesToProcess
     .filter(imageFile => imageFile.size > 0 && imageFile.type.startsWith('image/'))
     .map(async (imageFile, index) => {
-      if (imageFile.size > 4 * 1024 * 1024) {
-        throw new Error('Una de las imágenes pesa más de 4MB');
-      }
 
       const fileExt = imageFile.name.split('.').pop();
       const fileName = `${user.id}/${Date.now()}-${index}-${Math.random().toString(36).substring(7)}.${fileExt}`;
