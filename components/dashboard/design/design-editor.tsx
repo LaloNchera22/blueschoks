@@ -96,70 +96,79 @@ export default function DesignEditor({ initialConfig, initialProducts, userId, s
 
   // REEMPLAZO TOTAL DE LA LÓGICA DE CARGA INICIAL
   React.useEffect(() => {
+    // Bloqueo de seguridad: Si no hay usuario, no hacemos nada.
     if (!userId) return;
 
-    const fetchProfileData = async () => {
-      try {
-        console.log("⚡ [DesignEditor] Iniciando carga de perfil...");
-        const supabase = createClient();
-        // 1. Consulta la ÚNICA fuente de verdad: tabla 'profiles'
-        const { data, error } = await supabase
-          .from('profiles')
-          .select('shop_name, avatar_url, theme_config')
-          .eq('id', userId)
-          .single();
+    const loadExactData = async () => {
+      console.log("⚡ INICIANDO CARGA DE DISEÑO PARA:", userId);
 
-        if (error) throw error;
+      const supabase = createClient();
 
-        if (data) {
-           // Start with defaults to ensure full structure
-           const newConfig: DesignConfig = { ...DEFAULT_DESIGN };
+      // 1. Petición directa a la única fuente de verdad
+      const { data, error } = await supabase
+        .from('profiles')
+        .select('shop_name, avatar_url, theme_config')
+        .eq('id', userId)
+        .single();
 
-           // 2. Sincroniza Datos Básicos
-           if (data.shop_name) {
-             newConfig.profile.shopName = data.shop_name;
-             newConfig.profile.displayName = data.shop_name;
-           }
-           if (data.avatar_url) {
-             newConfig.profile.avatarUrl = data.avatar_url;
-           }
-
-           // 3. Sincroniza Configuración de Diseño (Hydration)
-           // Mapeamos el JSON guardado a la estructura de DesignConfig
-           // eslint-disable-next-line @typescript-eslint/no-explicit-any
-           const savedConfig = (data.theme_config as any) || {};
-
-           // Direct mapping of nested objects if they exist (Modern format)
-           if (savedConfig.colors) newConfig.colors = { ...newConfig.colors, ...savedConfig.colors };
-           if (savedConfig.fonts) newConfig.fonts = { ...newConfig.fonts, ...savedConfig.fonts };
-           if (savedConfig.cardStyle) newConfig.cardStyle = { ...newConfig.cardStyle, ...savedConfig.cardStyle };
-           if (savedConfig.profile) newConfig.profile = { ...newConfig.profile, ...savedConfig.profile };
-           if (savedConfig.socialLinks) newConfig.socialLinks = savedConfig.socialLinks;
-           if (savedConfig.socialStyle) newConfig.socialStyle = { ...newConfig.socialStyle, ...savedConfig.socialStyle };
-           if (savedConfig.checkout) newConfig.checkout = { ...newConfig.checkout, ...savedConfig.checkout };
-           if (savedConfig.backgroundImage) newConfig.backgroundImage = savedConfig.backgroundImage;
-
-           // Flat properties (Legacy format support as requested)
-           if (savedConfig.primaryColor) newConfig.colors.primary = savedConfig.primaryColor;
-           if (savedConfig.font) {
-             newConfig.fonts.heading = savedConfig.font;
-             newConfig.fonts.body = savedConfig.font;
-           }
-           if (savedConfig.borderRadius !== undefined) newConfig.cardStyle.borderRadius = savedConfig.borderRadius;
-
-           // Force update from root columns again to ensure consistency
-           if (data.shop_name) newConfig.profile.shopName = data.shop_name;
-           if (data.avatar_url) newConfig.profile.avatarUrl = data.avatar_url;
-
-           console.log('✅ Diseño sincronizado correctamente desde DB', newConfig);
-           setConfig(newConfig);
-        }
-      } catch (error: any) {
-        console.error('Error crítico cargando perfil:', error.message);
+      if (error) {
+        console.error("❌ ERROR CRÍTICO LEYENDO DB:", error);
+        return;
       }
+
+      console.log("✅ DATOS RECIBIDOS CRUDOS:", data);
+
+      // 2. Sincronización OBLIGATORIA (Hydration)
+      const newConfig: DesignConfig = { ...DEFAULT_DESIGN };
+
+      // A) Nombre de la tienda
+      if (data.shop_name) {
+        console.log("-> Estableciendo nombre:", data.shop_name);
+        newConfig.profile.shopName = data.shop_name;
+        newConfig.profile.displayName = data.shop_name;
+      }
+
+      // B) Avatar
+      if (data.avatar_url) {
+         newConfig.profile.avatarUrl = data.avatar_url;
+      }
+
+      // C) Configuración Visual (El punto donde fallaba)
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const config = (data.theme_config as any) || {};
+
+      // Mapeo defensivo de propiedades anidadas (Modern)
+      if (config.colors) newConfig.colors = { ...newConfig.colors, ...config.colors };
+      if (config.fonts) newConfig.fonts = { ...newConfig.fonts, ...config.fonts };
+      if (config.cardStyle) newConfig.cardStyle = { ...newConfig.cardStyle, ...config.cardStyle };
+      if (config.profile) newConfig.profile = { ...newConfig.profile, ...config.profile };
+      if (config.socialLinks) newConfig.socialLinks = config.socialLinks;
+      if (config.socialStyle) newConfig.socialStyle = { ...newConfig.socialStyle, ...config.socialStyle };
+      if (config.checkout) newConfig.checkout = { ...newConfig.checkout, ...config.checkout };
+      if (config.backgroundImage) newConfig.backgroundImage = config.backgroundImage;
+
+      // Mapeo de propiedades planas (Legacy/Snippet User)
+      if (config.primaryColor) newConfig.colors.primary = config.primaryColor;
+      if (config.font) {
+         newConfig.fonts.heading = config.font;
+         newConfig.fonts.body = config.font;
+      }
+      if (config.borderRadius !== undefined) newConfig.cardStyle.borderRadius = config.borderRadius;
+
+      // D) Re-imponer datos críticos de columnas (Source of Truth) para evitar sobreescritura por JSON antiguo
+      if (data.shop_name) {
+         newConfig.profile.shopName = data.shop_name;
+         newConfig.profile.displayName = data.shop_name;
+      }
+      if (data.avatar_url) {
+         newConfig.profile.avatarUrl = data.avatar_url;
+      }
+
+      console.log("🚀 ESTADO ACTUALIZADO CON:", newConfig);
+      setConfig(newConfig);
     };
 
-    fetchProfileData();
+    loadExactData();
   }, [userId]);
   const [selection, setSelection] = useState<SelectionState>(null);
   const [isSaving, setIsSaving] = useState(false);
