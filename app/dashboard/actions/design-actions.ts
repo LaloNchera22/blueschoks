@@ -14,27 +14,27 @@ export async function saveDesignConfig(config: DesignConfig) {
   }
 
   try {
-    const { data: store } = await supabase
-      .from('stores')
-      .select('slug')
-      .eq('owner_id', user.id)
+    // Obtenemos username (slug) de profiles para la revalidación
+    const { data: profile } = await supabase
+      .from('profiles')
+      .select('username')
+      .eq('id', user.id)
       .single()
 
     const { error } = await supabase
-      .from('stores')
+      .from('profiles')
       .update({
-        config: config,
-        updated_at: new Date().toISOString()
+        theme_config: config
       })
-      .eq('owner_id', user.id)
+      .eq('id', user.id)
 
     if (error) throw error
 
     revalidatePath('/dashboard/design', 'page')
 
-    if (store?.slug) {
+    if (profile?.username) {
       // ⚡ LA CLAVE: Limpiar caché de TODAS las rutas posibles
-      revalidatePath(`/${store.slug}`)       // Limpia la tienda específica
+      revalidatePath(`/${profile.username}`)       // Limpia la tienda específica
       revalidatePath('/[slug]', 'page')        // Limpia la ruta dinámica
     }
 
@@ -57,29 +57,28 @@ export async function saveThemeConfig(config: ThemeConfig) {
   }
 
   try {
-    // Get slug for revalidation
-    const { data: store } = await supabase
-      .from('stores')
-      .select('slug')
-      .eq('owner_id', user.id)
+    // Get username for revalidation
+    const { data: profile } = await supabase
+      .from('profiles')
+      .select('username')
+      .eq('id', user.id)
       .single()
 
     const { error } = await supabase
-      .from('stores')
+      .from('profiles')
       .update({
         // @ts-ignore: ThemeConfig structure might differ from DesignConfig, casting to any to allow save.
-        config: config as any,
-        updated_at: new Date().toISOString()
+        theme_config: config as any
       })
-      .eq('owner_id', user.id)
+      .eq('id', user.id)
 
     if (error) throw error
 
     revalidatePath('/dashboard/design', 'layout')
 
-    if (store?.slug) {
+    if (profile?.username) {
       // Revalidate the specific shop page
-      revalidatePath(`/${store.slug}`, 'layout')
+      revalidatePath(`/${profile.username}`, 'layout')
       // Invalidate the shop data cache
       // revalidateTag(`shop:${store.slug}`, 'max')
     }
