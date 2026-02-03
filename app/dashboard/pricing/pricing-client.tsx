@@ -125,7 +125,7 @@ export default function PricingClient({ isPro, subscriptionEnd, plans }: Pricing
   }
 
   return (
-    <div className="container mx-auto px-4 py-8 md:py-16 max-w-7xl">
+    <div className="container mx-auto px-4 py-8 pb-32 md:py-16 md:pb-24 max-w-7xl">
       <div className="text-center mb-12">
         <h1 className="text-3xl md:text-4xl font-bold tracking-tight mb-4">
           Elige el plan perfecto para tu negocio
