@@ -3,6 +3,7 @@
 import { revalidatePath } from "next/cache"
 import { redirect } from "next/navigation"
 import { createClient } from "@/utils/supabase/server"
+import { RESERVED_SLUGS } from "@/lib/constants"
 
 export async function signup(formData: FormData) {
   const supabase = await createClient()
@@ -20,6 +21,10 @@ export async function signup(formData: FormData) {
   // Si no hay slug explícito, lo generamos desde el nombre de la tienda
   const rawSlug = slugRaw || shopName
   const username = rawSlug.toLowerCase().replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, '')
+
+  if (RESERVED_SLUGS.includes(username)) {
+    return redirect("/register?message=Este nombre de usuario está reservado por el sistema. Por favor elige otro.")
+  }
 
   // 2. Creación del usuario con metadatos
   // Pasamos los datos extra en options.data para que el Trigger de Supabase capture first_name, last_name, etc.
