@@ -5,14 +5,18 @@
 ▲ Next.js 16.1.6 (Turbopack)
 - Local:         http://localhost:3000
 - Network:       http://192.168.0.2:3000
+- Environments: .env.local
 - Experiments (use with caution):
   · serverActions
 
 ✓ Starting...
+Attention: Next.js now collects completely anonymous telemetry regarding usage.
+This information is used to shape Next.js' roadmap and prioritize features.
+You can learn more, including how to opt-out if you'd not like to participate in this anonymous program, by visiting the following URL:
+https://nextjs.org/telemetry
+
 ⚠ The "middleware" file convention is deprecated. Please use "proxy" instead. Learn more: https://nextjs.org/docs/messages/middleware-to-proxy
-✓ Ready in 1372ms
- GET /test-pricing 200 in 1924ms (compile: 1503ms, proxy.ts: 144ms, render: 277ms)
- GET /test-pricing 200 in 119ms (compile: 8ms, proxy.ts: 16ms, render: 95ms)
-✓ Compiled in 680ms
- GET /test-pricing 200 in 236ms (compile: 77ms, proxy.ts: 9ms, render: 150ms)
-[?25h
+✓ Ready in 1881ms
+○ Compiling /test-design-editor ...
+ GET /test-design-editor 200 in 10.1s (compile: 8.9s, proxy.ts: 524ms, render: 739ms)
+ GET /test-design-editor 200 in 82ms (compile: 9ms, proxy.ts: 17ms, render: 56ms)

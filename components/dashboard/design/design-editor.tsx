@@ -13,10 +13,9 @@ import { useRouter } from 'next/navigation';
 import { createClient } from '@/utils/supabase/client';
 
 import { DesignConfig, ProductStyle } from '@/lib/types/design-system';
-import { saveDesignConfig } from '@/app/dashboard/actions/design-actions';
 import { updateProductStyle, applyStyleToAllProducts, saveProductStylesBulk } from '@/app/dashboard/products/actions';
 import { Database } from '@/utils/supabase/types';
-import { DEFAULT_DESIGN } from '@/utils/design-sanitizer';
+import { DEFAULT_DESIGN, sanitizeDesign } from '@/utils/design-sanitizer';
 
 // Components
 import { StorePreview } from './store-preview';
@@ -94,6 +93,35 @@ export default function DesignEditor({ initialConfig, initialProducts, userId, s
   const [products, setProducts] = useState<Product[]>(initialProducts);
   // null means closed, string means open drawer
   const [activeTool, setActiveTool] = useState<ToolType | string | null>(null);
+
+  // 1. Logic to Load Design from PROFILES
+  React.useEffect(() => {
+    const fetchDesign = async () => {
+      const supabase = createClient();
+      // We search in PROFILES, not stores
+      const { data, error } = await supabase
+        .from('profiles')
+        .select('theme_config, shop_name, avatar_url')
+        .eq('id', userId)
+        .single();
+
+      if (error) {
+        console.error('Error fetching design:', error);
+        return;
+      }
+
+      if (data?.theme_config) {
+        // 2. Map the saved configuration to the local editor state
+        // We use sanitizeDesign to ensure the structure is correct and apply fallbacks
+        const cleanConfig = sanitizeDesign(data.theme_config, data);
+        setConfig(cleanConfig);
+      }
+    };
+
+    if (userId) {
+      fetchDesign();
+    }
+  }, [userId]);
   const [selection, setSelection] = useState<SelectionState>(null);
   const [isSaving, setIsSaving] = useState(false);
   const [isSavingProduct, setIsSavingProduct] = useState(false);
@@ -127,15 +155,25 @@ export default function DesignEditor({ initialConfig, initialProducts, userId, s
         style_config: (p.style_config as ProductStyle) || {}
       }));
 
-      const [designResult, productsResult] = await Promise.all([
-        saveDesignConfig(config),
-        initialProducts.length > 0 ? saveProductStylesBulk(productUpdates) : Promise.resolve({ success: true })
-      ]);
+      // 1. Save Design (Directly to Profiles)
+      const supabase = createClient();
+      const { error: designError } = await supabase
+        .from('profiles')
+        .update({ theme_config: config }) // Column theme_config
+        .eq('id', userId);
 
-      if (designResult.error) throw new Error("Error saving design: " + JSON.stringify(designResult.error));
-      if ((productsResult as any)?.error) throw new Error((productsResult as any).error);
+      if (designError) throw new Error("Error saving design: " + designError.message);
 
-      toast.success("¡Todo guardado correctamente!");
+      // 2. Save Products (Separate action)
+      let productsResult: any = { success: true };
+      if (initialProducts.length > 0) {
+        productsResult = await saveProductStylesBulk(productUpdates);
+      }
+
+      if (productsResult?.error) throw new Error(productsResult.error);
+
+      toast.success("¡Diseño actualizado!");
+      // Importante: Refrescar la vista previa si usas iframe (en este caso router refresh)
       router.refresh();
     } catch (error: any) {
       console.error("❌ ERROR AL GUARDAR:", error);
