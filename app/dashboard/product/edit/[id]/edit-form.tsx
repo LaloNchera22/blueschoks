@@ -5,7 +5,6 @@ import { useActionState } from "react"
 import { useFormStatus } from "react-dom"
 import Link from "next/link"
 import { useState, useEffect } from "react"
-import { createClient } from "@/utils/supabase/client"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
@@ -22,27 +21,16 @@ interface Product {
   [key: string]: unknown;
 }
 
-export default function EditProductForm({ product }: { product: Product }) {
+export default function EditProductForm({ product, isPro }: { product: Product, isPro: boolean }) {
   const updateProductWithId = updateProduct.bind(null, product.id)
   const [state, dispatch] = useActionState(updateProductWithId, { status: null, message: null })
 
   // ESTADOS PARA LA INTERFAZ
-  const [isPro, setIsPro] = useState(false)
   const [previews, setPreviews] = useState<{ url: string, type: 'image' | 'video', isExisting: boolean }[]>([])
   const [newFiles, setNewFiles] = useState<File[]>([])
 
   // 1. Consultar si es PRO al cargar y cargar previews
   useEffect(() => {
-    const checkPlan = async () => {
-      const supabase = createClient()
-      const { data: { user } } = await supabase.auth.getUser()
-      if (user) {
-        const { data } = await supabase.from('profiles').select('is_pro').eq('id', user.id).single()
-        setIsPro(data?.is_pro || false)
-      }
-    }
-    checkPlan()
-
     const rawMedia = Array.isArray(product.media) && product.media.length > 0
     ? product.media
     : (product.image_url ? [product.image_url] : [])
