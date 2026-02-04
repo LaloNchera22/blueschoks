@@ -19,7 +19,13 @@ export default async function EditProductPage({ params }: { params: Promise<{ id
 
   if (!product) notFound()
 
-  const profile = await getProfile()
+  const { data: profile } = await supabase
+    .from('profiles')
+    .select('is_pro')
+    .eq('id', user.id)
+    .single()
 
-  return <EditProductForm product={product} isPro={profile?.is_pro || false} />
+  const isPro = profile?.is_pro || false
+
+  return <EditProductForm product={product} isPro={isPro} />
 }
