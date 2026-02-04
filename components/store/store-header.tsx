@@ -81,7 +81,7 @@ export function StoreHeader({ config }: StoreHeaderProps) {
   const textColor = config?.colors?.text || '#1f2937'
 
   return (
-    <div className="sticky top-0 z-40 w-full transition-all duration-300">
+    <div className="relative z-40 w-full transition-all duration-300">
       {/* Background with blur */}
       <div className="absolute inset-0 bg-white/70 backdrop-blur-md border-b border-gray-100/50 shadow-sm" />
 

@@ -120,7 +120,14 @@ export default function StoreClient({ profile, products, config }: StoreClientPr
           )}
       </div>
 
-      {/* 2. Capa de Contenido (Scrollable Viewport) */}
+      {/* 2. Header Fijo (Fixed Navbar) */}
+      <div className="fixed top-0 left-0 right-0 z-50 flex justify-center pointer-events-none">
+          <div className="w-full max-w-[430px] pointer-events-auto">
+              <StoreHeader config={config} />
+          </div>
+      </div>
+
+      {/* 3. Capa de Contenido (Scrollable Viewport) */}
       {/*
          We use h-[100dvh] and overflow-y-auto because the global layout has 'overflow: hidden' on body.
          This creates a dedicated scroll area for the store.
@@ -129,15 +136,9 @@ export default function StoreClient({ profile, products, config }: StoreClientPr
         <div className="w-full flex justify-center min-h-full">
             {/* Store Container (Centered on desktop, full width on mobile) */}
             <div
-                className="w-full max-w-[430px] min-h-full flex flex-col shadow-2xl relative"
+                className="w-full max-w-[430px] min-h-full flex flex-col shadow-2xl relative pt-20"
                 style={{ color: textColor }}
             >
-                {/*
-                  Header Sticky Bar
-                  Must be inside the scrollable container to stick correctly.
-                */}
-                <StoreHeader config={config} />
-
                 {/* Main Content Area */}
                 <div className="pb-32">
 
