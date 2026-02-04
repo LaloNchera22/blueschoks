@@ -171,6 +171,7 @@ export function ProductCard({ product, config, onSelectElement, onProductClick, 
 
   const btnBg = style.cartBtnBackground || cardStyle.buttonColor || '#000000'
   const btnColor = style.cartBtnColor || cardStyle.buttonTextColor || '#ffffff'
+  const btnIconColor = style.cartBtnIconColor || cardStyle.buttonIconColor || btnColor
 
   const currentMediaUrl = gallery[currentImg];
 
@@ -316,7 +317,7 @@ export function ProductCard({ product, config, onSelectElement, onProductClick, 
               color: btnColor
             }}
           >
-            <ShoppingBag size={18} strokeWidth={2.5} />
+            <ShoppingBag size={18} strokeWidth={2.5} color={btnIconColor} />
           </button>
         </div>
       </div>
