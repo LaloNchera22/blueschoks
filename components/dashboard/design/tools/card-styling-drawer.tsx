@@ -6,6 +6,7 @@ import { ColorCircle } from '../color-circle';
 import { Slider } from '@/components/ui/slider';
 import { Switch } from '@/components/ui/switch';
 import { ChevronDown, ChevronRight } from 'lucide-react';
+import { FontPicker } from '../font-picker';
 
 interface CardStylingDrawerProps {
   config: DesignConfig;
@@ -15,6 +16,7 @@ interface CardStylingDrawerProps {
 
 export function CardStylingDrawer({ config, onUpdate }: CardStylingDrawerProps) {
   const [showColors, setShowColors] = useState(false);
+  const [showTypography, setShowTypography] = useState(true);
 
   return (
     <div className="flex flex-col gap-6">
@@ -25,10 +27,10 @@ export function CardStylingDrawer({ config, onUpdate }: CardStylingDrawerProps) 
        <div className="space-y-3">
           <div className="flex justify-between items-center">
              <label className="text-xs font-bold text-gray-500 uppercase tracking-wider">Redondez</label>
-             <span className="text-xs font-medium bg-gray-100 px-2 py-1 rounded text-gray-600">{config.cardStyle.borderRadius}px</span>
+             <span className="text-xs font-medium bg-gray-100 px-2 py-1 rounded text-gray-600">{config.cardStyle.borderRadius ?? 8}px</span>
           </div>
           <Slider
-            value={config.cardStyle.borderRadius || 8}
+            value={config.cardStyle.borderRadius ?? 8}
             max={32}
             min={0}
             step={2}
@@ -62,8 +64,59 @@ export function CardStylingDrawer({ config, onUpdate }: CardStylingDrawerProps) 
           />
        </div>
 
+       {/* 2. Typography (New Section) */}
+       <div className="border border-gray-200 rounded-xl overflow-hidden bg-white shadow-sm transition-all duration-200">
+          <button
+            onClick={() => setShowTypography(!showTypography)}
+            className="w-full p-4 flex items-center justify-between hover:bg-gray-50 active:bg-gray-100 transition-colors"
+          >
+             <div className="flex items-center gap-3">
+               <span className="font-semibold text-sm text-gray-900">Tipografía</span>
+             </div>
+             {showTypography ? <ChevronDown className="w-5 h-5 text-gray-400" /> : <ChevronRight className="w-5 h-5 text-gray-400" />}
+          </button>
 
-       {/* 2. Colors (Collapsible) */}
+          {showTypography && (
+             <div className="p-4 bg-gray-50 border-t border-gray-100 space-y-4 animate-in slide-in-from-top-2 duration-200">
+                {/* Title */}
+                <div className="flex items-center justify-between bg-white p-3 rounded-xl border border-gray-200">
+                    <span className="text-xs font-bold text-gray-500 uppercase tracking-wider">Título</span>
+                    <div className="flex items-center gap-3">
+                        <FontPicker
+                           value={config.cardStyle.titleFont || config.fonts.heading}
+                           onChange={(val) => onUpdate(['cardStyle', 'titleFont'], val)}
+                           className="w-28"
+                        />
+                        <ColorCircle
+                           color={config.cardStyle.titleColor || config.colors.text}
+                           onChange={(c) => onUpdate(['cardStyle', 'titleColor'], c)}
+                           size="sm"
+                        />
+                    </div>
+                </div>
+
+                {/* Price */}
+                <div className="flex items-center justify-between bg-white p-3 rounded-xl border border-gray-200">
+                    <span className="text-xs font-bold text-gray-500 uppercase tracking-wider">Precio</span>
+                    <div className="flex items-center gap-3">
+                        <FontPicker
+                           value={config.cardStyle.priceFont || config.fonts.body}
+                           onChange={(val) => onUpdate(['cardStyle', 'priceFont'], val)}
+                           className="w-28"
+                        />
+                        <ColorCircle
+                           color={config.cardStyle.priceColor || config.colors.primary}
+                           onChange={(c) => onUpdate(['cardStyle', 'priceColor'], c)}
+                           size="sm"
+                        />
+                    </div>
+                </div>
+             </div>
+          )}
+       </div>
+
+
+       {/* 3. Colors (Collapsible) */}
        <div className="border border-gray-200 rounded-xl overflow-hidden bg-white shadow-sm transition-all duration-200">
           <button
             onClick={() => setShowColors(!showColors)}
@@ -80,32 +133,14 @@ export function CardStylingDrawer({ config, onUpdate }: CardStylingDrawerProps) 
                  {/* Card Colors */}
                  <div className="space-y-3">
                     <label className="text-xs font-bold text-gray-400 uppercase tracking-wider">Tarjeta</label>
-                    <div className="grid grid-cols-2 gap-3">
+                    <div className="grid grid-cols-1 gap-3">
                        {/* Card Background (Global) */}
-                       <div className="bg-white p-3 rounded-xl border border-gray-200 flex items-center gap-3">
+                       <div className="bg-white p-3 rounded-xl border border-gray-200 flex items-center justify-between">
+                           <span className="text-xs font-medium text-gray-700">Fondo</span>
                            <ColorCircle
                              color={config.colors.cardBackground || '#ffffff'}
                              onChange={(c) => onUpdate(['colors', 'cardBackground'], c)}
                            />
-                           <span className="text-xs font-medium text-gray-700">Fondo</span>
-                       </div>
-
-                       {/* Title Color */}
-                       <div className="bg-white p-3 rounded-xl border border-gray-200 flex items-center gap-3">
-                           <ColorCircle
-                             color={config.cardStyle.titleColor || config.colors.text}
-                             onChange={(c) => onUpdate(['cardStyle', 'titleColor'], c)}
-                           />
-                           <span className="text-xs font-medium text-gray-700">Título</span>
-                       </div>
-
-                       {/* Price Color */}
-                       <div className="bg-white p-3 rounded-xl border border-gray-200 flex items-center gap-3">
-                           <ColorCircle
-                             color={config.cardStyle.priceColor || config.colors.primary}
-                             onChange={(c) => onUpdate(['cardStyle', 'priceColor'], c)}
-                           />
-                           <span className="text-xs font-medium text-gray-700">Precio</span>
                        </div>
                     </div>
                  </div>

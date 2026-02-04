@@ -22,6 +22,8 @@ export interface CardStyle {
   buttonIconColor?: string;
   priceColor: string;
   titleColor: string;
+  titleFont?: string;
+  priceFont?: string;
   shadow?: boolean;
   opacity?: number;
 }

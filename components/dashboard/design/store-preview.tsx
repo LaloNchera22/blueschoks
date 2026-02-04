@@ -205,9 +205,6 @@ export function StorePreview({
                                         onProductClick={() => {
                                             onSelectTool('card-styling');
                                         }}
-                                        onSelectElement={(elementType) => {
-                                            onSelectElement(p.id, elementType);
-                                        }}
                                      />
                                   </div>
                               )})}
