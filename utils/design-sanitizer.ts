@@ -60,6 +60,8 @@ export function sanitizeDesign(raw: any, profileFallback?: any): DesignConfig {
   // 3. Structure seems okay, but we still reconstruct it to ensure no extra garbage
   // and type safety. We map existing fields if they exist, or default if missing.
   const clean: DesignConfig = {
+    backgroundImage: typeof raw.backgroundImage === 'string' ? raw.backgroundImage : undefined,
+    backgroundOpacity: typeof raw.backgroundOpacity === 'number' ? raw.backgroundOpacity : undefined,
     colors: {
       background: typeof raw.colors?.background === 'string' ? raw.colors.background : DEFAULT_DESIGN.colors.background,
       text: typeof raw.colors?.text === 'string' ? raw.colors.text : DEFAULT_DESIGN.colors.text,

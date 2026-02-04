@@ -133,9 +133,12 @@ export default function StoreClient({ profile, products, config }: StoreClientPr
                   <div className="flex justify-center mb-6">
                     <div
                       className={cn(
-                        "relative w-32 h-32 overflow-hidden ring-2 ring-offset-2 ring-neutral-900/10",
+                        "relative w-32 h-32 overflow-hidden ring-2 ring-offset-2",
                         shapeClass
                       )}
+                      style={{
+                        '--tw-ring-color': config.profile.avatarBorderColor || 'rgba(23, 23, 23, 0.1)',
+                      } as React.CSSProperties}
                     >
                       {config.profile.avatarUrl ? (
                           <Image
