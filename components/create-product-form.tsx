@@ -1,13 +1,14 @@
 "use client"
 
-import { useState, useRef } from "react"
+import { useState, useRef, useEffect } from "react"
 import { useRouter } from "next/navigation"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
 import { Loader2, Image as ImageIcon, Trash2, UploadCloud, Video, ArrowLeft, Lock, Star } from "lucide-react"
-import { createProduct } from "@/app/dashboard/products/actions"
+// import { createProduct } from "@/app/dashboard/products/actions" // Eliminado para usar lógica cliente directa
+import { createClient } from "@/utils/supabase/client"
 import Image from "next/image"
 import Link from "next/link"
 
@@ -16,7 +17,18 @@ export default function CreateProductForm({ isPro = false, productCount = 0 }: {
   const [isLoading, setIsLoading] = useState(false)
   const [previews, setPreviews] = useState<{url: string, type: string}[]>([])
   const [files, setFiles] = useState<File[]>([])
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const [user, setUser] = useState<any>(null);
   const fileInputRef = useRef<HTMLInputElement>(null)
+
+  useEffect(() => {
+     const getUser = async () => {
+         const supabase = createClient();
+         const { data: { user } } = await supabase.auth.getUser();
+         setUser(user);
+     }
+     getUser();
+  }, []);
 
   const isProductLimitReached = !isPro && productCount >= 3;
 
@@ -81,13 +93,60 @@ export default function CreateProductForm({ isPro = false, productCount = 0 }: {
   const handleSubmit = async (formData: FormData) => {
     setIsLoading(true)
     try {
-      await createProduct(formData)
+      if (!user) throw new Error("Sesión no iniciada o usuario no identificado");
+
+      const supabase = createClient();
+
+      // 1. Subir Imágenes (Client Side)
+      const uploadedUrls: string[] = [];
+
+      // Subir cada archivo secuencialmente
+      for (const file of files) {
+           const fileExt = file.name.split('.').pop();
+           const fileName = `${user.id}/${Date.now()}-${Math.random().toString(36).substring(7)}.${fileExt}`;
+
+           const { error: uploadError } = await supabase.storage
+              .from('products')
+              .upload(fileName, file);
+
+           if (uploadError) throw uploadError;
+
+           const { data } = supabase.storage
+              .from('products')
+              .getPublicUrl(fileName);
+
+           uploadedUrls.push(data.publicUrl);
+      }
+
+      // 2. Preparar Payload (Tipos Primitivos)
+      const name = formData.get('name') as string;
+      const priceStr = formData.get('price') as string;
+      const description = formData.get('description') as string;
+
+      const payload = {
+          user_id: user.id, // CRÍTICO: Inyección manual de user_id
+          name: name,
+          price: parseFloat(priceStr),
+          description: description,
+          image_url: uploadedUrls[0] || null, // Primera imagen como portada
+          images: uploadedUrls,
+          stock: 0 // Default obligatorio
+      };
+
+      // 3. Insertar en Base de Datos (Client Side - Tabla Products)
+      const { error } = await supabase
+          .from('products')
+          .upsert(payload); // upsert sirve para create/update si se configura, aquí es create (sin ID)
+
+      if (error) throw error;
+
       // Redirigir al dashboard al terminar
       router.push("/dashboard/products")
       router.refresh()
     } catch (error: unknown) {
+        console.error(error);
         if (error instanceof Error) {
-            alert("Error: " + error.message)
+            alert("Error al crear producto: " + error.message)
         } else {
             alert("Error desconocido")
         }
