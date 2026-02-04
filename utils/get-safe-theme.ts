@@ -79,7 +79,7 @@ export const DUMMY_PROFILE: Profile = {
   design_font: null,
   design_card_style: null,
   design_config: null,
-  theme_config: DEFAULT_THEME
+  theme_config: DEFAULT_THEME as any
 };
 
 // 3. DEFENSIVE MERGE UTILS

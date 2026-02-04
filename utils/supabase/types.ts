@@ -31,7 +31,7 @@ export interface Database {
           design_font: string | null
           design_card_style: string | null
           design_config: DesignConfig | null
-          theme_config: ThemeConfig | null
+          theme_config: DesignConfig | ThemeConfig | null
         }
         Insert: {
           id?: string
@@ -51,7 +51,7 @@ export interface Database {
           design_font?: string | null
           design_card_style?: string | null
           design_config?: DesignConfig | null
-          theme_config?: ThemeConfig | null
+          theme_config?: DesignConfig | ThemeConfig | null
         }
         Update: {
           id?: string
@@ -71,7 +71,7 @@ export interface Database {
           design_font?: string | null
           design_card_style?: string | null
           design_config?: DesignConfig | null
-          theme_config?: ThemeConfig | null
+          theme_config?: DesignConfig | ThemeConfig | null
         }
         Relationships: [
           {

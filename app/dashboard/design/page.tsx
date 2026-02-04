@@ -1,4 +1,4 @@
-import { createClient } from "@/utils/supabase/server";
+import { createClient, createAdminClient } from "@/utils/supabase/server";
 import { redirect } from "next/navigation";
 import { sanitizeDesign, DEFAULT_DESIGN } from "@/utils/design-sanitizer";
 import { getProfile } from "@/utils/user-data";
@@ -23,10 +23,19 @@ export default async function DesignPage() {
     .eq('user_id', userId)
     .order('created_at', { ascending: false });
 
+  // Use Admin Client to fetch potentially hidden config columns (RLS)
+  const adminSupabase = await createAdminClient();
+  const { data: adminProfile } = await adminSupabase
+    .from('profiles')
+    .select('theme_config, design_config')
+    .eq('id', userId)
+    .single();
+
   // 2. SANITIZE
   // Use 'theme_config' from profiles table.
+  // Prioritize Admin fetched data as User fetch might miss hidden columns
   // @ts-ignore: profile type might not be fully updated in generated types
-  const rawConfig = profile.design_config || profile.theme_config;
+  const rawConfig = adminProfile?.design_config || adminProfile?.theme_config || profile.design_config || profile.theme_config;
 
   // We pass 'profile' as the fallback object.
   const cleanConfig = sanitizeDesign(rawConfig, profile);
