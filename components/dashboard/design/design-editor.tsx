@@ -16,6 +16,7 @@ import { DesignConfig, ProductStyle } from '@/lib/types/design-system';
 import { updateProductStyle, applyStyleToAllProducts, saveProductStylesBulk } from '@/app/dashboard/products/actions';
 import { Database } from '@/utils/supabase/types';
 import { DEFAULT_DESIGN, sanitizeDesign } from '@/utils/design-sanitizer';
+import { getDesignConfigAction, saveDesignConfigAction } from '@/app/dashboard/design/actions';
 
 // Components
 import { StorePreview } from './store-preview';
@@ -104,75 +105,75 @@ export default function DesignEditor({ initialConfig, initialProducts, userId, s
     const loadExactData = async () => {
       console.log("⚡ INICIANDO CARGA DE DISEÑO PARA:", userId);
 
-      const supabase = createClient();
+      try {
+        // Usar Server Action para evitar problemas de RLS/Cache en cliente
+        const data = await getDesignConfigAction();
 
-      // 1. Petición directa a la única fuente de verdad
-      const { data, error } = await supabase
-        .from('profiles')
-        .select('shop_name, avatar_url, theme_config, design_config')
-        .eq('id', userId)
-        .single();
+        if (!data) {
+           console.error("❌ NO SE RECIBIERON DATOS DE LA SERVER ACTION");
+           return;
+        }
 
-      if (error) {
+        console.log("✅ DATOS RECIBIDOS CRUDOS:", data);
+        setDebugData(data?.theme_config);
+
+        // 2. Sincronización OBLIGATORIA (Hydration)
+        const newConfig: DesignConfig = { ...DEFAULT_DESIGN };
+
+        // A) Nombre de la tienda
+        if (data.shop_name) {
+          console.log("-> Estableciendo nombre:", data.shop_name);
+          newConfig.profile.shopName = data.shop_name;
+          newConfig.profile.displayName = data.shop_name;
+        }
+
+        // B) Avatar
+        if (data.avatar_url) {
+           newConfig.profile.avatarUrl = data.avatar_url;
+        }
+
+        // C) Configuración Visual (El punto donde fallaba)
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const config = (data.design_config as any) || (data.theme_config as any) || {};
+
+        // Mapeo defensivo de propiedades anidadas (Modern)
+        if (config.colors) newConfig.colors = { ...newConfig.colors, ...config.colors };
+        if (config.fonts) newConfig.fonts = { ...newConfig.fonts, ...config.fonts };
+        if (config.cardStyle) newConfig.cardStyle = { ...newConfig.cardStyle, ...config.cardStyle };
+        if (config.profile) newConfig.profile = { ...newConfig.profile, ...config.profile };
+        if (config.socialLinks) newConfig.socialLinks = config.socialLinks;
+        if (config.socialStyle) newConfig.socialStyle = { ...newConfig.socialStyle, ...config.socialStyle };
+        if (config.checkout) newConfig.checkout = { ...newConfig.checkout, ...config.checkout };
+        if (config.backgroundImage) newConfig.backgroundImage = config.backgroundImage;
+
+        // Mapeo de propiedades planas (Legacy/Snippet User)
+        if (config.primaryColor) newConfig.colors.primary = config.primaryColor;
+        if (config.font) {
+           newConfig.fonts.heading = config.font;
+           newConfig.fonts.body = config.font;
+        }
+        if (config.borderRadius !== undefined) newConfig.cardStyle.borderRadius = config.borderRadius;
+
+        // D) Re-imponer datos críticos de columnas (Source of Truth) para evitar sobreescritura por JSON antiguo
+        if (data.shop_name) {
+           newConfig.profile.shopName = data.shop_name;
+           newConfig.profile.displayName = data.shop_name;
+        }
+        if (data.avatar_url) {
+           newConfig.profile.avatarUrl = data.avatar_url;
+        }
+
+        console.log("🚀 ESTADO ACTUALIZADO CON:", newConfig);
+        setConfig(newConfig);
+
+      } catch (error) {
         console.error("❌ ERROR CRÍTICO LEYENDO DB:", error);
-        return;
       }
-
-      console.log("✅ DATOS RECIBIDOS CRUDOS:", data);
-      setDebugData(data?.theme_config);
-
-      // 2. Sincronización OBLIGATORIA (Hydration)
-      const newConfig: DesignConfig = { ...DEFAULT_DESIGN };
-
-      // A) Nombre de la tienda
-      if (data.shop_name) {
-        console.log("-> Estableciendo nombre:", data.shop_name);
-        newConfig.profile.shopName = data.shop_name;
-        newConfig.profile.displayName = data.shop_name;
-      }
-
-      // B) Avatar
-      if (data.avatar_url) {
-         newConfig.profile.avatarUrl = data.avatar_url;
-      }
-
-      // C) Configuración Visual (El punto donde fallaba)
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      const config = (data.design_config as any) || (data.theme_config as any) || {};
-
-      // Mapeo defensivo de propiedades anidadas (Modern)
-      if (config.colors) newConfig.colors = { ...newConfig.colors, ...config.colors };
-      if (config.fonts) newConfig.fonts = { ...newConfig.fonts, ...config.fonts };
-      if (config.cardStyle) newConfig.cardStyle = { ...newConfig.cardStyle, ...config.cardStyle };
-      if (config.profile) newConfig.profile = { ...newConfig.profile, ...config.profile };
-      if (config.socialLinks) newConfig.socialLinks = config.socialLinks;
-      if (config.socialStyle) newConfig.socialStyle = { ...newConfig.socialStyle, ...config.socialStyle };
-      if (config.checkout) newConfig.checkout = { ...newConfig.checkout, ...config.checkout };
-      if (config.backgroundImage) newConfig.backgroundImage = config.backgroundImage;
-
-      // Mapeo de propiedades planas (Legacy/Snippet User)
-      if (config.primaryColor) newConfig.colors.primary = config.primaryColor;
-      if (config.font) {
-         newConfig.fonts.heading = config.font;
-         newConfig.fonts.body = config.font;
-      }
-      if (config.borderRadius !== undefined) newConfig.cardStyle.borderRadius = config.borderRadius;
-
-      // D) Re-imponer datos críticos de columnas (Source of Truth) para evitar sobreescritura por JSON antiguo
-      if (data.shop_name) {
-         newConfig.profile.shopName = data.shop_name;
-         newConfig.profile.displayName = data.shop_name;
-      }
-      if (data.avatar_url) {
-         newConfig.profile.avatarUrl = data.avatar_url;
-      }
-
-      console.log("🚀 ESTADO ACTUALIZADO CON:", newConfig);
-      setConfig(newConfig);
     };
 
     loadExactData();
   }, [userId]);
+
   const [selection, setSelection] = useState<SelectionState>(null);
   const [isSaving, setIsSaving] = useState(false);
   const [isSavingProduct, setIsSavingProduct] = useState(false);
@@ -206,14 +207,8 @@ export default function DesignEditor({ initialConfig, initialProducts, userId, s
         style_config: (p.style_config as ProductStyle) || {}
       }));
 
-      // 1. Save Design (Directly to Profiles)
-      const supabase = createClient();
-      const { error: designError } = await supabase
-        .from('profiles')
-        .update({ theme_config: config, design_config: null }) // Column theme_config
-        .eq('id', userId);
-
-      if (designError) throw new Error("Error saving design: " + designError.message);
+      // 1. Save Design (Server Action - Admin Client)
+      await saveDesignConfigAction(config);
 
       // 2. Save Products (Separate action)
       let productsResult: any = { success: true };
