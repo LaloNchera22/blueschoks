@@ -109,8 +109,7 @@ export function sanitizeDesign(raw: any, profileFallback?: any): DesignConfig {
       titleColor: typeof raw.cardStyle?.titleColor === 'string' ? raw.cardStyle.titleColor : DEFAULT_DESIGN.cardStyle.titleColor,
       shadow: typeof raw.cardStyle?.shadow === 'boolean' ? raw.cardStyle.shadow : DEFAULT_DESIGN.cardStyle.shadow,
       opacity: typeof raw.cardStyle?.opacity === 'number' ? raw.cardStyle.opacity : DEFAULT_DESIGN.cardStyle.opacity,
-    },
-    backgroundImage: typeof raw.backgroundImage === 'string' ? raw.backgroundImage : undefined,
+    }
   };
 
   return clean;
