@@ -256,9 +256,9 @@ export default function DesignEditor({ initialConfig, initialProducts, userId, s
       const { error } = await supabase
         .from('profiles')
         .update({
+            shop_name: config.profile.shopName,
             theme_config: cleanConfig,
-            background_image: typeof bgUrl === 'string' && bgUrl.startsWith('http') ? bgUrl : null,
-            avatar_border_color: cleanConfig.profile.avatarBorderColor || null
+            updated_at: new Date()
         })
         .eq('id', userId);
 
