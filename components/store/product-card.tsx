@@ -164,8 +164,8 @@ export function ProductCard({ product, config, onSelectElement, onProductClick, 
 
   const isCardTransparent = (cardStyle.opacity === 0) || cardBg === 'transparent' || cardBg.endsWith(', 0)');
 
-  const titleFont = style.titleFont
-  const priceFont = style.priceFont
+  const titleFont = style.titleFont || cardStyle.titleFont
+  const priceFont = style.priceFont || cardStyle.priceFont
   const titleColor = style.titleColor || cardStyle.titleColor || globalColors.text
   const priceColor = style.priceColor || cardStyle.priceColor || globalColors.text
 
@@ -206,7 +206,7 @@ export function ProductCard({ product, config, onSelectElement, onProductClick, 
         {/* --- ZONA IMAGEN (CARRUSEL) --- */}
         <div
           className={`relative w-full aspect-square bg-gray-100 overflow-hidden transition-all ${
-            style.imageShape === 'square' ? 'rounded-none' : 'rounded-xl'
+            (style.imageShape === 'square' || (cardStyle.borderRadius ?? 16) === 0) ? 'rounded-none' : 'rounded-xl'
           }`}
           onTouchStart={onTouchStart}
           onTouchMove={onTouchMove}
