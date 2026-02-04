@@ -14,7 +14,8 @@ export async function createProduct(formData: FormData) {
   // 2. Recolectar datos básicos
   const productId = formData.get("id") as string | null // <--- IMPORTANTE: Buscamos si hay ID
   const name = formData.get("name")
-  const price = parseFloat(formData.get("price") as string)
+  const priceRaw = parseFloat(formData.get("price") as string)
+  const price = isNaN(priceRaw) ? 0 : priceRaw
   const description = formData.get("description")
   
   // Recolectamos URLs de imágenes que YA existían (vienen del frontend)
@@ -104,7 +105,10 @@ export async function createProduct(formData: FormData) {
     // --- MODO CREACIÓN (INSERT) ---
     const { error: insertError } = await supabase
         .from("products")
-        .insert(payload)
+        .insert({
+            ...payload,
+            stock: 0 // Default required field
+        })
     error = insertError
   }
 
