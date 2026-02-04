@@ -16,7 +16,7 @@ export interface CheckoutConfig {
 }
 
 export interface CardStyle {
-  borderRadius: number;
+  borderRadius: number | string;
   buttonColor: string;
   buttonTextColor: string;
   buttonIconColor?: string;

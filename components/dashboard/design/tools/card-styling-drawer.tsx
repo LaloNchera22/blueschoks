@@ -18,6 +18,16 @@ export function CardStylingDrawer({ config, onUpdate }: CardStylingDrawerProps) 
   const [showColors, setShowColors] = useState(false);
   const [showTypography, setShowTypography] = useState(true);
 
+  // Helper to safely get number for slider
+  const getRadiusValue = () => {
+     const val = config.cardStyle.borderRadius;
+     if (typeof val === 'number') return val;
+     if (typeof val === 'string') return parseInt(val, 10) || 0;
+     return 8;
+  };
+
+  const radiusVal = getRadiusValue();
+
   return (
     <div className="flex flex-col gap-6">
 
@@ -27,10 +37,10 @@ export function CardStylingDrawer({ config, onUpdate }: CardStylingDrawerProps) 
        <div className="space-y-3">
           <div className="flex justify-between items-center">
              <label className="text-xs font-bold text-gray-500 uppercase tracking-wider">Redondez</label>
-             <span className="text-xs font-medium bg-gray-100 px-2 py-1 rounded text-gray-600">{config.cardStyle.borderRadius ?? 8}px</span>
+             <span className="text-xs font-medium bg-gray-100 px-2 py-1 rounded text-gray-600">{radiusVal}px</span>
           </div>
           <Slider
-            value={config.cardStyle.borderRadius ?? 8}
+            value={radiusVal}
             max={32}
             min={0}
             step={2}
