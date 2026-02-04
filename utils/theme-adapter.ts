@@ -155,7 +155,9 @@ export function normalizeProfile(raw: any): Profile {
     design_card_style: raw?.design_card_style || null,
     design_config: raw?.design_config || null,
     // IMPORTANT: Normalizing the nested theme config
-    theme_config: normalizeTheme(raw?.theme_config || raw?.design_config)
+    theme_config: normalizeTheme(raw?.theme_config || raw?.design_config),
+    background_image: raw?.background_image || null,
+    avatar_border_color: raw?.avatar_border_color || null
   };
 
   // 2. Critical Field Repair: Slug
