@@ -18,7 +18,7 @@ export async function getDesignConfigAction() {
   const adminSupabase = await createAdminClient();
   const { data, error } = await adminSupabase
     .from('profiles')
-    .select('shop_name, avatar_url, theme_config, design_config')
+    .select('shop_name, avatar_url, theme_config, design_config, background_image, avatar_border_color')
     .eq('id', user.id)
     .single();
 
@@ -44,7 +44,12 @@ export async function saveDesignConfigAction(config: DesignConfig) {
   const adminSupabase = await createAdminClient();
   const { error } = await adminSupabase
     .from('profiles')
-    .update({ theme_config: config, design_config: null })
+    .update({
+      theme_config: config,
+      design_config: null,
+      background_image: config.backgroundImage || null,
+      avatar_border_color: config.profile.avatarBorderColor || null
+    })
     .eq('id', user.id);
 
   if (error) {
