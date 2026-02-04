@@ -143,6 +143,12 @@ export default function DesignEditor({ initialConfig, initialProducts, userId, s
         if (config.checkout) newConfig.checkout = { ...newConfig.checkout, ...config.checkout };
         if (config.backgroundImage) newConfig.backgroundImage = config.backgroundImage;
 
+        // Sobreescribir con columnas específicas si existen
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        if ((data as any).background_image) newConfig.backgroundImage = (data as any).background_image;
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        if ((data as any).avatar_border_color) newConfig.profile.avatarBorderColor = (data as any).avatar_border_color;
+
         // Mapeo de propiedades planas (Legacy/Snippet User)
         if (config.primaryColor) newConfig.colors.primary = config.primaryColor;
         if (config.font) {

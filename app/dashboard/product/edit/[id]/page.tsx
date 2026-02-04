@@ -1,7 +1,7 @@
 import { createClient } from "@/utils/supabase/server"
 import { notFound, redirect } from "next/navigation"
 import EditProductForm from "./edit-form"
-import { getUser } from "@/utils/user-data"
+import { getUser, getProfile } from "@/utils/user-data"
 
 export default async function EditProductPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params

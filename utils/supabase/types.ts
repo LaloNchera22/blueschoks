@@ -32,6 +32,8 @@ export interface Database {
           design_card_style: string | null
           design_config: DesignConfig | null
           theme_config: DesignConfig | ThemeConfig | null
+          background_image: string | null
+          avatar_border_color: string | null
         }
         Insert: {
           id?: string
@@ -52,6 +54,8 @@ export interface Database {
           design_card_style?: string | null
           design_config?: DesignConfig | null
           theme_config?: DesignConfig | ThemeConfig | null
+          background_image?: string | null
+          avatar_border_color?: string | null
         }
         Update: {
           id?: string
@@ -72,6 +76,8 @@ export interface Database {
           design_card_style?: string | null
           design_config?: DesignConfig | null
           theme_config?: DesignConfig | ThemeConfig | null
+          background_image?: string | null
+          avatar_border_color?: string | null
         }
         Relationships: [
           {

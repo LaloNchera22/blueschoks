@@ -29,7 +29,7 @@ export default function EditProductForm({ product, isPro }: { product: Product, 
   const [previews, setPreviews] = useState<{ url: string, type: 'image' | 'video', isExisting: boolean }[]>([])
   const [newFiles, setNewFiles] = useState<File[]>([])
 
-  // 1. Consultar si es PRO al cargar y cargar previews
+  // 1. Cargar previews
   useEffect(() => {
     const rawMedia = Array.isArray(product.media) && product.media.length > 0
     ? product.media
