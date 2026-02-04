@@ -1,6 +1,6 @@
 "use client"
 
-import React, { useMemo, useEffect } from 'react'
+import React, { useMemo } from 'react'
 import Image from 'next/image'
 import Link from 'next/link'
 import {
@@ -93,194 +93,192 @@ export default function StoreClient({ profile, products, config }: StoreClientPr
     };
   }, [config, profile.theme_config]);
 
-  useEffect(() => {
-    // UNLOCK BODY FOR PUBLIC STORE NATURAL SCROLL
-    document.body.style.setProperty('overflow', 'auto', 'important')
-    document.body.style.setProperty('height', 'auto', 'important')
-    document.body.style.setProperty('position', 'static', 'important')
-    document.documentElement.style.setProperty('overflow', 'auto', 'important')
-    document.documentElement.style.setProperty('height', 'auto', 'important')
-    document.documentElement.style.setProperty('position', 'static', 'important')
-
-    return () => {
-      // RESTORE GLOBAL LOCK
-      document.body.style.overflow = ''
-      document.body.style.height = ''
-      document.body.style.position = ''
-      document.documentElement.style.overflow = ''
-      document.documentElement.style.height = ''
-      document.documentElement.style.position = ''
-    }
-  }, [])
+  // REMOVED useEffect for Body Scroll Lock Hack - we now use a dedicated scroll container
 
   return (
-    <div className="min-h-screen w-full flex justify-center items-center relative" style={{ backgroundColor: bgColor, color: textColor }}>
+    <>
       <FontLoaderListener config={config} products={products} />
 
-      {/* Background Image Layer */}
-      {/* DEFENSIVE RENDERING: Only render if valid string URL */}
-      {config.backgroundImage &&
-       typeof config.backgroundImage === 'string' &&
-       config.backgroundImage.startsWith('http') && (
-        <div className="absolute inset-0 z-0 pointer-events-none">
-           <Image
-              src={config.backgroundImage}
-              alt="Background"
-              fill
-              className="object-cover"
-              style={{ opacity: config.backgroundOpacity ?? 0.5 }}
-              priority
-           />
-        </div>
-      )}
-
-      {/* CONTENEDOR PRINCIPAL: Sin bordes blancos, sin bg-white fijo */}
-      <div className="w-full max-w-[430px] min-h-full relative z-10 flex flex-col shadow-2xl">
-          {/*
-            Header Sticky Bar
-            Contains: Small Logo (optional), Cart Trigger
-          */}
-          <StoreHeader config={config} />
-
-          {/* Main Content Area */}
-          <div className="pb-32">
-
-            {/* --- HERO SECTION (Inlined from DesignEditor logic) --- */}
-            <div className="flex flex-col items-center text-center pt-12 pb-6 px-6">
-
-                {/* AVATAR */}
-                {profile.is_pro && (
-                  <div className="flex justify-center mb-6">
-                    <div
-                      className={cn(
-                        "relative w-32 h-32 overflow-hidden ring-2 ring-offset-2",
-                        shapeClass
-                      )}
-                      style={{
-                        '--tw-ring-color': config.profile.avatarBorderColor || 'rgba(23, 23, 23, 0.1)',
-                      } as React.CSSProperties}
-                    >
-                      {config.profile.avatarUrl ? (
-                          <Image
-                            src={config.profile.avatarUrl}
-                            alt="Avatar"
-                            fill
-                            className="object-cover"
-                            priority
-                          />
-                      ) : (
-                          <div className="w-full h-full flex items-center justify-center bg-gray-100 text-gray-300">
-                              <Smartphone className="w-10 h-10" />
-                          </div>
-                      )}
-                    </div>
-                  </div>
-                )}
-
-                {/* SOCIALS */}
-                {socialLinks.length > 0 && (
-                   <div className="flex flex-wrap justify-center gap-3 mb-6">
-                       {socialLinks.map((link) => {
-                           const platformDef = PLATFORMS.find(p => p.id === link.platform);
-                           const Icon = platformDef?.icon || LinkIcon;
-
-                           return (
-                               <Link
-                                  key={link.id}
-                                  href={link.url}
-                                  target="_blank"
-                                  rel="noopener noreferrer"
-                                  className="group flex flex-col items-center gap-1 min-w-[60px]"
-                               >
-                                   <div
-                                      className="p-3 rounded-full transition-all duration-300 border border-gray-100 shadow-sm hover:scale-105"
-                                      style={{
-                                          backgroundColor: config.socialStyle?.buttonColor || '#f9fafb',
-                                          color: link.color ? link.color : (config.socialStyle?.iconColor || '#4b5563')
-                                      }}
-                                   >
-                                       <Icon size={20} strokeWidth={1.5} />
-                                   </div>
-                                   <span
-                                      className="text-[10px] font-medium transition-colors"
-                                      style={{
-                                          color: config.socialStyle?.textColor || '#6b7280',
-                                          fontFamily: config.socialStyle?.font || config.fonts.body
-                                      }}
-                                   >
-                                      {link.label || platformDef?.label || link.platform}
-                                   </span>
-                               </Link>
-                           )
-                       })}
-                   </div>
-                )}
-
-                {/* SHOP NAME */}
-                <h1
-                  className="text-2xl font-bold text-neutral-900 tracking-tight mb-3"
-                  style={getTextStyle('title') as React.CSSProperties}
-                >
-                    {config.profile.shopName || 'Mi Tienda'}
-                </h1>
-
-                {/* BIO */}
-                {config.profile.bio && config.profile.bio.trim().length > 0 && (
-                  <p
-                    className="max-w-xl text-sm text-neutral-500 leading-relaxed mb-6"
-                    style={getTextStyle('bio') as React.CSSProperties}
-                  >
-                      {config.profile.bio}
-                  </p>
-                )}
+      {/* 1. Capa de Fondo (Fixed & Independent) */}
+      <div
+        className="fixed inset-0 z-[-1]"
+        style={{ backgroundColor: bgColor }}
+      >
+          {config.backgroundImage &&
+           typeof config.backgroundImage === 'string' &&
+           config.backgroundImage.startsWith('http') && (
+            <div className="absolute inset-0 w-full h-full">
+               <Image
+                  src={config.backgroundImage}
+                  alt="Background"
+                  fill
+                  className="object-cover"
+                  style={{ opacity: config.backgroundOpacity ?? 0.5 }}
+                  priority
+               />
             </div>
-
-            {/* --- PRODUCT GRID (INLINED) --- */}
-            <div className="px-4">
-               {products.length === 0 ? (
-                  <div className="py-24 text-center opacity-60">
-                    <p className="text-lg font-medium">No hay productos disponibles por el momento.</p>
-                  </div>
-               ) : (
-                  <div className="grid grid-cols-2 gap-3 pb-32">
-                      {products.map(product => (
-                        <ProductCard
-                          key={product.id}
-                          product={product}
-                          config={patchedConfig}
-                          onAddToCart={addToCart} // ✅ Pasamos la función como prop
-                        />
-                      ))}
-                  </div>
-               )}
-            </div>
-
-            {/* FOOTER: POWER BY BLUESHOCKS (Minimalist) */}
-            <footer className="w-full py-8 mt-auto flex justify-center items-center opacity-70 hover:opacity-100 transition-opacity duration-300">
-              <a
-                href="https://blueshocks.com"
-                target="_blank"
-                rel="noreferrer"
-                className="text-xs uppercase tracking-[0.2em] flex items-center gap-1.5"
-                style={{
-                  color: getTextStyle('title').color,
-                  fontFamily: getTextStyle('title').fontFamily
-                }}
-              >
-                <span className="font-light">Powered by</span>
-                <span className="font-bold">BLUESHOCKS</span>
-              </a>
-            </footer>
-
-          </div>
-
-          {/*
-            Slide-over Cart Drawer
-            Pass profile shop info for WhatsApp link generation
-          */}
-          <CartSidebar shop={{ whatsapp: config.checkout.whatsappNumber || profile.whatsapp || '', shop_name: config.profile.shopName || profile.shop_name }} />
-
+          )}
       </div>
-    </div>
+
+      {/* 2. Capa de Contenido (Scrollable Viewport) */}
+      {/*
+         We use h-[100dvh] and overflow-y-auto because the global layout has 'overflow: hidden' on body.
+         This creates a dedicated scroll area for the store.
+      */}
+      <main className="relative z-10 w-full h-[100dvh] overflow-y-auto">
+        <div className="w-full flex justify-center min-h-full">
+            {/* Store Container (Centered on desktop, full width on mobile) */}
+            <div
+                className="w-full max-w-[430px] min-h-full flex flex-col shadow-2xl relative"
+                style={{ color: textColor }}
+            >
+                {/*
+                  Header Sticky Bar
+                  Must be inside the scrollable container to stick correctly.
+                */}
+                <StoreHeader config={config} />
+
+                {/* Main Content Area */}
+                <div className="pb-32">
+
+                  {/* --- HERO SECTION (Inlined from DesignEditor logic) --- */}
+                  <div className="flex flex-col items-center text-center pt-12 pb-6 px-6">
+
+                      {/* AVATAR */}
+                      {profile.is_pro && (
+                        <div className="flex justify-center mb-6">
+                          <div
+                            className={cn(
+                              "relative w-32 h-32 overflow-hidden ring-2 ring-offset-2",
+                              shapeClass
+                            )}
+                            style={{
+                              '--tw-ring-color': config.profile.avatarBorderColor || 'rgba(23, 23, 23, 0.1)',
+                            } as React.CSSProperties}
+                          >
+                            {config.profile.avatarUrl ? (
+                                <Image
+                                  src={config.profile.avatarUrl}
+                                  alt="Avatar"
+                                  fill
+                                  className="object-cover"
+                                  priority
+                                />
+                            ) : (
+                                <div className="w-full h-full flex items-center justify-center bg-gray-100 text-gray-300">
+                                    <Smartphone className="w-10 h-10" />
+                                </div>
+                            )}
+                          </div>
+                        </div>
+                      )}
+
+                      {/* SOCIALS */}
+                      {socialLinks.length > 0 && (
+                        <div className="flex flex-wrap justify-center gap-3 mb-6">
+                            {socialLinks.map((link) => {
+                                const platformDef = PLATFORMS.find(p => p.id === link.platform);
+                                const Icon = platformDef?.icon || LinkIcon;
+
+                                return (
+                                    <Link
+                                        key={link.id}
+                                        href={link.url}
+                                        target="_blank"
+                                        rel="noopener noreferrer"
+                                        className="group flex flex-col items-center gap-1 min-w-[60px]"
+                                    >
+                                        <div
+                                            className="p-3 rounded-full transition-all duration-300 border border-gray-100 shadow-sm hover:scale-105"
+                                            style={{
+                                                backgroundColor: config.socialStyle?.buttonColor || '#f9fafb',
+                                                color: link.color ? link.color : (config.socialStyle?.iconColor || '#4b5563')
+                                            }}
+                                        >
+                                            <Icon size={20} strokeWidth={1.5} />
+                                        </div>
+                                        <span
+                                            className="text-[10px] font-medium transition-colors"
+                                            style={{
+                                                color: config.socialStyle?.textColor || '#6b7280',
+                                                fontFamily: config.socialStyle?.font || config.fonts.body
+                                            }}
+                                        >
+                                            {link.label || platformDef?.label || link.platform}
+                                        </span>
+                                    </Link>
+                                )
+                            })}
+                        </div>
+                      )}
+
+                      {/* SHOP NAME */}
+                      <h1
+                        className="text-2xl font-bold text-neutral-900 tracking-tight mb-3"
+                        style={getTextStyle('title') as React.CSSProperties}
+                      >
+                          {config.profile.shopName || 'Mi Tienda'}
+                      </h1>
+
+                      {/* BIO */}
+                      {config.profile.bio && config.profile.bio.trim().length > 0 && (
+                        <p
+                          className="max-w-xl text-sm text-neutral-500 leading-relaxed mb-6"
+                          style={getTextStyle('bio') as React.CSSProperties}
+                        >
+                            {config.profile.bio}
+                        </p>
+                      )}
+                  </div>
+
+                  {/* --- PRODUCT GRID (INLINED) --- */}
+                  <div className="px-4">
+                    {products.length === 0 ? (
+                        <div className="py-24 text-center opacity-60">
+                          <p className="text-lg font-medium">No hay productos disponibles por el momento.</p>
+                        </div>
+                    ) : (
+                        // Added explicit padding bottom here as well for safety, though parent has it.
+                        <div className="grid grid-cols-2 gap-3 pb-8">
+                            {products.map(product => (
+                              <ProductCard
+                                key={product.id}
+                                product={product}
+                                config={patchedConfig}
+                                onAddToCart={addToCart}
+                              />
+                            ))}
+                        </div>
+                    )}
+                  </div>
+
+                  {/* FOOTER: POWER BY BLUESHOCKS (Minimalist) */}
+                  <footer className="w-full py-8 mt-auto flex justify-center items-center opacity-70 hover:opacity-100 transition-opacity duration-300">
+                    <a
+                      href="https://blueshocks.com"
+                      target="_blank"
+                      rel="noreferrer"
+                      className="text-xs uppercase tracking-[0.2em] flex items-center gap-1.5"
+                      style={{
+                        color: getTextStyle('title').color,
+                        fontFamily: getTextStyle('title').fontFamily
+                      }}
+                    >
+                      <span className="font-light">Powered by</span>
+                      <span className="font-bold">BLUESHOCKS</span>
+                    </a>
+                  </footer>
+
+                </div>
+            </div>
+        </div>
+      </main>
+
+      {/*
+        Slide-over Cart Drawer
+        Pass profile shop info for WhatsApp link generation
+      */}
+      <CartSidebar shop={{ whatsapp: config.checkout.whatsappNumber || profile.whatsapp || '', shop_name: config.profile.shopName || profile.shop_name }} />
+    </>
   )
 }
