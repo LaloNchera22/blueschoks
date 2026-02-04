@@ -19,6 +19,7 @@ export interface CardStyle {
   borderRadius: number;
   buttonColor: string;
   buttonTextColor: string;
+  buttonIconColor?: string;
   priceColor: string;
   titleColor: string;
   shadow?: boolean;
@@ -35,6 +36,7 @@ export interface ProductStyle {
   priceColor?: string;
   cartBtnBackground?: string;
   cartBtnColor?: string;
+  cartBtnIconColor?: string;
   borderColor?: string;
   imageShape?: 'square' | 'rounded';
 }

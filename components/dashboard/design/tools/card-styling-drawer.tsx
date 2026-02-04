@@ -129,6 +129,13 @@ export function CardStylingDrawer({ config, onUpdate }: CardStylingDrawerProps) 
                               />
                               <span className="text-xs font-medium text-gray-700">Texto</span>
                            </div>
+                           <div className="flex items-center gap-3">
+                              <ColorCircle
+                                color={config.cardStyle.buttonIconColor || config.cardStyle.buttonTextColor || '#ffffff'}
+                                onChange={(c) => onUpdate(['cardStyle', 'buttonIconColor'], c)}
+                              />
+                              <span className="text-xs font-medium text-gray-700">Icono</span>
+                           </div>
                         </div>
                     </div>
                  </div>

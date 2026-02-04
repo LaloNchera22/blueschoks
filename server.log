@@ -10,26 +10,5 @@
 
 ✓ Starting...
 ⚠ The "middleware" file convention is deprecated. Please use "proxy" instead. Learn more: https://nextjs.org/docs/messages/middleware-to-proxy
-✓ Ready in 1274ms
- GET /register 200 in 973ms (compile: 432ms, proxy.ts: 136ms, render: 405ms)
-TypeError: fetch failed
-    at async signup (app/register/actions.ts:31:21)
-  29 |   // 2. Creación del usuario con metadatos
-  30 |   // Pasamos los datos extra en options.data para que el Trigger de Supabase capture first_name, last_name, etc.
-> 31 |   const { error } = await supabase.auth.signUp({
-     |                     ^
-  32 |     email,
-  33 |     password,
-  34 |     options: { {
-  [cause]: Error: getaddrinfo ENOTFOUND example.supabase.co
-      at ignore-listed frames {
-    errno: -3008,
-    code: 'ENOTFOUND',
-    syscall: 'getaddrinfo',
-    hostname: 'example.supabase.co'
-  }
-}
- GET /register?message=No+se+pudo+registrar+el+usuario 200 in 67ms (compile: 9ms, proxy.ts: 9ms, render: 50ms)
- POST /register 303 in 937ms (compile: 8ms, proxy.ts: 15ms, render: 914ms)
- GET /register 200 in 400ms (compile: 185ms, proxy.ts: 21ms, render: 194ms)
- GET /register 200 in 120ms (compile: 6ms, proxy.ts: 20ms, render: 94ms)
+✓ Ready in 1362ms
+ GET /test-drawer 200 in 2.0s (compile: 1565ms, proxy.ts: 142ms, render: 322ms)
