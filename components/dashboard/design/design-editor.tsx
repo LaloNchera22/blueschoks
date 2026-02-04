@@ -181,6 +181,8 @@ export default function DesignEditor({ initialConfig, initialProducts, userId, s
   const [isSaving, setIsSaving] = useState(false);
   const [isSavingProduct, setIsSavingProduct] = useState(false);
   const [isUploadingImage, setIsUploadingImage] = useState(false);
+  // Nuevo estado para la imagen de fondo pendiente de subida
+  const [bgFile, setBgFile] = useState<File | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   // Helper to update deep nested config
@@ -205,37 +207,77 @@ export default function DesignEditor({ initialConfig, initialProducts, userId, s
   const handleSave = async () => {
     setIsSaving(true);
     try {
-      // SANEAMIENTO PREVIO (Client-Side)
-      const cleanConfig = { ...config };
+      const supabase = createClient();
 
-      // Validación estricta de imagen de fondo
-      if (cleanConfig.backgroundImage &&
-          (typeof cleanConfig.backgroundImage !== 'string' || !cleanConfig.backgroundImage.startsWith('http'))) {
-         console.warn("⚠️ Detectado objeto inválido en backgroundImage. Limpiando antes de guardar.");
-         cleanConfig.backgroundImage = undefined;
-         // Opcional: Avisar al usuario
-         toast.error("Error en imagen de fondo. Se ha eliminado para evitar errores.");
+      // 1. Manejo de Imagen de Fondo (SOLO SI CAMBIÓ)
+      let bgUrl = config.backgroundImage;
+
+      if (bgFile) {
+         // Subir archivo
+         const fileExt = bgFile.name.split('.').pop();
+         const fileName = `${userId}/bg-${Date.now()}.${fileExt}`;
+
+         const { error: uploadError } = await supabase.storage
+            .from('backgrounds')
+            .upload(fileName, bgFile);
+
+         if (uploadError) throw uploadError;
+
+         // Obtener URL
+         const { data } = supabase.storage
+            .from('backgrounds')
+            .getPublicUrl(fileName);
+
+         bgUrl = data.publicUrl;
+      } else {
+         // Si es blob url pero no hay archivo (caso raro), limpiar
+         if (bgUrl && bgUrl.startsWith('blob:')) {
+             bgUrl = undefined;
+         }
       }
 
+      // 2. Preparar JSON Limpio (Sanitización Estricta)
+      const cleanConfig = {
+        ...config,
+        backgroundImage: bgUrl, // URL string
+        cardStyle: {
+            ...config.cardStyle,
+            // Convertir a string CSS explícito si es número
+            borderRadius: config.cardStyle?.borderRadius
+                ? (typeof config.cardStyle.borderRadius === 'number'
+                    ? `${config.cardStyle.borderRadius}px`
+                    : config.cardStyle.borderRadius)
+                : '16px'
+        }
+      };
+
+      // 3. Guardar en la tabla PROFILES (Fuente de verdad) usando cliente directo
+      // para evitar problemas de serialización con Server Actions
+      const { error } = await supabase
+        .from('profiles')
+        .update({
+            theme_config: cleanConfig,
+            background_image: typeof bgUrl === 'string' && bgUrl.startsWith('http') ? bgUrl : null,
+            avatar_border_color: cleanConfig.profile.avatarBorderColor || null
+        })
+        .eq('id', userId);
+
+      if (error) throw error;
+
+      // 4. Save Products Styles (si aplica)
       const productUpdates = products.map(p => ({
         id: p.id,
         style_config: (p.style_config as ProductStyle) || {}
       }));
 
-      // 1. Save Design (Server Action - Admin Client)
-      await saveDesignConfigAction(cleanConfig);
-
-      // 2. Save Products (Separate action)
-      let productsResult: any = { success: true };
       if (initialProducts.length > 0) {
-        productsResult = await saveProductStylesBulk(productUpdates);
+        await saveProductStylesBulk(productUpdates);
       }
 
-      if (productsResult?.error) throw new Error(productsResult.error);
-
       toast.success("¡Diseño actualizado!");
-      // Importante: Refrescar la vista previa si usas iframe (en este caso router refresh)
+      setBgFile(null); // Limpiar archivo pendiente
       router.refresh();
+
     } catch (error: any) {
       console.error("❌ ERROR AL GUARDAR:", error);
       toast.error(`Error: ${error.message}`);
@@ -335,35 +377,17 @@ export default function DesignEditor({ initialConfig, initialProducts, userId, s
     toast.success("Avatar actualizado");
   };
 
-  const handleBackgroundUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleBackgroundUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
 
+    // Guardar archivo en estado para subirlo al Guardar
+    setBgFile(file);
 
-    setIsUploadingImage(true);
-    const supabase = createClient();
-    const fileExt = file.name.split('.').pop();
-    const fileName = `bg-${userId}-${Date.now()}.${fileExt}`;
-    const filePath = `${fileName}`;
-
-    const { error: uploadError } = await supabase.storage
-      .from('avatars')
-      .upload(filePath, file);
-
-    if (uploadError) {
-      console.error(uploadError);
-      toast.error("Error al subir imagen");
-      setIsUploadingImage(false);
-      return;
-    }
-
-    const { data: { publicUrl } } = supabase.storage
-      .from('avatars')
-      .getPublicUrl(filePath);
-
-    updateConfig(['backgroundImage'], publicUrl);
-    setIsUploadingImage(false);
-    toast.success("Fondo actualizado");
+    // Crear preview local inmediata
+    const objectUrl = URL.createObjectURL(file);
+    updateConfig(['backgroundImage'], objectUrl);
+    toast.success("Fondo seleccionado (Guarda para aplicar)");
   };
 
   const selectedProduct = getSelectedProduct();
