@@ -1,5 +1,6 @@
 import { ImageResponse } from 'next/og';
 import { createAdminClient } from '@/utils/supabase/server';
+import { loadGoogleFont } from '@/lib/og-utils';
 
 export const runtime = 'edge';
 
@@ -9,33 +10,33 @@ export default async function Image({ params }: { params: Promise<{ slug: string
 
   const { data: profile } = await supabase
     .from('profiles')
-    .select('shop_name, avatar_url, theme_config')
+    .select('shop_name, avatar_url, theme_config, is_pro')
     .eq('username', slug)
     .single();
 
-  if (!profile) {
-    return new ImageResponse(
-      (
-        <div
-          style={{
-            fontSize: 60,
-            background: 'black',
-            color: 'white',
-            width: '100%',
-            height: '100%',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-          }}
-        >
-          BlueShocks
-        </div>
-      ),
-      {
-        width: 1200,
-        height: 630,
-      }
-    );
+  const defaultImage = (
+    <div
+      style={{
+        fontSize: 60,
+        background: 'black',
+        color: 'white',
+        width: '100%',
+        height: '100%',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+      }}
+    >
+      BlueShocks
+    </div>
+  );
+
+  // Fallback for non-existent profile or non-pro users (Free version)
+  if (!profile || !profile.is_pro) {
+    return new ImageResponse(defaultImage, {
+      width: 1200,
+      height: 630,
+    });
   }
 
   // Extract config
@@ -54,14 +55,18 @@ export default async function Image({ params }: { params: Promise<{ slug: string
   const avatarUrl = profile.avatar_url;
   const shopName = profile.shop_name || 'Mi Tienda';
 
+  // Fonts
+  const fontName = themeConfig.fonts?.heading || themeConfig.font || 'Inter';
+  const fontData = await loadGoogleFont(fontName);
+
   // 1. Define un estilo base para la imagen para asegurar que ocupe espacio
   const imageStyle = {
-      width: '250px',
-      height: '250px',
-      borderRadius: borderRadius,
-      objectFit: 'cover' as const,
-      marginBottom: '50px', // Separación con el título
-      border: '8px solid rgba(255,255,255,0.2)', // Marco estético
+    width: '250px',
+    height: '250px',
+    borderRadius: borderRadius,
+    objectFit: 'cover' as const,
+    marginBottom: '50px', // Separación con el título
+    border: '8px solid rgba(255,255,255,0.2)', // Marco estético
   };
 
   return new ImageResponse(
@@ -75,29 +80,58 @@ export default async function Image({ params }: { params: Promise<{ slug: string
           width: '100%',
           height: '100%',
           backgroundColor: bgColor,
+          fontFamily: fontName,
         }}
       >
         {/* 2. Renderizado condicional de la imagen */}
         {avatarUrl ? (
-            // Si hay avatar, intentamos cargarlo (requiere el fix de next.config.js)
-            <img src={avatarUrl} style={imageStyle} alt="Avatar" />
+          // Si hay avatar, intentamos cargarlo (requiere el fix de next.config.js)
+          // eslint-disable-next-line @next/next/no-img-element
+          <img src={avatarUrl} style={imageStyle} alt="Avatar" />
         ) : (
-            // FALLBACK: Si no hay avatar, mostramos un círculo placeholder
-            <div style={{ ...imageStyle, backgroundColor: 'rgba(255,255,255,0.1)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-               {/* Puedes poner una inicial o icono aquí */}
-               <span style={{ fontSize: 100, color: textColor }}>{shopName.charAt(0)}</span>
-            </div>
+          // FALLBACK: Si no hay avatar, mostramos un círculo placeholder
+          <div
+            style={{
+              ...imageStyle,
+              backgroundColor: 'rgba(255,255,255,0.1)',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+            }}
+          >
+            {/* Puedes poner una inicial o icono aquí */}
+            <span style={{ fontSize: 100, color: textColor }}>{shopName.charAt(0)}</span>
+          </div>
         )}
 
         {/* 3. El Título */}
-        <h1 style={{ fontSize: 80, fontWeight: 900, color: textColor, textAlign: 'center', margin: 0, padding: '0 40px' }}>
-            {shopName}
+        <h1
+          style={{
+            fontSize: 80,
+            fontWeight: 700,
+            color: textColor,
+            textAlign: 'center',
+            margin: 0,
+            padding: '0 40px',
+          }}
+        >
+          {shopName}
         </h1>
       </div>
     ),
     {
       width: 1200,
       height: 630,
+      fonts: fontData
+        ? [
+            {
+              name: fontName,
+              data: fontData,
+              style: 'normal',
+              weight: 700,
+            },
+          ]
+        : undefined,
     }
   );
 }

@@ -1,5 +1,6 @@
 import { ImageResponse } from 'next/og';
 import { createAdminClient } from '@/utils/supabase/server';
+import { loadGoogleFont } from '@/lib/og-utils';
 
 export const runtime = 'edge';
 
@@ -19,12 +20,37 @@ export async function GET(request: Request) {
     // We select theme_config specifically as requested
     const { data: profile } = await supabase
       .from('profiles')
-      .select('id, shop_name, avatar_url, theme_config')
+      .select('id, shop_name, avatar_url, theme_config, is_pro')
       .eq('username', username)
       .single();
 
     if (!profile) {
       return new Response('Profile not found', { status: 404 });
+    }
+
+    const defaultImage = (
+      <div
+        style={{
+          fontSize: 60,
+          background: 'black',
+          color: 'white',
+          width: '100%',
+          height: '100%',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+        }}
+      >
+        BlueShocks
+      </div>
+    );
+
+    // Free version fallback
+    if (!profile.is_pro) {
+      return new ImageResponse(defaultImage, {
+        width: 1200,
+        height: 630,
+      });
     }
 
     // 2. Extract Data
@@ -45,6 +71,10 @@ export async function GET(request: Request) {
 
     // Avatar
     const avatarUrl = profile.avatar_url;
+
+    // Fonts
+    const fontName = themeConfig.fonts?.heading || themeConfig.font || 'Inter';
+    const fontData = await loadGoogleFont(fontName);
 
     // Estilos comunes para la imagen
     const imageStyle = {
@@ -67,7 +97,7 @@ export async function GET(request: Request) {
             alignItems: 'center',
             justifyContent: 'center',
             backgroundColor: bgColor,
-            fontFamily: 'sans-serif',
+            fontFamily: fontName,
           }}
         >
           {/* 1. FOTO / AVATAR */}
@@ -100,7 +130,7 @@ export async function GET(request: Request) {
             style={{
               fontSize: 70,
               color: textColor,
-              fontWeight: 900,
+              fontWeight: 700,
               textAlign: 'center',
               textShadow: '0 4px 12px rgba(0,0,0,0.4)', // Soft shadow to ensure readability on any bg
               padding: '0 40px',
@@ -114,6 +144,16 @@ export async function GET(request: Request) {
       {
         width: 1200,
         height: 630,
+        fonts: fontData
+          ? [
+              {
+                name: fontName,
+                data: fontData,
+                style: 'normal',
+                weight: 700,
+              },
+            ]
+          : undefined,
       }
     );
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
