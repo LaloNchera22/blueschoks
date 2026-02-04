@@ -76,6 +76,23 @@ export default function StoreClient({ profile, products, config }: StoreClientPr
 
   const socialLinks = Array.isArray(config?.socialLinks) ? config.socialLinks.filter(l => l.active) : []
 
+  // FIX: Sync Card Roundness from legacy theme_config
+  // The editor saves borderRadius at the top level in some versions, or the sanitizer misses it.
+  const patchedConfig = useMemo(() => {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const rawTheme = profile.theme_config as any;
+    // Extract exactly as requested: const cardRadius = profile.theme_config?.borderRadius || '24px';
+    const cardRadius = rawTheme?.borderRadius || '24px';
+
+    return {
+      ...config,
+      cardStyle: {
+        ...config.cardStyle,
+        borderRadius: cardRadius
+      }
+    };
+  }, [config, profile.theme_config]);
+
   useEffect(() => {
     // UNLOCK BODY FOR PUBLIC STORE NATURAL SCROLL
     document.body.style.setProperty('overflow', 'auto', 'important')
@@ -230,7 +247,7 @@ export default function StoreClient({ profile, products, config }: StoreClientPr
                         <ProductCard
                           key={product.id}
                           product={product}
-                          config={config}
+                          config={patchedConfig}
                           onAddToCart={addToCart} // ✅ Pasamos la función como prop
                         />
                       ))}

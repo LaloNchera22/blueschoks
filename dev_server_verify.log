@@ -2,7 +2,31 @@
 > blueshock@0.1.0 dev
 > next dev
 
-⨯ Failed to load next.config.ts, see more info here https://nextjs.org/docs/messages/next-config-error
-TypeError: Cannot read properties of undefined (reading 'replace')
-    at Object.<anonymous> (next.config.compiled.js:16:64)
+▲ Next.js 16.1.6 (Turbopack)
+- Local:         http://localhost:3000
+- Network:       http://192.168.0.2:3000
+- Experiments (use with caution):
+  · serverActions
+
+✓ Starting...
+⚠ The "middleware" file convention is deprecated. Please use "proxy" instead. Learn more: https://nextjs.org/docs/messages/middleware-to-proxy
+✓ Ready in 1262ms
+○ Compiling /test-fix ...
+ GET /test-fix 200 in 10.0s (compile: 8.5s, proxy.ts: 252ms, render: 1257ms)
+SUPABASE_SERVICE_ROLE_KEY is missing. Falling back to ANON_KEY. This may cause 404s if RLS is strict.
+SUPABASE_SERVICE_ROLE_KEY is missing. Falling back to ANON_KEY. This may cause 404s if RLS is strict.
+Buscando usuario: placeholder.png
+Error de DB (profile): {
+  message: 'TypeError: fetch failed',
+  details: 'TypeError: fetch failed\n' +
+    '\n' +
+    'Caused by: Error: getaddrinfo ENOTFOUND example.supabase.co (ENOTFOUND)\n' +
+    'Error: getaddrinfo ENOTFOUND example.supabase.co\n' +
+    '    at GetAddrInfoReqWrap.onlookupall [as oncomplete] (node:dns:122:26)\n' +
+    '    at GetAddrInfoReqWrap.callbackTrampoline (node:internal/async_hooks:130:17)',
+  hint: '',
+  code: ''
+}
+ GET /placeholder.png 200 in 4.0s (compile: 3.8s, render: 201ms)
+⨯ The requested resource isn't a valid image for /placeholder.png received null
 [?25h
