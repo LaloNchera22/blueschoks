@@ -101,7 +101,10 @@ export default function StoreClient({ profile, products, config }: StoreClientPr
       <FontLoaderListener config={config} products={products} />
 
       {/* Background Image Layer */}
-      {config.backgroundImage && (
+      {/* DEFENSIVE RENDERING: Only render if valid string URL */}
+      {config.backgroundImage &&
+       typeof config.backgroundImage === 'string' &&
+       config.backgroundImage.startsWith('http') && (
         <div className="absolute inset-0 z-0 pointer-events-none">
            <Image
               src={config.backgroundImage}
