@@ -15,6 +15,7 @@ export default function CreateProductForm({ isPro = false, productCount = 0 }: {
   const router = useRouter()
   const [isLoading, setIsLoading] = useState(false)
   const [previews, setPreviews] = useState<{url: string, type: string}[]>([])
+  const [files, setFiles] = useState<File[]>([])
   const fileInputRef = useRef<HTMLInputElement>(null)
 
   const isProductLimitReached = !isPro && productCount >= 3;
@@ -50,22 +51,30 @@ export default function CreateProductForm({ isPro = false, productCount = 0 }: {
   }
 
   const handleFiles = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const files = Array.from(e.target.files || [])
+    const newFiles = Array.from(e.target.files || [])
 
     // Validación Plan
-    if (!isPro && (previews.length + files.length) > 3) {
+    if (!isPro && (files.length + newFiles.length) > 3) {
       alert("⚠️ Plan Gratuito: Máximo 3 fotos. Actualiza a PRO para ilimitadas.")
       return
     }
 
-    const newPreviews = files.map(file => ({
+    const newPreviews = newFiles.map(file => ({
       url: URL.createObjectURL(file),
       type: file.type
     }))
+
+    setFiles(prev => [...prev, ...newFiles])
     setPreviews(prev => [...prev, ...newPreviews])
+
+    // Resetear input para permitir subir el mismo archivo de nuevo si se borra
+    if (fileInputRef.current) {
+        fileInputRef.current.value = ""
+    }
   }
 
   const removeFile = (index: number) => {
+    setFiles(prev => prev.filter((_, i) => i !== index))
     setPreviews(prev => prev.filter((_, i) => i !== index))
   }
 
@@ -154,13 +163,28 @@ export default function CreateProductForm({ isPro = false, productCount = 0 }: {
                                     onClick={() => fileInputRef.current?.click()}
                                     className="aspect-square bg-white border-2 border-dashed border-slate-300 rounded-2xl flex flex-col items-center justify-center cursor-pointer hover:border-blue-500 hover:bg-blue-50/30 transition-all group"
                                 >
-                                    <input ref={fileInputRef} type="file" name="files" multiple accept={isPro ? "image/*,video/*" : "image/*"} className="hidden" onChange={handleFiles} />
+                                    <input ref={fileInputRef} type="file" multiple accept={isPro ? "image/*,video/*" : "image/*"} className="hidden" onChange={handleFiles} />
                                     <div className="bg-slate-50 p-3 rounded-full mb-3 group-hover:scale-110 transition-transform group-hover:bg-blue-100">
                                         <UploadCloud className="text-slate-400 group-hover:text-blue-600" size={24} />
                                     </div>
                                     <span className="text-xs font-bold text-slate-500 group-hover:text-blue-600">Subir Archivos</span>
                                 </div>
                             )}
+
+                            {/* Hidden Input for Data Transfer */}
+                            <input
+                                type="file"
+                                name="files"
+                                multiple
+                                className="hidden"
+                                ref={input => {
+                                    if (input) {
+                                        const dataTransfer = new DataTransfer();
+                                        files.forEach(file => dataTransfer.items.add(file));
+                                        input.files = dataTransfer.files;
+                                    }
+                                }}
+                            />
 
                             {/* Previews */}
                             {previews.map((file, i) => (
