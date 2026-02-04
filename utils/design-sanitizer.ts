@@ -104,7 +104,9 @@ export function sanitizeDesign(raw: any, profileFallback?: any): DesignConfig {
       buttonStyle: (['floating', 'fixed'].includes(raw.checkout?.buttonStyle)) ? raw.checkout.buttonStyle : DEFAULT_DESIGN.checkout.buttonStyle,
     },
     cardStyle: {
-      borderRadius: typeof raw.cardStyle?.borderRadius === 'number' ? raw.cardStyle.borderRadius : DEFAULT_DESIGN.cardStyle.borderRadius,
+      borderRadius: (typeof raw.cardStyle?.borderRadius === 'number' || typeof raw.cardStyle?.borderRadius === 'string')
+        ? raw.cardStyle.borderRadius
+        : DEFAULT_DESIGN.cardStyle.borderRadius,
       buttonColor: typeof raw.cardStyle?.buttonColor === 'string' ? raw.cardStyle.buttonColor : DEFAULT_DESIGN.cardStyle.buttonColor,
       buttonTextColor: typeof raw.cardStyle?.buttonTextColor === 'string' ? raw.cardStyle.buttonTextColor : DEFAULT_DESIGN.cardStyle.buttonTextColor,
       priceColor: typeof raw.cardStyle?.priceColor === 'string' ? raw.cardStyle.priceColor : DEFAULT_DESIGN.cardStyle.priceColor,

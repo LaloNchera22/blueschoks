@@ -40,6 +40,24 @@ export async function saveDesignConfigAction(config: DesignConfig) {
     throw new Error('No autorizado');
   }
 
+  // --- CRITICAL SANITIZATION START ---
+  // Ensure backgroundImage is a valid string URL or null.
+  if (config.backgroundImage && (typeof config.backgroundImage !== 'string' || !config.backgroundImage.startsWith('http'))) {
+    console.warn('⚠️ Sanitized invalid backgroundImage:', config.backgroundImage);
+    config.backgroundImage = undefined;
+  }
+
+  // Ensure borderRadius is safe
+  if (config.cardStyle) {
+    const r = config.cardStyle.borderRadius;
+    // If it's not a number and not a string, or if it's an object/array, reset it.
+    if (typeof r !== 'number' && typeof r !== 'string') {
+        console.warn('⚠️ Sanitized invalid borderRadius:', r);
+        config.cardStyle.borderRadius = 16;
+    }
+  }
+  // --- CRITICAL SANITIZATION END ---
+
   // Use Admin Client to bypass potential RLS issues
   const adminSupabase = await createAdminClient();
   const { error } = await adminSupabase
@@ -47,7 +65,7 @@ export async function saveDesignConfigAction(config: DesignConfig) {
     .update({
       theme_config: config,
       design_config: null,
-      background_image: config.backgroundImage || null,
+      background_image: typeof config.backgroundImage === 'string' ? config.backgroundImage : null,
       avatar_border_color: config.profile.avatarBorderColor || null
     })
     .eq('id', user.id);

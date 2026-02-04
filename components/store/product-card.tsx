@@ -125,6 +125,15 @@ export function ProductCard({ product, config, onSelectElement, onProductClick, 
       shadow: true,
       opacity: 1
   }
+
+  // FIX CRÍTICO: Asegurar que borderRadius sea seguro (num o string) y no un objeto/array
+  const safeBorderRadius = useMemo(() => {
+     const val = cardStyle.borderRadius;
+     if (typeof val === 'number') return val;
+     if (typeof val === 'string' && val.trim().length > 0) return val;
+     return 16;
+  }, [cardStyle.borderRadius]);
+
   const globalColors = config?.colors || { cardBackground: '#ffffff', text: '#1f2937' }
 
   // Helper para convertir Hex a RGBA
@@ -198,7 +207,7 @@ export function ProductCard({ product, config, onSelectElement, onProductClick, 
         `}
         style={{
           backgroundColor: cardBg,
-          borderRadius: cardStyle.borderRadius ?? 16,
+          borderRadius: safeBorderRadius,
           border: isCardTransparent ? 'none' : `1px solid ${style.borderColor || 'rgba(0,0,0,0.05)'}`
         }}
         onClick={handleCardClick}
@@ -206,7 +215,7 @@ export function ProductCard({ product, config, onSelectElement, onProductClick, 
         {/* --- ZONA IMAGEN (CARRUSEL) --- */}
         <div
           className={`relative w-full aspect-square bg-gray-100 overflow-hidden transition-all ${
-            (style.imageShape === 'square' || (cardStyle.borderRadius ?? 16) === 0) ? 'rounded-none' : 'rounded-xl'
+            (style.imageShape === 'square' || safeBorderRadius === 0 || safeBorderRadius === '0px') ? 'rounded-none' : 'rounded-xl'
           }`}
           onTouchStart={onTouchStart}
           onTouchMove={onTouchMove}

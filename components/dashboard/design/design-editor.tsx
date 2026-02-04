@@ -205,13 +205,25 @@ export default function DesignEditor({ initialConfig, initialProducts, userId, s
   const handleSave = async () => {
     setIsSaving(true);
     try {
+      // SANEAMIENTO PREVIO (Client-Side)
+      const cleanConfig = { ...config };
+
+      // Validación estricta de imagen de fondo
+      if (cleanConfig.backgroundImage &&
+          (typeof cleanConfig.backgroundImage !== 'string' || !cleanConfig.backgroundImage.startsWith('http'))) {
+         console.warn("⚠️ Detectado objeto inválido en backgroundImage. Limpiando antes de guardar.");
+         cleanConfig.backgroundImage = undefined;
+         // Opcional: Avisar al usuario
+         toast.error("Error en imagen de fondo. Se ha eliminado para evitar errores.");
+      }
+
       const productUpdates = products.map(p => ({
         id: p.id,
         style_config: (p.style_config as ProductStyle) || {}
       }));
 
       // 1. Save Design (Server Action - Admin Client)
-      await saveDesignConfigAction(config);
+      await saveDesignConfigAction(cleanConfig);
 
       // 2. Save Products (Separate action)
       let productsResult: any = { success: true };
