@@ -237,17 +237,23 @@ export default function DesignEditor({ initialConfig, initialProducts, userId, s
       }
 
       // 2. Preparar JSON Limpio (Sanitización Estricta)
+      // Fix: Extract radius to inject as flat property for Store Client compatibility
+      const radiusRaw = config.cardStyle?.borderRadius;
+      let finalRadius = '16px';
+
+      if (typeof radiusRaw === 'number') {
+          finalRadius = `${radiusRaw}px`;
+      } else if (typeof radiusRaw === 'string' && radiusRaw.trim() !== '') {
+          finalRadius = radiusRaw;
+      }
+
       const cleanConfig = {
         ...config,
         backgroundImage: bgUrl, // URL string
+        borderRadius: finalRadius, // <--- INYECCIÓN DIRECTA (Solución Slider)
         cardStyle: {
             ...config.cardStyle,
-            // Convertir a string CSS explícito si es número
-            borderRadius: config.cardStyle?.borderRadius
-                ? (typeof config.cardStyle.borderRadius === 'number'
-                    ? `${config.cardStyle.borderRadius}px`
-                    : config.cardStyle.borderRadius)
-                : '16px'
+            borderRadius: finalRadius
         }
       };
 
