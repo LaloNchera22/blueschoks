@@ -72,6 +72,7 @@ export interface SocialStyle {
 }
 
 export interface DesignConfig {
+  borderRadius?: string | number;
   backgroundImage?: string;
   backgroundOpacity?: number;
   colors: {
