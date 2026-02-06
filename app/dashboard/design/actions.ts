@@ -3,6 +3,7 @@
 import { createClient, createAdminClient } from '@/utils/supabase/server';
 import { revalidatePath } from 'next/cache';
 import { DesignConfig } from '@/lib/types/design-system';
+import { sanitizeDesign } from '@/utils/design-sanitizer';
 
 export async function getDesignConfigAction() {
   const supabase = await createClient();
@@ -41,20 +42,14 @@ export async function saveDesignConfigAction(config: DesignConfig) {
   }
 
   // --- CRITICAL SANITIZATION START ---
-  // Ensure backgroundImage is a valid string URL or null.
-  if (config.backgroundImage && (typeof config.backgroundImage !== 'string' || !config.backgroundImage.startsWith('http'))) {
-    console.warn('⚠️ Sanitized invalid backgroundImage:', config.backgroundImage);
-    config.backgroundImage = undefined;
-  }
+  // We strictly sanitize the incoming config to ensure no junk data or huge payloads
+  // pollute the database or cause revalidation crashes.
+  const sanitizedConfig = sanitizeDesign(config);
 
-  // Ensure borderRadius is safe
-  if (config.cardStyle) {
-    const r = config.cardStyle.borderRadius;
-    // If it's not a number and not a string, or if it's an object/array, reset it.
-    if (typeof r !== 'number' && typeof r !== 'string') {
-        console.warn('⚠️ Sanitized invalid borderRadius:', r);
-        config.cardStyle.borderRadius = 16;
-    }
+  // Explicit check for background image safety (redundant but safe)
+  if (sanitizedConfig.backgroundImage && (typeof sanitizedConfig.backgroundImage !== 'string' || !sanitizedConfig.backgroundImage.startsWith('http'))) {
+    console.warn('⚠️ Sanitized invalid backgroundImage:', sanitizedConfig.backgroundImage);
+    sanitizedConfig.backgroundImage = undefined;
   }
   // --- CRITICAL SANITIZATION END ---
 
@@ -63,11 +58,11 @@ export async function saveDesignConfigAction(config: DesignConfig) {
   const { error } = await adminSupabase
     .from('profiles')
     .update({
-      shop_name: config.profile?.shopName,
-      theme_config: config,
+      shop_name: sanitizedConfig.profile.shopName,
+      theme_config: sanitizedConfig,
       design_config: null,
-      background_image: config.backgroundImage || null,
-      avatar_border_color: config.profile?.avatarBorderColor || null
+      background_image: sanitizedConfig.backgroundImage || null,
+      avatar_border_color: sanitizedConfig.profile.avatarBorderColor || null
     })
     .eq('id', user.id);
 
@@ -76,9 +71,14 @@ export async function saveDesignConfigAction(config: DesignConfig) {
     throw new Error('Error al guardar el diseño');
   }
 
-  revalidatePath('/dashboard/design');
-  revalidatePath('/[slug]', 'page');
-  revalidatePath('/', 'layout');
+  try {
+    revalidatePath('/dashboard/design');
+    revalidatePath('/[slug]', 'page');
+    revalidatePath('/', 'layout');
+  } catch (e) {
+    console.warn("⚠️ Error revalidating paths (non-critical):", e);
+    // We do NOT throw here, as the save was successful.
+  }
 
   return { success: true };
 }
