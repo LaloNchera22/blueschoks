@@ -17,7 +17,6 @@ import { updateProductStyle, applyStyleToAllProducts, saveProductStylesBulk } fr
 import { Database } from '@/utils/supabase/types';
 import { DEFAULT_DESIGN, sanitizeDesign } from '@/utils/design-sanitizer';
 import { getDesignConfigAction, saveDesignConfigAction } from '@/app/dashboard/design/actions';
-import { saveDesignAction } from '@/app/actions/save-design';
 
 // Components
 import { StorePreview } from './store-preview';
@@ -260,7 +259,7 @@ export default function DesignEditor({ initialConfig, initialProducts, userId, s
 
       // 3. Guardar usando Server Action IMPORTADA
       // (Supabase Client solo para uploads, Action para DB)
-      await saveDesignAction(null, cleanConfig);
+      await saveDesignConfigAction(cleanConfig);
 
       // 4. Save Products Styles (si aplica)
       const productUpdates = products.map(p => ({

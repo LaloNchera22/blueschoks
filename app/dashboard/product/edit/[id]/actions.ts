@@ -64,7 +64,7 @@ export async function updateProduct(productId: string, prevState: State, formDat
             name,
             price: parseFloat(priceRaw),
             description,
-            media: finalMedia,
+            images: finalMedia,
             image_url: finalMedia[0] || null,
             updated_at: new Date().toISOString()
         })
