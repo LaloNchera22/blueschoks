@@ -65,7 +65,9 @@ export async function saveDesignConfigAction(config: DesignConfig) {
     .update({
       shop_name: config.profile?.shopName,
       theme_config: config,
-      design_config: null
+      design_config: null,
+      background_image: config.backgroundImage || null,
+      avatar_border_color: config.profile?.avatarBorderColor || null
     })
     .eq('id', user.id);
 
