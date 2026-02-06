@@ -53,9 +53,8 @@ export async function saveDesignConfigAction(config: DesignConfig) {
   }
   // --- CRITICAL SANITIZATION END ---
 
-  // Use Admin Client to bypass potential RLS issues
-  const adminSupabase = await createAdminClient();
-  const { error } = await adminSupabase
+  // Use authenticated client to ensure RLS compliance and user context
+  const { error } = await supabase
     .from('profiles')
     .update({
       shop_name: sanitizedConfig.profile.shopName,
@@ -67,7 +66,7 @@ export async function saveDesignConfigAction(config: DesignConfig) {
 
   if (error) {
     console.error('Error saving design config:', error);
-    throw new Error('Error al guardar el diseño');
+    throw new Error(`Error al guardar el diseño: ${error.message}`);
   }
 
   try {
