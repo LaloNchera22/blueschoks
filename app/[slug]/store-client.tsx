@@ -76,23 +76,6 @@ export default function StoreClient({ profile, products, config }: StoreClientPr
 
   const socialLinks = Array.isArray(config?.socialLinks) ? config.socialLinks.filter(l => l.active) : []
 
-  // FIX: Sync Card Roundness from legacy theme_config
-  // The editor saves borderRadius at the top level in some versions, or the sanitizer misses it.
-  const patchedConfig = useMemo(() => {
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const rawTheme = profile.theme_config as any;
-    // Extract exactly as requested: const cardRadius = profile.theme_config?.borderRadius || '24px';
-    const cardRadius = rawTheme?.borderRadius || '24px';
-
-    return {
-      ...config,
-      cardStyle: {
-        ...config.cardStyle,
-        borderRadius: cardRadius
-      }
-    };
-  }, [config, profile.theme_config]);
-
   // REMOVED useEffect for Body Scroll Lock Hack - we now use a dedicated scroll container
 
   return (
@@ -245,7 +228,7 @@ export default function StoreClient({ profile, products, config }: StoreClientPr
                               <ProductCard
                                 key={product.id}
                                 product={product}
-                                config={patchedConfig}
+                                config={config}
                                 onAddToCart={addToCart}
                               />
                             ))}
