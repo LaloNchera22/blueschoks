@@ -22,7 +22,7 @@ export function Hero() {
         </p>
 
         {/* Input Component */}
-        <div className="w-full mb-2">
+        <div className="w-full mb-6">
             <HeroUrlClaimer />
         </div>
 
