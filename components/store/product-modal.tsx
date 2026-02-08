@@ -96,7 +96,7 @@ export function ProductModal({
 
   return (
     <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
-      <DialogContent className="max-w-4xl p-0 overflow-hidden bg-white gap-0 border-none sm:rounded-2xl md:h-[600px] h-[90vh] flex flex-col md:flex-row">
+      <DialogContent className="max-w-4xl p-0 overflow-hidden bg-white gap-0 border-none sm:rounded-2xl md:h-[600px] h-[90vh] flex flex-col md:flex-row [&>button:last-child]:hidden">
         {/* Hidden Accessibility Title */}
         <DialogTitle className="sr-only">
           {product.name}
@@ -104,6 +104,17 @@ export function ProductModal({
         <DialogDescription className="sr-only">
           Detalles del producto {product.name}
         </DialogDescription>
+
+        <Button
+          onClick={onClose}
+          className="absolute right-4 top-4 z-50 w-10 h-10 rounded-xl shadow-md transition-transform active:scale-[0.98] p-0 flex items-center justify-center"
+          style={{
+            backgroundColor: btnBg,
+            color: btnColor
+          }}
+        >
+          <X size={20} />
+        </Button>
 
         {/* --- LEFT: CAROUSEL --- */}
         <div
