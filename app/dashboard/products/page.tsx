@@ -35,7 +35,7 @@ export default async function ProductsPage({
   const totalPages = count ? Math.ceil(count / ITEMS_PER_PAGE) : 0
 
   return (
-    <div className="p-4 md:p-12 w-full max-w-7xl mx-auto flex flex-col h-[calc(100dvh_-_80px)] md:h-auto md:block space-y-4 md:space-y-10">
+    <div className="p-4 md:p-12 w-full max-w-7xl mx-auto flex flex-col min-h-[calc(100dvh_-_80px)] md:block space-y-4 md:space-y-10 pb-24">
       
       {/* HEADER */}
       <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 border-b border-slate-200/60 pb-6">
