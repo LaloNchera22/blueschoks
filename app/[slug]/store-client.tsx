@@ -130,7 +130,7 @@ export default function StoreClient({ profile, products, config }: StoreClientPr
 
                       {/* AVATAR */}
                       {profile.is_pro && (
-                        <div className="flex justify-center mb-6">
+                        <div className="flex justify-center mb-4">
                           <div
                             className={cn(
                               "relative w-32 h-32 overflow-hidden ring-2 ring-offset-2",
@@ -156,6 +156,14 @@ export default function StoreClient({ profile, products, config }: StoreClientPr
                           </div>
                         </div>
                       )}
+
+                      {/* SHOP NAME */}
+                      <h1
+                        className="text-2xl font-bold text-neutral-900 tracking-tight mb-6"
+                        style={getTextStyle('title') as React.CSSProperties}
+                      >
+                          {config.profile.shopName || 'Mi Tienda'}
+                      </h1>
 
                       {/* SOCIALS */}
                       {socialLinks.length > 0 && (
@@ -195,14 +203,6 @@ export default function StoreClient({ profile, products, config }: StoreClientPr
                             })}
                         </div>
                       )}
-
-                      {/* SHOP NAME */}
-                      <h1
-                        className="text-2xl font-bold text-neutral-900 tracking-tight mb-3"
-                        style={getTextStyle('title') as React.CSSProperties}
-                      >
-                          {config.profile.shopName || 'Mi Tienda'}
-                      </h1>
 
                       {/* BIO */}
                       {config.profile.bio && config.profile.bio.trim().length > 0 && (
