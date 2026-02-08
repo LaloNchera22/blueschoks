@@ -26,7 +26,7 @@ export default function DashboardLayoutClient({
   const isDesignPage = pathname?.startsWith("/dashboard/design")
 
   return (
-    <div className="flex h-screen w-full bg-slate-50 overflow-hidden">
+    <div className="flex h-[100dvh] w-full bg-slate-50 overflow-hidden">
       <AppSidebar
         shopUrl={shopUrl}
         userEmail={userEmail}
