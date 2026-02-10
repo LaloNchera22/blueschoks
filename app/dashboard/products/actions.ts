@@ -49,19 +49,9 @@ export async function createProduct(formData: FormData) {
   
   // Calcular total de archivos (Viejos + Nuevos que tengan tamaño > 0)
   const validNewFiles = newFiles.filter(f => f.size > 0)
-  const totalFilesCount = existingMedia.length + validNewFiles.length
 
   // --- REGLAS DE NEGOCIO (MEDIA) ---
-  if (!isPro) {
-    if (totalFilesCount > 3) {
-      throw new Error(`El plan gratuito permite 3 fotos. Tienes ${totalFilesCount}.`)
-    }
-    const hasVideo = validNewFiles.some(f => f.type.startsWith('video/'))
-    // Nota: También deberíamos checar si existingMedia tiene videos, pero asumimos que ya pasaron el filtro antes.
-    if (hasVideo) {
-      throw new Error("Los videos son exclusivos del plan PRO.")
-    }
-  }
+  // Limits removed for photos and videos
 
   // 5. Subir Archivos NUEVOS a Supabase Storage
   const uploadPromises = validNewFiles.map(async (file, index) => {

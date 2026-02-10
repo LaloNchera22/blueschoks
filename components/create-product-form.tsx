@@ -65,11 +65,7 @@ export default function CreateProductForm({ isPro = false, productCount = 0 }: {
   const handleFiles = (e: React.ChangeEvent<HTMLInputElement>) => {
     const newFiles = Array.from(e.target.files || [])
 
-    // Validación Plan
-    if (!isPro && (files.length + newFiles.length) > 3) {
-      alert("⚠️ Plan Gratuito: Máximo 3 fotos. Actualiza a PRO para ilimitadas.")
-      return
-    }
+    // Validación Plan (Removed)
 
     const newPreviews = newFiles.map(file => ({
       url: URL.createObjectURL(file),
@@ -154,9 +150,6 @@ export default function CreateProductForm({ isPro = false, productCount = 0 }: {
     setIsLoading(false)
   }
 
-  const usageCount = previews.length
-  const isLimitReached = !isPro && usageCount >= 3
-
   return (
     <div className="max-w-5xl mx-auto">
       <form action={handleSubmit}>
@@ -207,28 +200,21 @@ export default function CreateProductForm({ isPro = false, productCount = 0 }: {
                             <Label className="text-xs font-bold text-slate-500 uppercase tracking-widest flex items-center gap-2">
                                 <ImageIcon size={14} /> Multimedia
                             </Label>
-                            {!isPro && (
-                                <span className={`text-[10px] font-bold px-2 py-1 rounded-md ${isLimitReached ? 'bg-red-100 text-red-600' : 'bg-slate-200 text-slate-600'}`}>
-                                    {usageCount} / 3 Free
-                                </span>
-                            )}
                         </div>
 
                         {/* Grid de Fotos Grande */}
                         <div className="grid grid-cols-2 gap-4">
                             {/* Botón Upload Grande */}
-                            {(!isLimitReached || isPro) && (
-                                <div
-                                    onClick={() => fileInputRef.current?.click()}
-                                    className="aspect-square bg-white border-2 border-dashed border-slate-300 rounded-2xl flex flex-col items-center justify-center cursor-pointer hover:border-blue-500 hover:bg-blue-50/30 transition-all group"
-                                >
-                                    <input ref={fileInputRef} type="file" multiple accept={isPro ? "image/*,video/*" : "image/*"} className="hidden" onChange={handleFiles} />
-                                    <div className="bg-slate-50 p-3 rounded-full mb-3 group-hover:scale-110 transition-transform group-hover:bg-blue-100">
-                                        <UploadCloud className="text-slate-400 group-hover:text-blue-600" size={24} />
-                                    </div>
-                                    <span className="text-xs font-bold text-slate-500 group-hover:text-blue-600">Subir Archivos</span>
+                            <div
+                                onClick={() => fileInputRef.current?.click()}
+                                className="aspect-square bg-white border-2 border-dashed border-slate-300 rounded-2xl flex flex-col items-center justify-center cursor-pointer hover:border-blue-500 hover:bg-blue-50/30 transition-all group"
+                            >
+                                <input ref={fileInputRef} type="file" multiple accept="image/*,video/*" className="hidden" onChange={handleFiles} />
+                                <div className="bg-slate-50 p-3 rounded-full mb-3 group-hover:scale-110 transition-transform group-hover:bg-blue-100">
+                                    <UploadCloud className="text-slate-400 group-hover:text-blue-600" size={24} />
                                 </div>
-                            )}
+                                <span className="text-xs font-bold text-slate-500 group-hover:text-blue-600">Subir Archivos</span>
+                            </div>
 
                             {/* Hidden Input for Data Transfer */}
                             <input
