@@ -35,7 +35,7 @@ export function UnifyFinances() {
           </motion.button>
         </div>
 
-        <div className="relative h-[600px] w-full flex items-center justify-center perspective-1000">
+        <div className="relative h-[600px] w-full flex items-center justify-center [perspective:1000px]">
            {/* Card 1: Balance (Background) */}
            <motion.div
              initial={{ opacity: 0, y: 100, rotate: -10, scale: 0.9 }}
